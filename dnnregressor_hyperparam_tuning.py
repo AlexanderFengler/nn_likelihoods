@@ -112,7 +112,7 @@ def run_training(hyper_params = [],
 
             # Printing some info
             print('Start training of model ' + str(i) + ' with n_training_steps: ' + str(n_training_steps))
-            
+
             # Store hyper_parameters into our model parameter dictionary
             model_params = {
                 'feature_columns': feature_columns,
@@ -206,7 +206,7 @@ def run_training(hyper_params = [],
                     writer.writerow(current_eval_data)
             new_metric = evaluation_metrics_test[model_params['loss_fn']]
             cnt += 1
-            print('Trained model with hyperparameters: ' + current_eval_data)
+            print('Trained model with hyperparameters: ' + str(current_eval_data))
 
 # MAKE EXECUTABLE FROM COMMAND LINE
 if __name__ == "__main__":
