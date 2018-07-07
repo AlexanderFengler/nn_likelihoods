@@ -19,7 +19,7 @@ import make_data_wfpt as mdw
 cwd = os.getcwd()
 
 # Suppressing tensorflow output to keep things clean at this point
-tf.logging.set_verbosity(tf.logging.INFO) # could be tf.logging.ERROR, tf.logging.INFO, tf.logging.DEBUG, tf.logging.FATAL, tf.logging.WARN ....
+tf.logging.set_verbosity(tf.logging.ERROR) # could be tf.logging.ERROR, tf.logging.INFO, tf.logging.DEBUG, tf.logging.FATAL, tf.logging.WARN ....
 
 # Function that sets up a csv file with headers in which
 # we collect training results for models under consideration
@@ -96,11 +96,13 @@ def run_training(hyper_params = [],
                  training_labels = [],
                  feature_columns = [],
                  model_directory = '...',
-                 max_epoch = 100000):
+                 max_epoch = 100000,
+                 print_info = True):
     # Training loop (instead of nested for loops, for loops through panda rows?!)
     max_idx = hyper_params.shape[0]
     cnt = 0
     for i in range(0, max_idx, 1):
+
         old_metric = 10000000
         new_metric = 10000000 - 1
         n_training_steps = 1000
@@ -108,6 +110,9 @@ def run_training(hyper_params = [],
             n_training_steps  = n_training_steps * 2
             old_metric = new_metric
 
+            # Printing some info
+            print('Start training of model ' + str(i) + ' with n_training_steps: ' + str(n_training_steps))
+            
             # Store hyper_parameters into our model parameter dictionary
             model_params = {
                 'feature_columns': feature_columns,
@@ -201,6 +206,7 @@ def run_training(hyper_params = [],
                     writer.writerow(current_eval_data)
             new_metric = evaluation_metrics_test[model_params['loss_fn']]
             cnt += 1
+            print('Trained model with hyperparameters: ' + current_eval_data)
 
 # MAKE EXECUTABLE FROM COMMAND LINE
 if __name__ == "__main__":
@@ -281,7 +287,8 @@ if __name__ == "__main__":
                  training_labels = train_labels,
                  feature_columns = feature_columns,
                  model_directory = model_directory,
-                 max_epoch = 100000)
+                 max_epoch = 100000,
+                 print_info = True)
 
     # Get the best hyperparameters for further consideration
     best_hyperparams_mse = get_best_hyperparams(n_models_to_consider = 10,
@@ -304,7 +311,8 @@ if __name__ == "__main__":
                  training_features = train_features,
                  training_labels = train_labels,
                  feature_columns = feature_columns,
-                 model_directory = model_directory)
+                 model_directory = model_directory,
+                 print_info = True)
 
     # Best models mae
     run_training(hyper_params = best_hyperparams_mae,
@@ -313,4 +321,5 @@ if __name__ == "__main__":
                  training_features = train_features,
                  training_labels = train_labels,
                  feature_columns = feature_columns,
-                 model_directory = model_directory)
+                 model_directory = model_directory,
+                 print_info = True)
