@@ -111,7 +111,7 @@ def run_training(hyper_params = [],
             old_metric = new_metric
 
             # Printing some info
-            print('Start training of model ' + str(i) + ' with n_training_steps: ' + str(n_training_steps))
+            print('Start training of model ' + str(i) + ' of ' + str(max_idx) + ' with n_training_steps: ' + str(n_training_steps))
 
             # Store hyper_parameters into our model parameter dictionary
             model_params = {
