@@ -251,12 +251,12 @@ if __name__ == "__main__":
     # Hyperparameters under consideration
     hyp_hidden_units = [[i, j] for i in [100, 300, 500] for j in [300]]
     hyp_activations = [[i, j] for i in ['relu'] for j in ['relu']]
-    hyp_optimizer = ['momentum', 'sgd']  #['momentum', 'sgd'],
+    hyp_optimizer = ['momentum', 'adagrad']  #['momentum', 'sgd'],
     hyp_learning_rate = [0.01, 0.005, 0.001]  #  [0.001, 0.005, 0.01, 0.02]
     hyp_loss_fn = ['mse', 'mae']  #['mse', 'abs'],
-    hyp_l_1 =  [0.0, 0.5, 1]  # [0.0, 0.1, 1.0, 10.0]
-    hyp_l_2 =  [0.0, 0.5, 1]  # [0.0, 0.1, 0.5, 1.0]
-    hyp_batch_size = [2000, 5000]  #[1, 10, 100, 500, 1000, 10000]
+    hyp_l_1 =  [0.0, 0.5]  # [0.0, 0.1, 1.0, 10.0]
+    hyp_l_2 =  [0.0, 0.5]  # [0.0, 0.1, 0.5, 1.0]
+    hyp_batch_size = [1000, 10000]  #[1, 10, 100, 500, 1000, 10000]
 
     # Make table to hyperparameters that we consider in training (WRITE TO FILE)
     make_hyper_params_csv(hyp_hidden_units = hyp_hidden_units,
