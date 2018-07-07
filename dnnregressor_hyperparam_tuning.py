@@ -95,15 +95,16 @@ def run_training(hyper_params = [],
                  training_features = [],
                  training_labels = [],
                  feature_columns = [],
-                 model_directory = '...'):
+                 model_directory = '...',
+                 max_epoch = 100000):
     # Training loop (instead of nested for loops, for loops through panda rows?!)
     max_idx = hyper_params.shape[0]
     cnt = 0
     for i in range(0, max_idx, 1):
-        old_metric = np.inf
-        new_metric = np.inf
+        old_metric = 10000000
+        new_metric = 10000000 - 1
         n_training_steps = 1000
-        while new_metric <= old_metric:
+        while new_metric < old_metric and n_training_steps < ((training_labels.shape[0] / hyper_params['batch_size'][i]) * max_epoch):
             n_training_steps  = n_training_steps * 2
             old_metric = new_metric
 
@@ -279,7 +280,8 @@ if __name__ == "__main__":
                  training_features = train_features,
                  training_labels = train_labels,
                  feature_columns = feature_columns,
-                 model_directory = model_directory)
+                 model_directory = model_directory,
+                 max_epoch = 100000)
 
     # Get the best hyperparameters for further consideration
     best_hyperparams_mse = get_best_hyperparams(n_models_to_consider = 10,
