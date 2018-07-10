@@ -14,23 +14,23 @@ def cleaner(models = True,
         print('ok')
 
     if hyper_param_file:
-        #os.remove(cwd + '/hyper_parameters.csv')
+        os.remove(cwd + '/hyper_parameters.csv')
         print('ok')
 
     if train_data:
-        #os.remove(cwd + '/train_data*')
+        os.remove(cwd + '/train_data*')
         print('ok')
 
     if test_data:
-        #os.remove(cwd + '/test_data*')
+        os.remove(cwd + '/test_data*')
         print('ok')
 
     if results:
-        #os.remove(cwd + '/dnnregressor_result_table.csv')
+        os.remove(cwd + '/dnnregressor_result_table.csv')
         print('ok')
 
     if best_hyperparams:
-        #os.remove(cwd + '/best_hyperparams*')
+        os.remove(cwd + '/best_hyperparams*')
         print('ok')
     return
 
