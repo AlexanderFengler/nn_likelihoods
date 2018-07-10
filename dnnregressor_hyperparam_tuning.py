@@ -310,7 +310,7 @@ if __name__ == "__main__":
                  model_directory = model_directory,
                  max_epoch = 100,
                  print_info = True,
-                 min_training_steps = 1)
+                 min_training_steps = 100)
 
     # Get the best hyperparameters for further consideration
     best_hyperparams_mse = get_best_hyperparams(n_models_to_consider = 10,
