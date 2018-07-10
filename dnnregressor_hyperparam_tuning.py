@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 import scipy as scp
+import time
+from datetime import datetime
 import matplotlib.pyplot as plt
 import shutil
 import csv
@@ -19,7 +21,7 @@ import make_data_wfpt as mdw
 cwd = os.getcwd()
 
 # Suppressing tensorflow output to keep things clean at this point
-tf.logging.set_verbosity(tf.logging.ERROR) # could be tf.logging.ERROR, tf.logging.INFO, tf.logging.DEBUG, tf.logging.FATAL, tf.logging.WARN ....
+tf.logging.set_verbosity(tf.logging.INFO) # could be tf.logging.ERROR, tf.logging.INFO, tf.logging.DEBUG, tf.logging.FATAL, tf.logging.WARN ....
 
 # Function that sets up a csv file with headers in which
 # we collect training results for models under consideration
@@ -82,6 +84,8 @@ def get_best_hyperparams(n_models_to_consider = 10, # specify number of columns 
     model_results = model_results.loc[model_results['loss_fn'] == metric].copy()
     model_results = model_results.reset_index()
     model_results = model_results.sort_values(by = metric + '_test')
+    model_results = model_results.reset_index()
+
     if model_results.shape[0] < 10:
         n_models_to_consider = model_results.shape[0]
     return model_results.iloc[0:n_models_to_consider].copy()
@@ -97,21 +101,29 @@ def run_training(hyper_params = [],
                  feature_columns = [],
                  model_directory = '...',
                  max_epoch = 100000,
-                 print_info = True):
+                 print_info = True,
+                 min_training_steps = 1):
     # Training loop (instead of nested for loops, for loops through panda rows?!)
     max_idx = hyper_params.shape[0]
     cnt = 0
     for i in range(0, max_idx, 1):
+        # Initializing metrics as some big numbers
+        old_metric = 10000000000
+        new_metric = 10000000000 - 1
+        n_training_steps = min_training_steps
 
-        old_metric = 10000000
-        new_metric = 10000000 - 1
-        n_training_steps = 1000
-        while new_metric < old_metric and n_training_steps < ((training_labels.shape[0] / hyper_params['batch_size'][i]) * max_epoch):
+        while new_metric < old_metric and n_training_steps < int(((training_labels.shape[0] / hyper_params['batch_size'][i]) * max_epoch)):
+            # Get time
+            start_time = time.time()
+
+            # Update training_steps
             n_training_steps  = n_training_steps * 2
+
+            # Update metric
             old_metric = new_metric
 
             # Printing some info
-            print('Start training of model ' + str(i) + ' of ' + str(max_idx) + ' with n_training_steps: ' + str(n_training_steps))
+            print( str(datetime.now()) + ', Start training of model ' + str(i) + ' of ' + str(max_idx) + ' with n_training_steps: ' + str(n_training_steps))
 
             # Store hyper_parameters into our model parameter dictionary
             model_params = {
@@ -188,7 +200,9 @@ def run_training(hyper_params = [],
                                  str(evaluation_metrics_test['mse']),
                                  str(evaluation_metrics_test['mae']),
                                  str(n_training_steps),
-                                 'model_' + str(cnt)
+                                 'model_' + str(cnt),
+                                 '%.1f' % (time.time() - start_time),
+                                 str(datetime.now())
             ]
 
             if save_models == True:
@@ -204,7 +218,12 @@ def run_training(hyper_params = [],
                 with open(basedir + '/model_params.csv', 'a') as f:
                     writer = csv.writer(f)
                     writer.writerow(current_eval_data)
+
             new_metric = evaluation_metrics_test[model_params['loss_fn']]
+
+            ####### JUST FOR TESTING QUICKLY IF ALL HYPERPARAMETERS WORK
+            #old_metric = -np.inf
+            #######
             cnt += 1
             print('Trained model with hyperparameters: ' + str(current_eval_data))
 
@@ -228,7 +247,9 @@ if __name__ == "__main__":
                  'mse_test',
                  'mae_test',
                  'n_training_steps',
-                 'model_name'
+                 'model_name',
+                 'training_time',
+                 'time_started'
     ]
     # Define directory for models to be spit out into
     model_directory = cwd + '/tensorflow_models'
@@ -249,13 +270,13 @@ if __name__ == "__main__":
 
 
     # Hyperparameters under consideration
-    hyp_hidden_units = [[i, j] for i in [100, 300, 500] for j in [300]]
+    hyp_hidden_units = [[i, j] for i in [300, 500] for j in [300, 500]]
     hyp_activations = [[i, j] for i in ['relu'] for j in ['relu']]
-    hyp_optimizer = ['momentum', 'adagrad']  #['momentum', 'sgd'],
-    hyp_learning_rate = [0.01, 0.005, 0.001]  #  [0.001, 0.005, 0.01, 0.02]
-    hyp_loss_fn = ['mse', 'mae']  #['mse', 'abs'],
-    hyp_l_1 =  [0.0, 0.5]  # [0.0, 0.1, 1.0, 10.0]
-    hyp_l_2 =  [0.0, 0.5]  # [0.0, 0.1, 0.5, 1.0]
+    hyp_optimizer = ['momentum', 'sgd'] #['momentum', 'adam']  #['momentum', 'sgd'],
+    hyp_learning_rate = [0.01, 0.005] #[0.01, 0.005, 0.001]  #  [0.001, 0.005, 0.01, 0.02]
+    hyp_loss_fn = ['mse', 'mae'] #, 'mae']  #['mse', 'abs'],
+    hyp_l_1 =  [0.0] # 0.5]  # [0.0, 0.1, 1.0, 10.0]
+    hyp_l_2 =  [0.0] # 0.5]  # [0.0, 0.1, 0.5, 1.0]
     hyp_batch_size = [1000, 10000]  #[1, 10, 100, 500, 1000, 10000]
 
     # Make table to hyperparameters that we consider in training (WRITE TO FILE)
@@ -274,7 +295,7 @@ if __name__ == "__main__":
                                              'activations':eval})
 
     # Open training summary csv file
-    generate_summary_csv_headers(headers = headers, file = 'dnnregressor_result_table.csv')
+    # generate_summary_csv_headers(headers = headers, file = 'dnnregressor_result_table.csv')
 
     # Generate featrue
     feature_columns = dnnreg_model_input.make_feature_columns_numeric(features = train_features)
@@ -287,8 +308,9 @@ if __name__ == "__main__":
                  training_labels = train_labels,
                  feature_columns = feature_columns,
                  model_directory = model_directory,
-                 max_epoch = 100000,
-                 print_info = True)
+                 max_epoch = 100,
+                 print_info = True,
+                 min_training_steps = 100)
 
     # Get the best hyperparameters for further consideration
     best_hyperparams_mse = get_best_hyperparams(n_models_to_consider = 10,

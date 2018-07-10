@@ -1,3 +1,0 @@
-,index,hidden_units,activations,optimizer,learning_rate,loss_fn,beta1,beta2,rho,l_1,l_2,batch_size,mse_train,mae_train,mse_test,mae_test,n_training_steps,model_name
-0,0,"[10, 10]","['sigmoid', 'relu']",momentum,0.005,mse,0.9,0.9990000000000001,0.9,0.0,0.0,500,0.39437693,0.185135,0.99496967,0.26724094,2000,model_0
-1,1,"[10, 10]","['sigmoid', 'relu']",momentum,0.005,mse,0.9,0.9990000000000001,0.9,0.0,0.0,500,0.5072204,0.16627215,1.2149576000000002,0.25299699999999997,4000,model_1
