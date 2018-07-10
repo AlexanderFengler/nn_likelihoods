@@ -295,7 +295,7 @@ if __name__ == "__main__":
                                              'activations':eval})
 
     # Open training summary csv file
-    # generate_summary_csv_headers(headers = headers, file = 'dnnregressor_result_table.csv')
+    generate_summary_csv_headers(headers = headers, file = 'dnnregressor_result_table.csv')
 
     # Generate featrue
     feature_columns = dnnreg_model_input.make_feature_columns_numeric(features = train_features)
