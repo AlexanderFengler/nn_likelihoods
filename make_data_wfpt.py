@@ -50,11 +50,11 @@ def fptd(t, v, a, w, eps):
         sgn_lambda, k_l, k_s = choice_function(t, eps)
         leading_term = calculate_leading_term(t, v, a, w)
         if sgn_lambda >= 0:
-            return max(0, leading_term * fptd_large(t/(a**2), w, k_l))
+            return max(1e-29, leading_term * fptd_large(t/(a**2), w, k_l))
         else:
-            return max(0, leading_term * fptd_small(t/(a**2), w, k_s))
+            return max(1e-29, leading_term * fptd_small(t/(a**2), w, k_s))
     else:
-        return 0
+        return 1e-29
 
 # Generate training / test data for DDM
 # We want training data for

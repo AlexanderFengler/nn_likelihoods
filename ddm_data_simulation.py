@@ -1,5 +1,6 @@
 # Functions for DDM data simulation
 import numpy as np
+import pandas as pd
 import time
 
 def  ddm_simulate_rts(v = 0, # drift by timestep 'delta_t'
@@ -14,7 +15,7 @@ def  ddm_simulate_rts(v = 0, # drift by timestep 'delta_t'
     delta_t_sqrt = np.sqrt(delta_t)
 
     for n in range(0, n_samples, 1):
-        y = a * w
+        y = -a + (w * (2 * a))
         y_abs = abs(y)
         t = 0
 
@@ -23,9 +24,7 @@ def  ddm_simulate_rts(v = 0, # drift by timestep 'delta_t'
             t += delta_t
             y_abs = abs(y)
 
-        rts[n] = np.sign(y) * t
-        #print(n)
-
+        rts[n] = (-1) * np.sign(y) * t
     return rts
 
 
@@ -46,7 +45,7 @@ def  ddm_simulate_rts_fast(v = 0, # drift by timestep 'delta_t'
     rand_high = n_noise_samples - (max_t / delta_t) - 1
 
     for n in range(0, n_samples, 1):
-        y = a * w
+        y = -a + (w * (2 * a))
         y_abs = abs(y)
         t = 0
         cnt = 0
@@ -57,7 +56,7 @@ def  ddm_simulate_rts_fast(v = 0, # drift by timestep 'delta_t'
             cnt += 1
 
         np.random.shuffle(noise)
-        rts[n] = np.sign(y) * t
+        rts[n] = (-1) * np.sign(y) * t
         # print(n)
 
     return rts
