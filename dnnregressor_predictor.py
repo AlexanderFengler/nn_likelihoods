@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import shutil
 import csv
 import os
+import itertools
 import dnnregressor_model_and_input_fn as dnnreg_model_input
 
 # Get working directory (in case it's useful)
@@ -26,12 +27,15 @@ def get_dnnreg_predictor(model_directory = '', params = []):
 def get_predictions(regressor = [],
                     features = [],
                     labels = []):
-    predictions = pd.DataFrame(list(regressor.predict(
+    predictions = list(regressor.predict(
                                        input_fn = lambda: dnnreg_model_input.eval_input_fn(features = features,
                                                                          labels = labels,
-                                                                         batch_size = 1,
+                                                                         batch_size = len(labels),
                                                                          num_epochs = 1),
                                        predict_keys = 'output',
                                        yield_single_examples = False,
-                                      )))
-    return predictions
+                                      ))[0]['output']
+    return predictions.flatten()
+
+
+    #list(itertools.chain.from_iterable(

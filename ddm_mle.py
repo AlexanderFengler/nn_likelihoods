@@ -38,22 +38,24 @@ class ddm_mle_estimator:
         self.gen_alg_fitness_record = np.zeros((self.gen_alg_params['steps'], self.gen_alg_params['population_size']))
 
         self.data = []
-
         self.model_directory = 'none'    # directory for model that can predict likelihoods (to be passed as parameter to a function that restores the model from tensorflow for example)
 
+    def initialize_dnn_predictor(self):
+        if self.model_directory == 'none':
+            print('please specify directory of your dnn_regressor model files!')
         if self.model_directory != 'none':
-           # Get hyperparameters to feed into dnn_regressor model_input function
-           self.dnn_model_params = self.tf_estimator_hyperparameters()
+            # Get hyperparameters to feed into dnn_regressor model_input function
+            self.dnn_model_params = self.tf_estimator_hyperparameters()
 
-           # Make feature columns and add to
-           features = dict({'v': [],
+            # Make feature columns and add to
+            features = dict({'v': [],
                             'a': [],
                             'w': [],
                             'rt': []}
                             )
-          feature_columns = dnn_model_input.make_feature_columns_numeric(features = features)
-          self.dnn_model_params['feature_columns'] = feature_columns
-          self.dnn_predictor = get_dnnreg_predictor(model_directory = self.model_directory, params = self.dnn_model_params)
+            feature_columns = dnn_model_input.make_feature_columns_numeric(features = features)
+            self.dnn_model_params['feature_columns'] = feature_columns
+            self.dnn_predictor = dnn_predictor.get_dnnreg_predictor(model_directory = self.model_directory, params = self.dnn_model_params)
 
     def make_data(self):
         self.data = ddm_data_simulation.ddm_simulate_rts(v = self.ddm_sim_params['v'],
@@ -94,22 +96,26 @@ class ddm_mle_estimator:
         fitness = np.zeros((self.gen_alg_params['population_size'], ))
 
         for i in range(0, self.gen_alg_params['population_size'], 1):
-            data  = pd.DataFrame(np.zeros((len(self.data), 4)))
-            data.loc[:, 0] = self.gen_alg_population.loc[i, 'v']
-            data.loc[:, 1] = self.gen_alg_population.loc[i, 'a']
-            data.loc[:, 2] = self.gen_alg_population.loc[i, 'w']
-            data.loc[:, 3] = self.data
+            data  = pd.DataFrame(np.zeros((len(self.data), 5)), columns = ['v','a', 'w', 'rt', 'nf_likelihood'])
+            data.loc[:, 'v'] = self.gen_alg_population.loc[i, 'v']
+            data.loc[:, 'a'] = self.gen_alg_population.loc[i, 'a']
+            data.loc[:, 'w'] = self.gen_alg_population.loc[i, 'w']
+            data.loc[:, 'rt'] = self.data.flatten()
+            data.loc[:, 'nf_likelihood'] = 0.0
+            #self.data_test = data
             features, labels, __, ___ = wfpt.train_test_split(data = data,
-                                                              p_train = 1,
+                                                              p_train = 1.0,
                                                               write_to_file = False
                                                               )
 
-            fitness[i] = np.sum(np.log(dnn_predictor.get_predictions(regressor = self.dnn_predictor,
+            #self.features = features
+            #self.labels = labels
+            fitness[i] = np.sum(np.log(1e-29 + dnn_predictor.get_predictions(regressor = self.dnn_predictor,
                                                                      features = features,
                                                                      labels = labels)
                                                                      )
                                                                      )
-        self.gen_alg_fitness = fitness
+            self.gen_alg_fitness = fitness
 
     def make_next_generation(self):
         pop_size = self.gen_alg_params['population_size']
@@ -183,23 +189,23 @@ class ddm_mle_estimator:
 
     def run_gen_alg(self):
         self.make_pop_init()
-        if self.gen_alg_steps['model'] == 'navarro':
+        if self.gen_alg_params['model'] == 'navarro':
             self.population_fitness_navarro()
         #self.gen_alg_fitness_max = np.zeros((self.gen_alg_steps, ))
         #self.gen_alg_fitness_mean = np.zeros((self.gen_alg_steps, ))
+        if self.gen_alg_params['model'] == 'dnn':
+            self.population_fitness_dnn()
         for step in range(0, self.gen_alg_params['steps'], 1):
             self.make_next_generation()
-            #print('cur_population: ', self.gen_alg_population)
-            #print('cur_fitness: ', self.gen_alg_fitness)
+            print('cur_population: ', self.gen_alg_population)
+            print('cur_fitness: ', self.gen_alg_fitness)
             #self.gen_alg_fitness_mean[step], self.gen_alg_fitness_max[step] = self.make_fitness_stats()
 
             # Record current population and fitness
-            self.gen_alg_fitness_record[step] = self.fitness
-            self.gen_alg_population_record[step] = self.population
+            self.gen_alg_fitness_record[step] = self.gen_alg_fitness
+            self.gen_alg_population_record[step] = self.gen_alg_population
             if self.gen_alg_params['print_steps']:
                 print(step)
-
-
 
     def plot_gen_alg(self):
         plt.plot(arange(0, self.gen_alg_steps, 1), self.gen_alg_fitness_mean, 'g.')
