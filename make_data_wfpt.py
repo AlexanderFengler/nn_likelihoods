@@ -70,6 +70,8 @@ def gen_ddm_features(v_range = [-3, 3], a_range = [0.1, 3], w_range = [0, 1], rt
                         np.random.uniform(low = a_range[0], high = a_range[1], size = 1),
                         np.random.uniform(low = w_range[0], high = w_range[1], size = 1),
                         np.random.choice([-1,1], size = 1) * np.random.gamma(rt_params[0], rt_params[1], size = 1)]
+        if (i % 1000) === 0:
+            print('datapoint ' + str(i) + ' generated')
     return data
 
 def gen_ddm_labels(data = [1,1,0,1], eps = 10**(-29)):
