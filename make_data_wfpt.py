@@ -120,6 +120,7 @@ def train_test_split(data = [],
     test_features = test.drop(labels = 'nf_likelihood', axis = 1).copy()
 
     if write_to_file == True:
+        print('writing training and test data to file ....')
         cur_time = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
         train.to_csv('train_data_' + cur_time + '.csv')
         test.to_csv('test_data_' + cur_time + '.csv')

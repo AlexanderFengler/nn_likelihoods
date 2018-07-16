@@ -256,20 +256,21 @@ if __name__ == "__main__":
 
     # Make Dataset
     # features, labels = mds.make_data()
+    print('making data....')
     data = mdw.make_data(n_samples = 5000000)
 
     # Generating training and test test
     # train_features, train_labels, test_features, test_labels = mds.train_test_split(features = features,
     #                                                                             labels = labels,
     #                                                                             p = 0.8)
-
+    print('splitting into train and test set...')
     train_features, train_labels, test_features, test_labels = mdw.train_test_split(data = data,
                                                                                     p_train = 0.8,
                                                                                     write_to_file = True)
 
 
-
     # Hyperparameters under consideration
+    print('defining hyperparameters...')
     hyp_hidden_units = [[i, j] for i in [500] for j in [500]]
     hyp_activations = [[i, j] for i in ['relu'] for j in ['relu']]
     hyp_optimizer = ['sgd', 'adagrad'] #['momentum', 'adam']  #['momentum', 'sgd'],
@@ -301,6 +302,7 @@ if __name__ == "__main__":
     feature_columns = dnnreg_model_input.make_feature_columns_numeric(features = train_features)
 
     # Run training across hyperparameter setups
+    print('starting training....')
     run_training(hyper_params = hyper_params,
                  save_models = False,
                  headers = headers,
@@ -313,6 +315,7 @@ if __name__ == "__main__":
                  min_training_steps = 200)
 
     # Get the best hyperparameters for further consideration
+    print('collecting best models in csv sheets....')
     for metric in hyp_loss_fn:
         if metric == 'mse':
             best_hyperparams_mse = get_best_hyperparams(n_models_to_consider = 10,
@@ -328,6 +331,7 @@ if __name__ == "__main__":
     # Train best models and save checkpoints
 
     # Best models mse
+    print('retraining best models....')
     for metric in hyp_loss_fn:
         if metric == 'mse':
             run_training(hyper_params = best_hyperparams_mse,
