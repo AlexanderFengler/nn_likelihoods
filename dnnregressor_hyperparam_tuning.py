@@ -256,7 +256,7 @@ if __name__ == "__main__":
 
     # Make Dataset
     # features, labels = mds.make_data()
-    data = mdw.make_data(n_samples = 100000)
+    data = mdw.make_data(n_samples = 5000000)
 
     # Generating training and test test
     # train_features, train_labels, test_features, test_labels = mds.train_test_split(features = features,
@@ -270,13 +270,13 @@ if __name__ == "__main__":
 
 
     # Hyperparameters under consideration
-    hyp_hidden_units = [[i, j] for i in [300, 500] for j in [300, 500]]
+    hyp_hidden_units = [[i, j] for i in [500] for j in [500]]
     hyp_activations = [[i, j] for i in ['relu'] for j in ['relu']]
-    hyp_optimizer = ['momentum', 'sgd'] #['momentum', 'adam']  #['momentum', 'sgd'],
+    hyp_optimizer = ['sgd', 'adagrad'] #['momentum', 'adam']  #['momentum', 'sgd'],
     hyp_learning_rate = [0.01, 0.005] #[0.01, 0.005, 0.001]  #  [0.001, 0.005, 0.01, 0.02]
-    hyp_loss_fn = ['mse', 'mae'] #, 'mae']  #['mse', 'abs'],
+    hyp_loss_fn = ['mse'] #, 'mae']  #['mse', 'abs'],
     hyp_l_1 =  [0.0] # 0.5]  # [0.0, 0.1, 1.0, 10.0]
-    hyp_l_2 =  [0.0] # 0.5]  # [0.0, 0.1, 0.5, 1.0]
+    hyp_l_2 =  [0.0, 1] # 0.5]  # [0.0, 0.1, 0.5, 1.0]
     hyp_batch_size = [1000, 10000]  #[1, 10, 100, 500, 1000, 10000]
 
     # Make table to hyperparameters that we consider in training (WRITE TO FILE)
@@ -308,40 +308,44 @@ if __name__ == "__main__":
                  training_labels = train_labels,
                  feature_columns = feature_columns,
                  model_directory = model_directory,
-                 max_epoch = 100,
+                 max_epoch = 200,
                  print_info = True,
-                 min_training_steps = 100)
+                 min_training_steps = 200)
 
     # Get the best hyperparameters for further consideration
-    best_hyperparams_mse = get_best_hyperparams(n_models_to_consider = 10,
-                                            metric = 'mse',
-                                            input_file = 'dnnregressor_result_table.csv')
-
-    best_hyperparams_mae = get_best_hyperparams(n_models_to_consider = 10,
-                                                metric = 'mae',
-                                                input_file = 'dnnregressor_result_table.csv')
-
-    best_hyperparams_mse.to_csv('dnnregressor_best_hyperparams_mse.csv')
-    best_hyperparams_mae.to_csv('dnnregressor_best_hyperparams_mae.csv')
+    for metric in hyp_loss_fn:
+        if metric = 'mse':
+            best_hyperparams_mse = get_best_hyperparams(n_models_to_consider = 10,
+                                                        metric = metric,
+                                                        input_file = 'dnnregressor_result_table.csv')
+            best_hyperparams_mse.to_csv('dnnregressor_best_hyperparams_mse.csv')
+        if metric = 'mae':
+            best_hyperparams_mae = get_best_hyperparams(n_models_to_consider = 10,
+                                                        metric = metric,
+                                                        input_file = 'dnnregressor_result_table.csv')
+            best_hyperparams_mae.to_csv('dnnregressor_best_hyperparams_mae.csv')
 
     # Train best models and save checkpoints
 
     # Best models mse
-    run_training(hyper_params = best_hyperparams_mse,
-                 save_models = True,
-                 headers = headers,
-                 training_features = train_features,
-                 training_labels = train_labels,
-                 feature_columns = feature_columns,
-                 model_directory = model_directory,
-                 print_info = True)
+    for metric in hyp_loss_fn:
+        if metric == 'mse':
+            run_training(hyper_params = best_hyperparams_mse,
+                         save_models = True,
+                         headers = headers,
+                         training_features = train_features,
+                         training_labels = train_labels,
+                         feature_columns = feature_columns,
+                         model_directory = model_directory,
+                         print_info = True)
 
-    # Best models mae
-    run_training(hyper_params = best_hyperparams_mae,
-                 save_models = True,
-                 headers = headers,
-                 training_features = train_features,
-                 training_labels = train_labels,
-                 feature_columns = feature_columns,
-                 model_directory = model_directory,
-                 print_info = True)
+        if metric == 'mae':
+            # Best models mae
+            run_training(hyper_params = best_hyperparams_mae,
+                         save_models = True,
+                         headers = headers,
+                         training_features = train_features,
+                         training_labels = train_labels,
+                         feature_columns = feature_columns,
+                         model_directory = model_directory,
+                         print_info = True)
