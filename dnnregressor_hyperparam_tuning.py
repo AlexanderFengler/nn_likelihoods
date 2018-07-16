@@ -314,12 +314,12 @@ if __name__ == "__main__":
 
     # Get the best hyperparameters for further consideration
     for metric in hyp_loss_fn:
-        if metric = 'mse':
+        if metric == 'mse':
             best_hyperparams_mse = get_best_hyperparams(n_models_to_consider = 10,
                                                         metric = metric,
                                                         input_file = 'dnnregressor_result_table.csv')
             best_hyperparams_mse.to_csv('dnnregressor_best_hyperparams_mse.csv')
-        if metric = 'mae':
+        if metric == 'mae':
             best_hyperparams_mae = get_best_hyperparams(n_models_to_consider = 10,
                                                         metric = metric,
                                                         input_file = 'dnnregressor_result_table.csv')
