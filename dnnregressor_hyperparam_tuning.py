@@ -167,14 +167,14 @@ def run_training(hyper_params = [],
             evaluation_metrics_train = dnnregressor.evaluate(
                                                        input_fn = lambda: dnnreg_model_input.eval_input_fn(features = train_features,
                                                                                          labels = train_labels,
-                                                                                         batch_size = len(train_features) + 1,
+                                                                                         batch_size = len(train_features) + 1, # change ?
                                                                                          num_epochs = 1)
                                                       )
 
             evaluation_metrics_test = dnnregressor.evaluate(
                                                        input_fn = lambda: dnnreg_model_input.eval_input_fn(features = test_features,
                                                                                          labels = test_labels,
-                                                                                         batch_size = len(test_features) + 1,
+                                                                                         batch_size = len(test_features) + 1, # change ?
                                                                                          num_epochs = 1)
                                                       )
 

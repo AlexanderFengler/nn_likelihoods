@@ -9,7 +9,8 @@ def  ddm_simulate_rts(v = 0, # drift by timestep 'delta_t'
                       s = 1, # noise sigma
                       delta_t = 0.001,
                       max_t = 20,
-                      n_samples = 20000): # timesteps fraction of seconds
+                      n_samples = 20000,
+                      print_info = True): # timesteps fraction of seconds
 
     rts = np.zeros((n_samples, 1))
     delta_t_sqrt = np.sqrt(delta_t)
@@ -25,6 +26,10 @@ def  ddm_simulate_rts(v = 0, # drift by timestep 'delta_t'
             y_abs = abs(y)
 
         rts[n] = (-1) * np.sign(y) * t
+
+        if print_info == True:
+            if n % 1000 == 0:
+                print(n, ' datapoints sampled')
     return rts
 
 

@@ -83,14 +83,18 @@ def gen_ddm_labels(data = [1,1,0,1], eps = 10**(-29)):
                             a = data.loc[i, 'a'],
                             w = data.loc[i, 'w'],
                             eps = eps)
+        if (i % 1000) == 0:
+            print('label ' + str(i) + ' generated')
+
     return labels
 
 def make_data(v_range = [-3, 3],
-                 a_range = [0.1, 3],
-                 w_range = [0, 1],
-                 rt_params = [1,2],
-                 n_samples = 20000,
-                 eps = 10**(-29)):
+              a_range = [0.1, 3],
+              w_range = [0, 1],
+              rt_params = [1,2],
+              n_samples = 20000,
+              eps = 10**(-29),
+              write_to_file = True):
 
     data_features = gen_ddm_features(v_range = v_range,
                                     a_range = a_range,
@@ -103,13 +107,16 @@ def make_data(v_range = [-3, 3],
 
     data_features['nf_likelihood'] = data_labels
 
+    if write_to_file == True:
+
+
     return data_features.copy()
 
 
 def train_test_split(data = [],
                      p_train = 0.8,
                      write_to_file = False):
-
+    n = data.shape[0]
     train_indices = np.random.choice([0,1], size = data.shape[0], p = [p_train, 1 - p_train])
 
     train = data.loc[train_indices == 0].copy()
@@ -124,8 +131,10 @@ def train_test_split(data = [],
     if write_to_file == True:
         print('writing training and test data to file ....')
         cur_time = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
-        train.to_csv('train_data_' + cur_time + '.csv')
-        test.to_csv('test_data_' + cur_time + '.csv')
+        data.to_csv('data_' + n + '_' + cur_time + '.csv')
+        train.to_csv('train_data_'+ n + '_' + cur_time + '.csv')
+        test.to_csv('test_data_' + n + '_' + cur_time + '.csv')
+        np.savetxt('train_indices_' + n + '_' + cur_time + '.csv', train_indices, delimiter = ',')
 
 
     return (train_features.to_dict(orient = 'list'),
