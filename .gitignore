@@ -38,3 +38,5 @@ Thumbs.db
 
 # My additions
 __pycache__/
+data_storage/
+
