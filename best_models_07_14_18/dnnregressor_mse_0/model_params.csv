@@ -1,2 +1,0 @@
-hidden_units,activations,optimizer,learning_rate,loss_fn,beta1,beta2,rho,l_1,l_2,batch_size,mse_train,mae_train,mse_test,mae_test,n_training_steps,model_name,training_time,time_started
-"[300, 500]","['relu', 'relu']",momentum,0.005,mse,0.9,0.999,0.9,0.0,0.0,1000,2.5739062,0.16547301,1.9977264,0.16779779,2,model_0,274.1,2018-07-10 22:49:07.985468
