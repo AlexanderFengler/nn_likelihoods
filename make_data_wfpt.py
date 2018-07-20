@@ -2,6 +2,7 @@ import numpy as np
 import scipy as scp
 import pandas as pd
 from datetime import datetime
+import glob
 
 # WFPT NAVARROS FUSS
 def fptd_large(t, w, k):
@@ -102,20 +103,42 @@ def make_data(v_range = [-3, 3],
                                     rt_params = rt_params,
                                     n_samples = n_samples)
 
-    data_labels = gen_ddm_labels(data = data_features,
-                         eps = eps)
+    data_labels = pd.DataFrame(gen_ddm_labels(data = data_features,
+                         eps = eps), columns = ['nf_likelihood'])
+    data = pd.concat([data_features, data_labels], axis = 1)
+    # data_features['nf_likelihood'] = data_labels
 
-    data_features['nf_likelihood'] = data_labels
+    cur_time = datetime.now().strftime('%m_%d_%y_%H_%M_%S')
 
     if write_to_file == True:
+       data.to_csv('data_' + str(n_samples) + '_' + cur_time + '.csv')
 
-
-    return data_features.copy()
+    return data.copy(), cur_time, n_samples
 
 
 def train_test_split(data = [],
                      p_train = 0.8,
-                     write_to_file = False):
+                     write_to_file = True,
+                     from_file = True,
+                     fname = '',  # default behavior is to load the latest file of a specified number of examples
+                     n = None): # if we pass a number, we pick a data file with the specified number of examples, if None the function picks some data file
+
+    if from_file:
+        # List data files in directory
+        if fname == '':
+            if n != None:
+                flist = glob.glob('data_' + str(n) + '*')
+                assert len(flist) > 0, 'There seems to be no datafile that fullfills the requirements passed to the function'
+                fname = flist[-1]
+            else:
+                flist = glob.glob('data_*')
+                assert len(flist) > 0, 'There seems to be no datafile that fullfills the requirements passed to the function'
+                fname = flist[-1]
+
+            data = pd.read_csv(fname)
+        else:
+            data = pd.read_csv(fname)
+
     n = data.shape[0]
     train_indices = np.random.choice([0,1], size = data.shape[0], p = [p_train, 1 - p_train])
 
@@ -130,14 +153,23 @@ def train_test_split(data = [],
 
     if write_to_file == True:
         print('writing training and test data to file ....')
-        cur_time = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
-        data.to_csv('data_' + n + '_' + cur_time + '.csv')
-        train.to_csv('train_data_'+ n + '_' + cur_time + '.csv')
-        test.to_csv('test_data_' + n + '_' + cur_time + '.csv')
-        np.savetxt('train_indices_' + n + '_' + cur_time + '.csv', train_indices, delimiter = ',')
+        train.to_csv('train_data_'+ str(n) + '_' + fname[-21:])
+        test.to_csv('test_data_' + str(n) + '_' + fname[-21:])
+        np.savetxt('train_indices_' + str(n) + '_' + fname[-21:], train_indices, delimiter = ',')
 
+    # Store correct data structures for return
+    if from_file: # clean up dictionary: Get rid of index column
+        train_f = train_features.to_dict(orient = 'list')
+        test_f = test_features.to_dict(orient = 'list')
+        del train_f['Unnamed: 0']
+        del test_f['Unnamed: 0']
+        return (train_f,
+                train_labels,
+                test_f,
+                test_labels)
 
-    return (train_features.to_dict(orient = 'list'),
-            train_labels,
-            test_features.to_dict(orient = 'list'),
-            test_labels)
+    else:
+        return (train_features.to_dict(orient = 'list'),
+                train_labels,
+                test_features.to_dict(orient = 'list'),
+                test_labels)

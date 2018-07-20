@@ -5,10 +5,13 @@ import tensorflow as tf
 import scipy as scp
 import time
 from datetime import datetime
+from datetime import date
 import matplotlib.pyplot as plt
 import shutil
 import csv
 import os
+from shutil import copyfile
+import glob
 
 # Importing the helper functions to generate my dnnregressor
 import dnnregressor_model_and_input_fn as dnnreg_model_input
@@ -227,6 +230,9 @@ def run_training(hyper_params = [],
             cnt += 1
             print('Trained model with hyperparameters: ' + str(current_eval_data))
 
+        if n_training_steps >= int(((training_labels.shape[0] / hyper_params['batch_size'][i]) * max_epoch)):
+            print('training of model terminated due to reaching max epoch: ', max_epoch)
+
 # MAKE EXECUTABLE FROM COMMAND LINE
 if __name__ == "__main__":
     # Headers for training results table
@@ -256,29 +262,31 @@ if __name__ == "__main__":
 
     # Make Dataset
     # features, labels = mds.make_data()
-    print('making data....')
-    data = mdw.make_data(n_samples = 5000000)
+    # print('making data....')
+    # data = mdw.make_data(n_samples = 5000000)
+
+
 
     # Generating training and test test
     # train_features, train_labels, test_features, test_labels = mds.train_test_split(features = features,
     #                                                                             labels = labels,
     #                                                                             p = 0.8)
     print('splitting into train and test set...')
-    train_features, train_labels, test_features, test_labels = mdw.train_test_split(data = data,
-                                                                                    p_train = 0.8,
-                                                                                    write_to_file = True)
+    train_features, train_labels, test_features, test_labels = mdw.train_test_split(p_train = 0.8,
+                                                                                    write_to_file = True,
+                                                                                    from_file = True)
 
 
     # Hyperparameters under consideration
     print('defining hyperparameters...')
     hyp_hidden_units = [[i, j] for i in [500] for j in [500]]
     hyp_activations = [[i, j] for i in ['relu'] for j in ['relu']]
-    hyp_optimizer = ['sgd', 'adagrad'] #['momentum', 'adam']  #['momentum', 'sgd'],
-    hyp_learning_rate = [0.01, 0.005] #[0.01, 0.005, 0.001]  #  [0.001, 0.005, 0.01, 0.02]
+    hyp_optimizer = ['sgd'] #, 'adagrad'] #['momentum', 'adam']  #['momentum', 'sgd'],
+    hyp_learning_rate = [0.01] #, 0.005] #[0.01, 0.005, 0.001]  #  [0.001, 0.005, 0.01, 0.02]
     hyp_loss_fn = ['mse'] #, 'mae']  #['mse', 'abs'],
     hyp_l_1 =  [0.0] # 0.5]  # [0.0, 0.1, 1.0, 10.0]
-    hyp_l_2 =  [0.0, 1] # 0.5]  # [0.0, 0.1, 0.5, 1.0]
-    hyp_batch_size = [1000, 10000]  #[1, 10, 100, 500, 1000, 10000]
+    hyp_l_2 =  [0.0] # 0.5]  # [0.0, 0.1, 0.5, 1.0]
+    hyp_batch_size = [10000] # , 10000]  #[1, 10, 100, 500, 1000, 10000]
 
     # Make table to hyperparameters that we consider in training (WRITE TO FILE)
     make_hyper_params_csv(hyp_hidden_units = hyp_hidden_units,
@@ -310,9 +318,9 @@ if __name__ == "__main__":
                  training_labels = train_labels,
                  feature_columns = feature_columns,
                  model_directory = model_directory,
-                 max_epoch = 200,
+                 max_epoch = 2000,
                  print_info = True,
-                 min_training_steps = 200)
+                 min_training_steps = 2000)
 
     # Get the best hyperparameters for further consideration
     print('collecting best models in csv sheets....')
@@ -329,6 +337,8 @@ if __name__ == "__main__":
             best_hyperparams_mae.to_csv('dnnregressor_best_hyperparams_mae.csv')
 
     # Train best models and save checkpoints
+    date_today = date.today()
+    model_directory = model_directory + '/best_models_' + date_today.strftime("%m_%d_%y")
 
     # Best models mse
     print('retraining best models....')
@@ -353,3 +363,12 @@ if __name__ == "__main__":
                          feature_columns = feature_columns,
                          model_directory = model_directory,
                          print_info = True)
+
+    # Copy data into best models directory for reference
+
+    files_to_copy = glob.glob('*'+ date_today.strftime("%m_%d_%y") + '*')
+    print(files_to_copy)
+    for f in files_to_copy:
+        print(cwd + '/' + f)
+        print(model_directory + '/' + f)
+        copyfile(cwd + '/' + f, model_directory + '/' + f)
