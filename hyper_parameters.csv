@@ -1,0 +1,2 @@
+,hidden_units,activations,optimizer,learning_rate,loss_fn,l_1,l_2,batch_size
+0,"[100, 100]","['relu', 'relu']",adam,0.005,mse,0.0,0.0,100

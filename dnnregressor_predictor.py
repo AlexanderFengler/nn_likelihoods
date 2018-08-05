@@ -38,4 +38,4 @@ def get_predictions(regressor = [],
     return predictions.flatten()
 
 
-    #list(itertools.chain.from_iterable(
+    #list(itertools.chain.from_iterable)

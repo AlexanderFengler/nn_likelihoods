@@ -106,6 +106,7 @@ def run_training(hyper_params = [],
                  max_epoch = 100000,
                  print_info = True,
                  min_training_steps = 1):
+
     # Training loop (instead of nested for loops, for loops through panda rows?!)
     max_idx = hyper_params.shape[0]
     cnt = 0
@@ -154,7 +155,8 @@ def run_training(hyper_params = [],
                 basedir = model_directory + '/tmp'
 
             # Making the estimator
-            dnnregressor = tf.estimator.Estimator(model_fn = dnnreg_model_input.dnn_regressor,
+            dnnregressor = tf.estimator.Estimator(
+                                                 model_fn = dnnreg_model_input.dnn_regressor,
                                                  params = model_params,
                                                  model_dir = basedir
                                                  )
