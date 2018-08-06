@@ -5,13 +5,8 @@ import tensorflow as tf
 import scipy as scp
 import time
 from datetime import datetime
-from datetime import date
-import matplotlib.pyplot as plt
-import shutil
 import csv
 import os
-from shutil import copyfile
-import glob
 
 # Importing the helper functions to generate my dnnregressor
 import dnnregressor_model_and_input_fn as dnnreg_model_input
@@ -19,6 +14,7 @@ import dnnregressor_model_and_input_fn as dnnreg_model_input
 # Importing helper functions to make data set (CHANGE WHEN CHANGING DATA GENERATING MODEL)
 # import make_data_sin as mds
 import make_data_wfpt as mdw
+import make_data_sin as mds
 
 # Getting working directory in case it is useful later (definition of model_dir)
 cwd = os.getcwd()
@@ -28,45 +24,6 @@ tf.logging.set_verbosity(tf.logging.INFO) # could be tf.logging.ERROR, tf.loggin
 
 # Functions that generates a panda dataframe with rows as sets of
 # hyperparameters --> passed to run_training(...)
-def make_hyper_params_csv(hyp_hidden_units = [[i, j] for i in [10, 300, 500] for j in [300]],
-                           hyp_activations = [[i, j] for i in ['relu'] for j in ['relu']],
-                           hyp_optimizer = ['momentum', 'adagrad'],  #['momentum', 'sgd'],
-                           hyp_learning_rate = [0.01, 0.005, 0.001],  #  [0.001, 0.005, 0.01, 0.02]
-                           hyp_loss_fn = ['mse', 'mae'],  #['mse', 'abs'],
-                           hyp_l_1 =  [0.0, 0.5],  # [0.0, 0.1, 1.0, 10.0]
-                           hyp_l_2 =  [0.0, 0.5],  # [0.0, 0.1, 0.5, 1.0]
-                           hyp_batch_size = [1000, 10000],  #[1, 10, 100, 500, 1000, 10000]
-                           out_file = 'hyper_parameters.csv'):
-    hyper_params = pd.DataFrame(columns=['hidden_units',
-                                     'activations',
-                                     'optimizer',
-                                     'learning_rate',
-                                     'loss_fn',
-                                     'l_1',
-                                     'l_2',
-                                     'batch_size'])
-
-    cnt = 0
-    for tmp_hidden_units in hyp_hidden_units:
-        for tmp_activations in hyp_activations:
-            for tmp_optimizer in hyp_optimizer:
-                for tmp_learning_rate in hyp_learning_rate:
-                    for tmp_loss_fn in hyp_loss_fn:
-                        for tmp_l_1 in hyp_l_1:
-                            for tmp_l_2 in hyp_l_2:
-                                for tmp_batch_size in hyp_batch_size:
-                                    hyper_params.loc[cnt] = [tmp_hidden_units,
-                                                            tmp_activations,
-                                                            tmp_optimizer,
-                                                            tmp_learning_rate,
-                                                            tmp_loss_fn,
-                                                            tmp_l_1,
-                                                            tmp_l_2,
-                                                            tmp_batch_size]
-                                    cnt += 1
-    # Write to file
-    hyper_params.to_csv(out_file)
-    #return hyper_params
 
 def run_training(hyper_params = [],
                  headers = [],
@@ -74,7 +31,6 @@ def run_training(hyper_params = [],
                  training_labels = [],
                  feature_columns = [],
                  model_directory = '...',
-                 max_epoch = 5000,
                  eval_after_n_epochs = 10,
                  print_info = True):
 
@@ -87,26 +43,16 @@ def run_training(hyper_params = [],
     start_time = time.time()
 
     # Store hyper_parameters into our model parameter dictionary
-    model_params = {
-                    'feature_columns': feature_columns,
-                    'hidden_units': hyper_params['hidden_units'][0],
-                    'activations': hyper_params['activations'][0],
-                    'optimizer': hyper_params['optimizer'][0],
-                    'learning_rate': hyper_params['learning_rate'][0],
-                    'loss_fn': hyper_params['loss_fn'][0],
-                    'beta1': 0.9,
-                    'beta2': 0.999,
-                    'rho': 0.9,
-                    'l_1': hyper_params['l_1'][0], # NOTE: Cannot supply integers here
-                    'l_2': hyper_params['l_2'][0], # NOTE: Cannot supply integers here
-                    'batch_size': hyper_params['batch_size'][0]
-                    }
+    model_params = hyper_params
 
     # Define number of training steps before evaluation
     # I want to evaluate after every 10 epochs
-    steps_until_eval = eval_after_n_epochs * (len(training_labels) // hyper_params['batch_size'][0])
+    steps_until_eval = model_params['eval_after_n_epochs'] * (len(training_labels) //model_params['batch_size'])
 
+    # Get current date and time for file naming purposes
     date_time_str = datetime.now().strftime('_%m_%d_%y_%H_%M_%S')
+
+    # Specify folder for storage of graph and results
     basedir = model_directory + '/dnnregressor_' + model_params['loss_fn'] + date_time_str
 
     # Making the estimator
@@ -116,15 +62,18 @@ def run_training(hyper_params = [],
                                          model_dir = basedir
                                          )
 
+
+    # Initialze epoch and training steps counters
+    max_epoch = model_params['max_epoch']
     epoch_cnt = 0
     training_steps_cnt = 0
 
-    print('max_epoch: ', max_epoch)
-    print('epoch_cnt: ', epoch_cnt)
-    print(new_metric < old_metric)
 
+    # Training loop
+    print('now starting training')
     while new_metric < old_metric and epoch_cnt < max_epoch:
-        print('now starting training')
+
+        # Update reference metric
         old_metric = new_metric
 
         # Training the estimator
@@ -144,13 +93,18 @@ def run_training(hyper_params = [],
                                                                                                             )
                                                         )
 
+        # Update metric
         new_metric = evaluation_metrics_test[model_params['loss_fn']]
         training_steps_cnt += steps_until_eval
+        print('Old metric value:' + str(old_metric))
+        print('New metric value:' + str(new_metric))
+        print('Improvement in evaluation metric: ' + str(old_metric - new_metric))
 
         # Generate summary of hyperparameters and append results to file
         current_eval_data = [
                              str(model_params['hidden_units']),
                              str(model_params['activations']),
+                             model_params['output_activation'],
                              model_params['optimizer'],
                              str(model_params['learning_rate']),
                              model_params['loss_fn'],
@@ -167,23 +121,27 @@ def run_training(hyper_params = [],
                              date_time_str
         ]
 
+        # If first round of training, initialize training_results table with headers
         if epoch_cnt == 0:
             with open(basedir + '/dnn_training_results'  + date_time_str + '.csv', 'w') as f:
                 writer = csv.writer(f)
                 writer.writerow(headers)
 
+        # Update training_results table with current training results
         with open(basedir + '/dnn_training_results' + date_time_str + '.csv', 'a') as f:
             writer = csv.writer(f)
             writer.writerow(current_eval_data)
 
-        epoch_cnt += eval_after_n_epochs
-        print(str(epoch_cnt) + ' epochs run')
+        # Update epoch_cnt and print current number of epochs completed
+        epoch_cnt += model_params['eval_after_n_epochs']
+        print(str(epoch_cnt) + ' of a maximum of ' + str(max_epoch) +  ' epochs run')
 
+        # Print info if training terminated due to reaching max_epoch as passed to the function
         if epoch_cnt >= max_epoch:
             print('training of model terminated due to reaching max epoch: ', max_epoch)
 
-
-    print('skipped training')
+    # Report that training is finished once we exited the while loop
+    print('finished training')
 
 # MAKE EXECUTABLE FROM COMMAND LINE
 if __name__ == "__main__":
@@ -191,6 +149,7 @@ if __name__ == "__main__":
     headers = [
                  'hidden_units',
                  'activations',
+                 'output_activation',
                  'optimizer',
                  'learning_rate',
                  'loss_fn',
@@ -210,45 +169,46 @@ if __name__ == "__main__":
     # Define directory for models to be spit out into
     model_directory = cwd + '/tensorflow_models'
 
-    # Generating training and test test
-    # train_features, train_labels, test_features, test_labels = mds.train_test_split(features = features,
-    #                                                                             labels = labels,
-    #                                                                             p = 0.8)
-
-    print('reading in training and test set....')
-    train_features, train_labels, test_features, test_labels = mdw.train_test_from_file(fname_test = '',
-                                                                                        fname_train = '',
-                                                                                        n = 5000000)
-
     # Potentially remove 'choice' column and make reaction times positive and negative at this point
     # Hyperparameters under consideration
     print('defining hyperparameters...')
-    hyp_hidden_units = [[i, j] for i in [200] for j in [200]]
-    hyp_activations = [[i, j] for i in ['relu'] for j in ['relu']]
-    hyp_optimizer = ['adam'] #, 'adagrad'] #['momentum', 'adam']  #['momentum', 'sgd'],
-    hyp_learning_rate = [0.005] #, 0.005] #[0.01, 0.005, 0.001]  #  [0.001, 0.005, 0.01, 0.02]
-    hyp_loss_fn = ['mse'] #, 'mae']  #['mse', 'abs'],
-    hyp_l_1 =  [0.0] # 0.5]  # [0.0, 0.1, 1.0, 10.0]
-    hyp_l_2 =  [0.0] # 0.5]  # [0.0, 0.1, 0.5, 1.0]
-    hyp_batch_size = [10000] # , 10000]  #[1, 10, 100, 500, 1000, 10000]
 
-    # Make table to hyperparameters that we consider in training (WRITE TO FILE)
-    make_hyper_params_csv(hyp_hidden_units = hyp_hidden_units,
-                          hyp_activations = hyp_activations,
-                          hyp_optimizer = hyp_optimizer,
-                          hyp_learning_rate = hyp_learning_rate,    # [0.001, 0.005, 0.01, 0.02]
-                          hyp_loss_fn = hyp_loss_fn,
-                          hyp_l_1 =  hyp_l_1,  # [0.0, 0.1, 1.0, 10.0]
-                          hyp_l_2 =  hyp_l_2, # [0.0, 0.1, 0.5, 1.0]
-                          hyp_batch_size = hyp_batch_size # [1, 10, 100, 500, 1000, 10000]
-                          )
+    hyper_params = { 'hidden_units': [30,30],
+                     'activations': ['sigmoid', 'sigmoid'],
+                     'output_activation': 'linear',
+                     'optimizer': 'adam',
+                     'learning_rate': 0.005,
+                     'loss_fn': 'mse',
+                     'beta1': 0.9,
+                     'beta2': 0.999,
+                     'rho': 0.9,
+                     'l_1': 0.0, # NOTE: Cannot supply integers here
+                     'l_2': 0.0, # NOTE: Cannot supply integers here
+                     'batch_size': 10000,
+                     'max_epoch': 10000,
+                     'eval_after_n_epochs': 100,
+                     'training_data_size': 5000000,
+                     'data_type': 'wfpt'
+                    }
 
-    hyper_params = pd.read_csv('hyper_parameters.csv',
-                               converters = {'hidden_units':eval,
-                                             'activations':eval})
+    # mini sanity check to make sure that batch_size is smaller or equal than training_data_size
+    assert hyper_params['batch_size'] <= hyper_params['training_data_size'], 'Make batch size smaller or equal to training data size please..... (specified in hyper_params dictionary)'
+
+    # Reading in training data
+    if hyper_params['data_type'] == 'wfpt':
+        print('reading in training and test set....')
+        train_features, train_labels, test_features, test_labels = mdw.train_test_from_file(fname_test = '',
+                                                                                            fname_train = '',
+                                                                                            n = hyper_params['training_data_size'])
+
+    if hyper_params['data_type'] == 'sin':
+        features, labels = mds.make_data()
+        train_features, train_labels, test_features, test_labels = mds.train_test_split(features, labels, p = 0.8)
 
     # Generate feature
     feature_columns = dnnreg_model_input.make_feature_columns_numeric(features = train_features)
+
+    hyper_params['feature_columns'] = feature_columns
 
     # Run training across hyperparameter setups
     print('starting training....')
@@ -259,6 +219,4 @@ if __name__ == "__main__":
                  training_labels = train_labels,
                  feature_columns = feature_columns,
                  model_directory = model_directory,
-                 max_epoch = 20000,
-                 eval_after_n_epochs = 50,
                  print_info = True)

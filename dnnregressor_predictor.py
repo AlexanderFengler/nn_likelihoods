@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 import scipy as scp
-import matplotlib.pyplot as plt
 import shutil
 import csv
 import os
@@ -12,7 +11,6 @@ import dnnregressor_model_and_input_fn as dnnreg_model_input
 
 # Get working directory (in case it's useful)
 cwd = os.getcwd()
-
 
 # Suppressing tensorflow output to keep things clean at this point
 tf.logging.set_verbosity(tf.logging.ERROR) # could be tf.logging.ERROR, tf.logging.INFO, tf.logging.DEBUG, tf.logging.FATAL, tf.logging.WARN ....
@@ -36,6 +34,4 @@ def get_predictions(regressor = [],
                                        yield_single_examples = False,
                                       ))[0]['output']
     return predictions.flatten()
-
-
     #list(itertools.chain.from_iterable)

@@ -13,7 +13,7 @@ def train_input_fn(features, labels, batch_size, num_epochs = None):
     dataset = tf.data.Dataset.from_tensor_slices((features, labels))
 
     # Shuffle repeat and batch samples
-    dataset = dataset.shuffle(len(labels)).repeat(num_epochs).batch(batch_size)
+    dataset = dataset.shuffle(buffer_size = 50*batch_size, reshuffle_each_iteration = True).repeat(num_epochs).batch(batch_size)
 
     # Return read end of pipeline
     return dataset.make_one_shot_iterator().get_next()
@@ -28,9 +28,9 @@ def eval_input_fn(features, labels, batch_size, num_epochs = None):
 
 # WRITE A MODEL FUNCTION
 def dnn_regressor(features, # BATCH_FEATURES FROM input_fn
-                 labels, # BATCH_LABELS from input_fn
-                 mode, # TRAIN, PREDICT, EVAL
-                 params):
+                  labels, # BATCH_LABELS from input_fn
+                  mode, # TRAIN, PREDICT, EVAL
+                  params):
 
     # DEFINING A MODEL
     # ----------------------
@@ -50,26 +50,52 @@ def dnn_regressor(features, # BATCH_FEATURES FROM input_fn
         # construct layer with correct activation functions
         if params['activations'][cnt] == 'relu':
             net = tf.layers.dense(
-                inputs = net,
-                units = units,
-                activation = tf.nn.relu,
-                kernel_regularizer = l1_l2_reg
+                                  inputs = net,
+                                  units = units,
+                                  activation = tf.nn.relu,
+                                  kernel_regularizer = l1_l2_reg
             )
+
         if params['activations'][cnt] == 'sigmoid':
             net = tf.layers.dense(
-                inputs = net,
-                units = units,
-                activation = tf.nn.sigmoid,
-                kernel_regularizer = l1_l2_reg
+                                  inputs = net,
+                                  units = units,
+                                  activation = tf.nn.sigmoid,
+                                  kernel_regularizer = l1_l2_reg
+            )
+
+        if params['activations'][cnt] == 'leaky_relu':
+            net = tf.layers.dense(
+                                  inputs = net,
+                                  units = units,
+                                  activation = tf.nn.leaky_relu,
+                                  kernel_regularizer = l1_l2_reg
+
             )
         cnt += 1
 
 
     # Output layer
-    output = tf.layers.dense(inputs = net,
-                             units = 1,
-                             activation = tf.nn.relu # relu activation here to enforce positivity
-                            )
+    if params['output_activation'] == 'relu':
+        output = tf.layers.dense(inputs = net,
+                                 units = 1,
+                                 activation = tf.nn.relu # relu activation here to enforce positivity
+                                )
+
+        print('using relu output activation...... !!!!!!!!!!!!!!!!!!!!!!!!!')
+
+    if params['output_activation'] == 'linear':
+        output = tf.layers.dense(inputs = net,
+                                 units = 1,
+                                 activation = None
+                                 )
+        print('using linear output activation...... !!!!!!!!!!!!!!!!!!!!!!!!!')
+
+    if params['output_activation'] == 'leaky_relu':
+        output = tf.layers.dense(inputs = net,
+                                 units = 1,
+                                 activation = tf.nn.leaky_relu
+                                 )
     # ----------------------
 
     # PREDICTION MODE
@@ -128,6 +154,7 @@ def dnn_regressor(features, # BATCH_FEATURES FROM input_fn
     mae = tf.metrics.mean_absolute_error(labels = labels,
                                          predictions = tf.cast(output, tf.float64)
                                         )
+
     # Store evaluation metric to be returned in mode = 'eval'
     metrics = {'mse': mse,
                'mae': mae
