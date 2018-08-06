@@ -173,7 +173,7 @@ if __name__ == "__main__":
     # Hyperparameters under consideration
     print('defining hyperparameters...')
 
-    hyper_params = { 'hidden_units': [30,30],
+    hyper_params = { 'hidden_units': [300,300],
                      'activations': ['sigmoid', 'sigmoid'],
                      'output_activation': 'linear',
                      'optimizer': 'adam',
