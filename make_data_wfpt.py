@@ -64,7 +64,7 @@ def fptd(t, v, a, w, eps):
 # w ~ U(0,1)
 # rt ~ random.sample({-1, 1}) * GAMMA(scale = 1, shape = 2)
 
-def gen_ddm_features(v_range = [-3, 3], a_range = [0.1, 3], w_range = [0, 1], rt_params = [1,2] ,n_samples = 20000):
+def gen_ddm_features(v_range = [-3, 3], a_range = [0.1, 3], w_range = [0, 1], rt_params = [1, 2] , n_samples = 20000):
     data = pd.DataFrame(np.zeros((n_samples, 5)), columns = ['v', 'a', 'w', 'rt', 'choice'])
     for i in np.arange(0, n_samples, 1):
         data.iloc[i] = [np.random.uniform(low = v_range[0], high = v_range[1], size = 1),

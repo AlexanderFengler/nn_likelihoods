@@ -13,7 +13,7 @@ def train_input_fn(features, labels, batch_size, num_epochs = None):
     dataset = tf.data.Dataset.from_tensor_slices((features, labels))
 
     # Shuffle repeat and batch samples
-    dataset = dataset.shuffle(1000).repeat(num_epochs).batch(batch_size)
+    dataset = dataset.shuffle(len(labels)).repeat(num_epochs).batch(batch_size)
 
     # Return read end of pipeline
     return dataset.make_one_shot_iterator().get_next()

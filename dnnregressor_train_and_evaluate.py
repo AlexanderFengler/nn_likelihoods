@@ -223,7 +223,7 @@ if __name__ == "__main__":
     # Potentially remove 'choice' column and make reaction times positive and negative at this point
     # Hyperparameters under consideration
     print('defining hyperparameters...')
-    hyp_hidden_units = [[i, j] for i in [300] for j in [300]]
+    hyp_hidden_units = [[i, j] for i in [200] for j in [200]]
     hyp_activations = [[i, j] for i in ['relu'] for j in ['relu']]
     hyp_optimizer = ['adam'] #, 'adagrad'] #['momentum', 'adam']  #['momentum', 'sgd'],
     hyp_learning_rate = [0.005] #, 0.005] #[0.01, 0.005, 0.001]  #  [0.001, 0.005, 0.01, 0.02]
@@ -259,6 +259,6 @@ if __name__ == "__main__":
                  training_labels = train_labels,
                  feature_columns = feature_columns,
                  model_directory = model_directory,
-                 max_epoch = 10000,
+                 max_epoch = 20000,
                  eval_after_n_epochs = 50,
                  print_info = True)
