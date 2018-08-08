@@ -52,8 +52,8 @@ class dnn_trainer():
         self.model_directory = os.getcwd() + '/tensorflow_models'
 
         self.hyper_params = {
-                             'hidden_units': [20,20],
-                             'activations': ['sigmoid', 'sigmoid'],
+                             'hidden_units': [500,500],
+                             'activations': ['relu', 'relu'],
                              'output_activation': 'linear',
                              'optimizer': 'adam',
                              'learning_rate': 0.005,
@@ -63,11 +63,11 @@ class dnn_trainer():
                              'rho': 0.9,
                              'l_1': 0.0, # NOTE: Cannot supply integers here
                              'l_2': 0.0, # NOTE: Cannot supply integers here
-                             'batch_size': 100,
+                             'batch_size': 10000,
                              'max_epoch': 10000,
                              'eval_after_n_epochs': 100,
-                             'training_data_size': 1000,
-                             'data_type': 'sin',
+                             'training_data_size': 5000000,
+                             'data_type': 'wfpt',
                              'train_test_file_signature': ''
                              }
 
