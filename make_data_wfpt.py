@@ -190,20 +190,26 @@ def train_test_from_file(
         flist_test = glob.glob('data_storage/test_data_' + str(n) + '*')
         assert len(flist_train) > 0, 'There seems to be no datafile for train data that fullfills the requirements passed to the function'
         assert len(flist_test) > 0, 'There seems to be no datafile for train data that fullfills the requirements passed to the function'
-        fname = flist_train[-1]
-        fname = flist_test[-1]
+        fname_train = flist_train[-1]
+        fname_test = flist_test[-1]
 
     else:
         flist_train = glob.glob('data_storage/train_data_' + str(n) + f_signature + '*')
         flist_test = glob.glob('data_storage/test_data_' + str(n) + f_signature + '*')
         assert len(flist_train) > 0, 'There seems to be no datafile for train data that fullfills the requirements passed to the function'
         assert len(flist_test) > 0, 'There seems to be no datafile for train data that fullfills the requirements passed to the function'
-        fname = flist_train[-1]
-        fname = flist_test[-1]
+        fname_train = flist_train[-1]
+        fname_test =  flist_test[-1]
+
 
     print('datafile used to read in training data: ' + flist_train[-1])
     print('datafile used to read in test data: ' + flist_train[-1])
 
+    # Reading in the data
+    train_data = pd.read_csv(fname_train)
+    test_data = pd.read_csv(fname_test)
+
+    # Splitting into labels and features
     train_labels = np.asmatrix(train_data['nf_likelihood'].copy()).T
     train_features = train_data.drop(labels = 'nf_likelihood', axis = 1).copy()
 
