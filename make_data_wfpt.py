@@ -203,7 +203,7 @@ def train_test_from_file(
 
 
     print('datafile used to read in training data: ' + flist_train[-1])
-    print('datafile used to read in test data: ' + flist_train[-1])
+    print('datafile used to read in test data: ' + flist_test[-1])
 
     # Reading in the data
     train_data = pd.read_csv(fname_train)
