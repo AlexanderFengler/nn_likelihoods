@@ -96,23 +96,27 @@ def make_data(v_range = [-3, 3],
               rt_params = [1,2],
               n_samples = 20000,
               eps = 10**(-29),
+              f_signature = '',
               write_to_file = True):
 
     data_features = gen_ddm_features(v_range = v_range,
-                                    a_range = a_range,
-                                    w_range = w_range,
-                                    rt_params = rt_params,
-                                    n_samples = n_samples)
+                                     a_range = a_range,
+                                     w_range = w_range,
+                                     rt_params = rt_params,
+                                     n_samples = n_samples
+                                     )
 
     data_labels = pd.DataFrame(gen_ddm_labels(data = data_features,
-                         eps = eps), columns = ['nf_likelihood'])
+                               eps = eps),
+                               columns = ['nf_likelihood']
+                               )
+
     data = pd.concat([data_features, data_labels], axis = 1)
-    # data_features['nf_likelihood'] = data_labels
 
     cur_time = datetime.now().strftime('%m_%d_%y_%H_%M_%S')
 
     if write_to_file == True:
-       data.to_csv('data_storage/data_' + str(n_samples) + '_' + cur_time + '.csv')
+       data.to_csv('data_storage/data_' + str(n_samples) + '_' + f_signature + cur_time + '.csv')
 
     return data.copy(), cur_time, n_samples
 
@@ -121,24 +125,25 @@ def train_test_split(data = [],
                      p_train = 0.8,
                      write_to_file = True,
                      from_file = True,
-                     fname = '',  # default behavior is to load the latest file of a specified number of examples
+                     f_signature = '',  # default behavior is to load the latest file of a specified number of examples
                      n = None): # if we pass a number, we pick a data file with the specified number of examples, if None the function picks some data file
 
-    if from_file:
-        # List data files in directory
-        if fname == '':
-            if n != None:
-                flist = glob.glob('data_storage/data_' + str(n) + '*')
-                assert len(flist) > 0, 'There seems to be no datafile that fullfills the requirements passed to the function'
-                fname = flist[-1]
-            else:
-                flist = glob.glob('data_storage/data_*')
-                assert len(flist) > 0, 'There seems to be no datafile that fullfills the requirements passed to the function'
-                fname = flist[-1]
+    assert n != None, 'please specify the size of the dataset (rows) that is supposed to be read in....'
 
+    if from_file:
+
+        # List data files in directory
+        if f_signature == '':
+            flist = glob.glob('data_storage/data_' + str(n) + '*')
+            assert len(flist) > 0, 'There seems to be no datafile that fullfills the requirements passed to the function'
+            fname = flist[-1]
             data = pd.read_csv(fname)
         else:
+            list = glob.glob('data_storage/data_' + str(n) + f_signature + '*')
+            assert len(flist) > 0, 'There seems to be no datafile that fullfills the requirements passed to the function'
+            fname = flist[-1]
             data = pd.read_csv(fname)
+            data = pd.read_csv('data_storage/data_' + str(n) + f_signature + '*')
 
     n = data.shape[0]
     train_indices = np.random.choice([0,1], size = data.shape[0], p = [p_train, 1 - p_train])
@@ -154,7 +159,7 @@ def train_test_split(data = [],
 
     if write_to_file == True:
         print('writing training and test data to file ....')
-        train.to_csv('data_storage/train_data_'+ str(n) + '_' + fname[-21:])
+        train.to_csv('data_storage/train_data_' + str(n) + '_' + fname[-21:])
         test.to_csv('data_storage/test_data_' + str(n) + '_' + fname[-21:])
         np.savetxt('data_storage/train_indices_' + str(n) + '_' + fname[-21:], train_indices, delimiter = ',')
 
@@ -173,37 +178,31 @@ def train_test_split(data = [],
             test_labels)
 
 def train_test_from_file(
-                         fname_train = '',
-                         fname_test = '',  # default behavior is to load the latest file of a specified number of examples
+                         f_signature = '', # default behavior is to load the latest file of a specified number of examples
                          n = None # if we pass a number, we pick a data file with the specified number of examples, if None the function picks some data file
                          ):
 
+    assert n != None, 'please specify the size of the dataset (rows) that is supposed to be read in....'
+
     # List data files in directory
-    if fname_train == '' and fname_test == '':
-        if n != None:
-            flist_train = glob.glob('data_storage/train_data_' + str(n) + '*')
-            flist_test = glob.glob('data_storage/train_data_' + str(n) + '*')
-            assert len(flist_train) > 0, 'There seems to be no datafile for train data that fullfills the requirements passed to the function'
-            assert len(flist_test) > 0, 'There seems to be no datafile for train data that fullfills the requirements passed to the function'
-            fname_train = flist_train[-1]
-            fname_test = flist_test[-1]
-        else:
-            flist_train = glob.glob('data_storage/test_data_*')
-            flist_test = glob.glob('data_storage/train_data_*')
-            assert len(flist_train) > 0, 'There seems to be no datafile that fullfills the requirements passed to the function'
-            assert len(flist_test) > 0, 'There seems to be no datafile that fullfills the requirements passed to the function'
-            fname_train = flist_train[-1]
-            fname_test = flist_test[-1]
+    if f_signature == '':
+        flist_train = glob.glob('data_storage/train_data_' + str(n) + '*')
+        flist_test = glob.glob('data_storage/test_data_' + str(n) + '*')
+        assert len(flist_train) > 0, 'There seems to be no datafile for train data that fullfills the requirements passed to the function'
+        assert len(flist_test) > 0, 'There seems to be no datafile for train data that fullfills the requirements passed to the function'
+        fname = flist_train[-1]
+        fname = flist_test[-1]
 
-        train_data = pd.read_csv(fname_train)
-        test_data = pd.read_csv(fname_test)
-
-
-        print('datafile used to read in training data: ' + flist_train[-1])
-        print('datafile used to read in test data: ' + flist_train[-1])
     else:
-        train_data = pd.read_csv(fname_train)
-        test_data = pd.read_csv(fname_test)
+        flist_train = glob.glob('data_storage/train_data_' + str(n) + f_signature + '*')
+        flist_test = glob.glob('data_storage/test_data_' + str(n) + f_signature + '*')
+        assert len(flist_train) > 0, 'There seems to be no datafile for train data that fullfills the requirements passed to the function'
+        assert len(flist_test) > 0, 'There seems to be no datafile for train data that fullfills the requirements passed to the function'
+        fname = flist_train[-1]
+        fname = flist_test[-1]
+
+    print('datafile used to read in training data: ' + flist_train[-1])
+    print('datafile used to read in test data: ' + flist_train[-1])
 
     train_labels = np.asmatrix(train_data['nf_likelihood'].copy()).T
     train_features = train_data.drop(labels = 'nf_likelihood', axis = 1).copy()

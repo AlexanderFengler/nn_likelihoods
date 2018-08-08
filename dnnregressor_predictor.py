@@ -24,7 +24,8 @@ def get_dnnreg_predictor(model_directory = '', params = []):
 
 def get_predictions(regressor = [],
                     features = [],
-                    labels = []):
+                    labels = [],
+                    checkpoint = ''):
     predictions = list(regressor.predict(
                                        input_fn = lambda: dnnreg_model_input.eval_input_fn(features = features,
                                                                          labels = labels,
@@ -32,6 +33,7 @@ def get_predictions(regressor = [],
                                                                          num_epochs = 1),
                                        predict_keys = 'output',
                                        yield_single_examples = False,
+                                       checkpoint_path = checkpoint
                                       ))[0]['output']
     return predictions.flatten()
     #list(itertools.chain.from_iterable)

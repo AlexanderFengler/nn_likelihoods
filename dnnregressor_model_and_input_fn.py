@@ -82,14 +82,11 @@ def dnn_regressor(features, # BATCH_FEATURES FROM input_fn
                                  activation = tf.nn.relu # relu activation here to enforce positivity
                                 )
 
-        print('using relu output activation...... !!!!!!!!!!!!!!!!!!!!!!!!!')
-
     if params['output_activation'] == 'linear':
         output = tf.layers.dense(inputs = net,
                                  units = 1,
                                  activation = None
                                  )
-        print('using linear output activation...... !!!!!!!!!!!!!!!!!!!!!!!!!')
 
     if params['output_activation'] == 'leaky_relu':
         output = tf.layers.dense(inputs = net,

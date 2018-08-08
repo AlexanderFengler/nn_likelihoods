@@ -35,8 +35,6 @@ class ddm_data_simulator():
         #print('z: ', z)
         #print('b: ', b)
 
-
-
         while True:
             if z > b:
                 return 0
@@ -117,6 +115,7 @@ class ddm_data_simulator():
             if i % 1000 == 0:
                 print(i, ' data points sampled')
         return data
+
     def compute_t_tilde_small_mu(self):
         return 0.12 + 0.5 * np.exp(- self.mu/3)
 

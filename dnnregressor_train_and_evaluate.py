@@ -56,11 +56,17 @@ def run_training(hyper_params = [],
     basedir = model_directory + '/dnnregressor_' + model_params['loss_fn'] + date_time_str
 
     # Making the estimator
+    config_obj = tf.estimator.RunConfig(keep_checkpoint_max = 10,
+                           save_summary_steps = 100)
+
     dnnregressor = tf.estimator.Estimator(
-                                         model_fn = dnnreg_model_input.dnn_regressor,
-                                         params = model_params,
-                                         model_dir = basedir
-                                         )
+                                          model_fn = dnnreg_model_input.dnn_regressor,
+                                          params = model_params,
+                                          model_dir = basedir,
+                                          config = config_obj
+                                          )
+
+
 
 
     # Initialze epoch and training steps counters
@@ -99,7 +105,8 @@ def run_training(hyper_params = [],
         print('Old metric value:' + str(old_metric))
         print('New metric value:' + str(new_metric))
         print('Improvement in evaluation metric: ' + str(old_metric - new_metric))
-
+        if new_metric < old_metric:
+            checkpoint_path = 'model.ckpt-' + str(training_steps_cnt)
         # Generate summary of hyperparameters and append results to file
         current_eval_data = [
                              str(model_params['hidden_units']),
@@ -143,6 +150,11 @@ def run_training(hyper_params = [],
     # Report that training is finished once we exited the while loop
     print('finished training')
 
+    # Write file that stores the best checkpoint from training
+    with open(basedir + '/best_checkpoint.txt', 'w') as f:
+        writer = csv.writer(f)
+        writer.writerow([checkpoint_path])
+
 # MAKE EXECUTABLE FROM COMMAND LINE
 if __name__ == "__main__":
     # Headers for training results table
@@ -173,7 +185,7 @@ if __name__ == "__main__":
     # Hyperparameters under consideration
     print('defining hyperparameters...')
 
-    hyper_params = { 'hidden_units': [300,300],
+    hyper_params = { 'hidden_units': [20,20],
                      'activations': ['sigmoid', 'sigmoid'],
                      'output_activation': 'linear',
                      'optimizer': 'adam',
@@ -184,11 +196,11 @@ if __name__ == "__main__":
                      'rho': 0.9,
                      'l_1': 0.0, # NOTE: Cannot supply integers here
                      'l_2': 0.0, # NOTE: Cannot supply integers here
-                     'batch_size': 10000,
+                     'batch_size': 100,
                      'max_epoch': 10000,
                      'eval_after_n_epochs': 100,
-                     'training_data_size': 5000000,
-                     'data_type': 'wfpt'
+                     'training_data_size': 1000,
+                     'data_type': 'sin'
                     }
 
     # mini sanity check to make sure that batch_size is smaller or equal than training_data_size
@@ -197,8 +209,8 @@ if __name__ == "__main__":
     # Reading in training data
     if hyper_params['data_type'] == 'wfpt':
         print('reading in training and test set....')
-        train_features, train_labels, test_features, test_labels = mdw.train_test_from_file(fname_test = '',
-                                                                                            fname_train = '',
+        train_features, train_labels, test_features, test_labels = mdw.train_test_from_file(f_signature_test = '',
+                                                                                            f_signature_train = '',
                                                                                             n = hyper_params['training_data_size'])
 
     if hyper_params['data_type'] == 'sin':
