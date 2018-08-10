@@ -175,20 +175,22 @@ def make_data_rt_choice(v_range = [-3, 3],
     cur_time = datetime.now().strftime('%m_%d_%y_%H_%M_%S')
 
     if write_to_file == True:
-       data.to_csv('data_storage/data_' + str(n_samples) + '_' + f_signature + cur_time + '.csv')
+       data.to_csv('data_storage/data_' + str(n_samples) + f_signature + cur_time + '.csv')
 
     return data.copy(), cur_time, n_samples
 
 def make_data_choice_probabilities(v_range = [-3, 3],
                                    a_range = [0.1, 3],
                                    w_range = [0, 1],
+                                   n_samples = 20000,
                                    eps = 1e-29,
                                    f_signature = '',
                                    write_to_file = True,
-                                   print_detailed_cnt = False):
+                                   print_detailed_cnt = False,
+                                   ):
 
 
-    data = pd.DataFrame(np.zeros((n_samples, 5)), columns = ['v',
+    data = pd.DataFrame(np.zeros((n_samples, 4)), columns = ['v',
                                                              'a',
                                                              'w',
                                                              'p_lower_barrier'])
@@ -238,7 +240,6 @@ def train_test_split_choice_probabilities(data = [],
             assert len(flist) > 0, 'There seems to be no datafile that fullfills the requirements passed to the function'
             fname = flist[-1]
             data = pd.read_csv(fname)
-            data = pd.read_csv('data_storage/data_' + str(n) + f_signature + '*')
 
     n = data.shape[0]
     train_indices = np.random.choice([0,1], size = data.shape[0], p = [p_train, 1 - p_train])
@@ -291,11 +292,10 @@ def train_test_split_rt_choice(data = [],
             fname = flist[-1]
             data = pd.read_csv(fname)
         else:
-            list = glob.glob('data_storage/data_' + str(n) + f_signature + '*')
+            flist = glob.glob('data_storage/data_' + str(n) + f_signature + '*')
             assert len(flist) > 0, 'There seems to be no datafile that fullfills the requirements passed to the function'
             fname = flist[-1]
             data = pd.read_csv(fname)
-            data = pd.read_csv('data_storage/data_' + str(n) + f_signature + '*')
 
     n = data.shape[0]
     train_indices = np.random.choice([0,1], size = data.shape[0], p = [p_train, 1 - p_train])

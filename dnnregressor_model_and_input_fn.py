@@ -93,6 +93,12 @@ def dnn_regressor(features, # BATCH_FEATURES FROM input_fn
                                  units = 1,
                                  activation = tf.nn.leaky_relu
                                  )
+
+    if params['output_activation'] == 'sigmoid':
+        output = tf.layers.dense(inputs = net,
+                                 units = 1,
+                                 activation = tf.nn.sigmoid
+                                 )
     # ----------------------
 
     # PREDICTION MODE
@@ -114,6 +120,11 @@ def dnn_regressor(features, # BATCH_FEATURES FROM input_fn
         loss = tf.losses.absolute_difference(labels = labels,
                                             predictions = output
                                             ) + tf.losses.get_regularization_loss()
+
+    if params['loss_fn'] == 'crossentropy':
+        loss = tf.distributions.kl_divergence(tf.concat(output,1-output),
+                                              tf.concat(labels,1-labels)
+                                              )
 
     # TRAINING
     # Choose optimizer

@@ -13,32 +13,49 @@ import dnnregressor_model_and_input_fn as dnn_model_input
 class ddm_mle_estimator:
     def __init__(self):
         self.ddm_sim_params = dict({'v': 1,
-                            'a': 1,
-                            'w': 0.5,
-                            's': 1,
-                            'delta_t': 0.001,
-                            'max_t': 20,
-                            'sample_size': 1000
-                            })
+                                    'a': 1,
+                                    'w': 0.5,
+                                    's': 1,
+                                    'delta_t': 0.001,
+                                    'max_t': 20,
+                                    'sample_size': 1000}
+                                    )
 
-        self.gen_alg_params = dict({'population_size': 40,
-                                    'mutation_probability': 0.1,
-                                    'print_steps': True,
-                                    'steps': 100,
-                                    'model': 'navarro'})
+
 
         self.parameter_bounds = dict({'v': [-2, 2],
                                       'a': [0.3, 4],
                                       'w': [0.001, 0.999]
-                                      })
+                                      }
+                                      )
+
+        # Genetic algorithm related
+        self.gen_alg_params = dict({'population_size': 40,
+                                    'mutation_probability': 0.1,
+                                    'print_steps': True,
+                                    'steps': 100}
+                                    )
 
         self.gen_alg_population = []
         self.gen_alg_population_record = np.zeros((self.gen_alg_params['steps'], self.gen_alg_params['population_size'], 3))
         self.gen_alg_fitness = []
         self.gen_alg_fitness_record = np.zeros((self.gen_alg_params['steps'], self.gen_alg_params['population_size']))
 
+        # Grid search related
+        self.grid_search_parameters = dict({'precision_v': 0.2,
+                                            'precision_a': 0.2,
+                                            'precision_w': 0.1})
+
+
+        # Data and miscellaneous
         self.data = []
         self.model_directory = 'none'    # directory for model that can predict likelihoods (to be passed as parameter to a function that restores the model from tensorflow for example)
+        self.hyper_parameter_file = ''
+
+        # Meta
+        self.meta_parameters = dict({'model': 'navarro',
+                                     'datatype': 'choice_probabilities',
+                                     'optimizer': 'genetic'})
 
     def initialize_dnn_predictor(self):
         if self.model_directory == 'none':
@@ -51,20 +68,25 @@ class ddm_mle_estimator:
             features = dict({'v': [],
                             'a': [],
                             'w': [],
-                            'rt': []}
+                            'rt': [],
+                            'choice': []}
                             )
             feature_columns = dnn_model_input.make_feature_columns_numeric(features = features)
             self.dnn_model_params['feature_columns'] = feature_columns
             self.dnn_predictor = dnn_predictor.get_dnnreg_predictor(model_directory = self.model_directory, params = self.dnn_model_params)
 
     def make_data(self):
-        self.data = ddm_data_simulation.ddm_simulate_rts(v = self.ddm_sim_params['v'],
-                                                         a = self.ddm_sim_params['a'] / 2, # we divide by 2 => correct conversion when simulating with euler narayujan
-                                                         w = self.ddm_sim_params['w'],
-                                                         s = self.ddm_sim_params['s'],
-                                                         delta_t = self.ddm_sim_params['delta_t'],
-                                                         max_t = self.ddm_sim_params['max_t'],
-                                                         n_samples = self.ddm_sim_params['sample_size'])
+        rts, choices = ddm_data_simulation.ddm_simulate_rts(v = self.ddm_sim_params['v'],
+                                                            a = self.ddm_sim_params['a'] / 2, # we divide by 2 => correct conversion when simulating with euler narayujan
+                                                            w = self.ddm_sim_params['w'],
+                                                            s = self.ddm_sim_params['s'],
+                                                            delta_t = self.ddm_sim_params['delta_t'],
+                                                            max_t = self.ddm_sim_params['max_t'],
+                                                            n_samples = self.ddm_sim_params['sample_size']
+                                                            )
+
+       self.p_lower_barrier = np.sum(choices > 0) / len(choices)
+       self.data = np.multiply(rts, choices)
 
     # functions related to genetic algorithm setup
     def make_pop_init(self):
@@ -85,11 +107,11 @@ class ddm_mle_estimator:
     def population_fitness_navarro(self):
         fitness = np.zeros((self.gen_alg_params['population_size'], ))
         for i in range(0, self.gen_alg_params['population_size'], 1):
-            fitness[i] = self.loglik(eps = 1e-29,
-                                     v = self.gen_alg_population.loc[i, 'v'],
-                                     a = self.gen_alg_population.loc[i, 'a'],
-                                     w = self.gen_alg_population.loc[i, 'w']
-                                     )
+            fitness[i] = self.loglik_choice_rt(eps = 1e-29,
+                                               v = self.gen_alg_population.loc[i, 'v'],
+                                               a = self.gen_alg_population.loc[i, 'a'],
+                                               w = self.gen_alg_population.loc[i, 'w']
+                                               )
         self.gen_alg_fitness = fitness
 
     def population_fitness_dnn(self):
@@ -102,6 +124,7 @@ class ddm_mle_estimator:
             data.loc[:, 'w'] = self.gen_alg_population.loc[i, 'w']
             data.loc[:, 'rt'] = self.data.flatten()
             data.loc[:, 'nf_likelihood'] = 0.0
+
             #self.data_test = data
             features, labels, __, ___ = wfpt.train_test_split(data = data,
                                                               p_train = 1.0,
@@ -116,6 +139,18 @@ class ddm_mle_estimator:
                                                                      )
                                                                      )
             self.gen_alg_fitness = fitness
+
+    def population_fitness_choice_p_navarro(self):
+
+        fitness = np.zeros((self.gen_alg_params['population_size'], ))
+
+        for i in range(0, self.gen_alg_params['population_size'], 1):
+            fitness[i] = self.loglik_choice_probability(v = self.gen_alg_population.loc[i, 'v'],
+                                                        a = self.gen_alg_population.loc[i, 'a'],
+                                                        w = self.gen_alg_population.loc[i, 'w']
+                                                        )
+
+        self.gen_alg_fitness = fitness
 
     def make_next_generation(self):
         pop_size = self.gen_alg_params['population_size']
@@ -177,24 +212,27 @@ class ddm_mle_estimator:
         #print('new_gen_data_frame : ', pd.DataFrame(new_gen, columns = ['v', 'a', 'w']))
         self.gen_alg_population = pd.DataFrame(new_gen, columns = ['v', 'a', 'w'])
 
-        if self.gen_alg_params['model'] == 'navarro':
+        if self.meta_parameters['model'] == 'navarro':
             self.population_fitness_navarro()
 
-        if self.gen_alg_params['model'] == 'dnn':
+        if self.meta_parameters['model'] == 'dnn':
             self.population_fitness_dnn()
-
 
     def make_fitness_stats(self):
         return np.mean(self.gen_alg_fitness), np.max(self.gen_alg_fitness)
 
     def run_gen_alg(self):
         self.make_pop_init()
-        if self.gen_alg_params['model'] == 'navarro':
+        if self.meta_parameters['model'] == 'navarro':
             self.population_fitness_navarro()
         #self.gen_alg_fitness_max = np.zeros((self.gen_alg_steps, ))
         #self.gen_alg_fitness_mean = np.zeros((self.gen_alg_steps, ))
-        if self.gen_alg_params['model'] == 'dnn':
+        if self.meta_parameters['model'] == 'dnn':
             self.population_fitness_dnn()
+
+        if self.meta_parameters['model'] == 'choice_probabilities':
+            self.population_fitness_choice_p_navarro()
+
         for step in range(0, self.gen_alg_params['steps'], 1):
             self.make_next_generation()
             print('cur_population: ', self.gen_alg_population)
@@ -213,20 +251,101 @@ class ddm_mle_estimator:
         plt.show()
 
     # compute log likelihood one set of data
-    def loglik(self,
-               eps = 1e-29,
-               v = 0,
-               a = 1,
-               w = 0.5):
+    def loglik_choice_rt(self,
+                         eps = 1e-29,
+                         v = 0,
+                         a = 1,
+                         w = 0.5):
 
         tmp = 0
         for t in self.data:
             tmp += np.log(wfpt.fptd(t, v, a, w, eps))
         return tmp
 
+    def d_kl_choice_probabiliy_navarro(self,
+                                       eps = 1e-29,
+                                       v = 0,
+                                       a = 1,
+                                       w = 0.5):
+
+        p_navarro = wfpt.choice_probabilities(v = v,
+                                              a = a,
+                                              w = w)
+        p_data = self.p_lower_barrier
+
+        d_kl = p_navarro * np.log(p_data) + (1 - p_navarro) * np.log(1 - p_data)
+
+        return d_kl
+
+    def loglik_choice_probability_navarro(self,
+                                      eps = 1e-29,
+                                      v = 0,
+                                      a = 1,
+                                      w = 0.5):
+
+        log_p_navarro = np.log(wfpt.choice_probabilities(v = v,
+                                                         a = a,
+                                                         w = w)
+                                                         )
+
+        tmp = 0
+        for c in np.sign(self.data):
+            if c > 0:
+                tmp += log_p_navarro
+            else:
+                tmp += log_p_navarro
+
+        return tmp
+
+    # Methods related to grid search
+    def grid_search_make_grid(self):
+        v_vals = np.arange(self.parameter_bounds['v'][0], self.parameter_bounds['v'][1], self.grid_search_parameters['precision_v'][0])
+        a_vals = np.arange(self.parameter_bounds['a'][0], self.parameter_bounds['a'][1], self.grid_search_parameters['precision_a'][0])
+        w_vals = np.arange(self.parameter_bounds['w'][0], self.parameter_bounds['w'][1], self.grid_search_parameters['precision_w'][0])
+
+        grid = pd.DataFrame(np.zeros(len(v_vals)*len(a_vals)*len(w_vals), 3),
+                            columns = ['v', 'a', 'w'])
+
+        cnt = 0
+        for v_tmp in v_vals:
+            for a_tmp in a_vals:
+                for w_tmp in w_vals:
+                    grid.loc[cnt] = [v_tmp, a_tmp, w_tmp]
+                    cnt += 1
+
+        self.grid_search_grid = grid
+
+
+    def run_grid_search(self):
+        self.grid_search_make_grid()
+
+        self.grid_search_results = self.grid_search_grid.copy()
+        self.grid_search_results['loglik'] = 0
+        self.grid_search_results['d_kl'] = 0
+
+        for i in range(0, len(self.grid_search_grid['v']), 1):
+
+            if self.meta_parameters['datatype'] == 'choice_rt':
+                if self.meta_parameters['model'] == 'navarro':
+                    self.grid_search_results.loc[i, 'loglik'] = self.loglik_choice_rt(v = self.grid_search_grid.loc[i, 'v'],
+                                                                                      a = self.grid_search_grid.loc[i, 'a'],
+                                                                                      w = self.grid_search_grid.loc[i, 'w'])
+                if self.meta_parameters['model'] == 'dnn':
+                    #self.grid_search_results.loc[i, 'loglik'] =
+
+            if self.meta_parameters['datatype'] == 'choice_probabilities':
+                self.grid_search_results.loc[i, 'loglik'] = self.loglik_choice_probability_navarro(v = self.grid_search_grid.loc[i, 'v'],
+                                                                                                   a = self.grid_search_grid.loc[i, 'a'],
+                                                                                                   w = self.grid_search_grid.loc[i, 'w'])
+
+                self.grid_search_results['d_kl'] = self.d_kl_choice_probability_navarro(v = self.grid_search_grid.loc[i, 'v'],
+                                                                                        a = self.grid_search_grid.loc[i, 'a'],
+                                                                                        w = self.grid_search_grid.loc[i, 'w'])
+
+
     # Methods related to importing tensorflow model for likelihood
     def tf_estimator_hyperparameters(self):
-        hyper_params= pd.read_csv(self.model_directory + '/model_params.csv',
+        hyper_params= pd.read_csv(self.model_directory + '/' + hyper_parameter_file,
                                   converters = {'hidden_units': eval,
                                                 'activations': eval}
                                  )
