@@ -76,9 +76,9 @@ class dnn_trainer():
 
     def read_in_training_data(self):
         if self.hyper_params['data_type'] == 'wfpt':
-            self.train_features, self.train_labels, self.test_features, self.test_labels = mdw.train_test_from_file(f_signature = self.hyper_params['train_test_file_signature'],
-                                                                                                                    n = self.hyper_params['training_data_size']
-                                                                                                                    )
+            self.train_features, self.train_labels, self.test_features, self.test_labels = mdw.train_test_from_file_rt_choice(f_signature = self.hyper_params['train_test_file_signature'],
+                                                                                                                              n = self.hyper_params['training_data_size']
+                                                                                                                              )
 
         if self.hyper_params['data_type'] == 'sin':
             features, labels = mds.make_data()
