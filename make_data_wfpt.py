@@ -200,15 +200,15 @@ def make_data_choice_probabilities(v_range = [-3, 3],
         a_tmp = np.random.uniform(low = a_range[0], high = a_range[1], size = 1)
         w_tmp = np.random.uniform(low = w_range[0], high = w_range[1], size = 1)
         p_tmp = choice_probabilities(v = v_tmp,
-                                   a = a_tmp,
-                                   w = w_tmp
-                                   )
+                                     a = a_tmp,
+                                     w = w_tmp
+                                     )
 
         data.iloc[i] = [v_tmp,
-                      a_tmp,
-                      w_tmp,
-                      p_tmp
-                      ]
+                        a_tmp,
+                        w_tmp,
+                        p_tmp
+                       ]
 
         if print_detailed_cnt:
           print(str(i))
@@ -216,7 +216,12 @@ def make_data_choice_probabilities(v_range = [-3, 3],
         if (i % 1000) == 0:
           print('datapoint ' + str(i) + ' generated')
 
-    return data
+    cur_time = datetime.now().strftime('%m_%d_%y_%H_%M_%S')
+
+    if write_to_file == True:
+       data.to_csv('data_storage/data_' + str(n_samples) + f_signature + cur_time + '.csv')
+
+    return data.copy(), cur_time, n_samples
 
 def train_test_split_choice_probabilities(data = [],
                                           p_train = 0.8,
