@@ -311,9 +311,9 @@ def train_test_split_rt_choice(data = [],
 
     if write_to_file == True:
         print('writing training and test data to file ....')
-        train.to_csv('data_storage/train_data_' + str(n) + '_' + f_signature + fname[-21:])
-        test.to_csv('data_storage/test_data_' + str(n) + '_' + f_signature + fname[-21:])
-        np.savetxt('data_storage/train_indices_' + str(n) + '_' + f_signature + fname[-21:], train_indices, delimiter = ',')
+        train.to_csv('data_storage/train_data_' + str(n) + f_signature + fname[-21:])
+        test.to_csv('data_storage/test_data_' + str(n) + f_signature + fname[-21:])
+        np.savetxt('data_storage/train_indices_' + str(n) + f_signature + fname[-21:], train_indices, delimiter = ',')
 
 
     # clean up dictionary: Get rid of index coltrain_features = train_features[['v', 'a', 'w', 'rt', 'choice']], which is unfortunately retained when reading with 'from_csv'
