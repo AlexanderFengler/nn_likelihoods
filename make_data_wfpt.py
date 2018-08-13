@@ -75,16 +75,26 @@ def gen_ddm_features_random(v_range = [-3, 3],
                             w_range = [0, 1],
                             rt_params = [1, 2],
                             n_samples = 20000,
+                            mixture_p = 0.2,
                             print_detailed_cnt = False):
 
     data = pd.DataFrame(np.zeros((n_samples, 5)), columns = ['v', 'a', 'w', 'rt', 'choice'])
+    mixture_indicator = np.random.choice([0, 1], p = [1 - mixture_p, mixture_p] , size = n_samples)
 
     for i in np.arange(0, n_samples, 1):
-        data.iloc[i] = [np.random.uniform(low = v_range[0], high = v_range[1], size = 1),
-                        np.random.uniform(low = a_range[0], high = a_range[1], size = 1),
-                        np.random.uniform(low = w_range[0], high = w_range[1], size = 1),
-                        np.random.gamma(rt_params[0], rt_params[1], size = 1),
-                        np.random.choice([-1,1], size = 1)]
+        if mixture_indicator[i] == 0:
+            data.iloc[i] = [np.random.uniform(low = v_range[0], high = v_range[1], size = 1),
+                            np.random.uniform(low = a_range[0], high = a_range[1], size = 1),
+                            np.random.uniform(low = w_range[0], high = w_range[1], size = 1),
+                            np.random.gamma(rt_params[0], rt_params[1], size = 1),
+                            np.random.choice([-1, 1], size = 1)]
+
+        else:
+            data.iloc[i] = [np.random.uniform(low = v_range[0], high = v_range[1], size = 1),
+                            np.random.uniform(low = a_range[0], high = a_range[1], size = 1),
+                            np.random.uniform(low = w_range[0], high = w_range[1], size = 1),
+                            np.random.normal(loc = 0, scale = 1, size = 1),
+                            np.random.choice([-1, 1], size = 1)]
 
         if print_detailed_cnt:
             print(str(i))
@@ -97,26 +107,35 @@ def gen_ddm_features_sim(v_range = [-3, 3],
                          a_range = [0.1, 3],
                          w_range = [0, 1],
                          n_samples = 20000,
+                         mixture_p = 0.2,
                          print_detailed_cnt = False):
 
     data = pd.DataFrame(np.zeros((n_samples, 5)), columns = ['v', 'a', 'w', 'rt', 'choice'])
+    mixture_indicator = np.random.choice([0, 1], p = [1 - mixture_p, mixture_p] , size = n_samples)
 
     for i in np.arange(0, n_samples, 1):
         v_tmp = np.random.uniform(low = v_range[0], high = v_range[1], size = 1)
         a_tmp = np.random.uniform(low = a_range[0], high = a_range[1], size = 1)
         w_tmp = np.random.uniform(low = w_range[0], high = w_range[1], size = 1)
-        rt_tmp, choice_tmp = ddm_data_simulator.ddm_simulate(v = v_tmp,
-                                                             a = a_tmp,
-                                                             w = w_tmp,
-                                                             n_samples = 1,
-                                                             print_info = False
-                                                             )
+
+        if mixture_indicator[i] == 0:
+            rt_tmp, choice_tmp = ddm_data_simulator.ddm_simulate(v = v_tmp,
+                                                                 a = a_tmp,
+                                                                 w = w_tmp,
+                                                                 n_samples = 1,
+                                                                 print_info = False
+                                                                 )
+        else:
+            choice_tmp = np.random.choice([-1, 1], size = 1)
+            rt_tmp = np.random.normal(loc = 0, scale = 1, size = 1)
+
         data.iloc[i] = [v_tmp,
                         a_tmp,
                         w_tmp,
                         rt_tmp,
                         choice_tmp
                         ]
+
         if print_detailed_cnt:
             print(str(i))
 
@@ -129,11 +148,15 @@ def gen_ddm_labels(data = [1,1,0,1], eps = 10**(-29)):
     labels = np.zeros((data.shape[0],1))
     #labels = pd.Series(np.zeros((data.shape[0],)), name = 'nf_likelihood')
     for i in np.arange(0, labels.shape[0], 1):
-        labels[i] = fptd(t = data.loc[i, 'rt'] * data.loc[i, 'choice'],
-                            v = data.loc[i, 'v'],
-                            a = data.loc[i, 'a'],
-                            w = data.loc[i, 'w'],
-                            eps = eps)
+        if data.loc[i, 'rt'] <= 0:
+            labels[i] = 0
+        else:
+            labels[i] = fptd(t = data.loc[i, 'rt'] * data.loc[i, 'choice'],
+                                v = data.loc[i, 'v'],
+                                a = data.loc[i, 'a'],
+                                w = data.loc[i, 'w'],
+                                eps = eps)
+
         if (i % 1000) == 0:
             print('label ' + str(i) + ' generated')
 
@@ -148,6 +171,7 @@ def make_data_rt_choice(v_range = [-3, 3],
                         f_signature = '',
                         write_to_file = True,
                         method = 'random',
+                        mixture_p = 0.2,
                         print_detailed_cnt = False):
 
     if method == 'random':
@@ -156,14 +180,16 @@ def make_data_rt_choice(v_range = [-3, 3],
                                                 w_range = w_range,
                                                 rt_params = rt_params,
                                                 n_samples = n_samples,
-                                                print_detailed_cnt = print_detailed_cnt)
+                                                print_detailed_cnt = print_detailed_cnt,
+                                                mixture_p = mixture_p)
 
     if method == 'sim':
         data_features = gen_ddm_features_sim(v_range = v_range,
                                              a_range = a_range,
                                              w_range = w_range,
                                              n_samples = n_samples,
-                                             print_detailed_cnt = print_detailed_cnt)
+                                             print_detailed_cnt = print_detailed_cnt,
+                                             mixture_p = mixture_p)
 
     data_labels = pd.DataFrame(gen_ddm_labels(data = data_features,
                                eps = eps),
@@ -230,7 +256,8 @@ def train_test_split_choice_probabilities(data = [],
                                           f_signature = '',  # default behavior is to load the latest file of a specified number of examples
                                           n = None): # if we pass a number, we pick a data file with the specified number of examples, if None the function picks some data file
 
-    assert n != None, 'please specify the size of the dataset (rows) that is supposed to be read in....'
+    if from_file == True:
+        assert n != None, 'please specify the size of the dataset (rows) that is supposed to be read in....'
 
     if from_file:
 
@@ -286,7 +313,8 @@ def train_test_split_rt_choice(data = [],
                                f_signature = '',  # default behavior is to load the latest file of a specified number of examples
                                n = None): # if we pass a number, we pick a data file with the specified number of examples, if None the function picks some data file
 
-    assert n != None, 'please specify the size of the dataset (rows) that is supposed to be read in....'
+    if from_file == True:
+        assert n != None, 'please specify the size of the dataset (rows) that is supposed to be read in....'
 
     if from_file:
 
