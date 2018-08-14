@@ -79,14 +79,16 @@ class dnn_trainer():
             self.train_features, self.train_labels, self.test_features, self.test_labels = mdw.train_test_from_file_rt_choice(f_signature = self.hyper_params['train_test_file_signature'],
                                                                                                                               n = self.hyper_params['training_data_size']
                                                                                                                               )
-
+        if self.hyper_params['data_type'] == 'choice_probabilities':
+            self.train_features, self.train_labels, self.test_features, self.test_labels = mdw.train_test_from_file_choice_probabilities(f_signature = self.hyper_params['train_test_file_signature'],
+                                                                                                                                         n = self.hyper_params['training_data_size']
+                                                                                                                                         )
         if self.hyper_params['data_type'] == 'sin':
             features, labels = mds.make_data()
             self.train_features, self.train_labels, self.test_features, self.test_labels = mds.train_test_split(features,
                                                                                                                 labels,
                                                                                                                 p = 0.8
                                                                                                                 )
-
         # Already prepare feature columns
         feature_columns = dnnreg_model_input.make_feature_columns_numeric(features = self.train_features)
         self.hyper_params['feature_columns'] = feature_columns
@@ -101,10 +103,10 @@ class dnn_trainer():
 
         # Define number of training steps before evaluation
         # I want to evaluate after every 10 epochs
-        steps_until_eval = model_params['eval_after_n_epochs'] * (len(self.train_labels) //model_params['batch_size'])
-
+        steps_until_eval = model_params['eval_after_n_epochs'] * ((self.train_labels.shape[0]) // model_params['batch_size'])
+        print('steps_until_eval:', steps_until_eval)
         # Get current date and time for file naming purposes
-        date_time_str = datetime.now().strftime('_%m_%d_%y_%H_%M_%S')
+        date_time_str = datetime.now().strftime('%m_%d_%y_%H_%M_%S')
 
         # Specify folder for storage of graph and results
         basedir = self.model_directory + '/dnnregressor_' + model_params['loss_fn'] + self.hyper_params['train_test_file_signature'] + date_time_str
@@ -185,12 +187,12 @@ class dnn_trainer():
 
             # If first round of training, initialize training_results table with headers
             if epoch_cnt == 0:
-                with open(basedir + '/dnn_training_results'  + self.hyper_params['train_test_file_signature'] + date_time_str + '.csv', 'w') as f:
+                with open(basedir + '/dnn_training_results' + model_params['loss_fn'] + self.hyper_params['train_test_file_signature'] + date_time_str + '.csv', 'w') as f:
                     writer = csv.writer(f)
                     writer.writerow(self.headers)
 
             # Update training_results table with current training results
-            with open(basedir + '/dnn_training_results' + self.hyper_params['train_test_file_signature'] + date_time_str + '.csv', 'a') as f:
+            with open(basedir + '/dnn_training_results' + model_params['loss_fn'] + self.hyper_params['train_test_file_signature'] + date_time_str + '.csv', 'a') as f:
                 writer = csv.writer(f)
                 writer.writerow(current_eval_data)
 

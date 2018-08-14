@@ -230,7 +230,7 @@ def make_data_choice_probabilities(v_range = [-3, 3],
         v_tmp = np.random.uniform(low = v_range[0], high = v_range[1], size = 1)
         a_tmp = np.random.uniform(low = a_range[0], high = a_range[1], size = 1)
         w_tmp = np.random.uniform(low = w_range[0], high = w_range[1], size = 1)
-        p_tmp = choice_probabilities(v = v_tmp,
+        p_lower_tmp = choice_probabilities(v = v_tmp,
                                      a = a_tmp,
                                      w = w_tmp
                                      )
@@ -238,7 +238,7 @@ def make_data_choice_probabilities(v_range = [-3, 3],
         data.iloc[i] = [v_tmp,
                         a_tmp,
                         w_tmp,
-                        p_tmp
+                        p_lower_tmp
                        ]
 
         if print_detailed_cnt:
@@ -259,7 +259,7 @@ def train_test_split_choice_probabilities(data = [],
                                           write_to_file = True,
                                           from_file = True,
                                           f_signature = '',  # default behavior is to load the latest file of a specified number of examples
-                                          n = None): # if we pass a number, we pick a data file with the specified number of examples, if None the function picks some data file
+                                          n_samples = None): # if we pass a number, we pick a data file with the specified number of examples, if None the function picks some data file
 
     if from_file == True:
         assert n != None, 'please specify the size of the dataset (rows) that is supposed to be read in....'
@@ -268,35 +268,34 @@ def train_test_split_choice_probabilities(data = [],
 
         # List data files in directory
         if f_signature == '':
-            flist = glob.glob('data_storage/data_' + str(n) + '*')
+            flist = glob.glob('data_storage/data_' + str(n_samples) + '*')
             assert len(flist) > 0, 'There seems to be no datafile that fullfills the requirements passed to the function'
             fname = flist[-1]
             data = pd.read_csv(fname)
         else:
-            flist = glob.glob('data_storage/data_' + str(n) + f_signature + '*')
+            flist = glob.glob('data_storage/data_' + str(n_samples) + f_signature + '*')
             print(flist)
             assert len(flist) > 0, 'There seems to be no datafile that fullfills the requirements passed to the function'
             fname = flist[-1]
             data = pd.read_csv(fname)
 
-    n = data.shape[0]
+    n_samples = data.shape[0]
     train_indices = np.random.choice([0,1], size = data.shape[0], p = [p_train, 1 - p_train])
 
     train = data.loc[train_indices == 0].copy()
     test = data.loc[train_indices == 1].copy()
 
-    train_labels = np.asmatrix(train['p_lower_barrier'].copy()).T
-    train_features = train.drop(labels = 'p_lower_barrier', axis = 1).copy()
+    train_labels = np.asmatrix(train[['p_lower_barrier']].copy()).T
+    train_features = train.drop(columns = ['p_lower_barrier']).copy()
 
-    test_labels = np.asmatrix(test['p_lower_barrier'].copy()).T
-    test_features = test.drop(labels = 'p_lower_barrier', axis = 1).copy()
+    test_labels = np.asmatrix(test[['p_lower_barrier']].copy()).T
+    test_features = test.drop(columns = ['p_lower_barrier']).copy()
 
     if write_to_file == True:
         print('writing training and test data to file ....')
-        train.to_csv('data_storage/train_data_' + str(n) + f_signature + fname[-21:])
-        test.to_csv('data_storage/test_data_' + str(n) + f_signature + fname[-21:])
-        np.savetxt('data_storage/train_indices_' + str(n) + f_signature + fname[-21:], train_indices, delimiter = ',')
-
+        train.to_csv('data_storage/train_data_' + str(n_samples) + f_signature + fname[-21:])
+        test.to_csv('data_storage/test_data_' + str(n_samples) + f_signature + fname[-21:])
+        np.savetxt('data_storage/train_indices_' + str(n_samples) + f_signature + fname[-21:], train_indices, delimiter = ',')
 
     # clean up dictionary: Get rid of index coltrain_features = train_features[['v', 'a', 'w', 'rt', 'choice']], which is unfortunately retained when reading with 'from_csv'
     train_features = train_features[['v', 'a', 'w']]
@@ -317,16 +316,16 @@ def train_test_split_rt_choice(data = [],
                                write_to_file = True,
                                from_file = True,
                                f_signature = '',  # default behavior is to load the latest file of a specified number of examples
-                               n = None): # if we pass a number, we pick a data file with the specified number of examples, if None the function picks some data file
+                               n_samples = None): # if we pass a number, we pick a data file with the specified number of examples, if None the function picks some data file
 
     if from_file == True:
-        assert n != None, 'please specify the size of the dataset (rows) that is supposed to be read in....'
+        assert n_samples != None, 'please specify the size of the dataset (rows) that is supposed to be read in....'
 
     if from_file:
 
         # List data files in directory
         if f_signature == '':
-            flist = glob.glob('data_storage/data_' + str(n) + '*')
+            flist = glob.glob('data_storage/data_' + str(n_samples) + '*')
             assert len(flist) > 0, 'There seems to be no datafile that fullfills the requirements passed to the function'
             fname = flist[-1]
             data = pd.read_csv(fname)
@@ -336,23 +335,23 @@ def train_test_split_rt_choice(data = [],
             fname = flist[-1]
             data = pd.read_csv(fname)
 
-    n = data.shape[0]
+    n_samples = data.shape[0]
     train_indices = np.random.choice([0,1], size = data.shape[0], p = [p_train, 1 - p_train])
 
     train = data.loc[train_indices == 0].copy()
     test = data.loc[train_indices == 1].copy()
 
-    train_labels = np.asmatrix(train['nf_likelihood'].copy()).T
+    train_labels = np.asmatrix(train[['nf_likelihood']].copy())
     train_features = train.drop(labels = 'nf_likelihood', axis = 1).copy()
 
-    test_labels = np.asmatrix(test['nf_likelihood'].copy()).T
+    test_labels = np.asmatrix(test[['nf_likelihood']].copy())
     test_features = test.drop(labels = 'nf_likelihood', axis = 1).copy()
 
     if write_to_file == True:
         print('writing training and test data to file ....')
-        train.to_csv('data_storage/train_data_' + str(n) + f_signature + fname[-21:])
-        test.to_csv('data_storage/test_data_' + str(n) + f_signature + fname[-21:])
-        np.savetxt('data_storage/train_indices_' + str(n) + f_signature + fname[-21:], train_indices, delimiter = ',')
+        train.to_csv('data_storage/train_data_' + str(n_samples) + f_signature + fname[-21:])
+        test.to_csv('data_storage/test_data_' + str(n_samples) + f_signature + fname[-21:])
+        np.savetxt('data_storage/train_indices_' + str(n_samples) + f_signature + fname[-21:], train_indices, delimiter = ',')
 
 
     # clean up dictionary: Get rid of index coltrain_features = train_features[['v', 'a', 'w', 'rt', 'choice']], which is unfortunately retained when reading with 'from_csv'
@@ -370,23 +369,23 @@ def train_test_split_rt_choice(data = [],
 
 def train_test_from_file_rt_choice(
                                    f_signature = '', # default behavior is to load the latest file of a specified number of examples
-                                   n = None # if we pass a number, we pick a data file with the specified number of examples, if None the function picks some data file
+                                   n_samples = None # if we pass a number, we pick a data file with the specified number of examples, if None the function picks some data file
                                    ):
 
-    assert n != None, 'please specify the size of the dataset (rows) that is supposed to be read in....'
+    assert n_samples != None, 'please specify the size of the dataset (rows) that is supposed to be read in....'
 
     # List data files in directory
     if f_signature == '':
-        flist_train = glob.glob('data_storage/train_data_' + str(n) + '*')
-        flist_test = glob.glob('data_storage/test_data_' + str(n) + '*')
+        flist_train = glob.glob('data_storage/train_data_' + str(n_samples) + '*')
+        flist_test = glob.glob('data_storage/test_data_' + str(n_samples) + '*')
         assert len(flist_train) > 0, 'There seems to be no datafile for train data that fullfills the requirements passed to the function'
         assert len(flist_test) > 0, 'There seems to be no datafile for train data that fullfills the requirements passed to the function'
         fname_train = flist_train[-1]
         fname_test = flist_test[-1]
 
     else:
-        flist_train = glob.glob('data_storage/train_data_' + str(n) + f_signature + '*')
-        flist_test = glob.glob('data_storage/test_data_' + str(n) + f_signature + '*')
+        flist_train = glob.glob('data_storage/train_data_' + str(n_samples) + f_signature + '*')
+        flist_test = glob.glob('data_storage/test_data_' + str(n_samples) + f_signature + '*')
         assert len(flist_train) > 0, 'There seems to be no datafile for train data that fullfills the requirements passed to the function'
         assert len(flist_test) > 0, 'There seems to be no datafile for train data that fullfills the requirements passed to the function'
         fname_train = flist_train[-1]
@@ -397,15 +396,15 @@ def train_test_from_file_rt_choice(
     print('datafile used to read in test data: ' + flist_test[-1])
 
     # Reading in the data
-    train_data = pd.read_csv(fname_train)
-    test_data = pd.read_csv(fname_test)
+    train = pd.read_csv(fname_train)
+    test = pd.read_csv(fname_test)
 
     # Splitting into labels and features
-    train_labels = np.asmatrix(train_data['nf_likelihood'].copy()).T
-    train_features = train_data.drop(labels = 'nf_likelihood', axis = 1).copy()
+    train_labels = np.asmatrix(train[['nf_likelihood']].copy())
+    train_features = train.drop(labels = 'nf_likelihood', axis = 1).copy()
 
-    test_labels = np.asmatrix(test_data['nf_likelihood'].copy()).T
-    test_features = test_data.drop(labels = 'nf_likelihood', axis = 1).copy()
+    test_labels = np.asmatrix(test[['nf_likelihood']].copy())
+    test_features = test.drop(labels = 'nf_likelihood', axis = 1).copy()
 
     # clean up dictionary: Get rid of index coltrain_features = train_features[['v', 'a', 'w', 'rt', 'choice']], which is unfortunately retained when reading with 'from_csv'
     train_features = train_features[['v', 'a', 'w', 'rt', 'choice']]
@@ -423,23 +422,23 @@ def train_test_from_file_rt_choice(
 
 def train_test_from_file_choice_probabilities(
                                               f_signature = '', # default behavior is to load the latest file of a specified number of examples
-                                              n = None # if we pass a number, we pick a data file with the specified number of examples, if None the function picks some data file
+                                              n_samples = None # if we pass a number, we pick a data file with the specified number of examples, if None the function picks some data file
                                               ):
 
-    assert n != None, 'please specify the size of the dataset (rows) that is supposed to be read in....'
+    assert n_samples != None, 'please specify the size of the dataset (rows) that is supposed to be read in....'
 
     # List data files in directory
     if f_signature == '':
-        flist_train = glob.glob('data_storage/train_data_' + str(n) + '*')
-        flist_test = glob.glob('data_storage/test_data_' + str(n) + '*')
+        flist_train = glob.glob('data_storage/train_data_' + str(n_samples) + '*')
+        flist_test = glob.glob('data_storage/test_data_' + str(n_samples) + '*')
         assert len(flist_train) > 0, 'There seems to be no datafile for train data that fullfills the requirements passed to the function'
         assert len(flist_test) > 0, 'There seems to be no datafile for train data that fullfills the requirements passed to the function'
         fname_train = flist_train[-1]
         fname_test = flist_test[-1]
 
     else:
-        flist_train = glob.glob('data_storage/train_data_' + str(n) + f_signature + '*')
-        flist_test = glob.glob('data_storage/test_data_' + str(n) + f_signature + '*')
+        flist_train = glob.glob('data_storage/train_data_' + str(n_samples) + f_signature + '*')
+        flist_test = glob.glob('data_storage/test_data_' + str(n_samples) + f_signature + '*')
         assert len(flist_train) > 0, 'There seems to be no datafile for train data that fullfills the requirements passed to the function'
         assert len(flist_test) > 0, 'There seems to be no datafile for train data that fullfills the requirements passed to the function'
         fname_train = flist_train[-1]
@@ -450,19 +449,19 @@ def train_test_from_file_choice_probabilities(
     print('datafile used to read in test data: ' + flist_test[-1])
 
     # Reading in the data
-    train_data = pd.read_csv(fname_train)
-    test_data = pd.read_csv(fname_test)
+    train = pd.read_csv(fname_train)
+    test = pd.read_csv(fname_test)
 
     # Splitting into labels and features
-    train_labels = np.asmatrix(train_data['p_lower_barrier'].copy()).T
-    train_features = train_data.drop(labels = 'p_lower_barrier', axis = 1).copy()
+    train_labels = np.asmatrix(train[['p_lower_barrier']].copy()).T
+    train_features = train.drop(columns = ['p_lower_barrier']).copy()
 
-    test_labels = np.asmatrix(test_data['p_lower_barrier'].copy()).T
-    test_features = test_data.drop(labels = 'p_lower_barrier', axis = 1).copy()
+    test_labels = np.asmatrix(test[['p_lower_barrier']].copy()).T
+    test_features = test.drop(columns = ['p_lower_barrier']).copy()
 
     # clean up dictionary: Get rid of index coltrain_features = train_features[['v', 'a', 'w', 'rt', 'choice']], which is unfortunately retained when reading with 'from_csv'
-    train_features = train_features[['v', 'a', 'w', 'p_lower_barrier']]
-    test_features = test_features[['v', 'a', 'w', 'p_lower_barrier']]
+    train_features = train_features[['v', 'a', 'w']]
+    test_features = test_features[['v', 'a', 'w']]
 
     # Transform feature pandas into dicts as expected by tensorflow
     train_features = train_features.to_dict(orient = 'list')

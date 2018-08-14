@@ -118,13 +118,19 @@ def dnn_regressor(features, # BATCH_FEATURES FROM input_fn
 
     if params['loss_fn'] == 'mae':
         loss = tf.losses.absolute_difference(labels = labels,
-                                            predictions = output
-                                            ) + tf.losses.get_regularization_loss()
+                                             predictions = output
+                                             ) + tf.losses.get_regularization_loss()
 
-    if params['loss_fn'] == 'kl':
-        loss = tf.distributions.kl_divergence(tf.concat(output,1-output),
-                                              tf.concat(labels,1-labels)
-                                              )
+    # Doesnt work for some reason
+    # if params['loss_fn'] == 'kl':
+    #     loss = tf.distributions.kl_divergence(tf.concat([output, 1 - output], axis = 0),
+    #                                           tf.concat([labels, 1 - labels], axis = 0)
+    #                                           )
+
+    # if params['loss_fn'] == 'cross_entropy':
+    #     loss = tf.nn.softmax_cross_entropy_with_logits(labels = labels,
+    #                                                    logits = output
+    #                                                    ) + tf.losses.get_regularization_loss()
 
     # TRAINING
     # Choose optimizer
@@ -154,7 +160,9 @@ def dnn_regressor(features, # BATCH_FEATURES FROM input_fn
                                   global_step = tf.train.get_global_step()
                                  )
 
-    # Compute evaluation metrics of interest
+
+    # EVALUATION METRICS
+    # Cmopute evaluation metrics of interest
     mse = tf.metrics.mean_squared_error(labels = labels,
                                         predictions = tf.cast(output, tf.float64)
                                        )
