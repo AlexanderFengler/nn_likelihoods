@@ -262,7 +262,7 @@ def train_test_split_choice_probabilities(data = [],
                                           n_samples = None): # if we pass a number, we pick a data file with the specified number of examples, if None the function picks some data file
 
     if from_file == True:
-        assert n != None, 'please specify the size of the dataset (rows) that is supposed to be read in....'
+        assert n_samples != None, 'please specify the size of the dataset (rows) that is supposed to be read in....'
 
     if from_file:
 
