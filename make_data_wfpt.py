@@ -60,8 +60,13 @@ def fptd(t, v, a, w, eps):
     else:
         return 1e-29
 
-def choice_probabilities(v, a , w):
+def choice_probabilities(v, a , w, allow_analytic = True):
+    if w == 0.5 and allow_analytic:
+        return choice_probabilities_analytic(v, a)
     return integrate.quad(fptd, 0, 100, args = (v, a, w, 1e-29))[0]
+
+def choice_probabilities_analytic(v, a):
+    return (1 / (1 + np.exp(v*a)))
 
 # Generate training / test data for DDM
 # We want training data for
@@ -268,7 +273,8 @@ def train_test_split_choice_probabilities(data = [],
             fname = flist[-1]
             data = pd.read_csv(fname)
         else:
-            list = glob.glob('data_storage/data_' + str(n) + f_signature + '*')
+            flist = glob.glob('data_storage/data_' + str(n) + f_signature + '*')
+            print(flist)
             assert len(flist) > 0, 'There seems to be no datafile that fullfills the requirements passed to the function'
             fname = flist[-1]
             data = pd.read_csv(fname)
@@ -293,8 +299,8 @@ def train_test_split_choice_probabilities(data = [],
 
 
     # clean up dictionary: Get rid of index coltrain_features = train_features[['v', 'a', 'w', 'rt', 'choice']], which is unfortunately retained when reading with 'from_csv'
-    train_features = train_features[['v', 'a', 'w', 'p_lower_barrier']]
-    test_features = test_features[['v', 'a', 'w', 'p_lower_barrier']]
+    train_features = train_features[['v', 'a', 'w']]
+    test_features = test_features[['v', 'a', 'w']]
 
     # Transform feature pandas into dicts as expected by tensorflow
     train_features = train_features.to_dict(orient = 'list')

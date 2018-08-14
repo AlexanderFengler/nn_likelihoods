@@ -121,7 +121,7 @@ def dnn_regressor(features, # BATCH_FEATURES FROM input_fn
                                             predictions = output
                                             ) + tf.losses.get_regularization_loss()
 
-    if params['loss_fn'] == 'crossentropy':
+    if params['loss_fn'] == 'kl':
         loss = tf.distributions.kl_divergence(tf.concat(output,1-output),
                                               tf.concat(labels,1-labels)
                                               )

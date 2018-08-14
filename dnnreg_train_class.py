@@ -107,7 +107,7 @@ class dnn_trainer():
         date_time_str = datetime.now().strftime('_%m_%d_%y_%H_%M_%S')
 
         # Specify folder for storage of graph and results
-        basedir = self.model_directory + '/dnnregressor_' + model_params['loss_fn'] + date_time_str
+        basedir = self.model_directory + '/dnnregressor_' + model_params['loss_fn'] + self.hyper_params['train_test_file_signature'] + date_time_str
 
         # Making the estimator
         config_obj = tf.estimator.RunConfig(keep_checkpoint_max = 10)
@@ -185,12 +185,12 @@ class dnn_trainer():
 
             # If first round of training, initialize training_results table with headers
             if epoch_cnt == 0:
-                with open(basedir + '/dnn_training_results'  + date_time_str + '.csv', 'w') as f:
+                with open(basedir + '/dnn_training_results'  + self.hyper_params['train_test_file_signature'] + date_time_str + '.csv', 'w') as f:
                     writer = csv.writer(f)
                     writer.writerow(self.headers)
 
             # Update training_results table with current training results
-            with open(basedir + '/dnn_training_results' + date_time_str + '.csv', 'a') as f:
+            with open(basedir + '/dnn_training_results' + self.hyper_params['train_test_file_signature'] + date_time_str + '.csv', 'a') as f:
                 writer = csv.writer(f)
                 writer.writerow(current_eval_data)
 

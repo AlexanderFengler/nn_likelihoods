@@ -18,14 +18,13 @@ def  ddm_simulate(v = 0, # drift by timestep 'delta_t'
     delta_t_sqrt = np.sqrt(delta_t)
 
     for n in range(0, n_samples, 1):
-        y = -a + (w * (2 * a))
+        y = w*a
         y_abs = abs(y)
         t = 0
 
-        while y_abs < a and t <= max_t:
+        while y <= a and y >= 0 and t <= max_t:
             y += v * delta_t + delta_t_sqrt * np.random.normal(loc = 0, scale = s, size = 1)
             t += delta_t
-            y_abs = abs(y)
 
         # Store choice and reaction time
         rts[n] = t
@@ -35,7 +34,7 @@ def  ddm_simulate(v = 0, # drift by timestep 'delta_t'
         if print_info == True:
             if n % 1000 == 0:
                 print(n, ' datapoints sampled')
-    return rts, choices
+    return (rts, choices)
 
 
 def  ddm_simulate_fast(v = 0, # drift by timestep 'delta_t'
@@ -57,14 +56,12 @@ def  ddm_simulate_fast(v = 0, # drift by timestep 'delta_t'
     rand_high = n_noise_samples - (max_t / delta_t) - 1
 
     for n in range(0, n_samples, 1):
-        y = -a + (w * (2 * a))
-        y_abs = abs(y)
+        y = w*a
         t = 0
         cnt = 0
-        while y_abs < a and t <= max_t:
+        while y <= a and y >=0  and t <= max_t:
             y += v * delta_t + noise[cnt]
             t += delta_t
-            y_abs = abs(y)
             cnt += 1
 
         # reshuffle noise
@@ -75,7 +72,11 @@ def  ddm_simulate_fast(v = 0, # drift by timestep 'delta_t'
         # Note that for purposes of consistency with Navarro and Fuss, the choice corresponding the lower barrier is +1, higher barrier is -1
         choices[n] = (-1) * np.sign(y)
 
-    return rts, choices
+        if print_info == True:
+            if n % 1000 == 0:
+                print(n, ' datapoints sampled')
+
+    return (rts, choices)
 
 if __name__ == "__main__":
     start_time = time.time()
