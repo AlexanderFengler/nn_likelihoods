@@ -330,7 +330,7 @@ def train_test_split_rt_choice(data = [],
             fname = flist[-1]
             data = pd.read_csv(fname)
         else:
-            flist = glob.glob('data_storage/data_' + str(n) + f_signature + '*')
+            flist = glob.glob('data_storage/data_' + str(n_samples) + f_signature + '*')
             assert len(flist) > 0, 'There seems to be no datafile that fullfills the requirements passed to the function'
             fname = flist[-1]
             data = pd.read_csv(fname)
