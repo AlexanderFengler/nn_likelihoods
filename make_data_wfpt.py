@@ -453,10 +453,10 @@ def train_test_from_file_choice_probabilities(
     test = pd.read_csv(fname_test)
 
     # Splitting into labels and features
-    train_labels = np.asmatrix(train[['p_lower_barrier']].copy()).T
+    train_labels = np.asmatrix(train[['p_lower_barrier']].copy())
     train_features = train.drop(columns = ['p_lower_barrier']).copy()
 
-    test_labels = np.asmatrix(test[['p_lower_barrier']].copy()).T
+    test_labels = np.asmatrix(test[['p_lower_barrier']].copy())
     test_features = test.drop(columns = ['p_lower_barrier']).copy()
 
     # clean up dictionary: Get rid of index coltrain_features = train_features[['v', 'a', 'w', 'rt', 'choice']], which is unfortunately retained when reading with 'from_csv'
