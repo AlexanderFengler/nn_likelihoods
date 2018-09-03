@@ -24,12 +24,12 @@ def get_dnnreg_predictor(model_directory = '', params = []):
 
 def get_predictions(regressor = [],
                     features = [],
-                    labels = [],
                     checkpoint = ''):
     predictions = list(regressor.predict(
-                                       input_fn = lambda: dnnreg_model_input.eval_input_fn(features = features,
-                                                                         labels = labels,
-                                                                         batch_size = len(labels),
+                                       input_fn = lambda: dnnreg_model_input.pred_input_fn(features = features,
+                                                                         # labels = labels,
+                                                                         # batch_size = len(labels),
+                                                                         batch_size = len(features[list(features.keys())[0]]),
                                                                          num_epochs = 1),
                                        predict_keys = 'output',
                                        yield_single_examples = False,

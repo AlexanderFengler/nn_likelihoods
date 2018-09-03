@@ -84,7 +84,7 @@ def gen_ddm_features_random(v_range = [-3, 3],
                             print_detailed_cnt = False):
 
     data = pd.DataFrame(np.zeros((n_samples, 5)), columns = ['v', 'a', 'w', 'rt', 'choice'])
-    mixture_indicator = np.random.choice([0, 1], p = [1 - mixture_p, mixture_p] , size = n_samples)
+    mixture_indicator = np.random.choice([0, 1, 2], p = [mixture_p[0], mixture_p[1], mixture_p[2]] , size = n_samples)
 
     for i in np.arange(0, n_samples, 1):
         if mixture_indicator[i] == 0:
@@ -94,11 +94,18 @@ def gen_ddm_features_random(v_range = [-3, 3],
                             np.random.gamma(rt_params[0], rt_params[1], size = 1),
                             np.random.choice([-1, 1], size = 1)]
 
-        else:
+        elif mixture_indicator[i] == 1:
             data.iloc[i] = [np.random.uniform(low = v_range[0], high = v_range[1], size = 1),
                             np.random.uniform(low = a_range[0], high = a_range[1], size = 1),
                             np.random.uniform(low = w_range[0], high = w_range[1], size = 1),
                             np.random.normal(loc = 0, scale = 1, size = 1),
+                            np.random.choice([-1, 1], size = 1)]
+
+        else:
+            data.iloc[i] = [np.random.uniform(low = v_range[0], high = v_range[1], size = 1),
+                            np.random.uniform(low = a_range[0], high = a_range[1], size = 1),
+                            np.random.uniform(low = w_range[0], high = w_range[1], size = 1),
+                            np.random.uniform(low = 5.0, high = 20, size = 1),
                             np.random.choice([-1, 1], size = 1)]
 
         if print_detailed_cnt:
@@ -116,7 +123,7 @@ def gen_ddm_features_sim(v_range = [-3, 3],
                          print_detailed_cnt = False):
 
     data = pd.DataFrame(np.zeros((n_samples, 5)), columns = ['v', 'a', 'w', 'rt', 'choice'])
-    mixture_indicator = np.random.choice([0, 1], p = [1 - mixture_p, mixture_p] , size = n_samples)
+    mixture_indicator = np.random.choice([0, 1, 2], p = [mixture_p[0], mixture_p[1], mixture_p[2]] , size = n_samples)
 
     for i in np.arange(0, n_samples, 1):
         v_tmp = np.random.uniform(low = v_range[0], high = v_range[1], size = 1)
@@ -130,9 +137,13 @@ def gen_ddm_features_sim(v_range = [-3, 3],
                                                                  n_samples = 1,
                                                                  print_info = False
                                                                  )
-        else:
+        elif mixture_indicator[i] == 1:
             choice_tmp = np.random.choice([-1, 1], size = 1)
             rt_tmp = np.random.normal(loc = 0, scale = 1, size = 1)
+
+        else:
+            choice_tmp = np.random.choice([-1, 1], size = 1)
+            rt_tmp = np.random.uniform(low = 5.0, high = 20.0, size = 1)
 
         data.iloc[i] = [v_tmp,
                         a_tmp,
@@ -148,6 +159,55 @@ def gen_ddm_features_sim(v_range = [-3, 3],
             print('datapoint ' + str(i) + ' generated')
 
     return  data
+
+
+def gen_ddm_features_combination(v_range = [1,2],
+                                 a_range = [1],
+                                 w_range = [0.5],
+                                 n_samples = 20000,
+                                 ):
+
+    data = pd.DataFrame(np.zeros((n_samples, 5)), columns = ['v', 'a', 'w', 'rt', 'choice'])
+    mixture_indicator = np.random.choice([0, 1, 2], p = [mixture_p[0], mixture_p[1], mixture_p[2]] , size = n_samples)
+    n_by_parameter_set = n_samples // (len(v_range)*len(a_range)*len(w_range))
+
+    cnt = 0
+    for v_tmp in v_range:
+        for a_tmp in a_range:
+            for w_tmp in w_range:
+                for i in range(0, n_by_parameter_set, 1):
+                    if mixture_indicator[i] == 0:
+                        rt_tmp, choice_tmp = ddm_data_simulator.ddm_simulate(v = v_tmp,
+                                                                             a = a_tmp,
+                                                                             w = w_tmp,
+                                                                             n_samples = 1,
+                                                                             print_info = False
+                                                                             )
+
+                    elif mixture_indicator[i] == 1:
+                        choice_tmp = np.random.choice([-1, 1], size = 1)
+                        rt_tmp = np.random.normal(loc = 0, scale = 1, size = 1)
+                    else:
+                        choice_tmp = np.random.choice([-1, 1], size = 1)
+                        rt_tmp = np.random.uniform(low = 5.0, high = 20.0, size = 1)
+
+
+                    data.iloc[i] = [v_tmp,
+                                    a_tmp,
+                                    w_tmp,
+                                    rt_tmp,
+                                    choice_tmp
+                                    ]
+
+                    if print_detailed_cnt:
+                        print(str(i))
+
+                    cnt += 1
+                    if (cnt % 1000) == 0:
+                        print('datapoint ' + str(i) + ' generated')
+
+    return  data
+
 
 def gen_ddm_labels(data = [1,1,0,1], eps = 10**(-29)):
     labels = np.zeros((data.shape[0],1))
@@ -176,7 +236,7 @@ def make_data_rt_choice(v_range = [-3, 3],
                         f_signature = '',
                         write_to_file = True,
                         method = 'random',
-                        mixture_p = 0.2,
+                        mixture_p = [0.8, 0.1, 0.1],
                         print_detailed_cnt = False):
 
     if method == 'random':
@@ -195,6 +255,14 @@ def make_data_rt_choice(v_range = [-3, 3],
                                              n_samples = n_samples,
                                              print_detailed_cnt = print_detailed_cnt,
                                              mixture_p = mixture_p)
+
+    if method == 'discrete_parameter_combinations':
+        data_features = gen_dmm_features_combination(v = v_range,
+                                                     a = a_range,
+                                                     w = w_range,
+                                                     n_samples = n_samples,
+                                                     print_detailed_cnt = print_detailed_cnt,
+                                                     mixture_p = mixture_p)
 
     data_labels = pd.DataFrame(gen_ddm_labels(data = data_features,
                                eps = eps),
@@ -259,7 +327,8 @@ def train_test_split_choice_probabilities(data = [],
                                           write_to_file = True,
                                           from_file = True,
                                           f_signature = '',  # default behavior is to load the latest file of a specified number of examples
-                                          n_samples = None): # if we pass a number, we pick a data file with the specified number of examples, if None the function picks some data file
+                                          n_samples = None, # if we pass a number, we pick a data file with the specified number of examples, if None the function picks some data file
+                                          backend = 'tf'):
 
     if from_file == True:
         assert n_samples != None, 'please specify the size of the dataset (rows) that is supposed to be read in....'
@@ -283,27 +352,48 @@ def train_test_split_choice_probabilities(data = [],
     train_indices = np.random.choice([0,1], size = data.shape[0], p = [p_train, 1 - p_train])
 
     train = data.loc[train_indices == 0].copy()
-    test = data.loc[train_indices == 1].copy()
 
-    train_labels = np.asmatrix(train[['p_lower_barrier']].copy()).T
+    if np.sum(train_indices) > 0:
+        test = data.loc[train_indices == 1].copy()
+
+    train_labels = np.asmatrix(train[['p_lower_barrier']].copy())
     train_features = train.drop(columns = ['p_lower_barrier']).copy()
 
-    test_labels = np.asmatrix(test[['p_lower_barrier']].copy()).T
-    test_features = test.drop(columns = ['p_lower_barrier']).copy()
+    if np.sum(train_indices) > 0:
+        test_labels = np.asmatrix(test[['p_lower_barrier']].copy())
+        test_features = test.drop(columns = ['p_lower_barrier']).copy()
 
     if write_to_file == True:
         print('writing training and test data to file ....')
         train.to_csv('data_storage/train_data_' + str(n_samples) + f_signature + fname[-21:])
-        test.to_csv('data_storage/test_data_' + str(n_samples) + f_signature + fname[-21:])
+
+        if np.sum(train_indices) > 0:
+            test.to_csv('data_storage/test_data_' + str(n_samples) + f_signature + fname[-21:])
         np.savetxt('data_storage/train_indices_' + str(n_samples) + f_signature + fname[-21:], train_indices, delimiter = ',')
 
     # clean up dictionary: Get rid of index coltrain_features = train_features[['v', 'a', 'w', 'rt', 'choice']], which is unfortunately retained when reading with 'from_csv'
     train_features = train_features[['v', 'a', 'w']]
-    test_features = test_features[['v', 'a', 'w']]
 
-    # Transform feature pandas into dicts as expected by tensorflow
-    train_features = train_features.to_dict(orient = 'list')
-    test_features = test_features.to_dict(orient = 'list')
+    if np.sum(train_indices) > 0:
+        test_features = test_features[['v', 'a', 'w']]
+
+    # Transform feature pandas into dicts as expected by tensorflow (or numpy arrays as expected by keras)
+
+    if backend == 'tf':
+        train_features = train_features.to_dict(orient = 'list')
+
+        if np.sum(train_indices) > 0:
+            test_features = test_features.to_dict(orient = 'list')
+
+    if backend == 'keras':
+        train_features = train_features.copy().values
+
+        if np.sum(train_indices) > 0:
+            test_features = test_features.copy().values
+
+    if np.sum(train_indices) == 0:
+        test_features = []
+        test_labels = []
 
     return (train_features,
             train_labels,
@@ -316,7 +406,8 @@ def train_test_split_rt_choice(data = [],
                                write_to_file = True,
                                from_file = True,
                                f_signature = '',  # default behavior is to load the latest file of a specified number of examples
-                               n_samples = None): # if we pass a number, we pick a data file with the specified number of examples, if None the function picks some data file
+                               n_samples = None,
+                               backend = 'tf'): # if we pass a number, we pick a data file with the specified number of examples, if None the function picks some data file
 
     if from_file == True:
         assert n_samples != None, 'please specify the size of the dataset (rows) that is supposed to be read in....'
@@ -339,28 +430,49 @@ def train_test_split_rt_choice(data = [],
     train_indices = np.random.choice([0,1], size = data.shape[0], p = [p_train, 1 - p_train])
 
     train = data.loc[train_indices == 0].copy()
-    test = data.loc[train_indices == 1].copy()
+
+    if np.sum(train_indices) > 0:
+        test = data.loc[train_indices == 1].copy()
 
     train_labels = np.asmatrix(train[['nf_likelihood']].copy())
     train_features = train.drop(labels = 'nf_likelihood', axis = 1).copy()
 
-    test_labels = np.asmatrix(test[['nf_likelihood']].copy())
-    test_features = test.drop(labels = 'nf_likelihood', axis = 1).copy()
+    if np.sum(train_indices) > 0:
+        test_labels = np.asmatrix(test[['nf_likelihood']].copy())
+        test_features = test.drop(labels = 'nf_likelihood', axis = 1).copy()
 
     if write_to_file == True:
         print('writing training and test data to file ....')
         train.to_csv('data_storage/train_data_' + str(n_samples) + f_signature + fname[-21:])
-        test.to_csv('data_storage/test_data_' + str(n_samples) + f_signature + fname[-21:])
+
+        if np.sum(train_indices) > 0:
+            test.to_csv('data_storage/test_data_' + str(n_samples) + f_signature + fname[-21:])
         np.savetxt('data_storage/train_indices_' + str(n_samples) + f_signature + fname[-21:], train_indices, delimiter = ',')
 
 
     # clean up dictionary: Get rid of index coltrain_features = train_features[['v', 'a', 'w', 'rt', 'choice']], which is unfortunately retained when reading with 'from_csv'
     train_features = train_features[['v', 'a', 'w', 'rt', 'choice']]
-    test_features = test_features[['v', 'a', 'w', 'rt', 'choice']]
 
-    # Transform feature pandas into dicts as expected by tensorflow
-    train_features = train_features.to_dict(orient = 'list')
-    test_features = test_features.to_dict(orient = 'list')
+    if np.sum(train_indices) > 0:
+        test_features = test_features[['v', 'a', 'w', 'rt', 'choice']]
+
+    # Transform feature pandas into dicts as expected by tensorflow (or numpy arrays as expected by keras)
+
+    if backend == 'tf':
+        train_features = train_features.to_dict(orient = 'list')
+
+        if np.sum(train_indices) > 0:
+            test_features = test_features.to_dict(orient = 'list')
+
+    if backend == 'keras':
+        train_features = train_features.copy().values
+
+        if np.sum(train_indices) > 0:
+            test_features = test_features.copy().values
+
+    if np.sum(train_indices) == 0:
+        test_features =  []
+        test_labels = []
 
     return (train_features,
             train_labels,
@@ -369,7 +481,8 @@ def train_test_split_rt_choice(data = [],
 
 def train_test_from_file_rt_choice(
                                    f_signature = '', # default behavior is to load the latest file of a specified number of examples
-                                   n_samples = None # if we pass a number, we pick a data file with the specified number of examples, if None the function picks some data file
+                                   n_samples = None, # if we pass a number, we pick a data file with the specified number of examples, if None the function picks some data file
+                                   backend = 'tf'
                                    ):
 
     assert n_samples != None, 'please specify the size of the dataset (rows) that is supposed to be read in....'
@@ -410,9 +523,14 @@ def train_test_from_file_rt_choice(
     train_features = train_features[['v', 'a', 'w', 'rt', 'choice']]
     test_features = test_features[['v', 'a', 'w', 'rt', 'choice']]
 
-    # Transform feature pandas into dicts as expected by tensorflow
-    train_features = train_features.to_dict(orient = 'list')
-    test_features = test_features.to_dict(orient = 'list')
+    # Transform feature pandas into dicts as expected by tensorflow (or numpy arrays as expected by keras)
+    if backend == 'tf':
+        train_features = train_features.to_dict(orient = 'list')
+        test_features = test_features.to_dict(orient = 'list')
+
+    if backend == 'keras':
+        train_features = train_features.copy().values
+        test_features = test_featues.copy().values
 
     return (train_features,
             train_labels,
@@ -422,7 +540,8 @@ def train_test_from_file_rt_choice(
 
 def train_test_from_file_choice_probabilities(
                                               f_signature = '', # default behavior is to load the latest file of a specified number of examples
-                                              n_samples = None # if we pass a number, we pick a data file with the specified number of examples, if None the function picks some data file
+                                              n_samples = None, # if we pass a number, we pick a data file with the specified number of examples, if None the function picks some data file
+                                              backend = 'tf'
                                               ):
 
     assert n_samples != None, 'please specify the size of the dataset (rows) that is supposed to be read in....'
@@ -463,9 +582,14 @@ def train_test_from_file_choice_probabilities(
     train_features = train_features[['v', 'a', 'w']]
     test_features = test_features[['v', 'a', 'w']]
 
-    # Transform feature pandas into dicts as expected by tensorflow
-    train_features = train_features.to_dict(orient = 'list')
-    test_features = test_features.to_dict(orient = 'list')
+    # Transform feature pandas into dicts as expected by tensorflow (or numpy arrays as expected by keras)
+    if backend == 'tf':
+        train_features = train_features.to_dict(orient = 'list')
+        test_features = test_features.to_dict(orient = 'list')
+
+    if backend == 'keras':
+        train_features = train_features.copy().values
+        test_features  = test_features.copy().values
 
     return (train_features,
             train_labels,

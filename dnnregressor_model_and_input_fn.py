@@ -26,6 +26,12 @@ def eval_input_fn(features, labels, batch_size, num_epochs = None):
     dataset = dataset.repeat(num_epochs).batch(batch_size)
     return dataset.make_one_shot_iterator().get_next()
 
+
+def pred_input_fn(features, batch_size, num_epochs = None):
+    dataset = tf.data.Dataset.from_tensor_slices(features)
+    dataset = dataset.repeat(num_epochs).batch(batch_size)
+    return dataset.make_one_shot_iterator().get_next()
+
 # WRITE A MODEL FUNCTION
 def dnn_regressor(features, # BATCH_FEATURES FROM input_fn
                   labels, # BATCH_LABELS from input_fn

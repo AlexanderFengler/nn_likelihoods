@@ -93,7 +93,7 @@ class dnn_trainer():
         feature_columns = dnnreg_model_input.make_feature_columns_numeric(features = self.train_features)
         self.hyper_params['feature_columns'] = feature_columns
 
-    def run_training(self, print_info = True):
+    def run_training(self, print_info = True, warm_start_ckpt_path = None):
 
         # Get time
         start_time = time.time()
@@ -119,6 +119,7 @@ class dnn_trainer():
                                               params = model_params,
                                               model_dir = basedir,
                                               config = config_obj
+                                              warm_start_from = warm_start_ckpt_path
                                               )
 
         # Initialze epoch and training steps counters
@@ -187,12 +188,12 @@ class dnn_trainer():
 
             # If first round of training, initialize training_results table with headers
             if epoch_cnt == 0:
-                with open(basedir + '/dnn_training_results' + model_params['loss_fn'] + self.hyper_params['train_test_file_signature'] + date_time_str + '.csv', 'w') as f:
+                with open(basedir + '/dnn_training_results_' + model_params['loss_fn'] + self.hyper_params['train_test_file_signature'] + date_time_str + '.csv', 'w') as f:
                     writer = csv.writer(f)
                     writer.writerow(self.headers)
 
             # Update training_results table with current training results
-            with open(basedir + '/dnn_training_results' + model_params['loss_fn'] + self.hyper_params['train_test_file_signature'] + date_time_str + '.csv', 'a') as f:
+            with open(basedir + '/dnn_training_results_' + model_params['loss_fn'] + self.hyper_params['train_test_file_signature'] + date_time_str + '.csv', 'a') as f:
                 writer = csv.writer(f)
                 writer.writerow(current_eval_data)
 

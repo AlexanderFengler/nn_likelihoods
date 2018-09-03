@@ -1,0 +1,2 @@
+model_checkpoint_path: "/Users/admin/OneDrive/git_repos/nn_likelihoods/keras_tests/train_with_callbacks"
+all_model_checkpoint_paths: "/Users/admin/OneDrive/git_repos/nn_likelihoods/keras_tests/train_with_callbacks"
