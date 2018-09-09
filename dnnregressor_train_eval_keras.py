@@ -67,6 +67,7 @@ class dnn_trainer():
                            }
 
         self.model  = []
+        self.data = {}
 
     # Define function that reads in data
     def read_in_dataset(self):
@@ -211,10 +212,10 @@ class dnn_trainer():
 
         else: # cold start
             train_history = self.model.fit(
-                                           x = self.train_features,
-                                           y = self.train_labels,
+                                           x = self.data['train_features'],
+                                           y = self.data['train_labels'],
                                            epochs = self.train_params['max_train_epochs'],
-                                           validation_data = (self.test_features, self.test_labels),
+                                           validation_data = (self.data['test_features'], self.data['test_labels']),
                                            callbacks = callback_funs
                                            )
 
