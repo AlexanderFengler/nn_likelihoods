@@ -530,7 +530,7 @@ def train_test_from_file_rt_choice(
 
     if backend == 'keras':
         train_features = train_features.copy().values
-        test_features = test_featues.copy().values
+        test_features = test_features.copy().values
 
     return (train_features,
             train_labels,

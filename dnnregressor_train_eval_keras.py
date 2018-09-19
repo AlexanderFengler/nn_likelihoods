@@ -174,7 +174,8 @@ class dnn_trainer():
                                                                        monitor = self.train_params['callback_monitor'],
                                                                        factor = self.train_params['red_coef_learning_rate'],
                                                                        patience = self.train_params['plateau_patience'],
-                                                                       min_lr = self.train_params['min_learning_rate']
+                                                                       min_lr = self.train_params['min_learning_rate'],
+                                                                       verbose = 1
                                                                        )
                                     )
 
@@ -182,7 +183,8 @@ class dnn_trainer():
                 callback_funs.append(keras.callbacks.EarlyStopping(
                                                                    min_delta = self.train_params['min_delta'],
                                                                    monitor = self.train_params['callback_monitor'],
-                                                                   patience = self.train_params['early_stopping_patience']
+                                                                   patience = self.train_params['early_stopping_patience'],
+                                                                   verbose = 1
                                                                    )
                                      )
 
@@ -196,7 +198,8 @@ class dnn_trainer():
                                                                                 '-' + model_cnt_tmp + '-{epoch:02d}',
                                                                      save_best_only = self.train_params['ckpt_save_best_only'],
                                                                      save_weights_only = self.train_params['ckpt_save_weights_only'],
-                                                                     period = self.train_params['ckpt_period']
+                                                                     period = self.train_params['ckpt_period'],
+                                                                     verbose = 1
                                                                      )
                                     )
 
