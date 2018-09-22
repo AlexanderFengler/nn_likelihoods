@@ -195,7 +195,7 @@ class dnn_trainer():
                                                                                 self.data_params['data_type_signature'] + \
                                                                                 self.data_params['timestamp'] + '/' + \
                                                                                 self.data_params['checkpoint'] + \
-                                                                                '-' + model_cnt_tmp + '-{epoch:02d}',
+                                                                                '_' + model_cnt_tmp + '_{epoch:02d}',
                                                                      save_best_only = self.train_params['ckpt_save_best_only'],
                                                                      save_weights_only = self.train_params['ckpt_save_weights_only'],
                                                                      period = self.train_params['ckpt_period'],
