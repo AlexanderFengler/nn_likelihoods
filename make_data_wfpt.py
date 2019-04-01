@@ -7,7 +7,8 @@ import ddm_data_simulation as ddm_data_simulator
 import scipy.integrate as integrate
 
 
-# WFPT NAVARROS FUSS
+# WFPT NAVARROS FUSS -------------
+# Large-time approximation to fpt distribution
 def fptd_large(t, w, k):
     terms = np.arange(1, k+1, 1)
     fptd_sum = 0
@@ -16,6 +17,7 @@ def fptd_large(t, w, k):
         fptd_sum += i * np.exp( - ((i**2) * (np.pi**2) * t) / 2) * np.sin(i * np.pi * w)
     return fptd_sum * np.pi
 
+# Small-time approximation to fpt distribution
 def fptd_small(t, w, k):
     temp = (k-1)/2
     flr = np.floor(temp).astype(int)
@@ -28,9 +30,11 @@ def fptd_small(t, w, k):
         fptd_sum += (w + 2 * i) * np.exp( - ((w + 2 * i)**2) / (2 * t))
     return fptd_sum * (1 / np.sqrt(2 * np.pi * (t**3)))
 
+# Leading term (shows up for both large and small time)
 def calculate_leading_term(t, v, a ,w):
     return 1 / (a**2) * np.exp(- (v * a * w) - (((v**2) * t) / 2))
 
+# Choice function to determine which approximation is appropriate (small or large time)
 def choice_function(t, eps):
     eps_l = min(eps, 1 / (t * np.pi))
     eps_l = eps
@@ -40,6 +44,7 @@ def choice_function(t, eps):
     k_s = max(2 + np.sqrt(- 2 * t * np.log(2 * eps_s * np.sqrt(2 * np.pi * t))), 1 + np.sqrt(t))
     return k_s - k_l, k_l, k_s
 
+# Actual fptd (first-passage-time-distribution) algorithm
 def fptd(t, v, a, w, eps):
     # negative reaction times signify upper boundary crossing
     # we have to change the parameters as suggested by navarro & fuss (2009)
@@ -59,7 +64,13 @@ def fptd(t, v, a, w, eps):
             return max(1e-29, leading_term * fptd_small(t/(a**2), w, k_s))
     else:
         return 1e-29
+# --------------------------------
 
+# SUPPORT FUNCTIONS
+# --------------------------------
+
+
+# Calculation of choice probabilities
 def choice_probabilities(v, a , w, allow_analytic = True):
     if w == 0.5 and allow_analytic:
         return choice_probabilities_analytic(v, a)
@@ -68,6 +79,7 @@ def choice_probabilities(v, a , w, allow_analytic = True):
 def choice_probabilities_analytic(v, a):
     return (1 / (1 + np.exp(v*a)))
 
+
 # Generate training / test data for DDM
 # We want training data for
 # v ~ U(-3,3)
@@ -75,6 +87,9 @@ def choice_probabilities_analytic(v, a):
 # w ~ U(0,1)
 # rt ~ random.sample({-1, 1}) * GAMMA(scale = 1, shape = 2)
 
+
+# Function that generate 'features' (ML parlance, here features are (v,a,w,rt,c))
+# ----
 def gen_ddm_features_random(v_range = [-3, 3],
                             a_range = [0.1, 3],
                             w_range = [0, 1],
@@ -207,8 +222,10 @@ def gen_ddm_features_combination(v_range = [1,2],
                         print('datapoint ' + str(i) + ' generated')
 
     return  data
+# ----
 
-
+# Function that generates 'Labels' (ML parlance, here 'label' refers to a navarro-fuss likelihood computed for datapoint of the form (v,a,w,rt,c))
+# ----
 def gen_ddm_labels(data = [1,1,0,1], eps = 10**(-29)):
     labels = np.zeros((data.shape[0],1))
     #labels = pd.Series(np.zeros((data.shape[0],)), name = 'nf_likelihood')
@@ -226,7 +243,10 @@ def gen_ddm_labels(data = [1,1,0,1], eps = 10**(-29)):
             print('label ' + str(i) + ' generated')
 
     return labels
+# ----
 
+# Functions to generate full datasets
+# ----
 def make_data_rt_choice(v_range = [-3, 3],
                         a_range = [0.1, 3],
                         w_range = [0, 1],
@@ -321,7 +341,11 @@ def make_data_choice_probabilities(v_range = [-3, 3],
        data.to_csv('data_storage/data_' + str(n_samples) + f_signature + cur_time + '.csv')
 
     return data.copy(), cur_time, n_samples
+# ----
 
+
+# Functions to split datasets into training and test sets respectively
+# ----
 def train_test_split_choice_probabilities(data = [],
                                           p_train = 0.8,
                                           write_to_file = True,
@@ -595,3 +619,5 @@ def train_test_from_file_choice_probabilities(
             train_labels,
             test_features,
             test_labels)
+
+# ----
