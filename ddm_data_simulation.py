@@ -73,6 +73,7 @@ def  ddm_simulate(v = 0, # drift by timestep 'delta_t'
 # 3. It return upper and lower bounds for every t as a list [upper, lower]
 
 def ddm_flexbound_simulate(v = 0,
+                           a = 1,
                            w = 0.5,
                            s = 1,
                            delta_t = 0.001,
@@ -81,7 +82,7 @@ def ddm_flexbound_simulate(v = 0,
                            print_info = True,
                            boundary_fun = None, # function of t (and potentially other parameters) that takes in (t, *args)
                            boundary_fun_type = 'constant',
-                           **boundary_params):
+                           boundary_params = {'p1': 0, 'p2':0}):
 
     # Initializations
     print({'boundary_fun': boundary_fun})
@@ -92,8 +93,10 @@ def ddm_flexbound_simulate(v = 0,
     # Boundary storage:
     boundaries = np.zeros(((int(max_t/delta_t), 2)))
     for i in range(0, int(max_t/delta_t), 1):
-        boundaries[i, :] = boundary_fun(t = i * delta_t, **boundary_params)
-
+        boundaries[i, 1] = a * boundary_fun(t = i * delta_t, **boundary_params)
+        boundaries[i, 0] = - boundaries[i, 1]
+    
+    
     # Outer loop over n - number of samples
     for n in range(0, n_samples, 1):
         # initialize y, t, and time_counter
@@ -114,7 +117,7 @@ def ddm_flexbound_simulate(v = 0,
         rts[n] = t
         # Note that for purposes of consistency with Navarro and Fuss, the choice corresponding the lower barrier is +1, higher barrier is -1
         # This is kind of a legacy issue at this point (plan is to flip this around, after appropriately reformulating navarro fuss wfpd function)
-        choices[n] = (-1) * np.sign(y)
+        choices[n] = np.sign(y)
 
         if print_info == True:
             if n % 1000 == 0:
@@ -128,7 +131,8 @@ def ddm_flexbound_simulate(v = 0,
                            'max_t': max_t,
                            'n_samples': n_samples,
                            'simulator': 'ddm_flexbound',
-                           'boundary_fun_type': boundary_fun_type})
+                           'boundary_fun_type': boundary_fun_type,
+                           'possible_choices': [-1, 1]})
 # -----------------------------------------------------------------------------------------------
 
 # Simulate (rt, choice) tuples from: RACE MODEL WITH N SAMPLES ----------------------------------

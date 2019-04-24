@@ -91,8 +91,8 @@ class logkde():
                 log_kde_eval[choice_idx_tmp] = -66.77497 # the number corresponds to log(1e-29)
             else:
                 log_kde_eval[choice_idx_tmp] = np.log(self.data['choice_proportions'][self.data['choices'].index(c)]) + \
-                self.base_kdes[self.data['choices'].index(c)].score_samples(np.expand_dims(log_rts[choice_idx_tmp], 1)) + \
-                - log_rts[choice_idx_tmp]
+                self.base_kdes[self.data['choices'].index(c)].score_samples(np.expand_dims(log_rts[choice_idx_tmp], 1)) - \
+                log_rts[choice_idx_tmp]
             
         if log_eval == True:
             return log_kde_eval
