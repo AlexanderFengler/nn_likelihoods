@@ -41,7 +41,7 @@ def  ddm_simulate(v = 0, # drift by timestep 'delta_t'
             if n % 1000 == 0:
                 print(n, ' datapoints sampled')
 
-    print('finished:', {'v:': v,
+    print('finished:', {'v': v,
            'a': a,
            'w': w,
            's': s,
@@ -51,7 +51,7 @@ def  ddm_simulate(v = 0, # drift by timestep 'delta_t'
            'simulator': 'ddm',
            'boundary_fun_type': 'constant'})
            
-    return (rts, choices, {'v:': v,
+    return (rts, choices, {'v': v,
                            'a': a,
                            'w': w,
                            's': s,
@@ -59,7 +59,8 @@ def  ddm_simulate(v = 0, # drift by timestep 'delta_t'
                            'max_t': max_t,
                            'n_samples': n_samples,
                            'simulator': 'ddm',
-                           'boundary_fun_type': 'constant'})
+                           'boundary_fun_type': 'constant',
+                           'possible_choices': [-1, 1]})
 # -----------------------------------------------------------------------------------------------
 
 # Simulate (rt, choice) tuples from: DDM WITH ARBITRARY BOUNDARY --------------------------------
@@ -118,7 +119,7 @@ def ddm_flexbound_simulate(v = 0,
         if print_info == True:
             if n % 1000 == 0:
                 print(n, ' datapoints sampled')
-    return (rts, choices,  {'v:': v,
+    return (rts, choices,  {'v': v,
                            'a': a,
                            'w': w,
                            's': s,

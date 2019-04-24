@@ -217,6 +217,7 @@ class dnn_trainer():
             train_history = self.model.fit(
                                            x = self.data['train_features'],
                                            y = self.data['train_labels'],
+                                           batch_size = self.train_params['batch_size'],
                                            epochs = self.train_params['max_train_epochs'],
                                            validation_data = (self.data['test_features'], self.data['test_labels']),
                                            callbacks = callback_funs
