@@ -91,11 +91,12 @@ def ddm_flexbound_simulate(v = 0,
     delta_t_sqrt = np.sqrt(delta_t) # correct scalar so we can use standard normal samples for the brownian motion
 
     # Boundary storage:
-    boundaries = np.zeros(((int(max_t/delta_t), 2)))
-    for i in range(0, int(max_t/delta_t), 1):
+    boundaries = np.zeros(((int((max_t/delta_t) + 1), 2)))
+    for i in range(0, int((max_t/delta_t) + 1), 1):
         boundaries[i, 1] = a * boundary_fun(t = i * delta_t, **boundary_params)
         boundaries[i, 0] = - boundaries[i, 1]
     
+    print(boundaries.shape)
     
     # Outer loop over n - number of samples
     for n in range(0, n_samples, 1):
