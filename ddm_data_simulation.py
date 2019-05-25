@@ -82,21 +82,35 @@ def ddm_flexbound_simulate(v = 0,
                            print_info = True,
                            boundary_fun = None, # function of t (and potentially other parameters) that takes in (t, *args)
                            boundary_fun_type = 'constant',
-                           boundary_params = {'p1': 0, 'p2':0}):
+                           boundary_multiplicative = True,
+                           boundary_params = {'p1': 0, 'p2':0}
+                          ):
 
     # Initializations
-    print({'boundary_fun': boundary_fun})
+    #print({'boundary_fun': boundary_fun})
+    
     rts = np.zeros((n_samples,1)) #rt storage
     choices = np.zeros((n_samples,1)) # choice storage
     delta_t_sqrt = np.sqrt(delta_t) # correct scalar so we can use standard normal samples for the brownian motion
 
     # Boundary storage:
     boundaries = np.zeros(((int((max_t/delta_t) + 1), 2)))
-    for i in range(0, int((max_t/delta_t) + 1), 1):
-        boundaries[i, 1] = a * boundary_fun(t = i * delta_t, **boundary_params)
-        boundaries[i, 0] = - boundaries[i, 1]
+    b_tmp = 0.0
     
-    print(boundaries.shape)
+    if boundary_multiplicative:
+        for i in range(0, int((max_t/delta_t) + 1), 1):
+            b_tmp = a * boundary_fun(t = i * delta_t, **boundary_params)
+            if b_tmp > 0:
+                boundaries[i, 1] = b_tmp
+                boundaries[i, 0] = - boundaries[i, 1]
+    else:
+        for i in range(0, int((max_t/delta_t) + 1), 1):
+            b_tmp =  a + boundary_fun(t = i * delta_t, **boundary_params)
+            if b_tmp > 0:
+                boundaries[i, 1] = b_tmp
+                boundaries[i, 0] = - boundaries[i, 1]
+            
+    #print(boundaries.shape)
     
     # Outer loop over n - number of samples
     for n in range(0, n_samples, 1):
@@ -132,7 +146,7 @@ def ddm_flexbound_simulate(v = 0,
                            'max_t': max_t,
                            'n_samples': n_samples,
                            'simulator': 'ddm_flexbound',
-                           'boundary_fun_type': boundary_fun_type,
+                           'boundary_fun_type': boundary_fun.__name__,
                            'possible_choices': [-1, 1]})
 # -----------------------------------------------------------------------------------------------
 
