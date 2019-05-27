@@ -45,11 +45,12 @@ def kde_train_test_from_simulations_flexbound(base_simulation_folder = '',
     
     files_ = [base_simulation_folder + '/' + file_ for file_ in files_]
     
-    n_samples_by_kde = int(n_total / n_files)
+    n_samples_by_kde_tmp = int(n_total / n_files)
     n_samples_total = n_total - (n_total % n_files)
-    n_kde = int(n_samples_by_kde * mixture_p[0])
-    n_unif_up = int(n_samples_by_kde * mixture_p[1])
-    n_unif_down = int(n_samples_by_kde * mixture_p[2])
+    n_kde = int(n_samples_by_kde_tmp * mixture_p[0])
+    n_unif_up = int(n_samples_by_kde_tmp * mixture_p[1])
+    n_unif_down = int(n_samples_by_kde_tmp * mixture_p[2])
+    n_samples_by_kde = n_kde + n_unif_up + n_unif_down
     
     # Generate basic empty dataframe (do more clever)
     # Should be automated better
