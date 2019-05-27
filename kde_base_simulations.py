@@ -1,0 +1,128 @@
+# Basic python utilities
+import numpy as np
+import scipy as scp 
+from scipy.stats import gamma
+
+# Parallelization
+import multiprocessing as mp
+from  multiprocessing import Process
+from  multiprocessing import Pool
+import psutil
+
+# System utilities
+from datetime import datetime
+import time
+import os
+import pickle 
+import uuid
+
+# My own code
+import kde_class as kde
+import ddm_data_simulation as ddm_simulator 
+
+# Define boundary function (c1, c2) (multiplicative)
+def exp_c1_c2(t = 1, 
+              c1 = 1,
+              c2 = 1):
+    
+    b = np.exp(- c2*(t-c1))
+    
+    if t >= c1:
+        
+        return - b
+        
+    else:
+        return 1    
+    
+# Define boundary functions (additive)
+def gamma_shape_scale(t = 1,
+                      shape = 1.01,
+                      scale = 1):
+    return gamma.pdf(t, a = shape, scale = scale)
+
+# Generalized logistic bound (multiplicative)
+def generalized_logistic_bnd(t = 1, 
+                             B = 2.,
+                             M = 3.,
+                             v = 0.5):
+    return 1 - (1 / np.power(1 + np.exp(- B * (t - M)), 1 / v))
+
+
+# Linear collapse (additive)
+def linear_collapse(t = 1, 
+                    node = 1,
+                    theta = 1):
+    if t >= node:
+        return (t - node) * (- np.sin(theta) / np.cos(theta))
+    else:
+        return 0
+    
+
+def data_generator(*args):
+    # CHOOSE SIMULATOR HERE
+    simulator_data = ddm_simulator.ddm_flexbound_simulate(*args)
+    file_dir =  'data_storage/kde/linear_collapse/base_simulations/'
+    print('# Data Files Detected:', len(os.listdir('data_storage/kde/linear_collapse/base_simulations/')))
+    # file_name = file_dir + simulator + '_' + datetime.now().strftime('%m_%d_%y_%H_%M_%S') + '_' + uuid.uuid1().hex
+    # I actually want to use the code above for file_names... there is currently no underscore separating the 'seconds'
+    # of current time from the 'uuid hex'
+    file_name = file_dir + simulator + '_' + uuid.uuid1().hex 
+    pickle.dump(simulator_data, open( file_name + '.pickle', "wb" ) )
+    
+
+if __name__ == "__main__":
+    # Get cpu cnt
+    n_cpus = psutil.cpu_count(logical = False)    
+
+    # Parameter ranges (for the simulator)
+    v = [-2.5, 2.5]
+    w = [0.15, 0.85]
+    a = [0.5, 5]
+    c1 = [0, 5]
+    c2 = [1, 1.5]
+    node = [0, 5]
+    theta = [0, np.pi/2]
+
+    # Simulator parameters 
+    simulator = 'ddm_flexbound'
+    s = 1
+    delta_t = 0.01
+    max_t = 20
+    n_samples = 10000
+    print_info = False
+    boundary_fun_type = 'linear_collapse'
+    boundary_multiplicative = False
+
+    # Number of kdes to generate
+    n_kdes = 50000
+
+    # Make function input tuples
+    v_sample = np.random.uniform(low = v[0], high = v[1], size = n_kdes)
+    w_sample = np.random.uniform(low = w[0], high = w[1], size = n_kdes)
+    a_sample = np.random.uniform(low = a[0], high = a[1], size = n_kdes)
+    c1_sample = np.random.uniform(low = c1[0], high = c1[1], size = n_kdes)
+    c2_sample = np.random.uniform(low = c2[0], high = c2[1], size = n_kdes)
+    node_sample = np.random.uniform(low = node[0], high = node[1], size = n_kdes)
+    theta_sample = np.random.uniform(low = theta[0], high = theta[1], size = n_kdes)
+
+    # Defining main function to iterate over:
+    # Folder in which we would like to dump files
+
+    args_list = []
+    for i in range(0, n_kdes, 1):
+        args_list.append((v_sample[i], 
+                          a_sample[i],
+                          w_sample[i], 
+                          s, 
+                          delta_t, 
+                          max_t, 
+                          n_samples, 
+                          print_info, 
+                          linear_collapse,  
+                          boundary_multiplicative,
+                          {'node': node_sample[i],
+                          'theta': theta_sample[i]}))
+
+    # Parallel Loop
+    with Pool(processes = n_cpus) as pool:
+        res = pool.starmap(data_generator, args_list)
