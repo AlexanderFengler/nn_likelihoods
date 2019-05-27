@@ -119,6 +119,11 @@ class logkde():
             else:
                 n_by_choice.append(int(round(n_samples * alternate_choice_p[i])))
         
+        # Catch an potential dimension error if we ended up rounding up twice
+        if sum(n_by_choice) != n_samples:
+            n_by_choice[np.random.choice(len(self.data['choice_proportions']))] -= 1
+        
+        # Get samples
         cnt_low = 0
         for i in range(0, len(self.data['choices']), 1):
             if n_by_choice[i] > 0:
