@@ -81,7 +81,6 @@ def ddm_flexbound_simulate(v = 0,
                            n_samples = 20000,
                            print_info = True,
                            boundary_fun = None, # function of t (and potentially other parameters) that takes in (t, *args)
-                           boundary_fun_type = 'constant',
                            boundary_multiplicative = True,
                            boundary_params = {'p1': 0, 'p2':0}
                           ):
