@@ -94,7 +94,7 @@ if __name__ == "__main__":
     boundary_multiplicative = False
 
     # Number of kdes to generate
-    n_kdes = 50000
+    n_kdes = 25000
 
     # Make function input tuples
     v_sample = np.random.uniform(low = v[0], high = v[1], size = n_kdes)

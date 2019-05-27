@@ -42,3 +42,4 @@ data_storage/
 tensorflow_models/
 keras_models/
 experiments/
+batch_scripts/
