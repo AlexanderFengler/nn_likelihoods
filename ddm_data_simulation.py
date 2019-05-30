@@ -149,6 +149,19 @@ def ddm_flexbound_simulate(v = 0,
                            'possible_choices': [-1, 1]})
 # -----------------------------------------------------------------------------------------------
 
+# return ({'rts': rts, 
+#          'choices': choices, 
+#          'process_params': {'v': v, 'a': a, 'w': w, 's': s},
+#          'boundary_params': {**boundary_params},
+#          'simulator_params': {'delta_t': delta_t, 
+#                               'max_t': max_t, 
+#                               'n_samples': n_samples, 
+#                               'simulator': 'ddm_flexbound',
+#                               'possible_choices': [-1, 1],
+#                               'boundary_fun_type': boundary_fun.__name__},
+#          'simulation_stats': {'choice_proportions': [len(choices[choices == -1]) / len(choices), len(choices[choices == 1]) / len(choices)]})
+
+
 # Simulate (rt, choice) tuples from: RACE MODEL WITH N SAMPLES ----------------------------------
 def race_model(v = [0, 0, 0], # np.array expected in fact, one column of floats
                w = [0, 0, 0], # np.array expected in fact, one column of floats
