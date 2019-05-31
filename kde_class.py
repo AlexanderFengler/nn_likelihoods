@@ -65,7 +65,6 @@ class logkde():
                 self.base_kdes.append(KernelDensity(kernel = 'gaussian',
                                                     bandwidth = self.bandwidths[i]).fit(np.log(self.data['rts'][i])))
 
-
         # Function to evaluate the kde log likelihood at chosen points
      
     # Better version of kde_eval
@@ -115,13 +114,17 @@ class logkde():
         n_by_choice = []
         for i in range(0, len(self.data['choices']), 1):
             if use_empirical_choice_p == True:
-                n_by_choice.append(int(round(n_samples * self.data['choice_proportions'][i])))
+                n_by_choice.append(round(n_samples * self.data['choice_proportions'][i]))
             else:
-                n_by_choice.append(int(round(n_samples * alternate_choice_p[i])))
+                n_by_choice.append(round(n_samples * alternate_choice_p[i]))
         
-        # Catch an potential dimension error if we ended up rounding up twice
-        if sum(n_by_choice) != n_samples:
-            n_by_choice[np.random.choice(len(self.data['choice_proportions']))] -= 1
+        # Catch a potential dimension error if we ended up rounding up twice
+        if sum(n_by_choice) > n_samples: 
+            n_by_choice[np.argmax(n_by_choice)] -= 1
+        elif sum(n_by_choice) < n_samples:
+            n_by_choice[np.argmax(n_by_choice)] += 1
+            print('rounding error catched')
+            choices[n_samples - 1, 0] = np.random.choice(self.data['choices'])
         
         # Get samples
         cnt_low = 0
@@ -129,7 +132,12 @@ class logkde():
             if n_by_choice[i] > 0:
                 #print('sum of n_by_choice:', sum(n_by_choice))
                 cnt_high = cnt_low + n_by_choice[i]
-                rts[cnt_low:cnt_high] = np.exp(self.base_kdes[i].sample(n_samples = n_by_choice[i]))
+                
+                if self.base_kdes[i] != 'no_base_data':
+                    rts[cnt_low:cnt_high] = np.exp(self.base_kdes[i].sample(n_samples = n_by_choice[i]))
+                else:
+                    rts[cnt_low:cnt_high, 0] = np.random.uniform(low = 0, high = 20, size = n_by_choice[i])
+                
                 choices[cnt_low:cnt_high, 0] = np.repeat(self.data['choices'][i], n_by_choice[i])
                 cnt_low = cnt_high
                 
