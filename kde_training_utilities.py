@@ -56,10 +56,11 @@ def kde_train_test_from_simulations_flexbound(base_simulation_folder = '',
     n_samples_total = n_samples_by_kde * n_files
     
     # Generate basic empty dataframe (do more clever)
-
+    my_columns = process_params + ['rt', 'choice', 'log_l']
+    
     # Initialize dataframe
-    data = pd.DataFrame(np.zeros((n_samples_total, len(process_params) + 3)), 
-                        columns = process_params + ['rt', 'choice', 'log_l'])
+    data = pd.DataFrame(np.zeros((n_samples_total, len(my_columns)), 
+                        columns = my_columns)
     
     
     # Main while loop
@@ -69,7 +70,7 @@ def kde_train_test_from_simulations_flexbound(base_simulation_folder = '',
         tmp_sim_data = pickle.load( open( file_ , "rb" ) )
         
         for param in process_params:
-            data.iloc[row_cnt:(row_cnt + n_samples_by_kde), process_params.index(param)] = tmp_sim_data[2][param]
+            data.iloc[row_cnt:(row_cnt + n_samples_by_kde), my_columns.index(param)] = tmp_sim_data[2][param]
             
                         
 #             data.iloc[row_cnt:(row_cnt + n_samples_by_kde), my_columns.index('v')] = tmp_sim_data[2]['v']            
