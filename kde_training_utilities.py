@@ -25,6 +25,7 @@ def kde_train_test_from_simulations_flexbound(base_simulation_folder = '',
                                               n_total = 10000,
                                               p_train = 0.8,
                                               mixture_p = [0.8, 0.1, 0.1], # maybe here I can instead pass a function that provides a sampler
+                                              process_params = ['v', 'a', 'w', 'c1', 'c2'],
                                               model = 'ddm_flexbound',
                                               print_info = False,
                                               target_file_format = 'pickle',
@@ -55,22 +56,25 @@ def kde_train_test_from_simulations_flexbound(base_simulation_folder = '',
     n_samples_total = n_samples_by_kde * n_files
     
     # Generate basic empty dataframe (do more clever)
-    # Should be automated better
-    my_columns = ['v', 'a', 'w', 'c1', 'c2', 'rt', 'choice', 'log_l']
-    
+
     # Initialize dataframe
-    data = pd.DataFrame(np.zeros((n_samples_total, len(my_columns))), columns = my_columns)
+    data = pd.DataFrame(np.zeros((n_samples_total, len(process_params) + 3)), columns = my_columns)
+    
     
     # Main while loop
     row_cnt = 0 
     for file_ in files_:
         tmp_sim_data = pickle.load( open( file_ , "rb" ) )
         
-        data.iloc[row_cnt:(row_cnt + n_samples_by_kde), my_columns.index('v')] = tmp_sim_data[2]['v'] 
-        data.iloc[row_cnt:(row_cnt + n_samples_by_kde), my_columns.index('a')] = tmp_sim_data[2]['a']
-        data.iloc[row_cnt:(row_cnt + n_samples_by_kde), my_columns.index('w')] = tmp_sim_data[2]['w']      
-        data.iloc[row_cnt:(row_cnt + n_samples_by_kde), my_columns.index('c1')] = tmp_sim_data[2]['c1']
-        data.iloc[row_cnt:(row_cnt + n_samples_by_kde), my_columns.index('c2')] = tmp_sim_data[2]['c2']
+        for param in process_params:
+            data.iloc[row_cnt:(row_cnt + n_samples_by_kde), process_params.index(param)] = tmp_sim_data[2][param]
+            
+                        
+#             data.iloc[row_cnt:(row_cnt + n_samples_by_kde), my_columns.index('v')] = tmp_sim_data[2]['v']            
+#             data.iloc[row_cnt:(row_cnt + n_samples_by_kde), my_columns.index('a')] = tmp_sim_data[2]['a']
+#             data.iloc[row_cnt:(row_cnt + n_samples_by_kde), my_columns.index('w')] = tmp_sim_data[2]['w']      
+#             data.iloc[row_cnt:(row_cnt + n_samples_by_kde), my_columns.index('c1')] = tmp_sim_data[2]['c1']
+#             data.iloc[row_cnt:(row_cnt + n_samples_by_kde), my_columns.index('c2')] = tmp_sim_data[2]['c2']
     
         # Get simulated data from kde
         tmp_kde = kde_class.logkde(tmp_sim_data)
@@ -81,6 +85,7 @@ def kde_train_test_from_simulations_flexbound(base_simulation_folder = '',
         data.iloc[row_cnt:(row_cnt + n_kde), my_columns.index('log_l')] = tmp_kde.kde_eval(data = tmp_kde_samples).ravel()
 
         # Generate rest of the data (to make sure we observe outliers that are negative and close to max_rt)
+        
         # Negative uniform part
         choice_tmp = np.random.choice(tmp_sim_data[2]['possible_choices'], 
                                       size = n_unif_down)
@@ -110,7 +115,7 @@ def kde_train_test_from_simulations_flexbound(base_simulation_folder = '',
     
     
     # Shuffle Data Frame
-    data = data.sample(frac = 1).reset_index(drop = True)
+    data = data.sample(frac = 1).reset_index(drop = True, inplace = True)
     
     train_id = np.random.choice(a = [True, False], 
                                 size = data.shape[0], 
@@ -129,7 +134,7 @@ def kde_train_test_from_simulations_flexbound(base_simulation_folder = '',
     # Hack for now: Just copy one of the base simulations files over
     pickle.dump(tmp_sim_data,  open(target_folder + '/meta_data.pickle', 'wb') )                
     
-    return 
+    return data
 
 def kde_load_data(folder = ''):
     # Load training data from file
