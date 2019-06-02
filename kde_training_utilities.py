@@ -58,7 +58,8 @@ def kde_train_test_from_simulations_flexbound(base_simulation_folder = '',
     # Generate basic empty dataframe (do more clever)
 
     # Initialize dataframe
-    data = pd.DataFrame(np.zeros((n_samples_total, len(process_params) + 3)), columns = my_columns)
+    data = pd.DataFrame(np.zeros((n_samples_total, len(process_params) + 3)), 
+                        columns = process_params + ['rt', 'choice', 'log_l'])
     
     
     # Main while loop
