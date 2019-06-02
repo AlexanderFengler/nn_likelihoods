@@ -63,6 +63,7 @@ def kde_train_test_from_simulations_flexbound(base_simulation_folder = '',
     
     # Main while loop
     row_cnt = 0 
+    cnt = 0
     for file_ in files_:
         tmp_sim_data = pickle.load( open( file_ , "rb" ) )
         
@@ -111,7 +112,9 @@ def kde_train_test_from_simulations_flexbound(base_simulation_folder = '',
         data.iloc[(row_cnt + n_kde + n_unif_down):(row_cnt + n_samples_by_kde), my_columns.index('log_l')] = tmp_kde.kde_eval(data = (rt_tmp, choice_tmp))
         
         row_cnt += n_samples_by_kde
-        print(row_cnt)
+        cnt += 1
+        if cnt % 1000 == 0:
+            print(cnt, 'kdes generated')
     
     
     # Shuffle Data Frame

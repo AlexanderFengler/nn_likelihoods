@@ -25,13 +25,13 @@ def data_generator(*args):
     # CHOOSE SIMULATOR HERE
     simulator_data = ddm_simulator.ddm_flexbound_simulate(*args)
     file_dir =  'data_storage/kde/weibull/base_simulations/'
-    print('# Data Files Detected:', len(os.listdir('data_storage/kde/weibull/base_simulations/')))
+    #print('# Data Files Detected:', len(os.listdir('data_storage/kde/weibull/base_simulations/')))
     # file_name = file_dir + simulator + '_' + datetime.now().strftime('%m_%d_%y_%H_%M_%S') + '_' + uuid.uuid1().hex
     # I actually want to use the code above for file_names... there is currently no underscore separating the 'seconds'
     # of current time from the 'uuid hex'
     file_name = file_dir + simulator + '_' + uuid.uuid1().hex 
     pickle.dump(simulator_data, open( file_name + '.pickle', "wb" ) )
-    
+    print('success')
 
 if __name__ == "__main__":
     # Get cpu cnt
