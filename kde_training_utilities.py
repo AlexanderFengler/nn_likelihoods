@@ -120,7 +120,9 @@ def kde_train_test_from_simulations_flexbound(base_simulation_folder = '',
     
     
     # Shuffle Data Frame
-    data = data.sample(frac = 1).reset_index(drop = True, inplace = True)
+    np.random.shuffle(data.values)
+    #data = data.sample(frac = 1).reset_index(drop = True, inplace = True)
+    
     
     train_id = np.random.choice(a = [True, False], 
                                 size = data.shape[0], 
