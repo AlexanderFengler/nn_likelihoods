@@ -22,6 +22,7 @@ import kde_class
 
 def kde_train_test_from_simulations_flexbound(base_simulation_folder = '',
                                               target_folder = '',
+                                              idx = 1,
                                               n_total = 10000,
                                               p_train = 0.8,
                                               mixture_p = [0.8, 0.1, 0.1], # maybe here I can instead pass a function that provides a sampler
@@ -119,11 +120,11 @@ def kde_train_test_from_simulations_flexbound(base_simulation_folder = '',
             print(cnt, 'kdes generated')
     
     
-    # Shuffle Data Frame
+    # Shuffle Data Frame (values/rows) 
     np.random.shuffle(data.values)
     #data = data.sample(frac = 1).reset_index(drop = True, inplace = True)
     
-    
+    # Get training and test ids
     train_id = np.random.choice(a = [True, False], 
                                 size = data.shape[0], 
                                 replace = True, 
@@ -132,10 +133,14 @@ def kde_train_test_from_simulations_flexbound(base_simulation_folder = '',
     
     # Store training and test data to file 
     print('writing to train test data to file')
-    data.iloc[train_id, :7].to_pickle(target_folder + '/train_features.pickle' , protocol = 4)
-    data.iloc[test_id, :7].to_pickle(target_folder + '/test_features.pickle', protocol = 4)
-    data.iloc[train_id, 7].to_pickle(target_folder + '/train_labels.pickle', protocol = 4)
-    data.iloc[test_id, 7].to_pickle(target_folder + '/test_labels.pickle', protocol = 4)
+    data.iloc[train_id, :(len(my_columns) - 1)].to_pickle(target_folder + '/train_features_' + str(idx) +  '.pickle' ,
+                                                          protocol = 4)
+    data.iloc[test_id, :(len(my_columns) - 1)].to_pickle(target_folder + '/test_features_'  + str(idx) +  '.pickle', 
+                                                         protocol = 4)
+    data.iloc[train_id, (len(my_columns) - 1)].to_pickle(target_folder + '/train_labels_' + str(idx) + '.pickle', 
+                                                         protocol = 4)
+    data.iloc[test_id, (len(my_columns) - 1)].to_pickle(target_folder + '/test_labels_' + str(idx) + '.pickle',
+                                                        protocol = 4)
                         
     # Write metafile (just need info from one of the files in base_simulation folder
     # Hack for now: Just copy one of the base simulations files over
@@ -143,6 +148,82 @@ def kde_train_test_from_simulations_flexbound(base_simulation_folder = '',
     
     return data
 
+def kde_make_train_test_split(folder = ''):
+    
+    # Get file names
+    files_ = os.listdir(folder)
+    files_.sort()
+    
+    # Check if there is a train test split already and stop if so
+    caution_stop_str = 'There seems to be a train test split in folder already.. not proceeding out of caution'
+    for file_ in files_:
+        if file_ == 'test_labels.pickle':
+            return caution_stop_str
+        elif file_ == 'train_labels.pickle':
+            return caution_stop_str
+        elif file_ == 'test_features.pickle':
+            return caution_stop_str
+        elif file_ == 'train_features.pickle':
+            return caution_stop_str
+    
+    # Initialize storage lists for files
+    test_label_files = []
+    train_label_files = []
+    test_features_files = []
+    train_features_files = []
+
+    # Store file names in their respective lists
+    for file_ in files_:
+        if file_[:6] == 'test_l':
+            test_label_files.append(file_)
+        if file_[:6] == 'test_f':
+            test_features_files.append(file_)
+        if file_[:7] == 'train_l':
+            train_label_files.append(file_)
+        if file_[:7] == 'train_f':
+            train_features_files.append(file_)
+            
+    # Read test label files     
+    data_tmp = pd.concat([pd.read_pickle(dir_ + file_) for file_ in test_label_files])
+    data_tmp.reset_index(drop = True, 
+                         inplace = True)
+    
+    print('writing test labels to file')
+    data_tmp.to_pickle(folder + '/test_labels.pickle',
+                       protocol = 4)
+    
+    # Read test features files
+    data_tmp = pd.concat([pd.read_pickle(dir_ + file_) for file_ in test_features_files])
+    data_tmp.reset_index(drop = True, 
+                         inplace = True)
+    
+    print('writing test features to file')
+    data_tmp.to_pickle(folder + '/test_features.pickle',
+                       protocol = 4)
+    
+    # Read train label files
+    data_tmp = pd.concat([pd.read_pickle(dir_ + file_) for file_ in train_label_files])
+    data_tmp.reset_index(drop = True, 
+                         inplace = True)
+    
+    print('writing train labels to file')
+    data_tmp.to_pickle(folder + '/train_labels.pickle',
+                       protocol = 4)
+    
+    
+    
+    # Read train features files
+    data_tmp = pd.concat([pd.read_pickle(dir_ + file_) for file_ in train_features_files])
+    data_tmp.reset_index(drop = True, 
+                         inplace = True)
+    
+    print('writing train features to file')
+    data_tmp.to_pickle(folder + '/train_features.pickle',
+                       protocol = 4)
+    
+    return 'success'
+    
+            
 def kde_load_data(folder = ''):
     # Load training data from file
     train_features = pd.read_pickle(folder + '/train_features.pickle')

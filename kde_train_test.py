@@ -19,7 +19,7 @@ if __name__ == "__main__":
     
     idx = 1
     base_simulation_folder = '/users/afengler/data/kde/weibull/base_simulations/'
-    target_folder = '/users/afengler/data/kde/weibull/train_test_data_' + str(idx) + '/'
+    target_folder = '/users/afengler/data/kde/weibull/train_test_data/'
     process_params = ['v', 'a', 'w', 'node', 'shape', 'scale'] 
     
     if not os.path.isdir(target_folder):
@@ -27,6 +27,7 @@ if __name__ == "__main__":
         
     kde_util.kde_train_test_from_simulations_flexbound(base_simulation_folder = base_simulation_folder,
                                                        target_folder = target_folder,
+                                                       idx = idx
                                                        n_total = 55000000,
                                                        p_train = 0.9,
                                                        mixture_p = [0.8, 0.1, 0.1],
