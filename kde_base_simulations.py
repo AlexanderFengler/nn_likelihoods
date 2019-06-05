@@ -103,7 +103,7 @@ if __name__ == "__main__":
                           {'node': node_sample[i],
                            'shape': shape_sample[i],
                            'scale': scale_sample[i]}))
-
+        
     # Parallel Loop
     with Pool(processes = n_cpus) as pool:
         res = pool.starmap(data_generator, args_list)

@@ -121,7 +121,9 @@ def ddm_flexbound_simulate(v = 0,
         # Inner loop (trajection simulation)
         while y <= boundaries[cnt, 1] and y >= boundaries[cnt, 0] and t < max_t:
             # Increment y position (particle position)
-            y += v * delta_t + delta_t_sqrt * np.random.normal(loc = 0, scale = s, size = 1)
+            y += v * delta_t + delta_t_sqrt * np.random.normal(loc = 0, 
+                                                               scale = s, 
+                                                               size = 1)
             # Increment time
             t += delta_t
             # increment count

@@ -184,7 +184,7 @@ def kde_make_train_test_split(folder = ''):
             train_features_files.append(file_)
             
     # Read test label files     
-    data_tmp = pd.concat([pd.read_pickle(dir_ + file_) for file_ in test_label_files])
+    data_tmp = pd.concat([pd.read_pickle(folder + file_) for file_ in test_label_files])
     data_tmp.reset_index(drop = True, 
                          inplace = True)
     
@@ -193,7 +193,7 @@ def kde_make_train_test_split(folder = ''):
                        protocol = 4)
     
     # Read test features files
-    data_tmp = pd.concat([pd.read_pickle(dir_ + file_) for file_ in test_features_files])
+    data_tmp = pd.concat([pd.read_pickle(folder + file_) for file_ in test_features_files])
     data_tmp.reset_index(drop = True, 
                          inplace = True)
     
@@ -202,7 +202,7 @@ def kde_make_train_test_split(folder = ''):
                        protocol = 4)
     
     # Read train label files
-    data_tmp = pd.concat([pd.read_pickle(dir_ + file_) for file_ in train_label_files])
+    data_tmp = pd.concat([pd.read_pickle(folder + file_) for file_ in train_label_files])
     data_tmp.reset_index(drop = True, 
                          inplace = True)
     
@@ -213,7 +213,7 @@ def kde_make_train_test_split(folder = ''):
     
     
     # Read train features files
-    data_tmp = pd.concat([pd.read_pickle(dir_ + file_) for file_ in train_features_files])
+    data_tmp = pd.concat([pd.read_pickle(folder + file_) for file_ in train_features_files])
     data_tmp.reset_index(drop = True, 
                          inplace = True)
     
