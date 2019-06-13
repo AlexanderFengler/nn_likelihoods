@@ -24,6 +24,9 @@ import ddm_data_simulation as ddm_sim
 def my_boundary_race(t = 0, height = 1):
     return height
 
+def constant(t = 0):
+    return 1
+
 # Gamma shape: (additive)
 def gamma_bnd(t = 1,
               node = 1,

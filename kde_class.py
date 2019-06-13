@@ -5,7 +5,6 @@ import time
 from datetime import datetime
 from sklearn.neighbors import KernelDensity
 
-
 # Generate class for log_kdes
 class logkde():
     def __init__(self,
@@ -17,14 +16,6 @@ class logkde():
         self.generate_base_kdes(auto_bandwidth = auto_bandwidth,
                                 bandwidth_type = bandwidth_type)
         self.simulator_info = simulator_data[2]
-        #self.choice_options = np.unique(simulator_data[1]) # storing choice options of process that generated data
-        #self.choice_options.sort()
-        #self.process_params = simulator_data[2] # storing the process parameters underlying the input data
-
-        #self.data = (([0, 2, 4], 1, 0.5),
-        #             ([1, 2, 3], -1, 0.5))
-        #self.base_kdes = 'no kde assigned yet'
-        #self.bandwidths = 'no bandwidth produced yet'
 
     # Function to compute bandwidth parameters given data-set
     # (At this point using Silverman rule)
@@ -65,9 +56,7 @@ class logkde():
                 self.base_kdes.append(KernelDensity(kernel = 'gaussian',
                                                     bandwidth = self.bandwidths[i]).fit(np.log(self.data['rts'][i])))
 
-        # Function to evaluate the kde log likelihood at chosen points
-     
-    # Better version of kde_eval
+    # Function to evaluate the kde log likelihood at chosen points
     def kde_eval(self,
                  data = ([], []),  #kde
                  log_eval = True):
@@ -78,14 +67,14 @@ class logkde():
         choices = np.unique(data[1])
         #print('choices to iterate:', choices)
         #print('choices from kde:', self.data['choices'])
+        
         # Main loop
         for c in choices:
             
             # Get data indices where choice == c
             choice_idx_tmp = np.where(data[1] == c)
-            #print(choice_idx_tmp)
+            
             # Main step: Evaluate likelihood for rts corresponding to choice == c
-            #print(self.data['choice_proportions'][self.data['choices'].index(c)])
             if self.base_kdes[self.data['choices'].index(c)] == 'no_base_data':
                 log_kde_eval[choice_idx_tmp] = -66.77497 # the number corresponds to log(1e-29)
             else:
@@ -141,17 +130,14 @@ class logkde():
                 choices[cnt_low:cnt_high, 0] = np.repeat(self.data['choices'][i], n_by_choice[i])
                 cnt_low = cnt_high
                 
-        return ((rts, choices, self.simulator_info))
-        # return samples from the kde model 
+        return ((rts, choices, self.simulator_info)) 
         
     # Helper function to transform ddm simulator output to dataset suitable for
     # the kde function class
     def attach_data_from_simulator(self,
                                    simulator_data = ([0, 2, 4], [-1, 1, -1])):
 
-        #choices = np.unique(simulator_data[1])
         choices = np.unique(simulator_data[2]['possible_choices'])
-        # CONTINUE HERE: IF SIMULATOR DATA DOES NOT PROVIDE ALL POSSIBLE CHOICES
         
         n = len(simulator_data[0])
         self.data = {'rts': [],
@@ -166,36 +152,26 @@ class logkde():
             self.data['rts'].append(rts_tmp)
             self.data['choice_proportions'].append(prop_tmp)
             
-    # Deprecated ------------------------------------------------------------------------------------
-    # Function to evaluate the kde log likelihood at chosen points (deprecated)
-    def kde_eval_2(self,
-                 where = np.ones((10, 1)),
-                 which = [-1, 1],  #kde
-                 log_eval = True):
-        
-        
-        log_rts = np.log(where[0])
-        log_kde_eval = []
-        kde_eval = []
-        which_data_idx = []
-
-        for i in range(0, len(self.data['choices']), 1):
-            if self.data['choices'][i] in which:
-                which_data_idx.append(i)
-
-        if log_eval:
-            for i in which_data_idx:
-                log_kde_eval.append(np.log(self.data['choice_proportions'][i]) + self.base_kdes[i].score_samples(log_where) - log_where[:, 0])
-            return log_kde_eval, which_data_idx
-        else:
-            for i in which_data_idx:
-                kde_eval.append(np.exp(np.log(self.data['choice_proportions'][i]) + self.base_kdes[i].score_samples(log_where) - log_where[:, 0]))
-            return kde_eval, which_data_idx
-        # return kde (log) likelihoods and also the indices in self.data corresponding to the choices requested
-        # -------------------------------------------------------------------------------------------
 
 # Support functions (accessible from outside the main class defined in script)
-def bandwidth_silverman(sample = [0,0,0]):
+def bandwidth_silverman(sample = [0,0,0], 
+                        std_cutoff = 1e-3, 
+                        std_proc = 'restrict', # options 'kill', 'restrict'
+                        std_n_1 = 1e-1 # HERE WE CAN ALLOW FOR SOMETHING MORE INTELLIGENT
+                       ): 
+    
+    # Compute sample std and number of samples
     std = np.std(sample)
     n = len(sample)
+    
+    # Deal with very small stds and n = 1 case
+    if n > 1:
+        if std < std_cutoff:
+            if std_prod == 'restrict':
+                std = std_cutoff
+            if std_proc == 'kill':
+                std = 0
+    else:
+        std = std_n_1
+    
     return np.power((4/3), 1/5) * std * np.power(n, (-1/5))
