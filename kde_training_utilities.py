@@ -30,24 +30,22 @@ def kde_train_test_from_simulations_flexbound(base_simulation_folder = '',
                                               model = 'ddm_flexbound',
                                               print_info = False,
                                               target_file_format = 'pickle',
-                                              n_files_max = 'all'):
+                                              files_ = 'all', # either 'all' or list of files
+                                              p_files = 0.2):
     
     # Get files 
     #print(base_simulation_folder)
-    files_ = os.listdir(base_simulation_folder)
+    if files_ == 'all'
+        files_ = os.listdir(base_simulation_folder)
     
-    # sort files
-    files_.sort(key = str.lower)
-
-    # Compute some quantities
+    n_files = int(len(files_) * p_files)
     
-    if n_files_max == 'all':
-        n_files = len(files_)
-    else:
-        n_files = n_files_max
-        files_ = np.random.choice(files_ , n_files)
+    # Get sample of files
+    files_ = random.sample(files_, n_files)
     
+    # Make every string full directory
     files_ = [base_simulation_folder + '/' + file_ for file_ in files_]
+    
     
     n_samples_by_kde_tmp = int(n_total / n_files)
     
@@ -64,7 +62,6 @@ def kde_train_test_from_simulations_flexbound(base_simulation_folder = '',
     # Initialize dataframe
     data = pd.DataFrame(np.zeros((n_samples_total, len(my_columns))), 
                         columns = my_columns)
-    
     
     # Main while loop
     row_cnt = 0 
@@ -118,6 +115,8 @@ def kde_train_test_from_simulations_flexbound(base_simulation_folder = '',
     # Shuffle Data Frame (values/rows) 
     np.random.shuffle(data.values)
     
+    
+    # ACTUALLY JUST SPIT OUT A SINGLE FILE HERE
     # Get training and test ids
     train_id = np.random.choice(a = [True, False], 
                                 size = data.shape[0], 
@@ -256,6 +255,8 @@ def kde_train_test_from_simulations_flexbound_2(base_simulation_folder = '',
 
 def kde_make_train_test_split(folder = ''):
     
+    # THIS SHOULD READ IN ONLY SIMPLE DATA FRAMES (BASICALLY A BUNCH OF PARALLELY GENERATED BASE DATA FILES)
+    # THEN MAKE TRAIN TEST SPLIT OUT OF THEM
     # Get file names
     files_ = os.listdir(folder)
     files_.sort()
