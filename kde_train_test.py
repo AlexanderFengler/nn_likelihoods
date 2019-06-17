@@ -16,23 +16,24 @@ import kde_class as kde
 
 if __name__ == "__main__":
     
+    # PICK
     idx = 1
     base_simulation_folder = '/users/afengler/data/kde/weibull/base_simulations/'
     target_folder = '/users/afengler/data/kde/weibull/train_test_data/'
     process_params = ['v', 'a', 'w', 'node', 'shape', 'scale'] 
+    files_ = pickle.load( open('/users/afengler/data/kde/weibull/base_simulations/keep_files.pickle', 'rb'))
     
     if not os.path.isdir(target_folder):
         os.mkdir(target_folder)
         
-    kde_util.kde_train_test_from_simulations_flexbound(base_simulation_folder = base_simulation_folder,
-                                                       target_folder = target_folder,
-                                                       idx = idx
-                                                       n_total = 55000000,
-                                                       p_train = 0.9,
-                                                       mixture_p = [0.8, 0.1, 0.1],
-                                                       process_params = process_params,
-                                                       model = 'ddm_weibull',
-                                                       print_info = False,
-                                                       target_file_format = 'pickle',
-                                                       n_files_max = 'all')
-    
+    kde_util.kde_from_simulations(base_simulation_folder = base_simulation_folder,
+                                  target_folder = target_folder,
+                                  idx = idx
+                                  n_total = 55000000,
+                                  p_train = 0.9,
+                                  mixture_p = [0.8, 0.1, 0.1],
+                                  process_params = process_params,
+                                  print_info = False,
+                                  target_file_format = 'pickle',
+                                  files_ = files_,
+                                  p_files = 0.1)
