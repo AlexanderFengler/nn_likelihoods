@@ -36,7 +36,7 @@ def calculate_leading_term(t, v, a ,w):
 # Choice function to determine which approximation is appropriate (small or large time)
 def choice_function(t, eps):
     eps_l = min(eps, 1 / (t * np.pi))
-    eps_l = eps
+    # eps_l = eps
     eps_s = min(eps, 1 / (2 * np.sqrt(2 * np.pi * t)))
 
     k_l = max(np.sqrt(- (2 * np.log(np.pi * t * eps_l))/(np.pi**2 * t)), 1 / (np.pi * np.sqrt(t)))
