@@ -48,7 +48,7 @@ def filter_simulations(base_simulation_folder = '',
     for file_ in files_:
         if (file_ != 'keep_files.pickle') & (file_ != 'simulator_statistics.pickle'):
             new_files_.append(file_)
-            
+
     files_ = new_files_
 
     n_files = len(files_)
@@ -173,7 +173,6 @@ def filter_simulations(base_simulation_folder = '',
 def kde_from_simulations(base_simulation_folder = '',
                          target_folder = '',
                          n_total = 10000,
-                         p_train = 0.8,
                          mixture_p = [0.8, 0.1, 0.1], # maybe here I can instead pass a function that provides a sampler
                          process_params = ['v', 'a', 'w', 'c1', 'c2'],
                          print_info = False,

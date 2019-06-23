@@ -27,8 +27,7 @@ if __name__ == "__main__":
 
     kde_util.kde_from_simulations(base_simulation_folder = base_simulation_folder,
                                   target_folder = target_folder,
-                                  n_total = 55000000,
-                                  p_train = 0.9,
+                                  n_total = 10000000,
                                   mixture_p = [0.8, 0.1, 0.1],
                                   process_params = process_params,
                                   print_info = False,
