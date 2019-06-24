@@ -27,7 +27,7 @@ import pandas as pd
 #           }
 
 
-def kera_model_generate(params = {}):
+def keras_model_generate(params = {}):
 
     # This returns a tensor
     inputs = keras.layers.Input(shape = (params['input_shape'], ))

@@ -31,6 +31,5 @@ if __name__ == "__main__":
                                   mixture_p = [0.8, 0.1, 0.1],
                                   process_params = process_params,
                                   print_info = False,
-                                  target_file_format = 'pickle',
                                   files_ = files_,
                                   p_files = 0.1)

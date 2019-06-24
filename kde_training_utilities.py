@@ -176,7 +176,6 @@ def kde_from_simulations(base_simulation_folder = '',
                          mixture_p = [0.8, 0.1, 0.1], # maybe here I can instead pass a function that provides a sampler
                          process_params = ['v', 'a', 'w', 'c1', 'c2'],
                          print_info = False,
-                         target_file_format = 'pickle',
                          files_ = 'all', # either 'all' or list of files
                          p_files = 0.2):
 
