@@ -288,7 +288,7 @@ def kde_make_train_test_split(folder = '',
     # Check if folder currently contains a train-test split
     print('check if we have a train and test sets already')
     for file_ in files_:
-        if file[:7] == 'train_f':
+        if file_[:7] == 'train_f':
             return 'looks like a train test split exists in folder: Please remove before running this function'
 
     # If no train-test split in folder: collect 'data_*' files
@@ -300,7 +300,7 @@ def kde_make_train_test_split(folder = '',
 
     # Read in and concatenate files
     print('read, concatenate and shuffle data')
-    data = pd.concat([pd.read_pickle(folder + file_) for file_ in data_files_])
+    data = pd.concat([pd.read_pickle(folder + file_) for file_ in data_files])
 
     # Shuffle data
     np.random.shuffle(data.values)
@@ -320,16 +320,16 @@ def kde_make_train_test_split(folder = '',
 
     # Write to file
     print('writing to file...')
-    data.iloc[train_id, :(len(n_cols) - 1)].to_pickle(folder + 'train_features.pickle',
+    data.iloc[train_id, :(n_cols - 1)].to_pickle(folder + 'train_features.pickle',
                                                           protocol = 4)
 
-    data.iloc[test_id, :(len(n_cols) - 1)].to_pickle(folder + 'test_features.pickle',
+    data.iloc[test_id, :(n_cols - 1)].to_pickle(folder + 'test_features.pickle',
                                                          protocol = 4)
 
-    data.iloc[train_id, (len(n_cols) - 1)].to_pickle(folder + 'train_labels.pickle',
+    data.iloc[train_id, (n_cols - 1)].to_pickle(folder + 'train_labels.pickle',
                                                          protocol = 4)
 
-    data.iloc[test_id, (len(n_cols) - 1)].to_pickle(folder + 'test_labels.pickle',
+    data.iloc[test_id, (n_cols - 1)].to_pickle(folder + 'test_labels.pickle',
                                                         protocol = 4)
 
     return 'success'

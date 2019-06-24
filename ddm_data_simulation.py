@@ -185,20 +185,22 @@ def full_ddm(v = 0,
             tmp = a + boundary_fun(t = i * delta_t, **boundary_params)
             if tmp > 0:
                 boundary[i] = tmp
-
+    
+    #print(boundary)
     # Outer loop over n - number of samples
-    for n in range(0, n_samples, 1):
+    for n in range(n_samples):
         y = (- 1) * boundary[0] + (w * 2 * boundary[0])
         # Apply perturbation to starting point
         y += np.random.uniform(low = (- 1) * dw, high = dw)
         # Define drift increment
-        drift_increment = np.random.normal(loc = v, scale = sdv) * delta_t
-
-        t = 0
+        drift_increment = np.random.normal(loc = v, scale = sdv, size = 1) * delta_t
+        
+        # print(drift_increment)
+        t = 0.0
         cnt = 0
 
         # Inner loop (trajection simulation)
-        while y <= boundary[cnt] and y >= boundary[cnt] and t < max_t:
+        while y <= boundary[cnt] and y >= ((- 1) * boundary[cnt]) and t < max_t:
             # Increment y position (particle position)
             y += drift_increment + delta_t_sqrt * np.random.normal(loc = 0,
                                                                    scale = s,
@@ -226,7 +228,7 @@ def full_ddm(v = 0,
                             'delta_t': delta_t,
                             'max_t': max_t,
                             'n_samples': n_samples,
-                            'simulator': 'ddm_flexbound',
+                            'simulator': 'full_ddm',
                             'boundary_fun_type': boundary_fun.__name__,
                             'possible_choices': [-1, 1]})
 # -----------------------------------------------------------------------------------------------

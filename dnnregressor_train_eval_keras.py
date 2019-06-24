@@ -69,29 +69,7 @@ class dnn_trainer():
         self.model  = []
         self.data = {}
 
-    # Define function that reads in data
-    def read_in_dataset(self):
-        if self.data_params['data_type'] == 'wfpt':
-            self.train_features, self.train_labels, self.test_features, self.test_labels = mdw.train_test_from_file_rt_choice(
-                                                                                                                              f_signature = self.data_params['data_type_signature'],
-                                                                                                                              n_samples = self.data_params['training_data_size'],
-                                                                                                                              backend = 'keras'
-                                                                                                                              )
-        if self.data_params['data_type'] == 'choice_probabilities':
-            self.train_features, self.train_labels, self.test_features, self.test_labels = mdw.train_test_from_file_choice_probabilities(
-                                                                                                                                         f_signature = self.data_params['data_type_signature'],
-                                                                                                                                         n_samples = self.data_params['training_data_size'],
-                                                                                                                                         backend = 'keras'
-                                                                                                                                         )
-        if self.data_params['data_type'] == 'sin':
-            features, labels = mds.make_data()
-            self.train_features, self.train_labels, self.test_features, self.test_labels = mds.train_test_split(
-                                                                                                                features,
-                                                                                                                labels,
-                                                                                                                p = 0.8
-                                                                                                                )
-
-    # Define function to generate keras model
+   # Define function to generate keras model
     def keras_model_generate(
                              self,
                              save_model = True
@@ -105,18 +83,14 @@ class dnn_trainer():
                                 self.model_params['hidden_layers'][0],
                                 activation = self.model_params['hidden_activations'][0],
                                 kernel_regularizer = keras.regularizers.l1_l2(l1 = self.model_params['l1_kernel'][0],
-                                                                              l2 = self.model_params['l2_kernel'][0]),
-                                activity_regularizer = keras.regularizers.l1_l2(l1 = self.model_params['l1_activation'][0],
-                                                                                l2 = self.model_params['l2_activation'][0])
+                                                                              l2 = self.model_params['l2_kernel'][0])
                                )(inputs)
 
         for cnt in range(1, len(self.model_params['hidden_layers']), 1):
             op = keras.layers.Dense(self.model_params['hidden_layers'][cnt],
                                     activation = self.model_params['hidden_activations'][cnt],
                                     kernel_regularizer = keras.regularizers.l1_l2(l1 = self.model_params['l1_kernel'][cnt],
-                                                                              l2 = self.model_params['l2_kernel'][cnt]),
-                                    activity_regularizer = keras.regularizers.l1_l2(l1 = self.model_params['l1_activation'][cnt],
-                                                                                l2 = self.model_params['l2_activation'][cnt]))(op)
+                                                                              l2 = self.model_params['l2_kernel'][cnt]))(op)
 
         # Model output
         outputs = keras.layers.Dense(self.model_params['output_shape'],

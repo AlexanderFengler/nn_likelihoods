@@ -37,9 +37,13 @@ if __name__ == "__main__":
     n_cpus = psutil.cpu_count(logical = False)
 
     # Parameter ranges (for the simulator)
-    v = [-2.5, 2.5]
-    w = [0.15, 0.85]
-    a = [0.5, 4]
+    v = [-1.0, 1.0]
+    w = [0.3, 0.7]
+    a = [0.3, 2]
+    
+    # FULL DDM
+    dw = [0.0, 0.1]
+    sdv = [0.0, 0.5]
 
     #     c1 = [0, 5]
 #     c2 = [1, 1.5]
@@ -48,22 +52,21 @@ if __name__ == "__main__":
 #     theta = [0, np.pi/2]
 
     # Weibull Bound
-    node = [0, 5]
-    shape = [1.1, 50]
-    scale = [0.1, 10]
+#     node = [0, 5]
+#     shape = [1.1, 50]
+#     scale = [0.1, 10]
 
     # Simulator parameters
     simulator = 'ddm_flexbound'
     s = 1
     delta_t = 0.01
     max_t = 20
-    n_samples = 100
+    n_samples = 10000
     print_info = False
-    boundary_fun_type = 'weibull_bnd'
     boundary_multiplicative = False
 
     # Number of kdes to generate
-    n_kdes = 100
+    n_kdes = 5000
 
     # Make function input tuples
     v_sample = np.random.uniform(low = v[0], high = v[1], size = n_kdes)
