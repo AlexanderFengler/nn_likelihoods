@@ -64,10 +64,10 @@ if __name__ == "__main__":
 #     from tensorflow.python.client import device_lib
 #     print(device_lib.list_local_devices())
 
-
+    base_path = '/media/data_cifs/afengler/data/kde/ornstein_uhlenbeck'
     # SPECIFY MODEL PATH
-    model_path = '/media/data_cifs/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_06_28_19_00_58_26/model_0' 
-    ckpt_path = '/media/data_cifs/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_06_28_19_00_58_26/ckpt_0_final'
+    model_path = base_path + '/keras_models/dnnregressor_ddm_06_28_19_00_58_26/model_0' 
+    ckpt_path = base_path + '/keras_models/dnnregressor_ddm_06_28_19_00_58_26/ckpt_0_60'
 
     # LOAD MODEL
     model = keras.models.load_model(model_path)
@@ -76,15 +76,16 @@ if __name__ == "__main__":
     # MLE RUN SETUP
     n_runs = 10 # number of mle's to compute
     n_samples = 2500 # number of samples as base
-    feature_file_path = '/media/data_cifs/afengler/data/kde/ddm/train_test_data/test_features.pickle' 
-    mle_out_path = '/media/data_cifs/afengler/data/kde/ddm/mle_runs'
+    feature_file_path = base_path + '/train_test_data/test_features.pickle' 
+    mle_out_path = base_path + '/mle_runs'
 
     # PARAMETERS: DDM-CONSTANT: [v, a, w]
     # PARAMETERS: DDM-WEIBULL: [v, a, w, node, shape, scale]
     # PARAMETERS: FULL-DDM-CONSTANT [v, a, w, dw, sdv]
+    # PARAMETERS: ORNSTEIN-UHLENBECK
     
     # SPECIFY PARAMETER BOUNDS FOR GENETIC ALGORITHM
-    param_bounds = [(-2, 2), (0.5, 2), (0.3, 0.7)]
+    param_bounds = [(-2, 2), (0.5, 2), (0.3, 0.7), (-1.0, 1.0)]
     
     # SPECIFY BOUNDARY USED
     boundary = bf.constant
