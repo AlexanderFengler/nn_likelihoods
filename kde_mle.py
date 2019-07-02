@@ -58,24 +58,24 @@ def make_params(param_bounds = []):
 if __name__ == "__main__":
     
     # CUDA INIT (CAREFUL SPECIFY CPU HERE IF NO GPU AVAILABLE)
-#     os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"   # see issue #152
-#     os.environ["CUDA_VISIBLE_DEVICES"]="1"
+    os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"   # see issue #152
+    os.environ["CUDA_VISIBLE_DEVICES"]="3"
 
-#     from tensorflow.python.client import device_lib
-#     print(device_lib.list_local_devices())
+    from tensorflow.python.client import device_lib
+    print(device_lib.list_local_devices())
 
-    base_path = '/media/data_cifs/afengler/data/kde/ornstein_uhlenbeck'
+    base_path = '/media/data_cifs/afengler/data/kde/full_ddm'
     # SPECIFY MODEL PATH
-    model_path = base_path + '/keras_models/dnnregressor_ddm_06_28_19_00_58_26/model_0' 
-    ckpt_path = base_path + '/keras_models/dnnregressor_ddm_06_28_19_00_58_26/ckpt_0_60'
+    model_path = base_path + '/keras_models/dnnregressor_full_ddm_06_28_19_00_48_00/model_0'
+    ckpt_path = base_path + '/keras_models/dnnregressor_full_ddm_06_28_19_00_48_00/ckpt_0_10'
 
     # LOAD MODEL
     model = keras.models.load_model(model_path)
     model.load_weights(ckpt_path)
 
     # MLE RUN SETUP
-    n_runs = 10 # number of mle's to compute
-    n_samples = 2500 # number of samples as base
+    n_runs = 50 # number of mle's to compute
+    n_samples = 5000 # number of samples as base
     feature_file_path = base_path + '/train_test_data/test_features.pickle' 
     mle_out_path = base_path + '/mle_runs'
 
@@ -85,7 +85,7 @@ if __name__ == "__main__":
     # PARAMETERS: ORNSTEIN-UHLENBECK
     
     # SPECIFY PARAMETER BOUNDS FOR GENETIC ALGORITHM
-    param_bounds = [(-2, 2), (0.5, 2), (0.3, 0.7), (-1.0, 1.0)]
+    param_bounds = [(-2, 2), (0.5, 2), (0.3, 0.7), (0.0, 0.1), (0.0, 0.5)]
     
     # SPECIFY BOUNDARY USED
     boundary = bf.constant
@@ -135,16 +135,18 @@ if __name__ == "__main__":
         boundary_params = {}
 
         # Run model simulations
-        ddm_dat_tmp = ddm_sim.ddm_flexbound_simulate(v = tmp_params[0],
-                                                     a = tmp_params[1],
-                                                     w = tmp_params[2],
-                                                     s = 1,
-                                                     delta_t = 0.001,
-                                                     max_t = 20,
-                                                     n_samples = n_samples,
-                                                     boundary_fun = boundary, # function of t (and potentially other parameters) that takes in (t, *args)
-                                                     boundary_multiplicative = boundary_multiplicative, # CAREFUL: CHECK IF BOUND
-                                                     boundary_params = boundary_params)
+        ddm_dat_tmp = ddm_sim.full_ddm(v = tmp_params[0],
+                                       a = tmp_params[1],
+                                       w = tmp_params[2],
+			               dw = tmp_params[3],
+				       sdv = tmp_params[4],
+                                       s = 1,
+                                       delta_t = 0.001,
+                                       max_t = 20,
+                                       n_samples = n_samples,
+                                       boundary_fun = boundary, # function of t (and potentially other parameters) that takes in (t, *args)
+                                       boundary_multiplicative = boundary_multiplicative, # CAREFUL: CHECK IF BOUND
+                                       boundary_params = boundary_params)
 
         # Print some info on run
         print('Mean rt for current run: ')
@@ -154,8 +156,11 @@ if __name__ == "__main__":
         out = differential_evolution(log_p, 
                                      bounds = param_bounds, 
                                      args = (model, ddm_dat_tmp, parameter_names), 
-                                     popsize = 30,
-                                     disp = True)
+                                     popsize = 40,
+                                     polish = False,
+                                     disp = True,
+				     maxiter = 100,
+				     )
 
         # Print some info
         print('Solution vector of current run: ')
