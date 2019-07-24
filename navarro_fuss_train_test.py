@@ -7,7 +7,6 @@ import pandas as pd
 import psutil
 import pickle
 import os
-import regit
 
 if __name__ == "__main__":
 
@@ -18,7 +17,7 @@ if __name__ == "__main__":
                         a_range = [1, 3],
                         w_range = [0.3, 0.7],
                         rt_params = [1,2],
-                        n_samples = 1000000,
+                        n_samples = 1000,
                         eps = 10**(-29),
                         target_folder = target_folder,
                         write_to_file = True,

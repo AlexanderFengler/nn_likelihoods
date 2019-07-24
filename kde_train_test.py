@@ -8,7 +8,6 @@ import multiprocessing as mp
 import psutil
 import pickle
 import os
-import regit
 
 import kde_training_utilities as kde_util
 import kde_class as kde
