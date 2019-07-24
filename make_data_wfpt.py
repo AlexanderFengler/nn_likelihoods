@@ -3,10 +3,11 @@ import scipy as scp
 import pandas as pd
 from datetime import datetime
 import glob
+import os
 import uuid
 import ddm_data_simulation as ddm_data_simulator
 import scipy.integrate as integrate
-import dwiener
+import cdwiener as dwiener
 
 
 # Generate training / test data for DDM
@@ -44,14 +45,14 @@ def gen_ddm_features_random(v_range = [-3, 3],
             data.iloc[i] = [np.random.uniform(low = v_range[0], high = v_range[1], size = 1),
                             np.random.uniform(low = a_range[0], high = a_range[1], size = 1),
                             np.random.uniform(low = w_range[0], high = w_range[1], size = 1),
-                            np.random.normal(loc = 0, scale = 1, size = 1),
+                            np.random.uniform(low = -1.0, high = 1.0, size = 1),
                             np.random.choice([-1, 1], size = 1)]
 
         else:
             data.iloc[i] = [np.random.uniform(low = v_range[0], high = v_range[1], size = 1),
                             np.random.uniform(low = a_range[0], high = a_range[1], size = 1),
                             np.random.uniform(low = w_range[0], high = w_range[1], size = 1),
-                            np.random.uniform(low = 5.0, high = 20, size = 1),
+                            np.random.uniform(low = 0.0, high = 20.0, size = 1),
                             np.random.choice([-1, 1], size = 1)]
 
         if print_detailed_cnt:
@@ -65,7 +66,7 @@ def gen_ddm_features_sim(v_range = [-3, 3],
                          a_range = [0.1, 3],
                          w_range = [0, 1],
                          n_samples = 20000,
-                         mixture_p = 0.2,
+                         mixture_p = [0.8, 0.1, 0.1],
                          print_detailed_cnt = False):
 
     data = pd.DataFrame(np.zeros((n_samples, 5)), columns = ['v', 'a', 'w', 'rt', 'choice'])
@@ -77,15 +78,18 @@ def gen_ddm_features_sim(v_range = [-3, 3],
         w_tmp = np.random.uniform(low = w_range[0], high = w_range[1], size = 1)
 
         if mixture_indicator[i] == 0:
-            rt_tmp, choice_tmp = ddm_data_simulator.ddm_simulate(v = v_tmp,
-                                                                 a = a_tmp,
-                                                                 w = w_tmp,
-                                                                 n_samples = 1,
-                                                                 print_info = False
-                                                                 )
+            rt_tmp, choice_tmp, _  = ddm_data_simulator.ddm_simulate(v = v_tmp,
+                                                                     a = a_tmp,
+                                                                     w = w_tmp,
+                                                                     n_samples = 1,
+                                                                     print_info = False
+                                                                    )
+            rt_tmp = rt_tmp[0]
+            choice_tmp = choice_tmp[0]
+        
         elif mixture_indicator[i] == 1:
             choice_tmp = np.random.choice([-1, 1], size = 1)
-            rt_tmp = np.random.normal(loc = 0, scale = 1, size = 1)
+            rt_tmp = np.random.uniform(low = -1.0, high = 0.0, size = 1)
 
         else:
             choice_tmp = np.random.choice([-1, 1], size = 1)
@@ -104,57 +108,6 @@ def gen_ddm_features_sim(v_range = [-3, 3],
         if (i % 1000) == 0:
             print('datapoint ' + str(i) + ' generated')
     return  data
-
-
-def gen_ddm_features_combination(v_range = [1,2],
-                                 a_range = [1],
-                                 w_range = [0.5],
-                                 n_samples = 20000,
-                                 ):
-
-    data = pd.DataFrame(np.zeros((n_samples, 5)),
-                        columns = ['v', 'a', 'w', 'rt', 'choice'])
-    mixture_indicator = np.random.choice([0, 1, 2],
-                                          p = [mixture_p[0], mixture_p[1], mixture_p[2]],
-                                          size = n_samples)
-    n_by_parameter_set = n_samples // (len(v_range) * len(a_range) * len(w_range))
-
-    cnt = 0
-    for v_tmp in v_range:
-        for a_tmp in a_range:
-            for w_tmp in w_range:
-                for i in range(0, n_by_parameter_set, 1):
-                    if mixture_indicator[i] == 0:
-                        rt_tmp, choice_tmp = ddm_data_simulator.ddm_simulate(v = v_tmp,
-                                                                             a = a_tmp,
-                                                                             w = w_tmp,
-                                                                             n_samples = 1,
-                                                                             print_info = False
-                                                                             )
-
-                    elif mixture_indicator[i] == 1:
-                        choice_tmp = np.random.choice([-1, 1], size = 1)
-                        rt_tmp = np.random.normal(loc = 0, scale = 1, size = 1)
-                    else:
-                        choice_tmp = np.random.choice([-1, 1], size = 1)
-                        rt_tmp = np.random.uniform(low = 5.0, high = 20.0, size = 1)
-
-
-                    data.iloc[i] = [v_tmp,
-                                    a_tmp,
-                                    w_tmp,
-                                    rt_tmp,
-                                    choice_tmp
-                                    ]
-
-                    if print_detailed_cnt:
-                        print(str(i))
-
-                    cnt += 1
-                    if (cnt % 1000) == 0:
-                        print('datapoint ' + str(i) + ' generated')
-
-    return  data
 # ----
 
 # Function that generates 'Labels' (ML parlance, here 'label' refers to a navarro-fuss likelihood computed for datapoint of the form (v,a,w,rt,c))
@@ -165,11 +118,11 @@ def gen_ddm_labels(data = [1,1,0,1], eps = 10**(-29)):
         if data.loc[i, 'rt'] <= 0:
             labels[i] = 0
         else:
-            labels[i] = dwiener.fptd(t = data.loc[i, 'rt'] * data.loc[i, 'choice'],
-                                     v = data.loc[i, 'v'],
-                                     a = data.loc[i, 'a'],
-                                     w = data.loc[i, 'w'],
-                                     eps = eps)
+            labels[i] = np.log(dwiener.fptd(t = data.loc[i, 'rt'] * data.loc[i, 'choice'],
+                                            v = data.loc[i, 'v'],
+                                            a = data.loc[i, 'a'],
+                                            w = data.loc[i, 'w'],
+                                            eps = eps))
 
         if (i % 1000) == 0:
             print('label ' + str(i) + ' generated')
@@ -186,6 +139,7 @@ def make_data_rt_choice(v_range = [-3, 3],
                         eps = 10**(-29),
                         target_folder = '',
                         write_to_file = True,
+                        print_detailed_cnt = True,
                         method = 'random',
                         mixture_p = [0.8, 0.1, 0.1]):
 
@@ -212,7 +166,7 @@ def make_data_rt_choice(v_range = [-3, 3],
                                              mixture_p = mixture_p)
 
     if method == 'discrete_parameter_combinations':
-        data_features = gen_dmm_features_combination(v = v_range,
+        data_features = gen_ddm_features_combination(v = v_range,
                                                      a = a_range,
                                                      w = w_range,
                                                      n_samples = n_samples,
@@ -230,7 +184,7 @@ def make_data_rt_choice(v_range = [-3, 3],
 
     # Write to file
     if write_to_file == True:
-       data.to_pickle(target_folder + '/data_' + str(n_samples) + '_' + uuid.uuid1().hex + '.pickle',
+       data.to_pickle(target_folder + '/data_' + uuid.uuid1().hex + '.pickle',
                       protocol = 4)
 
     return data
@@ -270,7 +224,7 @@ def make_data_choice_probabilities(v_range = [-3, 3],
           print('datapoint ' + str(i) + ' generated')
 
     if write_to_file == True:
-       data.to_pickle(target_folder + '/data_' + str(n_samples) + '_' + uuid.uuid1().hex + '.pickle',
+       data.to_pickle(target_folder + '/data_choice_p_' + str(n_samples) + '_' + uuid.uuid1().hex + '.pickle',
                       protocol = 4)
 
     return data
@@ -345,8 +299,8 @@ def make_train_test_split(source_folder = '',
     return 'success'
 
 def load_data(folder = '',
-              log = False,
-              cutoff = 1e-29 # 'none' or value
+              return_log = False, # function expects log likelihood, so if log = False we take exponent of loaded labels 
+              prelog_cutoff = 1e-29 # 'none' or value
               ):
 
     # Load training data from file
@@ -359,14 +313,14 @@ def load_data(folder = '',
 
     # Preprocess labels
     # 1. get rid of labels smaller than cutoff
-    if cutoff != 'none':
-        train_labels[train_labels < cutoff] = cutoff
-        test_labels[test_labels < cutoff] = cutoff
+    if prelog_cutoff != 'none':
+        train_labels[train_labels < np.log(prelog_cutoff)] = np.log(prelog_cutoff)
+        test_labels[test_labels < np.log(prelog_cutoff)] = np.log(prelog_cutoff)
 
     # 2. Take exp
-    if log:
-        train_labels = np.log(train_labels)
-        test_labels = np.log(test_labels)
+    if return_log == False:
+        train_labels = np.exp(train_labels)
+        test_labels = np.exp(test_labels)
 
     return train_features, train_labels, test_features, test_labels
 # -------------------------------------------------------------------------------------------

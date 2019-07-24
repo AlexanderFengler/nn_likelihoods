@@ -41,15 +41,15 @@ def  ddm_simulate(v = 0, # drift by timestep 'delta_t'
             if n % 1000 == 0:
                 print(n, ' datapoints sampled')
 
-    print('finished:', {'v': v,
-           'a': a,
-           'w': w,
-           's': s,
-           'delta_t': delta_t,
-           'max_t': max_t,
-           'n_samples': n_samples,
-           'simulator': 'ddm',
-           'boundary_fun_type': 'constant'})
+    #print('finished:', {'v': v,
+    #       'a': a,
+    #       'w': w,
+    #       's': s,
+    #       'delta_t': delta_t,
+    #       'max_t': max_t,
+    #       'n_samples': n_samples,
+    #       'simulator': 'ddm',
+    #       'boundary_fun_type': 'constant'})
 
     return (rts, choices, {'v': v,
                            'a': a,
@@ -284,7 +284,7 @@ def race_model(v = [0, 0, 0], # np.array expected in fact, one column of floats
 
         # Random walker
         while np.less_equal(particles, boundary[cnt]).all() and t <= max_t:
-            particles += (v * delta_t) + (delta_t_sqrt * np.random.normal(loc = 0, scale = s, size = (n_particles, 1)))
+            particles += (v * delta_t) + (delta_t_sqrt * np.random.normal(loc = 0, scale = s, size = n_particles))
             t += delta_t
             cnt += 1
 

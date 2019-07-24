@@ -334,7 +334,7 @@ def kde_make_train_test_split(folder = '',
     return 'success'
 
 def kde_load_data(folder = '',
-                  log = False,
+                  return_log = False, # function expects log data so if log = false we take exponent
                   prelog_cutoff = 1e-29 # either 'none' or number (like 1e-29)
                   ):
 
@@ -353,7 +353,7 @@ def kde_load_data(folder = '',
         test_labels[test_labels < np.log(prelog_cutoff)] = np.log(prelog_cutoff)
 
     # 2. Take exp
-    if log == False:
+    if return_log == False:
         train_labels = np.exp(train_labels)
         test_labels = np.exp(test_labels)
 

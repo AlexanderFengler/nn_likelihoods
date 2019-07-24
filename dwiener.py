@@ -1,3 +1,4 @@
+import math
 import numpy as np
 import scipy as scp
 import pandas as pd
@@ -13,12 +14,12 @@ def fptd_large(t, w, k):
     fptd_sum = 0
 
     for i in terms:
-        fptd_sum += i * np.exp( - ((i**2) * (np.pi**2) * t) / 2) * np.sin(i * np.pi * w)
+        fptd_sum += i * np.exp( - (math.pow(i,2) * math.pow(np.pi, 2) * t) / 2) * np.sin(i * np.pi * w)
     return fptd_sum * np.pi
 
 # Small-time approximation to fpt distribution
 def fptd_small(t, w, k):
-    temp = (k-1)/2
+    temp = (k-1) / 2
     flr = np.floor(temp).astype(int)
     cei = - np.ceil(temp).astype(int)
     terms = np.arange(cei, flr + 1, 1)
@@ -26,21 +27,20 @@ def fptd_small(t, w, k):
     fptd_sum = 0
 
     for i in terms:
-        fptd_sum += (w + 2 * i) * np.exp( - ((w + 2 * i)**2) / (2 * t))
-    return fptd_sum * (1 / np.sqrt(2 * np.pi * (t**3)))
+        fptd_sum += (w + 2 * i) * np.exp( - math.pow(w + 2 * i, 2) / (2 * t))
+    return fptd_sum * (1 / np.sqrt(2 * np.pi * math.pow(t, 3)))
 
 # Leading term (shows up for both large and small time)
 def calculate_leading_term(t, v, a ,w):
-    return 1 / (a**2) * np.exp(- (v * a * w) - (((v**2) * t) / 2))
+    return 1 / math.pow(a, 2) * np.exp(- (v * a * w) - ((math.pow(v, 2) * t) / 2))
 
 # Choice function to determine which approximation is appropriate (small or large time)
 def choice_function(t, eps):
     eps_l = min(eps, 1 / (t * np.pi))
-    # eps_l = eps
     eps_s = min(eps, 1 / (2 * np.sqrt(2 * np.pi * t)))
 
-    k_l = max(np.sqrt(- (2 * np.log(np.pi * t * eps_l))/(np.pi**2 * t)), 1 / (np.pi * np.sqrt(t)))
-    k_s = max(2 + np.sqrt(- 2 * t * np.log(2 * eps_s * np.sqrt(2 * np.pi * t))), 1 + np.sqrt(t))
+    k_l = np.ceil(max(np.sqrt(- (2 * np.log(np.pi * t * eps_l)) / (np.pi**2 * t)), 1 / (np.pi * np.sqrt(t))))
+    k_s = np.ceil(max(2 + np.sqrt(- 2 * t * np.log(2 * eps_s * np.sqrt(2 * np.pi * t))), 1 + np.sqrt(t)))
     return k_s - k_l, k_l, k_s
 
 # Actual fptd (first-passage-time-distribution) algorithm
@@ -48,7 +48,7 @@ def fptd(t,
          v = 0.0,
          a = 1.0,
          w = 0.5,
-         eps = 1e-10
+         eps = 1e-10 # potentially have min_l != eps as a minimum likelihood
          ):
 
     # negative reaction times signify upper boundary crossing
@@ -59,13 +59,14 @@ def fptd(t,
        t = np.abs(t)
 
     if t != 0:
-        sgn_lambda, k_l, k_s = choice_function(t, eps)
+        t_adj =  t / math.pow(a, 2)
         leading_term = calculate_leading_term(t, v, a, w)
+        sgn_lambda, k_l, k_s = choice_function(t_adj, eps)
 
         if sgn_lambda >= 0:
-            return max(1e-29, leading_term * fptd_large(t / (a**2), w, k_l))
+            return max(eps, leading_term * fptd_large(t_adj, w, k_l))
         else:
-            return max(1e-29, leading_term * fptd_small(t / (a**2), w, k_s))
+            return max(eps, leading_term * fptd_small(t_adj, w, k_s))
     else:
         return 1e-29
 # ---------------------------------------
