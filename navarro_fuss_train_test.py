@@ -21,6 +21,6 @@ if __name__ == "__main__":
                             eps = 10**(-29),
                             target_folder = target_folder,
                             write_to_file = True,
-                            print_detailed_cnt = True,
+                            print_detailed_cnt = False,
                             method = 'sim',
                             mixture_p = [0.8, 0.1, 0.1])
