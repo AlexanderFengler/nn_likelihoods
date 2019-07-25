@@ -28,11 +28,14 @@ def gen_ddm_features_random(v_range = [-3, 3],
                             mixture_p = 0.2,
                             print_detailed_cnt = False):
 
+    # Initialize dataframe
     data = pd.DataFrame(np.zeros((n_samples, 5)), columns = ['v', 'a', 'w', 'rt', 'choice'])
+    # Prespecify mixture_indicator
     mixture_indicator = np.random.choice([0, 1, 2],
                                          p = [mixture_p[0], mixture_p[1], mixture_p[2]],
                                          size = n_samples)
 
+    # Main loop that fills in feature data
     for i in np.arange(0, n_samples, 1):
         if mixture_indicator[i] == 0:
             data.iloc[i] = [np.random.uniform(low = v_range[0], high = v_range[1], size = 1),
@@ -62,16 +65,79 @@ def gen_ddm_features_random(v_range = [-3, 3],
             print('datapoint ' + str(i) + ' generated')
     return data
 
+def gen_ddm_features_kde_imit(v_range = [-3, 3],
+                              a_range = [0.1, 3],
+                              w_range = [0, 1],
+                              n_samples = 20000,
+                              n_by_param = 1000,
+                              mixture_p = [0.8, 0.1, 0.1],
+                              print_detailed_cnt = False):
+
+    # Initial computations for dimension consistency
+    n_params = int(np.ceil(n_samples / n_by_param))
+    n_ddm = int(n_by_param * mixture_p[0])
+    n_unif_up = int(n_by_param * mixture_p[1])
+    n_unif_down = int(n_by_param * mixture_p[2])
+    n_samples_by_param = n_ddm + n_unif_up + n_unif_down
+
+    # Initialize dataframe
+    data = pd.DataFrame(np.zeros((n_params * (n_samples_by_param), 5)), columns = ['v', 'a', 'w', 'rt', 'choice'])
+
+    row_cnt = 0
+    for i in np.arange(0, n_params, 1):
+
+        # Get random sample from specified parameter space
+        v_tmp = np.random.uniform(low = v_range[0], high = v_range[1])
+        a_tmp = np.random.uniform(low = a_range[0], high = a_range[1])
+        w_tmp = np.random.uniform(low = w_range[0], high = w_range[1])
+
+        # Store parameter values in appropriate rows in dataframe
+        data.iloc[row_cnt:(row_cnt + n_samples_by_param), [0, 1, 2]] = [v_tmp, a_tmp, w_tmp]
+
+        # Mixture Component 1: Model Simulations -------------------
+        rt_tmp, choice_tmp, _ = ddm_data_simulator.ddm_simulate(v = v_tmp,
+                                                                a = a_tmp,
+                                                                w = w_tmp,
+                                                                n_samples = n_ddm,
+                                                                print_info = False
+                                                                )
+        data.iloc[row_cnt:(row_cnt + n_ddm), 3] = rt_tmp.ravel()
+        data.iloc[row_cnt:(row_cnt + n_ddm), 4] = choice_tmp.ravel()
+        # ----------------------------------------------------------
+
+        # Mixture Component 2: Lower Uniform -----------------------
+        choice_tmp = np.random.choice([-1, 1], size = n_unif_down)
+        rt_tmp = np.random.uniform(low = -1, high = 0.0001, size = n_unif_down)
+
+        data.iloc[(row_cnt + n_ddm):(row_cnt + n_ddm + n_unif_down), 3] = rt_tmp
+        data.iloc[(row_cnt + n_ddm):(row_cnt + n_ddm + n_unif_down), 4] = choice_tmp
+        # ---------------------------------------------------------
+
+        # Mixture Component 3: Upper Uniform ----------------------
+        choice_tmp = np.random.choice([-1, 1], size = n_unif_up)
+        rt_tmp = np.random.uniform(low = 0.0001, high = 20, size = n_unif_up)
+
+        data.iloc[(row_cnt + n_ddm + n_unif_down):(row_cnt + n_samples_by_param), 3] = rt_tmp
+        data.iloc[(row_cnt + n_ddm + n_unif_down):(row_cnt + n_samples_by_param), 4] = choice_tmp
+        # ---------------------------------------------------------
+
+        row_cnt += n_samples_by_param
+        print(i, ' parameters sampled')
+
+    return data
+
 def gen_ddm_features_sim(v_range = [-3, 3],
                          a_range = [0.1, 3],
                          w_range = [0, 1],
                          n_samples = 20000,
                          mixture_p = [0.8, 0.1, 0.1],
                          print_detailed_cnt = False):
-
+    # Initialize dataframe
     data = pd.DataFrame(np.zeros((n_samples, 5)), columns = ['v', 'a', 'w', 'rt', 'choice'])
+    # Prespecify mixture indicators
     mixture_indicator = np.random.choice([0, 1, 2], p = [mixture_p[0], mixture_p[1], mixture_p[2]] , size = n_samples)
 
+    # Main loop that fills in features
     for i in np.arange(0, n_samples, 1):
         v_tmp = np.random.uniform(low = v_range[0], high = v_range[1], size = 1)
         a_tmp = np.random.uniform(low = a_range[0], high = a_range[1], size = 1)
@@ -86,7 +152,7 @@ def gen_ddm_features_sim(v_range = [-3, 3],
                                                                     )
             rt_tmp = rt_tmp[0]
             choice_tmp = choice_tmp[0]
-        
+
         elif mixture_indicator[i] == 1:
             choice_tmp = np.random.choice([-1, 1], size = 1)
             rt_tmp = np.random.uniform(low = -1.0, high = 0.0, size = 1)
@@ -141,7 +207,8 @@ def make_data_rt_choice(v_range = [-3, 3],
                         write_to_file = True,
                         print_detailed_cnt = True,
                         method = 'random',
-                        mixture_p = [0.8, 0.1, 0.1]):
+                        mixture_p = [0.8, 0.1, 0.1],
+                        n_by_param = 1000):
 
     # Make target folder if it doesn't exist:
     if not os.path.isdir(target_folder):
@@ -165,13 +232,14 @@ def make_data_rt_choice(v_range = [-3, 3],
                                              print_detailed_cnt = print_detailed_cnt,
                                              mixture_p = mixture_p)
 
-    if method == 'discrete_parameter_combinations':
-        data_features = gen_ddm_features_combination(v = v_range,
-                                                     a = a_range,
-                                                     w = w_range,
-                                                     n_samples = n_samples,
-                                                     print_detailed_cnt = print_detailed_cnt,
-                                                     mixture_p = mixture_p)
+    if method == 'kde_imit':
+        data_features = gen_ddm_features_kde_imit(v_range = v_range,
+                                                  a_range = a_range,
+                                                  w_range = w_range,
+                                                  n_samples = n_samples,
+                                                  n_by_param = n_by_param,
+                                                  print_detailed_cnt = print_detailed_cnt,
+                                                  mixture_p = mixture_p)
     # ----
 
     # Make labels
