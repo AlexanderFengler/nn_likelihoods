@@ -45,7 +45,7 @@ def gen_ddm_features_random(v_range = [-3, 3],
             data.iloc[i] = [np.random.uniform(low = v_range[0], high = v_range[1], size = 1),
                             np.random.uniform(low = a_range[0], high = a_range[1], size = 1),
                             np.random.uniform(low = w_range[0], high = w_range[1], size = 1),
-                            np.random.uniform(low = -1.0, high = 1.0, size = 1),
+                            np.random.uniform(low = -1.0, high = 0.0, size = 1),
                             np.random.choice([-1, 1], size = 1)]
 
         else:
