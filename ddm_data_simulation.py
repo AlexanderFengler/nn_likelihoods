@@ -9,7 +9,7 @@ import inspect
 # Simplest algorithm
 def  ddm_simulate(v = 0, # drift by timestep 'delta_t'
                   a = 1, # boundary separation
-                  w = 0.5,  # between -1 and 1
+                  w = 0.5,  # between 0 and 1
                   s = 1, # noise sigma
                   delta_t = 0.001, # timesteps fraction of seconds
                   max_t = 20, # maximum rt allowed
@@ -23,7 +23,7 @@ def  ddm_simulate(v = 0, # drift by timestep 'delta_t'
     delta_t_sqrt = np.sqrt(delta_t)
 
     for n in range(0, n_samples, 1):
-        y = w*a
+        y = w * a
         t = 0
 
         while y <= a and y >= 0 and t <= max_t:
@@ -40,16 +40,6 @@ def  ddm_simulate(v = 0, # drift by timestep 'delta_t'
         if print_info == True:
             if n % 1000 == 0:
                 print(n, ' datapoints sampled')
-
-    #print('finished:', {'v': v,
-    #       'a': a,
-    #       'w': w,
-    #       's': s,
-    #       'delta_t': delta_t,
-    #       'max_t': max_t,
-    #       'n_samples': n_samples,
-    #       'simulator': 'ddm',
-    #       'boundary_fun_type': 'constant'})
 
     return (rts, choices, {'v': v,
                            'a': a,
@@ -185,7 +175,7 @@ def full_ddm(v = 0,
             tmp = a + boundary_fun(t = i * delta_t, **boundary_params)
             if tmp > 0:
                 boundary[i] = tmp
-    
+
     #print(boundary)
     # Outer loop over n - number of samples
     for n in range(n_samples):
@@ -194,12 +184,12 @@ def full_ddm(v = 0,
         y += np.random.uniform(low = (- 1) * dw, high = dw)
         # Define drift increment
         drift_increment = np.random.normal(loc = v, scale = sdv, size = 1) * delta_t
-        
+
         # print(drift_increment)
         t = 0.0
         cnt = 0
 
-        # Inner loop (trajection simulation)
+        # Inner loop (trajectory simulation)
         while y <= boundary[cnt] and y >= ((- 1) * boundary[cnt]) and t < max_t:
             # Increment y position (particle position)
             y += drift_increment + delta_t_sqrt * np.random.normal(loc = 0,
@@ -214,9 +204,9 @@ def full_ddm(v = 0,
         rts[n] = t
         choices[n] = np.sign(y)
 
-        # if print_info == True:
-        #     if n % 1000 == 0:
-        #         print(n, ' datapoints sampled')
+        if print_info == True:
+             if n % 1000 == 0:
+                 print(n, ' datapoints sampled')
 
     return (rts, choices,  {'v': v,
                             'a': a,
@@ -245,7 +235,6 @@ def full_ddm(v = 0,
 #                               'boundary_fun_type': boundary_fun.__name__},
 #          'simulation_stats': {'choice_proportions': [len(choices[choices == -1]) / len(choices), len(choices[choices == 1]) / len(choices)]})
 
-
 # Simulate (rt, choice) tuples from: RACE MODEL WITH N SAMPLES ----------------------------------
 def race_model(v = [0, 0, 0], # np.array expected in fact, one column of floats
                a = 1, # Initial boundary height
@@ -269,11 +258,22 @@ def race_model(v = [0, 0, 0], # np.array expected in fact, one column of floats
 
     # We just care about an upper boundary here: (more complicated things possible)
 
-    # Precompute boundary
+    # Boundary Storage 
     num_steps = int(max_t / delta_t) + 1
     boundary = np.zeros(num_steps)
-    for i in range(num_steps):
-        boundary[i] = boundary_fun(t = i * delta_t, **boundary_params)
+
+    # Precompute boundary evaluations
+    if boundary_multiplicative:
+        for i in range(num_steps):
+            tmp = a * boundary_fun(t = i * delta_t, **boundary_params)
+            if tmp > 0:
+                boundary[i] = tmp
+    else:
+        for i in range(num_steps):
+            tmp = a + boundary_fun(t = i * delta_t, **boundary_params)
+            if tmp > 0:
+                boundary[i] = tmp
+
 
     # Loop over samples
     for n in range(n_samples):
