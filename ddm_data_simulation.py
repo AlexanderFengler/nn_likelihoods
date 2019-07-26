@@ -7,15 +7,15 @@ import inspect
 # Simulate (rt, choice) tuples from: SIMPLE DDM -----------------------------------------------
 
 # Simplest algorithm
-def  ddm_simulate(v = 0, # drift by timestep 'delta_t'
-                  a = 1, # boundary separation
-                  w = 0.5,  # between 0 and 1
-                  s = 1, # noise sigma
-                  delta_t = 0.001, # timesteps fraction of seconds
-                  max_t = 20, # maximum rt allowed
-                  n_samples = 20000, # number of samples considered
-                  print_info = True # timesteps fraction of seconds
-                  ):
+def  ddm(v = 0, # drift by timestep 'delta_t'
+         a = 1, # boundary separation
+         w = 0.5,  # between 0 and 1
+         s = 1, # noise sigma
+         delta_t = 0.001, # timesteps fraction of seconds
+         max_t = 20, # maximum rt allowed
+         n_samples = 20000, # number of samples considered
+         print_info = True # timesteps fraction of seconds
+         ):
 
     rts = np.zeros((n_samples, 1))
     choices = np.zeros((n_samples, 1))
@@ -62,22 +62,20 @@ def  ddm_simulate(v = 0, # drift by timestep 'delta_t'
 # 2. No touching of boundaries
 # 3. It return upper and lower bounds for every t as a list [upper, lower]
 
-def ddm_flexbound_simulate(v = 0,
-                           a = 1,
-                           w = 0.5,
-                           s = 1,
-                           delta_t = 0.001,
-                           max_t = 20,
-                           n_samples = 20000,
-                           print_info = True,
-                           boundary_fun = None, # function of t (and potentially other parameters) that takes in (t, *args)
-                           boundary_multiplicative = True,
-                           boundary_params = {'p1': 0, 'p2':0}
-                          ):
+def ddm_flexbound(v = 0,
+                  a = 1,
+                  w = 0.5,
+                  s = 1,
+                  delta_t = 0.001,
+                  max_t = 20,
+                  n_samples = 20000,
+                  print_info = True,
+                  boundary_fun = None, # function of t (and potentially other parameters) that takes in (t, *args)
+                  boundary_multiplicative = True,
+                  boundary_params = {'p1': 0, 'p2':0}
+                  ):
 
     # Initializations
-    #print({'boundary_fun': boundary_fun})
-
     rts = np.zeros((n_samples,1)) #rt storage
     choices = np.zeros((n_samples,1)) # choice storage
     delta_t_sqrt = np.sqrt(delta_t) # correct scalar so we can use standard normal samples for the brownian motion
@@ -97,8 +95,6 @@ def ddm_flexbound_simulate(v = 0,
             tmp = a + boundary_fun(t = i * delta_t, **boundary_params)
             if tmp > 0:
                 boundary[i] = tmp
-
-    #print(boundaries.shape)
 
     # Outer loop over n - number of samples
     for n in range(0, n_samples, 1):
@@ -176,7 +172,6 @@ def full_ddm(v = 0,
             if tmp > 0:
                 boundary[i] = tmp
 
-    #print(boundary)
     # Outer loop over n - number of samples
     for n in range(n_samples):
         y = (- 1) * boundary[0] + (w * 2 * boundary[0])
@@ -185,7 +180,6 @@ def full_ddm(v = 0,
         # Define drift increment
         drift_increment = np.random.normal(loc = v, scale = sdv, size = 1) * delta_t
 
-        # print(drift_increment)
         t = 0.0
         cnt = 0
 
