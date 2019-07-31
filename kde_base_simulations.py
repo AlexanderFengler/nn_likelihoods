@@ -70,13 +70,13 @@ if __name__ == "__main__":
     n_simulators = 2500
 
     # Make function input tuples
-    v_sample = np.random.uniform(low = v[0], high = v[1], size = n_kdes)
-    w_sample = np.random.uniform(low = w[0], high = w[1], size = n_kdes)
-    a_sample = np.random.uniform(low = a[0], high = a[1], size = n_kdes)
+    v_sample = np.random.uniform(low = v[0], high = v[1], size = n_simulators)
+    w_sample = np.random.uniform(low = w[0], high = w[1], size = n_simulators)
+    a_sample = np.random.uniform(low = a[0], high = a[1], size = n_simulators)
 
     # Full DDM
-    dw_sample = np.random.uniform(low = dw[0], high = dw[1], size = n_kdes)
-    sdv_sample = np.random.uniform(low = sdv[0], high = sdv[1], size = n_kdes)
+    dw_sample = np.random.uniform(low = dw[0], high = dw[1], size = n_simulators)
+    sdv_sample = np.random.uniform(low = sdv[0], high = sdv[1], size = n_simulators)
     
     # Exp c1_c2
 #     c1_sample = np.random.uniform(low = c1[0], high = c1[1], size = n_kdes)
