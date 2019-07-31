@@ -26,7 +26,7 @@ def data_generator(*args):
     simulator_data = ds.full_ddm(*args)
     
     # CHOOSE TARGET DIRECTORY HERE
-    file_dir =  'data_storage/kde/full_ddm/base_simulations/'
+    file_dir =  '/users/afengler/data/kde/full_ddm/base_simulations_20000/'
 
     # STORE
     file_name = file_dir + simulator + '_' + uuid.uuid1().hex
