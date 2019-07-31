@@ -18,14 +18,15 @@ import uuid
 
 # My own code
 import kde_class as kde
-import ddm_data_simulation as ddm_simulator
+import cddm_data_simulation as ds
 import boundary_functions as bf
 
 def data_generator(*args):
     # CHOOSE SIMULATOR HERE
-    simulator_data = ddm_simulator.ddm_flexbound_simulate(*args)
+    simulator_data = ds.full_ddm(*args)
+    
     # CHOOSE TARGET DIRECTORY HERE
-    file_dir =  'data_storage/kde/weibull/base_simulations/'
+    file_dir =  'data_storage/kde/full_ddm/base_simulations/'
 
     # STORE
     file_name = file_dir + simulator + '_' + uuid.uuid1().hex
@@ -37,7 +38,7 @@ if __name__ == "__main__":
     n_cpus = psutil.cpu_count(logical = False)
 
     # Parameter ranges (for the simulator)
-    v = [-1.0, 1.0]
+    v = [-1.5, 1.5]
     w = [0.3, 0.7]
     a = [0.3, 2]
     
@@ -57,22 +58,26 @@ if __name__ == "__main__":
 #     scale = [0.1, 10]
 
     # Simulator parameters
-    simulator = 'ddm_flexbound'
+    simulator = 'full_ddm'
     s = 1
     delta_t = 0.01
     max_t = 20
-    n_samples = 10000
+    n_samples = 20000
     print_info = False
     boundary_multiplicative = False
 
-    # Number of kdes to generate
-    n_kdes = 5000
+    # Number of simulators to run
+    n_simulators = 5000
 
     # Make function input tuples
     v_sample = np.random.uniform(low = v[0], high = v[1], size = n_kdes)
     w_sample = np.random.uniform(low = w[0], high = w[1], size = n_kdes)
     a_sample = np.random.uniform(low = a[0], high = a[1], size = n_kdes)
 
+    # Full DDM
+    dw_sample = np.random.uniform(low = dw[0], high = dw[1], size = n_kdes)
+    sdv_sample = np.random.uniform(low = sdv[0], high = sdv[1], size = n_kdes)
+    
     # Exp c1_c2
 #     c1_sample = np.random.uniform(low = c1[0], high = c1[1], size = n_kdes)
 #     c2_sample = np.random.uniform(low = c2[0], high = c2[1], size = n_kdes)
@@ -82,28 +87,28 @@ if __name__ == "__main__":
 #     theta_sample = np.random.uniform(low = theta[0], high = theta[1], size = n_kdes)
 
     # Weibull
-    node_sample = np.random.uniform(low = node[0], high = node[1], size = n_kdes)
-    shape_sample = np.random.uniform(low = shape[0], high = shape[1], size = n_kdes)
-    scale_sample = np.random.uniform(low = scale[0], high = scale[1], size = n_kdes)
+#     node_sample = np.random.uniform(low = node[0], high = node[1], size = n_kdes)
+#     shape_sample = np.random.uniform(low = shape[0], high = shape[1], size = n_kdes)
+#     scale_sample = np.random.uniform(low = scale[0], high = scale[1], size = n_kdes)
 
     # Defining main function to iterate over:
     # Folder in which we would like to dump files
 
     args_list = []
-    for i in range(0, n_kdes, 1):
-        args_list.append((v_sample[i],
-                          a_sample[i],
-                          w_sample[i],
+    for i in range(0, n_simulators, 1):
+        args_list.append((v_sample[i], # CHOOSE PARAM
+                          a_sample[i], # CHOOSE PARAM
+                          w_sample[i], ## ....
+                          dw_sample[i], # CHOOSE PARAM
+                          sdv_sample[i], # CHOOSE PARAM
                           s,
                           delta_t,
                           max_t,
                           n_samples,
                           print_info,
-                          bf.weibull_bnd,
-                          boundary_multiplicative,
-                          {'node': node_sample[i],
-                           'shape': shape_sample[i],
-                           'scale': scale_sample[i]}))
+                          bf.constant, # CHOOSE: BOUNDARY FUNCTION
+                          boundary_multiplicative, # CHOOSE: IS BOUNDARY MULTIPLICATIVE?
+                          {}))
 
     # Parallel Loop
     with Pool(processes = n_cpus) as pool:
