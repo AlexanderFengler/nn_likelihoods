@@ -67,7 +67,7 @@ if __name__ == "__main__":
     boundary_multiplicative = False
 
     # Number of simulators to run
-    n_simulators = 5000
+    n_simulators = 2500
 
     # Make function input tuples
     v_sample = np.random.uniform(low = v[0], high = v[1], size = n_kdes)
