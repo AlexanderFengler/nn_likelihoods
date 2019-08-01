@@ -49,8 +49,8 @@ if __name__ == "__main__":
     #     c1 = [0, 5]
 #     c2 = [1, 1.5]
     # Linear Collapse
-#     node = [0, 5]
-#     theta = [0, np.pi/2]
+    #node = [0, 2]
+    #theta = [0, np.pi/2 - 0.2]
 
     # Weibull Bound
 #     node = [0, 5]
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     max_t = 30
     n_samples = 20000
     print_info = False
-    boundary_multiplicative = False
+    boundary_multiplicative = True # CHOOSE WHETHER BOUNDARY IS MULTIPLICATIVE (W.R.T Starting separation) OR NOT
 
     # Number of simulators to run
     n_simulators = 10000
@@ -79,17 +79,17 @@ if __name__ == "__main__":
     #sdv_sample = np.random.uniform(low = sdv[0], high = sdv[1], size = n_simulators)
     
     # Exp c1_c2
-#     c1_sample = np.random.uniform(low = c1[0], high = c1[1], size = n_kdes)
-#     c2_sample = np.random.uniform(low = c2[0], high = c2[1], size = n_kdes)
+#     c1_sample = np.random.uniform(low = c1[0], high = c1[1], size = n_simulators)
+#     c2_sample = np.random.uniform(low = c2[0], high = c2[1], size = n_simulators)
 
     # Linear Collapse
-#     node_sample = np.random.uniform(low = node[0], high = node[1], size = n_kdes)
-#     theta_sample = np.random.uniform(low = theta[0], high = theta[1], size = n_kdes)
+    #node_sample = np.random.uniform(low = node[0], high = node[1], size = n_simulators)
+    #theta_sample = np.random.uniform(low = theta[0], high = theta[1], size = n_simulators)
 
     # Weibull
-#     node_sample = np.random.uniform(low = node[0], high = node[1], size = n_kdes)
-#     shape_sample = np.random.uniform(low = shape[0], high = shape[1], size = n_kdes)
-#     scale_sample = np.random.uniform(low = scale[0], high = scale[1], size = n_kdes)
+#     node_sample = np.random.uniform(low = node[0], high = node[1], size = n_simulators)
+#     shape_sample = np.random.uniform(low = shape[0], high = shape[1], size = n_simulators)
+#     scale_sample = np.random.uniform(low = scale[0], high = scale[1], size = n_simulators)
 
     # Defining main function to iterate over:
     # Folder in which we would like to dump files
