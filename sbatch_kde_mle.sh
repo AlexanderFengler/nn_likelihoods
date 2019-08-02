@@ -11,8 +11,8 @@
 # Request runtime, memory, cores:
 #SBATCH --time=15:00:00
 #SBATCH --mem=16G
-#SBATCH -c 32
-#SBATCH -N 4
+#SBATCH -c 2
+#SBATCH -N 1
 #SBATCH --array=1-1
 
 # Run a command

@@ -1,11 +1,11 @@
-model_path: '/media/data_cifs/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_06_28_19_00_58_26/model_0' # path for model
-ckpt_path: '/media/data_cifs/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_06_28_19_00_58_26/ckpt_0_final' # path for ckpt
-meta_data_file_path: '/media/data_cifs/afengler/data/kde/ddm/train_test_data/meta_data.pickle' # path for metadata 
-mle_out_path: '/media/data_cifs/afengler/data/kde/ddm/mle_runs' # path for the out files for the mle runs
+model_path: '/users/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_06_28_19_00_58_26/model_0' # path for model
+ckpt_path: '/users/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_06_28_19_00_58_26/ckpt_0_final' # path for ckpt
+meta_data_file_path: '/users/afengler/data/kde/ddm/train_test_data/meta_data.pickle' # path for metadata 
+mle_out_path: '/users/afengler/data/kde/ddm/mle_runs' # path for the out files for the mle runs
 n_runs: 1 # number of mles to compute in main loop
 n_samples: 2500 # samples by run
 n_workers: 1 # number of workers to choose for parallel mle
-save_mle_out: False # save mle output file?
+save_mle_out: True # save mle output file?
 boundary: bf.constant # boundary to choose for model
 boundary_multiplicative: True # is boundary multiplicative ?
 param_bounds: [ !!python/tuple [-1, 1], !!python/tuple [0.5, 2], !!python/tuple [0.3, 0.7] ] # list of tuples of parameter bounds
