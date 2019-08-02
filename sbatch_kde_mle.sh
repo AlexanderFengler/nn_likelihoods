@@ -6,14 +6,14 @@
 #SBATCH -J full_ddm_mle
 
 # output file
-##SBATCH --output /users/afengler/batch_job_out/full_ddm_mle_%A_%a.out
+#SBATCH --output /users/afengler/batch_job_out/full_ddm_mle_%A_%a.out
 
 # Request runtime, memory, cores:
 #SBATCH --time=15:00:00
 #SBATCH --mem=16G
-#SBATCH -c 14
-#SBATCH -N 1
+#SBATCH -c 32
+#SBATCH -N 4
 #SBATCH --array=1-1
 
 # Run a command
-python -u /users/afengler/git_repos/nn_likelihoods/kde_mle.py
+python -u /users/afengler/git_repos/nn_likelihoods/kde_mle_parallel.py
