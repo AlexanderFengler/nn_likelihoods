@@ -15,7 +15,6 @@ import time
 import os
 import pickle 
 import uuid
-#import argparse
 
 # My own code
 import kde_class as kde
@@ -25,14 +24,14 @@ import kde_training_utilities as kde_utils
 
 if __name__ == "__main__":
     # Specify base simulation folder
-    base_simulation_folder = '/home/afengler/git_repose/nn_likelihoods/data_storage/kde/linear_collapse/base_simulations/'
+    base_simulation_folder = '/users/afengler/data/kde/ddm/base_simulations_20000/'
     
     # PARAM RANGES: LINEAR COLLAPSE
     param_ranges = {'a': [0.5, 2],
                     'w': [0.3, 0.7],
-                    'v': [-1, 1],
-                    'theta': [0, np.pi/2.2],
-                    'node': [0, 5]}
+                    'v': [-2, 2]}
+#                     'theta': [0, np.pi/2.2],
+#                     'node': [0, 5]}
     
     # FILTERS: GENERAL
     filters = {'mode': 20, # != 
