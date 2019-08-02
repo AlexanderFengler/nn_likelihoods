@@ -2,7 +2,8 @@ model_path: '/users/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_06_28_19
 ckpt_path: '/users/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_06_28_19_00_58_26/ckpt_0_final' # path for ckpt
 meta_data_file_path: '/users/afengler/data/kde/ddm/train_test_data/meta_data.pickle' # path for metadata 
 mle_out_path: '/users/afengler/data/kde/ddm/mle_runs' # path for the out files for the mle runs
-n_runs: 1 # number of mles to compute in main loop
+cuda_on: False # do we use gpus?
+n_runs: 50 # number of mles to compute in main loop
 n_samples: 2500 # samples by run
 n_workers: 1 # number of workers to choose for parallel mle
 save_mle_out: True # save mle output file?

@@ -66,23 +66,25 @@ def get_params_from_meta_data(file_path  = ''):
 
 if __name__ == "__main__":
     
-#     Handle some cuda business (if desired to use cuda here..)
-    print('Handle cuda business....')   
-    os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"   # see issue #152
-    os.environ["CUDA_VISIBLE_DEVICES"]="3"
-    print(device_lib.list_local_devices())
-    
     # Initializations -------------
-    print('Running intialization....')
+    print('Running intialization ....')
     
     # Get configuration from yaml file
-    print('Reading config file: ')
+    print('Reading config file .... ')
     yaml_config_path = os.getcwd() + '/kde_mle_parallel.yaml' # MANUAL INTERVENTION
     with open(yaml_config_path, 'r') as stream:
         config_data = yaml.unsafe_load(stream)
 
+    # Handle cuda business if necessary
+    #     Handle some cuda business (if desired to use cuda here..)
+    if config_data['cuda_on']:
+        print('Handle cuda business....')   
+        os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"   # see issue #152
+        os.environ["CUDA_VISIBLE_DEVICES"]="3"
+        print(device_lib.list_local_devices())
+    
     # Load Model
-    print('Loading model: ')
+    print('Loading model .... ')
     
     model_path = config_data['model_path']
     ckpt_path = config_data['ckpt_path']
@@ -93,7 +95,7 @@ if __name__ == "__main__":
     # get network architecture for numpy forward pass (used in mle, coming from ktnp imported)
     weights, biases, activations = ktnp.extract_architecture(model)
 
-    print('Setting parameters: ')
+    print('Setting parameters from config file .... ')
     n_runs = config_data['n_runs'] # number of mles to compute in main loop
     n_samples = config_data['n_samples'] # samples by run
     n_workers = config_data['n_workers'] # number of workers to choose for parallel mle
@@ -113,6 +115,7 @@ if __name__ == "__main__":
     # LINEAR COLLAPSE: [v, a, w, node, theta]
     # DDM: [v, a, w]
     
+    print('Finishing up initialization .... ')
     # Get parameter names in correct ordering:
     parameter_names = get_params_from_meta_data(file_path = meta_data_file_path)
 
@@ -130,6 +133,7 @@ if __name__ == "__main__":
     optim_results = pd.DataFrame(np.zeros((n_runs, len(my_optim_columns))), columns = my_optim_columns)
     optim_results.iloc[:, 2 * len(parameter_names)] = n_samples
 
+    print('Start of MLE procedure .... ')
     # Main loop -------------------------------------------------------------
     for i in range(0, n_runs, 1): 
 

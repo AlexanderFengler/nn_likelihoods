@@ -10,10 +10,10 @@
 
 # Request runtime, memory, cores:
 #SBATCH --time=15:00:00
-#SBATCH --mem=16G
+#SBATCH --mem=4G
 #SBATCH -c 2
 #SBATCH -N 1
-#SBATCH --array=1-1
+#SBATCH --array=1-10
 
 # Run a command
 python -u /users/afengler/git_repos/nn_likelihoods/kde_mle_parallel.py
