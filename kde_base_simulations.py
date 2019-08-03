@@ -67,7 +67,7 @@ if __name__ == "__main__":
     boundary_multiplicative = False # CHOOSE WHETHER BOUNDARY IS MULTIPLICATIVE (W.R.T Starting separation) OR NOT
 
     # Number of simulators to run
-    n_simulators = 10000
+    n_simulators = 3096
 
     # Make function input tuples
     v_sample = np.random.uniform(low = v[0], high = v[1], size = n_simulators)
