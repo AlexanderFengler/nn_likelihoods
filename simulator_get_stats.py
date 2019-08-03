@@ -29,9 +29,10 @@ if __name__ == "__main__":
     # PARAM RANGES: LINEAR COLLAPSE
     param_ranges = {'a': [0.5, 2],
                     'w': [0.3, 0.7],
-                    'v': [-2, 2]},
+                    'v': [-2, 2],
                     'theta': [0, np.pi/2.2],
-                    'node': [0, 5]}
+                    'node': [0, 5]
+                    }
     
     # FILTERS: GENERAL
     filters = {'mode': 20, # != 
