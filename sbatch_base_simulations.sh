@@ -17,8 +17,8 @@
 ##SBATCH --output /users/afengler/batch_job_out/weibull_base_sim_%A_%a.out
 
 # Request runtime, memory, cores:
-#SBATCH --time=10:00:00
-#SBATCH --mem=4G
+#SBATCH --time=15:00:00
+#SBATCH --mem=16G
 #SBATCH -c 14
 #SBATCH -N 1
 #SBATCH --array=1-1
