@@ -24,16 +24,14 @@ import kde_training_utilities as kde_utils
 
 if __name__ == "__main__":
     # Specify base simulation folder
-    base_simulation_folder = '/users/afengler/data/kde/full_ddm/base_simulations_20000/'
+    base_simulation_folder = '/users/afengler/data/kde/linear_collapse/base_simulations_20000/'
     
     # PARAM RANGES: LINEAR COLLAPSE
     param_ranges = {'a': [0.5, 2],
                     'w': [0.3, 0.7],
                     'v': [-2, 2],
-                    'dw':[0, 0.2],
-                    'sdv':[0, 1]
-#                     'theta': [0, np.pi/2.2],
-#                     'node': [0, 5]
+                    'theta': [0, np.pi/2.2],
+                    'node': [0, 5]
                     }
     
     # FILTERS: GENERAL
