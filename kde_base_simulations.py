@@ -88,7 +88,6 @@ if __name__ == "__main__":
     # Ornstein 
 #     g_sample = np.random.uniform(low = g[0], high = g[1], size = n_simulators)
     
-    
     # LCA
     n_particles = 2
     v_sample = []
@@ -129,7 +128,7 @@ if __name__ == "__main__":
     args_list = []
     for i in range(n_simulators):
         # Get current set of parameters
-        process_params = (v_sample[i], a_sample[i], w_sample[i], g_samples[i], b_sample[i], s)
+        process_params = (v_sample[i], a_sample[i], w_sample[i], g_sample[i], b_sample[i], s)
         sampler_params = (delta_t, max_t, n_samples, print_info, bound, boundary_multiplicative)
         boundary_params = ({},)
         
