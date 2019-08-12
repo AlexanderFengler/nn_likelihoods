@@ -8,13 +8,15 @@
 ##SBATCH -J lin_col_sim
 ##SBATCH -J full_ddm_base_sim
 ##SBATCH -J weibull_base_sim
+#SBATCH -J lca
 
 # output file
 ##SBATCH --output /users/afengler/batch_job_out/full_ddm_base_sim_%A_%a.out
 ##SBATCH --output /users/afengler/batch_job_out/ddm_base_sim_%A_%a.out
 ##SBATCH --output /users/afengler/batch_job_out/lin_col_base_sim_%A_%a.out
-#SBATCH --output /users/afengler/batch_job_out/ornstein_base_sim_%A_%a.out
+##SBATCH --output /users/afengler/batch_job_out/ornstein_base_sim_%A_%a.out
 ##SBATCH --output /users/afengler/batch_job_out/weibull_base_sim_%A_%a.out
+#SBATCH --output /users/afengler/batch_job_out/lca_base_sim_%A_%a.out
 
 # Request runtime, memory, cores:
 #SBATCH --time=20:00:00

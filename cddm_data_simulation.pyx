@@ -563,7 +563,7 @@ def lca(v = np.array([0, 0, 0], dtype = DTYPE), # drift parameters (np.array exp
     cdef float t, particles_sum
     
     # Boundary storage                                                             
-    cdef int num_steps = int((max_t / delta_t) + 1)
+    cdef int num_steps = int((max_t / delta_t) + 2)
     cdef float tmp
     boundary = np.zeros(num_steps, dtype = DTYPE)
     cdef float[:] boundary_view = boundary

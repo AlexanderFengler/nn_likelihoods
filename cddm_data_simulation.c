@@ -9235,7 +9235,7 @@ static PyObject *__pyx_pf_20cddm_data_simulation_12lca(CYTHON_UNUSED PyObject *_
   /* "cddm_data_simulation.pyx":566
  * 
  *     # Boundary storage
- *     cdef int num_steps = int((max_t / delta_t) + 1)             # <<<<<<<<<<<<<<
+ *     cdef int num_steps = int((max_t / delta_t) + 2)             # <<<<<<<<<<<<<<
  *     cdef float tmp
  *     boundary = np.zeros(num_steps, dtype = DTYPE)
  */
@@ -9243,10 +9243,10 @@ static PyObject *__pyx_pf_20cddm_data_simulation_12lca(CYTHON_UNUSED PyObject *_
     PyErr_SetString(PyExc_ZeroDivisionError, "float division");
     __PYX_ERR(0, 566, __pyx_L1_error)
   }
-  __pyx_v_num_steps = ((int)((__pyx_v_max_t / __pyx_v_delta_t) + 1.0));
+  __pyx_v_num_steps = ((int)((__pyx_v_max_t / __pyx_v_delta_t) + 2.0));
 
   /* "cddm_data_simulation.pyx":568
- *     cdef int num_steps = int((max_t / delta_t) + 1)
+ *     cdef int num_steps = int((max_t / delta_t) + 2)
  *     cdef float tmp
  *     boundary = np.zeros(num_steps, dtype = DTYPE)             # <<<<<<<<<<<<<<
  *     cdef float[:] boundary_view = boundary
