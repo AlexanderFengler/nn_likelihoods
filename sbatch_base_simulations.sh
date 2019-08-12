@@ -23,7 +23,7 @@
 #SBATCH --mem=16G
 #SBATCH -c 14
 #SBATCH -N 1
-#SBATCH --array=1-1
+#SBATCH --array=1-2
 
 # Run a command
 
