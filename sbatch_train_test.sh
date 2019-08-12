@@ -6,7 +6,7 @@
 ##SBATCH -J ddm_train_test
 #SBATCH -J full_ddm_train_test
 ##SBATCH -J weibull_train_test
-#SBATCH -J ornstein_train_test
+##SBATCH -J ornstein_train_test
 ##SBATCH -J nf_train_test
 
 # output file
