@@ -21,7 +21,7 @@
 #SBATCH --mem=8G
 #SBATCH -c 1
 #SBATCH -N 1
-#SBATCH --array=1-500
+#SBATCH --array=1-1
 
 # Run a command
 
