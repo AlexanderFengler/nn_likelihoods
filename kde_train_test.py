@@ -16,9 +16,9 @@ import kde_class as kde
 if __name__ == "__main__":
 
     # PICK
-    base_simulation_folder = '/users/afengler/data/kde/linear_collapse/base_simulations_20000/'
-    target_folder = '/users/afengler/data/kde/linear_collapse/train_test_data_20000/'
-    process_params = ['v', 'a', 'w', 'node', 'theta']
+    base_simulation_folder = '/users/afengler/data/kde/ornstein_uhlenbeck/base_simulations_20000/'
+    target_folder = '/users/afengler/data/kde/ornstein_uhlenbeck/train_test_data_20000/'
+    process_params = ['v', 'a', 'w', 'g']
     files_ = pickle.load( open(base_simulation_folder + 'keep_files.pickle', 'rb'))
 
     if not os.path.isdir(target_folder):
