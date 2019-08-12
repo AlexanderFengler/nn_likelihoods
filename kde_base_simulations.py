@@ -26,10 +26,10 @@ def data_generator(*args):
     simulator_data = ds.lca(*args)
     
     # CHOOSE TARGET DIRECTORY HERE
-    #file_dir =  '/users/afengler/data/kde/lca/base_simulations_20000/'
+    file_dir =  '/users/afengler/data/kde/lca/base_simulations_20000/'
     
-    # 
-    file_dir = '/media/data_cifs/afengler/tmp/'
+    # USE FOR x7 MACHINE 
+    #file_dir = '/media/data_cifs/afengler/tmp/'
 
     # STORE
     file_name = file_dir + simulator + '_' + uuid.uuid1().hex
