@@ -2194,7 +2194,7 @@ static PyObject *__pyx_pf_20cddm_data_simulation_4full_ddm(CYTHON_UNUSED PyObjec
 static PyObject *__pyx_pf_20cddm_data_simulation_6ornstein_uhlenbeck(CYTHON_UNUSED PyObject *__pyx_self, float __pyx_v_v, float __pyx_v_a, float __pyx_v_w, float __pyx_v_g, float __pyx_v_s, float __pyx_v_delta_t, float __pyx_v_max_t, int __pyx_v_n_samples, CYTHON_UNUSED PyObject *__pyx_v_print_info, PyObject *__pyx_v_boundary_fun, PyObject *__pyx_v_boundary_multiplicative, PyObject *__pyx_v_boundary_params); /* proto */
 static PyObject *__pyx_pf_20cddm_data_simulation_8test_check(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
 static PyObject *__pyx_pf_20cddm_data_simulation_10race_model(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_v, float __pyx_v_a, PyObject *__pyx_v_w, PyObject *__pyx_v_s, float __pyx_v_delta_t, float __pyx_v_max_t, int __pyx_v_n_samples, CYTHON_UNUSED PyObject *__pyx_v_print_info, PyObject *__pyx_v_boundary_fun, PyObject *__pyx_v_boundary_multiplicative, PyObject *__pyx_v_boundary_params); /* proto */
-static PyObject *__pyx_pf_20cddm_data_simulation_12lca(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_v, PyObject *__pyx_v_w, float __pyx_v_a, float __pyx_v_g, float __pyx_v_b, float __pyx_v_s, float __pyx_v_delta_t, float __pyx_v_max_t, int __pyx_v_n_samples, CYTHON_UNUSED PyObject *__pyx_v_print_info, PyObject *__pyx_v_boundary_fun, PyObject *__pyx_v_boundary_multiplicative, PyObject *__pyx_v_boundary_params); /* proto */
+static PyObject *__pyx_pf_20cddm_data_simulation_12lca(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_v, float __pyx_v_a, PyObject *__pyx_v_w, float __pyx_v_g, float __pyx_v_b, float __pyx_v_s, float __pyx_v_delta_t, float __pyx_v_max_t, int __pyx_v_n_samples, CYTHON_UNUSED PyObject *__pyx_v_print_info, PyObject *__pyx_v_boundary_fun, PyObject *__pyx_v_boundary_multiplicative, PyObject *__pyx_v_boundary_params); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array_2__getbuffer__(struct __pyx_array_obj *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_array___pyx_pf_15View_dot_MemoryView_5array_4__dealloc__(struct __pyx_array_obj *__pyx_v_self); /* proto */
@@ -8631,8 +8631,8 @@ static PyObject *__pyx_pf_20cddm_data_simulation_10race_model(CYTHON_UNUSED PyOb
  * 
  * # Simulate (rt, choice) tuples from: Leaky Competing Accumulator Model -----------------------------
  * def lca(v = np.array([0, 0, 0], dtype = DTYPE), # drift parameters (np.array expect: one column of floats)             # <<<<<<<<<<<<<<
- *         w = np.array([0, 0, 0], dtype = DTYPE), # initial bias parameters (np.array expect: one column of floats)
  *         float a = 1, # criterion height
+ *         w = np.array([0, 0, 0], dtype = DTYPE), # initial bias parameters (np.array expect: one column of floats)
  */
 
 /* Python wrapper */
@@ -8640,8 +8640,8 @@ static PyObject *__pyx_pw_20cddm_data_simulation_13lca(PyObject *__pyx_self, PyO
 static PyMethodDef __pyx_mdef_20cddm_data_simulation_13lca = {"lca", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_20cddm_data_simulation_13lca, METH_VARARGS|METH_KEYWORDS, 0};
 static PyObject *__pyx_pw_20cddm_data_simulation_13lca(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_v = 0;
-  PyObject *__pyx_v_w = 0;
   float __pyx_v_a;
+  PyObject *__pyx_v_w = 0;
   float __pyx_v_g;
   float __pyx_v_b;
   float __pyx_v_s;
@@ -8656,10 +8656,10 @@ static PyObject *__pyx_pw_20cddm_data_simulation_13lca(PyObject *__pyx_self, PyO
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("lca (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_v,&__pyx_n_s_w,&__pyx_n_s_a,&__pyx_n_s_g,&__pyx_n_s_b,&__pyx_n_s_s,&__pyx_n_s_delta_t,&__pyx_n_s_max_t,&__pyx_n_s_n_samples,&__pyx_n_s_print_info,&__pyx_n_s_boundary_fun,&__pyx_n_s_boundary_multiplicative,&__pyx_n_s_boundary_params,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_v,&__pyx_n_s_a,&__pyx_n_s_w,&__pyx_n_s_g,&__pyx_n_s_b,&__pyx_n_s_s,&__pyx_n_s_delta_t,&__pyx_n_s_max_t,&__pyx_n_s_n_samples,&__pyx_n_s_print_info,&__pyx_n_s_boundary_fun,&__pyx_n_s_boundary_multiplicative,&__pyx_n_s_boundary_params,0};
     PyObject* values[13] = {0,0,0,0,0,0,0,0,0,0,0,0,0};
     values[0] = __pyx_k__9;
-    values[1] = __pyx_k__10;
+    values[2] = __pyx_k__10;
 
     /* "cddm_data_simulation.pyx":535
  *         float max_t = 20, # maximal time
@@ -8731,13 +8731,13 @@ static PyObject *__pyx_pw_20cddm_data_simulation_13lca(PyObject *__pyx_self, PyO
         CYTHON_FALLTHROUGH;
         case  1:
         if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_w);
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_a);
           if (value) { values[1] = value; kw_args--; }
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_a);
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_w);
           if (value) { values[2] = value; kw_args--; }
         }
         CYTHON_FALLTHROUGH;
@@ -8837,12 +8837,12 @@ static PyObject *__pyx_pw_20cddm_data_simulation_13lca(PyObject *__pyx_self, PyO
       }
     }
     __pyx_v_v = values[0];
-    __pyx_v_w = values[1];
-    if (values[2]) {
-      __pyx_v_a = __pyx_PyFloat_AsFloat(values[2]); if (unlikely((__pyx_v_a == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 528, __pyx_L3_error)
+    if (values[1]) {
+      __pyx_v_a = __pyx_PyFloat_AsFloat(values[1]); if (unlikely((__pyx_v_a == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 527, __pyx_L3_error)
     } else {
       __pyx_v_a = ((float)1.0);
     }
+    __pyx_v_w = values[2];
     if (values[3]) {
       __pyx_v_g = __pyx_PyFloat_AsFloat(values[3]); if (unlikely((__pyx_v_g == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 529, __pyx_L3_error)
     } else {
@@ -8886,14 +8886,14 @@ static PyObject *__pyx_pw_20cddm_data_simulation_13lca(PyObject *__pyx_self, PyO
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_20cddm_data_simulation_12lca(__pyx_self, __pyx_v_v, __pyx_v_w, __pyx_v_a, __pyx_v_g, __pyx_v_b, __pyx_v_s, __pyx_v_delta_t, __pyx_v_max_t, __pyx_v_n_samples, __pyx_v_print_info, __pyx_v_boundary_fun, __pyx_v_boundary_multiplicative, __pyx_v_boundary_params);
+  __pyx_r = __pyx_pf_20cddm_data_simulation_12lca(__pyx_self, __pyx_v_v, __pyx_v_a, __pyx_v_w, __pyx_v_g, __pyx_v_b, __pyx_v_s, __pyx_v_delta_t, __pyx_v_max_t, __pyx_v_n_samples, __pyx_v_print_info, __pyx_v_boundary_fun, __pyx_v_boundary_multiplicative, __pyx_v_boundary_params);
 
   /* "cddm_data_simulation.pyx":526
  * 
  * # Simulate (rt, choice) tuples from: Leaky Competing Accumulator Model -----------------------------
  * def lca(v = np.array([0, 0, 0], dtype = DTYPE), # drift parameters (np.array expect: one column of floats)             # <<<<<<<<<<<<<<
- *         w = np.array([0, 0, 0], dtype = DTYPE), # initial bias parameters (np.array expect: one column of floats)
  *         float a = 1, # criterion height
+ *         w = np.array([0, 0, 0], dtype = DTYPE), # initial bias parameters (np.array expect: one column of floats)
  */
 
   /* function exit code */
@@ -8901,7 +8901,7 @@ static PyObject *__pyx_pw_20cddm_data_simulation_13lca(PyObject *__pyx_self, PyO
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_20cddm_data_simulation_12lca(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_v, PyObject *__pyx_v_w, float __pyx_v_a, float __pyx_v_g, float __pyx_v_b, float __pyx_v_s, float __pyx_v_delta_t, float __pyx_v_max_t, int __pyx_v_n_samples, CYTHON_UNUSED PyObject *__pyx_v_print_info, PyObject *__pyx_v_boundary_fun, PyObject *__pyx_v_boundary_multiplicative, PyObject *__pyx_v_boundary_params) {
+static PyObject *__pyx_pf_20cddm_data_simulation_12lca(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_v, float __pyx_v_a, PyObject *__pyx_v_w, float __pyx_v_g, float __pyx_v_b, float __pyx_v_s, float __pyx_v_delta_t, float __pyx_v_max_t, int __pyx_v_n_samples, CYTHON_UNUSED PyObject *__pyx_v_print_info, PyObject *__pyx_v_boundary_fun, PyObject *__pyx_v_boundary_multiplicative, PyObject *__pyx_v_boundary_params) {
   int __pyx_v_n_particles;
   PyObject *__pyx_v_rts = NULL;
   __Pyx_memviewslice __pyx_v_rts_view = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -10221,8 +10221,8 @@ static PyObject *__pyx_pf_20cddm_data_simulation_12lca(CYTHON_UNUSED PyObject *_
  * 
  * # Simulate (rt, choice) tuples from: Leaky Competing Accumulator Model -----------------------------
  * def lca(v = np.array([0, 0, 0], dtype = DTYPE), # drift parameters (np.array expect: one column of floats)             # <<<<<<<<<<<<<<
- *         w = np.array([0, 0, 0], dtype = DTYPE), # initial bias parameters (np.array expect: one column of floats)
  *         float a = 1, # criterion height
+ *         w = np.array([0, 0, 0], dtype = DTYPE), # initial bias parameters (np.array expect: one column of floats)
  */
 
   /* function exit code */
@@ -24254,10 +24254,10 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * 
  * # Simulate (rt, choice) tuples from: Leaky Competing Accumulator Model -----------------------------
  * def lca(v = np.array([0, 0, 0], dtype = DTYPE), # drift parameters (np.array expect: one column of floats)             # <<<<<<<<<<<<<<
- *         w = np.array([0, 0, 0], dtype = DTYPE), # initial bias parameters (np.array expect: one column of floats)
  *         float a = 1, # criterion height
+ *         w = np.array([0, 0, 0], dtype = DTYPE), # initial bias parameters (np.array expect: one column of floats)
  */
-  __pyx_tuple__43 = PyTuple_Pack(40, __pyx_n_s_v, __pyx_n_s_w, __pyx_n_s_a, __pyx_n_s_g, __pyx_n_s_b, __pyx_n_s_s, __pyx_n_s_delta_t, __pyx_n_s_max_t, __pyx_n_s_n_samples, __pyx_n_s_print_info, __pyx_n_s_boundary_fun, __pyx_n_s_boundary_multiplicative, __pyx_n_s_boundary_params, __pyx_n_s_n_particles, __pyx_n_s_rts, __pyx_n_s_rts_view, __pyx_n_s_choices, __pyx_n_s_choices_view, __pyx_n_s_v_view, __pyx_n_s_w_view, __pyx_n_s_particles, __pyx_n_s_particles_view, __pyx_n_s_particles_reduced_sum, __pyx_n_s_particles_reduced_sum_view, __pyx_n_s_delta_t_sqrt, __pyx_n_s_sqrt_st, __pyx_n_s_n, __pyx_n_s_i, __pyx_n_s_ix, __pyx_n_s_m, __pyx_n_s_t, __pyx_n_s_particles_sum, __pyx_n_s_num_steps, __pyx_n_s_tmp, __pyx_n_s_boundary, __pyx_n_s_boundary_view, __pyx_n_s_num_draws, __pyx_n_s_gaussian_values, __pyx_n_s_v_dict, __pyx_n_s_w_dict); if (unlikely(!__pyx_tuple__43)) __PYX_ERR(0, 526, __pyx_L1_error)
+  __pyx_tuple__43 = PyTuple_Pack(40, __pyx_n_s_v, __pyx_n_s_a, __pyx_n_s_w, __pyx_n_s_g, __pyx_n_s_b, __pyx_n_s_s, __pyx_n_s_delta_t, __pyx_n_s_max_t, __pyx_n_s_n_samples, __pyx_n_s_print_info, __pyx_n_s_boundary_fun, __pyx_n_s_boundary_multiplicative, __pyx_n_s_boundary_params, __pyx_n_s_n_particles, __pyx_n_s_rts, __pyx_n_s_rts_view, __pyx_n_s_choices, __pyx_n_s_choices_view, __pyx_n_s_v_view, __pyx_n_s_w_view, __pyx_n_s_particles, __pyx_n_s_particles_view, __pyx_n_s_particles_reduced_sum, __pyx_n_s_particles_reduced_sum_view, __pyx_n_s_delta_t_sqrt, __pyx_n_s_sqrt_st, __pyx_n_s_n, __pyx_n_s_i, __pyx_n_s_ix, __pyx_n_s_m, __pyx_n_s_t, __pyx_n_s_particles_sum, __pyx_n_s_num_steps, __pyx_n_s_tmp, __pyx_n_s_boundary, __pyx_n_s_boundary_view, __pyx_n_s_num_draws, __pyx_n_s_gaussian_values, __pyx_n_s_v_dict, __pyx_n_s_w_dict); if (unlikely(!__pyx_tuple__43)) __PYX_ERR(0, 526, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__43);
   __Pyx_GIVEREF(__pyx_tuple__43);
   __pyx_codeobj__44 = (PyObject*)__Pyx_PyCode_New(13, 0, 40, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__43, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cddm_data_simulation_pyx, __pyx_n_s_lca, 526, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__44)) __PYX_ERR(0, 526, __pyx_L1_error)
@@ -24999,8 +24999,8 @@ if (!__Pyx_RefNanny) {
  * 
  * # Simulate (rt, choice) tuples from: Leaky Competing Accumulator Model -----------------------------
  * def lca(v = np.array([0, 0, 0], dtype = DTYPE), # drift parameters (np.array expect: one column of floats)             # <<<<<<<<<<<<<<
- *         w = np.array([0, 0, 0], dtype = DTYPE), # initial bias parameters (np.array expect: one column of floats)
  *         float a = 1, # criterion height
+ *         w = np.array([0, 0, 0], dtype = DTYPE), # initial bias parameters (np.array expect: one column of floats)
  */
   __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 526, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -25038,19 +25038,19 @@ if (!__Pyx_RefNanny) {
   __Pyx_GIVEREF(__pyx_t_4);
   __pyx_t_4 = 0;
 
-  /* "cddm_data_simulation.pyx":527
- * # Simulate (rt, choice) tuples from: Leaky Competing Accumulator Model -----------------------------
+  /* "cddm_data_simulation.pyx":528
  * def lca(v = np.array([0, 0, 0], dtype = DTYPE), # drift parameters (np.array expect: one column of floats)
- *         w = np.array([0, 0, 0], dtype = DTYPE), # initial bias parameters (np.array expect: one column of floats)             # <<<<<<<<<<<<<<
  *         float a = 1, # criterion height
+ *         w = np.array([0, 0, 0], dtype = DTYPE), # initial bias parameters (np.array expect: one column of floats)             # <<<<<<<<<<<<<<
  *         float g = 0, # decay parameter
+ *         float b = 1, # inhibition parameter
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 527, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 528, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_array); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 527, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_array); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 528, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = PyList_New(3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 527, __pyx_L1_error)
+  __pyx_t_4 = PyList_New(3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 528, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_INCREF(__pyx_int_0);
   __Pyx_GIVEREF(__pyx_int_0);
@@ -25061,18 +25061,18 @@ if (!__Pyx_RefNanny) {
   __Pyx_INCREF(__pyx_int_0);
   __Pyx_GIVEREF(__pyx_int_0);
   PyList_SET_ITEM(__pyx_t_4, 2, __pyx_int_0);
-  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 527, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 528, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4);
   __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 527, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 528, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_DTYPE); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 527, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_DTYPE); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 528, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_2) < 0) __PYX_ERR(0, 527, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_2) < 0) __PYX_ERR(0, 528, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 527, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 528, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -25098,8 +25098,8 @@ if (!__Pyx_RefNanny) {
  * 
  * # Simulate (rt, choice) tuples from: Leaky Competing Accumulator Model -----------------------------
  * def lca(v = np.array([0, 0, 0], dtype = DTYPE), # drift parameters (np.array expect: one column of floats)             # <<<<<<<<<<<<<<
- *         w = np.array([0, 0, 0], dtype = DTYPE), # initial bias parameters (np.array expect: one column of floats)
  *         float a = 1, # criterion height
+ *         w = np.array([0, 0, 0], dtype = DTYPE), # initial bias parameters (np.array expect: one column of floats)
  */
   __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_20cddm_data_simulation_13lca, NULL, __pyx_n_s_cddm_data_simulation); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 526, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);

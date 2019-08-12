@@ -524,8 +524,8 @@ def race_model(v = np.array([0, 0, 0], dtype = DTYPE), # np.array expected, one 
 
 # Simulate (rt, choice) tuples from: Leaky Competing Accumulator Model -----------------------------
 def lca(v = np.array([0, 0, 0], dtype = DTYPE), # drift parameters (np.array expect: one column of floats)
-        w = np.array([0, 0, 0], dtype = DTYPE), # initial bias parameters (np.array expect: one column of floats)
         float a = 1, # criterion height
+        w = np.array([0, 0, 0], dtype = DTYPE), # initial bias parameters (np.array expect: one column of floats)
         float g = 0, # decay parameter
         float b = 1, # inhibition parameter
         float s = 1, # variance (can be one value or np.array of size as v and w)
