@@ -26,12 +26,15 @@ def data_generator(*args):
     simulator_data = ds.lca(*args)
     
     # CHOOSE TARGET DIRECTORY HERE
-    file_dir =  '/users/afengler/data/kde/lca/base_simulations_20000/'
+    #file_dir =  '/users/afengler/data/kde/lca/base_simulations_20000/'
+    
+    # 
+    file_dir = '/media/data_cifs/afengler/tmp/'
 
     # STORE
     file_name = file_dir + simulator + '_' + uuid.uuid1().hex
     pickle.dump(simulator_data, open( file_name + '.pickle', "wb" ) )
-    print('success')
+    print(args)
 
 if __name__ == "__main__":
     # Get cpu cnt
@@ -78,7 +81,7 @@ if __name__ == "__main__":
     boundary_multiplicative = True # CHOOSE WHETHER BOUNDARY IS MULTIPLICATIVE (W.R.T Starting separation) OR NOT
 
     # Number of simulators to run
-    n_simulators = 100000
+    n_simulators = 10
 
     # Make function input tuples
 #     v_sample = np.random_uniform(low = v[0], high = v[1], size = n_simulators)
@@ -97,13 +100,13 @@ if __name__ == "__main__":
         v_tmp = np.random.uniform(low = v[0], high = v[1])
         w_tmp = np.random.uniform(low = w[0], high = w[1])
         
-        v_sample.append(np.array([v_tmp] * n_particles))
-        w_sample.append(np.array([w_tmp] * n_particles))
+        v_sample.append(np.array([v_tmp] * n_particles, dtype = np.float32))
+        w_sample.append(np.array([w_tmp] * n_particles, dtype = np.float32))
         
     a_sample = np.random.uniform(low = a[0], high = a[1], size = n_simulators)
     g_sample = np.random.uniform(low = g[0], high = g[1], size = n_simulators)
     b_sample = np.random.uniform(low = b[0], high = b[1], size = n_simulators)
-    s = np.array([1] * n_particles)
+    #s = np.array([1] * n_particles)
 
     # Full DDM
 #     dw_sample = np.random.uniform(low = dw[0], high = dw[1], size = n_simulators)
@@ -131,9 +134,10 @@ if __name__ == "__main__":
         process_params = (v_sample[i], a_sample[i], w_sample[i], g_sample[i], b_sample[i], s)
         sampler_params = (delta_t, max_t, n_samples, print_info, bound, boundary_multiplicative)
         boundary_params = ({},)
+        #cnt = (i,)
         
         # Append argument list with current parameters
-        args_tmp = process_params + sampler_params + boundary_params
+        args_tmp = process_params + sampler_params + boundary_params # + cnt
         args_list.append(args_tmp)
 
     # Parallel Loop
