@@ -13,7 +13,7 @@
 #SBATCH --mem=16G
 #SBATCH -c 14
 #SBATCH -N 1
-#SBATCH --array=1-7
+#SBATCH --array=1-5
 
 # Run a command
 python -u /users/afengler/git_repos/nn_likelihoods/lba_base_simulations.py
