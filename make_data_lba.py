@@ -76,7 +76,7 @@ def gen_lba_features_kde_imit(v_range = [1, 2],
         # ----------------------------------------------------------
 
         # Mixture Component 2: Lower Uniform -----------------------
-        choice_tmp = np.random.choice([-1, 1], size = n_unif_down)
+        choice_tmp = np.random.choice([0, 1], size = n_unif_down)
         rt_tmp = np.random.uniform(low = -1, high = 0.0001, size = n_unif_down)
 
         data.iloc[(row_cnt + n_lba):(row_cnt + n_lba + n_unif_down), len_data_columns - 2] = rt_tmp
@@ -84,8 +84,8 @@ def gen_lba_features_kde_imit(v_range = [1, 2],
         # ---------------------------------------------------------
 
         # Mixture Component 3: Upper Uniform ----------------------
-        choice_tmp = np.random.choice([-1, 1], size = n_unif_up)
-        rt_tmp = np.random.uniform(low = 0.0001, high = 20, size = n_unif_up)
+        choice_tmp = np.random.choice([0, 1], size = n_unif_up)
+        rt_tmp = np.random.uniform(low = 0.0001, high = 100, size = n_unif_up)
 
         data.iloc[(row_cnt + n_lba + n_unif_down):(row_cnt + n_samples_by_param), len_data_columns - 2] = rt_tmp
         data.iloc[(row_cnt + n_lba + n_unif_down):(row_cnt + n_samples_by_param), len_data_columns - 1] = choice_tmp
