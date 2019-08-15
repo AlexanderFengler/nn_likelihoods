@@ -47,7 +47,7 @@ if __name__ == "__main__":
     n_samples = 20000
 
     # Number of simulators to run
-    n_simulators = 10
+    n_simulators = 100000
 
     v_sample = []
     for i in range(n_simulators):
