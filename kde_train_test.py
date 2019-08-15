@@ -18,6 +18,7 @@ if __name__ == "__main__":
     # PICK
     base_simulation_folder = '/users/afengler/data/kde/full_ddm/base_simulations_20000/'
     target_folder = '/users/afengler/data/kde/full_ddm/train_test_data_20000/'
+    
     process_params = ['v', 'a', 'w', 'dw', 'sdv']
     files_ = pickle.load( open(base_simulation_folder + 'keep_files.pickle', 'rb'))
 

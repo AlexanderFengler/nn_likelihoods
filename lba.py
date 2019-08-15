@@ -45,30 +45,27 @@ def dlba(rt = 0.5,
          A = 1,
          b = 1.5,
          s = 0.1,
-         return_log = True):
+         return_log = True,
+         eps = 1e-16):
     
     n_choices = len(v)
     l_f_t = 0
-    
-    if len(s) == 1:
-        s = np.array([s[0]] * n_choices)
     
     # Get probability of choice i at time t = rt
     for i in range(n_choices):
         if i == choice:
             tmp = flba(rt = rt, A = A, b = b, v = v[i], s = s)
-            if tmp < 1e-29:
-                tmp = 1e-29
+            if tmp < eps:
+                tmp = eps
             l_f_t += np.log(tmp)
         else:
             tmp = Flba(rt = rt, A = A, b = b, v = v[i], s = s)
             
-            # numerical robustness catches
-            if tmp < 1e-29:
-                tmp = 1e-29
-            if tmp > (1.0 - 1e-29):
-                tmp = (1.0 - 1e-29)
-            l_f_t += np.log(1.0 - tmp)
+            # numerically robust l_f_t update
+            if (1.0 - tmp) <= eps:
+                l_f_t += np.log(eps)
+            else:
+                l_f_t += np.log(1.0 - tmp)
             
     if return_log: 
         return l_f_t
