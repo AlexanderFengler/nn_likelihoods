@@ -4,9 +4,9 @@ import make_data_lba as mdlba
 if __name__ == "__main__":
     # CHOOSE FOLDER
     # CCV 
-    # my_folder = '/users/afengler/data/lba_analytic/train_test_data_kde_imit/'
+    my_folder = '/users/afengler/data/lba_analytic/train_test_data_kde_imit/'
     # X7
-    my_folder = '/media/data_cifs/afengler/data/lba_analytic/train_test_data_kde_imit/'
+    #my_folder = '/media/data_cifs/afengler/data/lba_analytic/train_test_data_kde_imit/'
     
     my_dat = mdlba.make_data_rt_choice(v_range = [1, 2],
                                        A_range = [0, 1],
