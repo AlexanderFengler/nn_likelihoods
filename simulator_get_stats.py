@@ -24,15 +24,24 @@ import kde_training_utilities as kde_utils
 
 if __name__ == "__main__":
     # Specify base simulation folder
-    base_simulation_folder = '/users/afengler/data/kde/ornstein_uhlenbeck/base_simulations_20000/'
+    base_simulation_folder = '/users/afengler/data/lba_analytic/base_simulations_20000/'
     
     # PARAM RANGES: LINEAR COLLAPSE
-    param_ranges = {'a': [0.5, 2],
-                    'w': [0.3, 0.7],
-                    'v': [-2, 2],
-                    'g':[-2, 2]
-#                     'theta': [0, np.pi/2.2],
-#                     'node': [0, 5]
+    # ORNSTEIN UHLENBECK
+#     param_ranges = {'a': [0.5, 2],
+#                     'w': [0.3, 0.7],
+#                     'v': [-2, 2],
+#                     'g':[-2, 2]
+# #                     'theta': [0, np.pi/2.2],
+# #                     'node': [0, 5]
+#                     }
+
+    # LBA
+    param_ranges = {'v_0': [1, 2],
+                    'v_1': [1, 2],
+                    'A': [0, 1],
+                    'b':[1.5, 3],
+                    's':[0.1, 0.2]
                     }
     
     # FILTERS: GENERAL
