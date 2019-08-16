@@ -13,7 +13,7 @@ if __name__ == "__main__":
                                        b_range = [1.5, 3],
                                        s_range = [0.1, 0.2],
                                        n_choices = 2,
-                                       n_samples = 20000,
+                                       n_samples = 1000000,
                                        eps = 1e-16,
                                        target_folder = my_folder,
                                        write_to_file = True,
