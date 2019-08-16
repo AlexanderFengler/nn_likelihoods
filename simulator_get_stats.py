@@ -24,7 +24,7 @@ import kde_training_utilities as kde_utils
 
 if __name__ == "__main__":
     # Specify base simulation folder
-    base_simulation_folder = '/users/afengler/data/lba_analytic/base_simulations_20000/'
+    base_simulation_folder = '/users/afengler/data/kde/lba/base_simulations_20000/'
     
     # PARAM RANGES: LINEAR COLLAPSE
     # ORNSTEIN UHLENBECK
