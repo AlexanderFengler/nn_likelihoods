@@ -60,7 +60,7 @@ def dlba(rt = 0.5,
                     tmp = eps
                 l_f_t += np.log(tmp)
             else:
-                tmp = Flba(rt = rt, A = A, b = b, v = v[i], s = s)
+                tmp = Flba(rt = rt, v = v[i], A = A, b = b, s = s)
 
                 # numerically robust l_f_t update
                 if (1.0 - tmp) <= eps:
@@ -81,9 +81,9 @@ def Flba(rt = 0.5,
          A = 1,
          b = 1.5,
          s = 0.1):
-    return (1 + ((1 / A) * ((b - A - (rt * v)) * norm.cdf((b - A - (rt * v)) / (rt * s))) - \
+    return (1 + ((1 / A) * ((b - A - (rt * v)) * norm.cdf((b - A - (rt * v)) / (rt * s)) - \
         (b - (rt * v)) * norm.cdf((b - (rt * v)) / (rt * s)) + \
-                    (rt * s) * (norm.pdf((b - A - (rt * v)) / (rt * s)) - norm.pdf((b - (rt * v)) / (rt * s)))))
+                    (rt * s) * (norm.pdf((b - A - (rt * v)) / (rt * s)) - norm.pdf((b - (rt * v)) / (rt * s))))))
 
 # Function computes pdf of a given lba ray
 def flba(rt = 0.5, 
