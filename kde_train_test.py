@@ -16,10 +16,10 @@ import kde_class as kde
 if __name__ == "__main__":
 
     # PICK
-    base_simulation_folder = '/users/afengler/data/kde/full_ddm/base_simulations_20000/'
-    target_folder = '/users/afengler/data/kde/full_ddm/train_test_data_20000/'
+    base_simulation_folder = '/users/afengler/data/kde/lba/base_simulations_20000/'
+    target_folder = '/users/afengler/data/kde/lba/train_test_data_20000/'
     
-    process_params = ['v', 'a', 'w', 'dw', 'sdv']
+    process_params = ['v_0', 'v_1', 'A', 'b', 's']
     files_ = pickle.load( open(base_simulation_folder + 'keep_files.pickle', 'rb'))
 
     if not os.path.isdir(target_folder):
