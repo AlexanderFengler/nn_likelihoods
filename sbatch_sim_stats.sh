@@ -8,7 +8,7 @@
 ##SBATCH -J lin_col_stats
 ##SBATCH -J full_ddm_sim_stats
 ##SBATCH -J weibull_sim_stats
-##SBATCH -J lba_sim_stats
+#SBATCH -J lba_sim_stats
 
 # output file
 ##SBATCH --output /users/afengler/batch_job_out/ddm_sim_stats_%A_%a.out
