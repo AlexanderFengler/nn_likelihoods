@@ -6,6 +6,6 @@ if __name__ == "__main__":
     # CCV 
     # ....
     # X7
-    my_folder = '/media/data_cifs/afengler/data/kde/full_ddm/train_test_data_20000/'
+    my_folder = '/media/data_cifs/afengler/data/lba_analytic/train_test_data_kde_imit/'
     kde_utils.kde_make_train_test_split(folder = my_folder, 
                                         p_train = 0.95)

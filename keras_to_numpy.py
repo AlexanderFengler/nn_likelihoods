@@ -10,6 +10,9 @@ def relu(x):
 def linear(x):
     return x
 
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
 # Function to extract network architecture 
 def extract_architecture(model):
     biases = []
@@ -26,16 +29,75 @@ def extract_architecture(model):
 # Function to perform forward pass given architecture
 def predict(x, weights, biases, activations):
     # Activation dict
-    activation_fns = {"relu":relu, "linear":linear}
+    activation_fns = {"relu":relu, "linear":linear, 'sigmoid':sigmoid}
     
     for i in range(len(weights)):
         x = activation_fns[activations[i]](
             np.dot(x, weights[i]) + biases[i])
     return x
 
-def log_p(params, weights, biases, activations, data, ll_min = 1e-29):
+def log_p(params, weights, biases, activations, data, orig_output_log_l = True, ll_min = 1e-29):
     param_grid = np.tile(params, (data.shape[0], 1))
     inp = np.concatenate([param_grid, data], axis = 1)
     out = np.maximum(predict(inp, weights, biases, activations),ll_min)
+    if orig_output_log_l:
+        return - np.sum(out)
+    else:
+        return - np.sum(np.log(out))
+       
+
+def group_log_p(params, 
+                weights, 
+                biases, 
+                activations, 
+                data, 
+                param_varies = [0, 0, 1], 
+                params_ordered = ['v', 'a', 'w'],
+                params_names = ['v', 'a', 'w_0', 'w_1', 'w_2'],
+                orig_output_log_l = True,
+                ll_min = 1e-29):
     
-    return -np.sum(np.log(out))
+    n_datasets = len(data)
+    n_params = len(params_ordered)
+    log_p_out = 0
+    for i in range(n_datasets):
+        
+        # Parameters for data id
+        params_tmp = get_tmp_params(params = params, 
+                                    params_ordered = params_ordered,
+                                    param_varies = param_varies,
+                                    params_names = params_names,
+                                    idx = i)
+               
+        # Compute log_likelihood for current dataset
+        log_p_out += log_p(params = params_tmp, 
+                           weights = weights, 
+                           biases = biases, 
+                           activations = activations, 
+                           data = data[str(i)], 
+                           ll_min = ll_min,
+                           orig_output_log_l = orig_output_log_l)
+    return log_p_out
+
+# Support functions -----------------
+def get_tmp_params(params = [0, 1, 2, 3, 4],
+                   params_ordered = ['v', 'a', 'w'],
+                   param_varies = [0, 0, 1],
+                   params_names = ['v', 'a', 'w_0', 'w_1', 'w_2'],
+                   idx = 0):
+    
+    # Get parameters for current dataset
+        n_params = len(params_ordered)
+        params_tmp = []
+        for j in range(n_params):
+            if param_varies[j] == 1:
+                params_tmp.append(params[params_names.index(params_ordered[j] + '_' + str(idx))])
+            else:
+                params_tmp.append(params[params_names.index(params_ordered[j])])
+                
+#         print('parameter_names_adj: ', params_names)
+#         print('parameters: ', params)
+#         print('idx: ', idx)
+#         print('params out: ', params_tmp)
+        return params_tmp
+# ------------------------------------      
