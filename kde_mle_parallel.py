@@ -170,7 +170,7 @@ if __name__ == "__main__":
         model.load_weights(ckpt_path)
     if model_dtype == 'h5':
         model_path = config_data['model_path']
-        model = keras.models.load_model(model_path, custom_objects={"huber_loss": tf.losses.huber_loss})
+        model = keras.models.load_model(model_path, custom_objects = {"huber_loss": tf.losses.huber_loss})
     
     # get network architecture for numpy forward pass (used in mle, coming from ktnp imported)
     weights, biases, activations = ktnp.extract_architecture(model)

@@ -66,6 +66,7 @@ class SliceSampler:
 
     # Extra accept condition for doubling procedure
     def _accept(self, prev, upd, z, left, right, dim):
+        
         # initialize
         tmp_upd_left = prev.copy()
         tmp_upd_left[dim] = left
@@ -86,7 +87,7 @@ class SliceSampler:
                 tmp_upd_left[dim] = M
             
             if D and z >= self.target(tmp_upd_left, self.data) and z >= self.target(tmp_upd_right, self.data):
-                return(False)
+                return False
        
         return True  
     

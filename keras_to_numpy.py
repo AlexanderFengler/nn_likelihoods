@@ -2,6 +2,7 @@
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
+import pickle
 
 # Activations
 def relu(x):
@@ -11,25 +12,36 @@ def linear(x):
     return x
 
 def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
+    return 1 / (1 + np.exp(- x))
+
+def tanh(x):
+    return (2 / (1 + np.exp(- 2x))) - 1
 
 # Function to extract network architecture 
-def extract_architecture(model):
+def extract_architecture(model, save = False, save_path = ''):
+    
     biases = []
     activations = []
     weights = []
+    
     for layer in model.layers:
         if layer.name == "input_1":
             continue
         weights.append(layer.get_weights()[0])
         biases.append(layer.get_weights()[1])
         activations.append(layer.get_config()["activation"])
+            
+    if save = True:
+       pickle.dump(weights, open(save_path + "weights.pickle" ,"wb"))
+       pickle.dump(biases, open(save_path + "biases.pickle" ,"wb"))
+       pickle.dump(activations, open(save_path + "activations.pickle" ,"wb"))
+            
     return weights, biases, activations
 
 # Function to perform forward pass given architecture
 def predict(x, weights, biases, activations):
     # Activation dict
-    activation_fns = {"relu":relu, "linear":linear, 'sigmoid':sigmoid}
+    activation_fns = {"relu":relu, "linear":linear, 'sigmoid':sigmoid, "tanh":tanh}
     
     for i in range(len(weights)):
         x = activation_fns[activations[i]](
@@ -39,12 +51,12 @@ def predict(x, weights, biases, activations):
 def log_p(params, weights, biases, activations, data, orig_output_log_l = True, ll_min = 1e-29):
     param_grid = np.tile(params, (data.shape[0], 1))
     inp = np.concatenate([param_grid, data], axis = 1)
-    out = np.maximum(predict(inp, weights, biases, activations),ll_min)
     if orig_output_log_l:
+        out = predict(inp, weights, biases, activations)
         return - np.sum(out)
     else:
+        out = np.maximum(predict(inp, weights, biases, activations), ll_min)
         return - np.sum(np.log(out))
-       
 
 def group_log_p(params, 
                 weights, 

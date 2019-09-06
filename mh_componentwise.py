@@ -4,7 +4,7 @@ import ctypes
 
 class MetropolisHastingsComponentwise:
 
-    def __init__(self, dims, num_chains, bounds, target, proposal_var = .01):
+    def __init__(self, num_chains, bounds, target, proposal_var = .01):
         """
         Params
         -----
@@ -18,7 +18,7 @@ class MetropolisHastingsComponentwise:
             the log likelihood of the data conditioned on the parameters.
         """
         
-        self.dims = dims
+        self.dims = self.bounds.shape[0]
         self.target = target
         self.num_chains = num_chains
         self.bounds = bounds
