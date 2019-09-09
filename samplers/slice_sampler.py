@@ -6,7 +6,8 @@ class SliceSampler:
                  target, # provide target distribution
                  w = 1 / 256, # initial interval size
                  p = 8,
-                 m = 50): # max doubling allowed
+                 m = 50,
+                 print_interval = 1): # max doubling allowed
         
         self.dims = bounds.shape[0]
         self.bounds = bounds
@@ -14,6 +15,7 @@ class SliceSampler:
         self.w = w
         self.p = p
         self.m = m
+        self.print_interval = print_interval
 
     # Doubling procedue for finding intervals
     def _find_interval_doubling(self, z, prev, dim):
@@ -32,7 +34,7 @@ class SliceSampler:
         lp_l = self.target(left, self.data)
         lp_r = self.target(right, self.data)
 
-        while k > 0 and (z < lp_l or z < lp_r):
+        while (k > 0 and (z < lp_l or z < lp_r)):
             v = np.random.uniform()
             if v < .5:
                 left[dim] += left[dim] - right[dim] # L <- L - (R - L)  ... L + L - R
@@ -196,7 +198,7 @@ class SliceSampler:
             if method == 'step_out':
                 self.samples[i], self.lp[i] = self._slice_sample_step_out(self.samples[i - 1], self.lp[i - 1])
                 
-            if i % 100 == 0:
+            if i % self.print_interval == 0:
                 print("Iteration {}".format(i))
             
             i += 1

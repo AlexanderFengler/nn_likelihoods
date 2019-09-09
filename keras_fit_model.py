@@ -90,7 +90,6 @@ earlystopping = keras.callbacks.EarlyStopping(monitor = "val_loss",
                                               min_delta = 0, 
                                               patience = 1)
 
-
 history = model.fit(X, y, 
                     validation_data = (X_val, y_val), 
                     epochs = params["n_epochs"],

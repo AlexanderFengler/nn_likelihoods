@@ -15,7 +15,7 @@ def sigmoid(x):
     return 1 / (1 + np.exp(- x))
 
 def tanh(x):
-    return (2 / (1 + np.exp(- 2x))) - 1
+    return (2 / (1 + np.exp(- 2 * x))) - 1
 
 # Function to extract network architecture 
 def extract_architecture(model, save = False, save_path = ''):
@@ -31,7 +31,7 @@ def extract_architecture(model, save = False, save_path = ''):
         biases.append(layer.get_weights()[1])
         activations.append(layer.get_config()["activation"])
             
-    if save = True:
+    if save == True:
        pickle.dump(weights, open(save_path + "weights.pickle" ,"wb"))
        pickle.dump(biases, open(save_path + "biases.pickle" ,"wb"))
        pickle.dump(activations, open(save_path + "activations.pickle" ,"wb"))

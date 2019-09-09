@@ -80,8 +80,8 @@ def ddm(float v = 0, # drift by timestep 'delta_t'
         print_info = True # timesteps fraction of seconds
         ):
 
-    rts = np.zeros((n_samples, 1), dtype=DTYPE)
-    choices = np.zeros((n_samples, 1), dtype=np.intc)
+    rts = np.zeros((n_samples, 1), dtype = DTYPE)
+    choices = np.zeros((n_samples, 1), dtype = np.intc)
     cdef float[:, :] rts_view = rts
     cdef int[:, :] choices_view = choices
 

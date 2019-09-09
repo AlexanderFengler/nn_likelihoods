@@ -4,8 +4,8 @@ import numpy as np
 import yaml
 import pandas as pd
 from itertools import product
-#from samplers import SliceSampler
-from slice_sampler import SliceSampler
+from samplers import SliceSampler
+#from slice_sampler import SliceSampler
 import pickle
 import uuid
 
@@ -13,36 +13,47 @@ import boundary_functions as bf
 import multiprocessing as mp
 import cddm_data_simulation as cd
 from cdwiener import batch_fptd
-from np_network import np_predict
+#from np_network import np_predict
 #from kde_info import KDEStats
 
-import ktnp
+import keras_to_numpy as ktnp
 
 # INITIALIZATIONS -------------------------------------------------------------
-method = "full"
+machine = 'x7'
+method = "ddm"
 n_data_samples = 2000
 n_slice_samples = 2000
-n_sims = 100
+n_sims = 5
+n_cpus = 2
 
 stats = pickle.load(open("kde_stats.pickle", "rb"))
 method_params = stats[method]
 
-network_path = yaml.load(open("model_paths.yaml"))[method]
+if machine == 'x7':
+    output_folder = method_params['output_folder_x7']
+    with open("model_paths_x7.yaml") as tmp_file:
+        network_path = yaml.load(tmp_file)[method]
+if machine == 'ccv':
+    output_folder = method_params['output_folder']
+    with open("model_paths.yaml") as tmp_file:
+        network_path = yaml.load(tmp_file)[method]
 
 # model = keras.models.load_model(network_path, custom_objects=custom_objects)
 # fcn = keras.models.load_model(fcn_path, custom_objects=fcn_custom_objects)
 
 # Load weights, biases and activations of current network --------
-weights = pickle.load(open(network_path + "weights.pickle", "rb"))
-biases = pickle.load(open(network_path + "biases.pickle", "rb"))
-activations = pickle.load(open(network_path + "activations.pickle", "rb"))
+with open(network_path + "weights.pickle", "rb") as tmp_file:
+    weights = pickle.load(tmp_file)
+with open(network_path + 'biases.pickle', 'rb') as tmp_file:
+    biases = pickle.load(tmp_file)
+with open(network_path + 'activations.pickle', 'rb') as tmp_file:
+    activations = pickle.load(tmp_file)
 # ----------------------------------------------------------------
-
 def target(params, data, ll_min = 1e-29):
     params_rep = np.tile(params, (data.shape[0], 1))
     input_batch = np.concatenate([params_rep, data], axis = 1)
     out = ktnp.predict(input_batch, weights, biases, activations)
-    return - out
+    return np.sum(out)
 
 def nf_target(params, data):
     return np.log(batch_fptd(data[:, 0] * data[:, 1] * (-1), params[0],
@@ -60,7 +71,7 @@ for p in range(len(method_params['param_names'])):
     param_upper_bnd.append(method_params['param_bounds'][p][1])
     param_lower_bnd.append(method_params['param_bounds'][p][0])
 
-if len(method_params["boundary_param_names"])) > 0:
+if len(method_params['boundary_param_names']) > 0:
     for p in range(len(method_params['boundary_param_names'])):
         boundary_param_upper_bnd.append(method_params['boundary_param_bounds'][p][1])
         boundary_param_lower_bnd.append(method_params['boundary_param_bounds'][p][0])                                    
@@ -69,7 +80,7 @@ param_grid = np.random.uniform(low = param_lower_bnd,
                                high = param_upper_bnd, 
                                size = (n_sims, len(method_params['param_names'])))
 
-if len(boundary_param_bounds) > 0:
+if len(method_params['boundary_param_names']) > 0:
     boundary_param_grid = np.random.uniform(low = boundary_param_lower_bnd,
                                             high = boundary_param_upper_bnd,
                                             size = (n_sims, len(method_params['boundary_param_bounds'])))
@@ -97,26 +108,46 @@ def generate_data_grid(param_grid, boundary_param_grid):
     return data_grid
 
 data_grid = generate_data_grid(param_grid, boundary_param_grid)
+
+print(data_grid)
+print(data_grid.shape)
 # ----------------------------------------------------------------------------------------------------
 
 # RUN POSTERIOR SIMULATIONS --------------------------------------------------------------------------
+
+sampler_param_bounds = np.array(method_params["param_bounds"] + method_params["boundary_param_bounds"])
+
 def kde_posterior(data):
-    model = SliceSampler(bounds = method_params["param_bounds"].T,
-                         target = target, w = .4 / 1024, p = 8)
-    model.sample(data, num_samples=n_slice_samples)
-    return model.samples
-
-
-#test navarro-fuss
-def test_nf(data):
-    model = SliceSampler(bounds = method_params["param_bounds"].T,
-                         target = nf_target, w = .4 / 1024, p = 8)
+    model = SliceSampler(bounds = sampler_param_bounds, 
+                         target = target, 
+                         w = .4 / 1024, 
+                         p = 8)
     model.sample(data, num_samples = n_slice_samples)
     return model.samples
 
-p = mp.Pool(mp.cpu_count())
+#test navarro-fuss
+def nf_posterior(data):
+#     model = SliceSampler(bounds = method_params["param_bounds"].T,
+#                          target = nf_target, w = .4 / 1024, p = 8)
+    model = SliceSampler(bounds = sampler_param_bounds,
+                         target = nf_target, 
+                         w = .4 / 1024, 
+                         p = 8)
+    model.sample(data, num_samples = n_slice_samples)
+    return model.samples
 
-kde_results = np.array(p.map(kde_posterior, data_grid))
+# if n_cpus == 'all':
+#     p = mp.Pool(mp.cpu_count())
+    
+# else: 
+#     p = mp.Pool(n_cpus)
+
+# kde_results = np.array(p.map(kde_posterior, data_grid))
+
+
+#print(target([0, 1.5, 0.5], data_grid[0]))
+import ipdb; ipdb.set_trace()
+kde_results = kde_posterior(data_grid[0])
 
 # if method == "ddm":
 #     nf_results = p.map(test_nf, data_grid)
@@ -127,11 +158,12 @@ kde_results = np.array(p.map(kde_posterior, data_grid))
 
 # print("fcn finished!")
 
-pickle.dump((param_grid, data_grid, kde_results), open(method_params['output_folder'] + "kde_sim_random{}.pickle".format(uuid.uuid1()), "wb"))
+pickle.dump((param_grid, data_grid, kde_results), open(output_folder + "kde_sim_random_{}.pickle".format(uuid.uuid1()), "wb"))
+
 # pickle.dump((param_grid, fcn_results), open(output_folder + "fcn_sim_random{}.pickle".format(part), "wb"))
 
-if method == "ddm":
-    pickle.dump((param_grid, data_grid, nf_results), open(output_folder + "nf_sim{}.pickle".format(uuid.uuid1()), "wb"))
+# if method == "ddm":
+#     pickle.dump((param_grid, data_grid, nf_results), open(output_folder + "nf_sim_{}.pickle".format(uuid.uuid1()), "wb"))
 # ------------------------------------------------------------------------------------------------------
     
 # UNUSED ---------
