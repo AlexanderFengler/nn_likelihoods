@@ -22,5 +22,4 @@
 # Run a command
 #source /users/afengler/miniconda3/etc/profile.d/conda.sh
 #conda activate tony
-python3 /users/afengler/git_repos/tony/nn_likelihoods/method_comparison_sim.py
-
+python /users/afengler/git_repos/nn_likelihoods/method_comparison_sim.py
