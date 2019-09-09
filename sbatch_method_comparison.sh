@@ -17,10 +17,10 @@
 #SBATCH -c 7
 #SBATCH -N 1
 ##SBATCH -p gpu --gres=gpu:1
-#SBATCH --array=1-4
-# Run a command
+#SBATCH --array=1-10
 
-source /users/afengler/miniconda3/etc/profile.d/conda.sh
-conda activate tony
+# Run a command
+#source /users/afengler/miniconda3/etc/profile.d/conda.sh
+#conda activate tony
 python3 /users/afengler/git_repos/tony/nn_likelihoods/method_comparison_sim.py
 

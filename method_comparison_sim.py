@@ -19,12 +19,12 @@ from cdwiener import batch_fptd
 import keras_to_numpy as ktnp
 
 # INITIALIZATIONS -------------------------------------------------------------
-machine = 'x7'
+machine = 'ccv'
 method = "ddm"
 n_data_samples = 2000
-n_slice_samples = 2000
-n_sims = 5
-n_cpus = 2
+n_slice_samples = 100
+n_sims = 10
+n_cpus = 'all'
 
 stats = pickle.load(open("kde_stats.pickle", "rb"))
 method_params = stats[method]
@@ -136,18 +136,18 @@ def nf_posterior(data):
     model.sample(data, num_samples = n_slice_samples)
     return model.samples
 
-# if n_cpus == 'all':
-#     p = mp.Pool(mp.cpu_count())
+if n_cpus == 'all':
+    p = mp.Pool(mp.cpu_count())
     
-# else: 
-#     p = mp.Pool(n_cpus)
+else: 
+    p = mp.Pool(n_cpus)
 
-# kde_results = np.array(p.map(kde_posterior, data_grid))
+kde_results = np.array(p.map(kde_posterior, data_grid))
 
 
 #print(target([0, 1.5, 0.5], data_grid[0]))
-import ipdb; ipdb.set_trace()
-kde_results = kde_posterior(data_grid[0])
+# import ipdb; ipdb.set_trace()
+# kde_results = kde_posterior(data_grid[0])
 
 # if method == "ddm":
 #     nf_results = p.map(test_nf, data_grid)
@@ -158,7 +158,7 @@ kde_results = kde_posterior(data_grid[0])
 
 # print("fcn finished!")
 
-pickle.dump((param_grid, data_grid, kde_results), open(output_folder + "kde_sim_random_{}.pickle".format(uuid.uuid1()), "wb"))
+pickle.dump((param_grid, data_grid, kde_results), open(output_folder + "kde_sim_test_{}.pickle".format(uuid.uuid1()), "wb"))
 
 # pickle.dump((param_grid, fcn_results), open(output_folder + "fcn_sim_random{}.pickle".format(part), "wb"))
 
