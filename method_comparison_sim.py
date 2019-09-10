@@ -22,7 +22,7 @@ import keras_to_numpy as ktnp
 machine = 'ccv'
 method = "lba"
 n_data_samples = 2000
-n_slice_samples = 5000
+n_slice_samples = 10
 n_sims = 10
 n_cpus = 'all'
 
