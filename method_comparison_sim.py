@@ -29,6 +29,8 @@ n_cpus = 'all'
 stats = pickle.load(open("kde_stats.pickle", "rb"))
 method_params = stats[method]
 
+print(stats)
+
 if machine == 'x7':
     output_folder = method_params['output_folder_x7']
     with open("model_paths_x7.yaml") as tmp_file:
