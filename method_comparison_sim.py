@@ -20,7 +20,7 @@ import keras_to_numpy as ktnp
 
 # INITIALIZATIONS -------------------------------------------------------------
 machine = 'ccv'
-method = "ddm"
+method = "lba"
 n_data_samples = 2000
 n_slice_samples = 5000
 n_sims = 10
@@ -65,30 +65,34 @@ def nf_target(params, data):
 # MAKE PARAMETER / DATA GRID -------------------------------------------------------------------------
 
 # REFORMULATE param bounds
-param_upper_bnd = []
-param_lower_bnd = []
-boundary_param_upper_bnd = [] 
-boundary_param_lower_bnd = []
+def generate_param_grid():
+    param_upper_bnd = []
+    param_lower_bnd = []
+    boundary_param_upper_bnd = [] 
+    boundary_param_lower_bnd = []
 
-for p in range(len(method_params['param_names'])):
-    param_upper_bnd.append(method_params['param_bounds'][p][1])
-    param_lower_bnd.append(method_params['param_bounds'][p][0])
+    for p in range(len(method_params['param_names'])):
+        param_upper_bnd.append(method_params['param_bounds'][p][1])
+        param_lower_bnd.append(method_params['param_bounds'][p][0])
 
-if len(method_params['boundary_param_names']) > 0:
-    for p in range(len(method_params['boundary_param_names'])):
-        boundary_param_upper_bnd.append(method_params['boundary_param_bounds'][p][1])
-        boundary_param_lower_bnd.append(method_params['boundary_param_bounds'][p][0])                                    
-                                     
-param_grid = np.random.uniform(low = param_lower_bnd, 
-                               high = param_upper_bnd, 
-                               size = (n_sims, len(method_params['param_names'])))
+    if len(method_params['boundary_param_names']) > 0:
+        for p in range(len(method_params['boundary_param_names'])):
+            boundary_param_upper_bnd.append(method_params['boundary_param_bounds'][p][1])
+            boundary_param_lower_bnd.append(method_params['boundary_param_bounds'][p][0])                                    
 
-if len(method_params['boundary_param_names']) > 0:
-    boundary_param_grid = np.random.uniform(low = boundary_param_lower_bnd,
-                                            high = boundary_param_upper_bnd,
-                                            size = (n_sims, len(method_params['boundary_param_bounds'])))
-else:
-    boundary_param_grid = []
+    param_grid = np.random.uniform(low = param_lower_bnd, 
+                                   high = param_upper_bnd, 
+                                   size = (n_sims, len(method_params['param_names'])))
+
+    if len(method_params['boundary_param_names']) > 0:
+        boundary_param_grid = np.random.uniform(low = boundary_param_lower_bnd,
+                                                high = boundary_param_upper_bnd,
+                                                size = (n_sims, len(method_params['boundary_param_bounds'])))
+    else:
+        boundary_param_grid = []
+        
+    return (param_grid, boundary_param_grid)
+
                
                         
 def generate_data_grid(param_grid, boundary_param_grid):
@@ -110,7 +114,32 @@ def generate_data_grid(param_grid, boundary_param_grid):
         data_grid[i] = np.concatenate([rts, choices], axis = 1)
     return data_grid
 
-data_grid = generate_data_grid(param_grid, boundary_param_grid)
+def generate_data_grid_lba(param_grid):
+    data_grid = np.zeros((n_sims, n_data_samples, 2))
+    param_names_tmp = ['v', 'A', 'b', 's']
+    for i in range(n_sims):
+        params_tmp = []
+        params_tmp.append(np.array(param_grid[i][:(len(param_grid[i]) - 3)]))
+        params_tmp.append(np.array(param_grid[i][len(param_grid[i]) - 3]))
+        params_tmp.append(np.array(param_grid[i][len(param_grid[i]) - 2]))
+        params_tmp.append(np.array(param_grid[i][len(param_grid[i]) - 1]))     
+        params_dict_tmp = dict(zip(param_names_tmp, params_tmp))
+        print(params_dict_tmp['v'])
+        # Generate data
+        rts, choices, _ = method_params["dgp"](**params_dict_tmp,
+                                               n_samples = n_data_samples)
+        data_grid[i] = np.concatenate([rts, choices], axis = 1)
+    return data_grid
+
+   
+                                               
+
+param_grid, boundary_param_grid = generate_param_grid() 
+print('param_grid', param_grid[0])
+if method[:3] == 'lba':
+    data_grid = generate_data_grid_lba(param_grid) 
+else:   
+    data_grid = generate_data_grid(param_grid, boundary_param_grid)
 
 print(data_grid)
 print(data_grid.shape)

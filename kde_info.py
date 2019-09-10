@@ -1,11 +1,22 @@
 import numpy as np
 import pickle
 import cddm_data_simulation as cd
-#import lba
+import lba
 import boundary_functions as bf
 import os
 
-temp = {"ddm":
+temp = {
+"lba":{
+        "dgp":lba.rlba,
+        "data_folder": "/users/afengler/data/kde/lba/train_test_data_20000",
+        "output_folder": "/users/afengler/data/kde/lba/posterior_samples/",
+        "output_folder_x7": "/media/data_cifs/afengler/data/kde/lba/posterior_samples/",
+        "param_names": ['v_0', 'v_1', 'A', 'b', 's'],
+        "boundary_param_names": [],
+        "param_bounds": [[1.0, 2.0], [1.0, 2.0], [0.0, 1.0], [1.5, 3.0], [0.1, 0.2]],
+        "boundary_param_bounds": []
+       },
+"ddm":
     {
     "dgp": cd.ddm_flexbound,
     "boundary": bf.constant,
