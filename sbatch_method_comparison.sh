@@ -13,11 +13,11 @@
 
 # Request runtime, memory, cores:
 #SBATCH --time=24:00:00
-#SBATCH --mem=64G
+#SBATCH --mem=32G
 #SBATCH -c 7
 #SBATCH -N 1
 ##SBATCH -p gpu --gres=gpu:1
-#SBATCH --array=1-10
+#SBATCH --array=1-50
 
 # Run a command
 #source /users/afengler/miniconda3/etc/profile.d/conda.sh
