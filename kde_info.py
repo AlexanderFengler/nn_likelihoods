@@ -70,7 +70,7 @@ temp = {
     "param_names": ["v", "a", "w", "g"],
     "boundary_param_names": [],
     "boundary_param_bounds": [],
-    "param_bounds": [[-2, 2], [0.6, 1.5], [0.3, 0.7], [-1, 1]]
+    "param_bounds": [[-1.9, 1.9], [0.65, 1.5], [0.31, 0.69], [-0.9, 0.9]]
     #"param_bounds": np.array([[-2, .6, .3, -1], [2, 1.5, .7, 1]])
     },
 "full":
