@@ -100,7 +100,7 @@ def generate_data_grid(param_grid, boundary_param_grid):
     for i in range(n_sims):
         param_dict_tmp = dict(zip(method_params["param_names"], param_grid[i]))
         
-        if len(method_params['boundary_param_names'] > 0:
+        if len(method_params['boundary_param_names']) > 0:
             boundary_dict_tmp = dict(zip(method_params["boundary_param_names"], boundary_grid[i]))
         else:
             boundary_dict_tmp = {}
