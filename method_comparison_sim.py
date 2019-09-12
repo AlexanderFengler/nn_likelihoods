@@ -20,7 +20,7 @@ import keras_to_numpy as ktnp
 
 # INITIALIZATIONS -------------------------------------------------------------
 machine = 'ccv'
-method = "ornstein"
+method = "linear_collapse"
 n_data_samples = 2000
 n_slice_samples = 5000
 n_sims = 10

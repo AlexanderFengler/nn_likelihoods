@@ -55,8 +55,8 @@ temp = {
     "output_folder_x7": "/media/data_cifs/afengler/data/kde/linear_collapse/method_comparison/",
     "param_names": ["v", "a", "w"],
     "boundary_param_names": ["node", "theta"],
-    "param_bounds": [[-2, 2], [0.6, 1.5], [0.3, 0.7]],
-    "boundary_param_bounds": [[1, 2], [0, 1.37]]
+    "param_bounds": [[-1.5, 1.5], [0.6, 1.5], [0.31, 0.69]],
+    "boundary_param_bounds": [[1, 2], [0, 1.2]]
     #"param_bounds": np.array([[-2, .6, .3], [2, 1.5, .7]]),
     #"boundary_param_bounds": np.array([[1, 0], [2, 1.37]])
     },
