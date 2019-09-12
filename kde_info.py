@@ -16,6 +16,19 @@ temp = {
         "param_bounds": [[1.0, 2.0], [1.0, 2.0], [0.0, 1.0], [1.5, 3.0], [0.1, 0.2]],
         "boundary_param_bounds": []
        },
+"lba_analytic":{
+        "dgp":lba.rlba,
+        "data_folder": "/users/afengler/data/analytic/lba/train_test_data_kde_imit",
+        "data_folder_x7": "/media/data_cifs/afengler/data/analytic/lba/train_test_data_kde_imit",
+        "output_folder": "/users/afengler/data/analytic/lba/posterior_samples/",
+        "output_folder_x7": "/media/data_cifs/afengler/data/analytic/lba/posterior_samples/",
+        "model_folder": "/users/afengler/data/analytic/lba/keras_models/",
+        "model_folder_x7": "/media/data_cifs/afengler/data/analytic/lba/keras_models/",
+        "param_names": ['v_0', 'v_1', 'A', 'b', 's'],
+        "boundary_param_names": [],
+        "param_bounds": [[1.0, 2.0], [1.0, 2.0], [0.0, 1.0], [1.5, 3.0], [0.1, 0.2]],
+        "boundary_param_bounds": []
+       },
 "ddm":
     {
     "dgp": cd.ddm_flexbound,

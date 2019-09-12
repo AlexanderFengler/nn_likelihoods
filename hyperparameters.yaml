@@ -1,11 +1,12 @@
 hidden_layers: [100, 100, 120, 1]
-hidden_activations: ["tanh", "tanh", "tanh", "tanh"]
+hidden_activations: ["tanh", "tanh", "tanh", "linear"]
 filters: [128, 128, 128, 128]
-batch_size: 64
+batch_size: 1024
 n_epochs: 5
 learning_rate: .0002
 momentum: .7
-model_type: "dnnregressor_analytic"
+model_type: "dnnregressor_lba_analytic"
 optimizer: "adam"
 log: True
 loss: "huber"
+gpu_x7: '1'
