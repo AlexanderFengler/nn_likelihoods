@@ -42,7 +42,6 @@ def extract_architecture(model, save = False, save_path = ''):
 def predict(x, weights, biases, activations):
     # Activation dict
     activation_fns = {"relu":relu, "linear":linear, 'sigmoid':sigmoid, "tanh":tanh}
-    
     for i in range(len(weights)):
         x = activation_fns[activations[i]](
             np.dot(x, weights[i]) + biases[i])

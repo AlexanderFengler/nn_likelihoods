@@ -11,9 +11,9 @@ temp = {
         "data_folder": "/users/afengler/data/kde/lba/train_test_data_20000",
         "output_folder": "/users/afengler/data/kde/lba/posterior_samples/",
         "output_folder_x7": "/media/data_cifs/afengler/data/kde/lba/posterior_samples/",
-        "param_names": ['v_0', 'v_1', 'A', 'b', 's'],
+        "param_names": ['v_0', 'v_1', 'A', 'b', 's', 'ndt'],
         "boundary_param_names": [],
-        "param_bounds": [[1.0, 2.0], [1.0, 2.0], [0.0, 1.0], [1.5, 3.0], [0.1, 0.2]],
+        "param_bounds": [[1.0, 2.0], [1.0, 2.0], [0.0, 1.0], [1.5, 3.0], [0.1, 0.2], [0, 1.0]],
         "boundary_param_bounds": []
        },
 "lba_analytic":{
@@ -40,9 +40,9 @@ temp = {
 #    fcn_custom_objects: {"heteroscedastic_loss": tf.losses.huber_loss}
     "output_folder": "/users/afengler/data/kde/ddm/method_comparison/",
     "output_folder_x7": "/media/data_cifs/afengler/data/kde/ddm/method_comparison/",
-    "param_names": ["v", "a", "w"],
+    "param_names": ['v', 'a', 'w', 'ndt'],
     "boundary_param_names": [],
-    "param_bounds": [[-2.0, 2.0], [0.6, 1.5], [0.3, 0.7]],   
+    "param_bounds": [[-2.0, 2.0], [0.6, 1.5], [0.3, 0.7], [0.0, 1.0]],   
     #"param_bounds": np.array([[-2, .6, .3], [2, 1.5, .7]]),
     "boundary_param_bounds": []
     },

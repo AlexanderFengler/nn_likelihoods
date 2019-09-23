@@ -20,7 +20,7 @@ import keras_to_numpy as ktnp
 
 # INITIALIZATIONS -------------------------------------------------------------
 machine = 'ccv'
-method = "linear_collapse"
+method = 'ddm'
 n_data_samples = 2000
 n_slice_samples = 5000
 n_sims = 10
@@ -52,11 +52,18 @@ with open(network_path + 'biases.pickle', 'rb') as tmp_file:
 with open(network_path + 'activations.pickle', 'rb') as tmp_file:
     activations = pickle.load(tmp_file)
 # ----------------------------------------------------------------
-def target(params, data, ll_min = 1e-29):
-    params_rep = np.tile(params, (data.shape[0], 1))
-    input_batch = np.concatenate([params_rep, data], axis = 1)
-    out = ktnp.predict(input_batch, weights, biases, activations)
-    return np.sum(out)
+def target(params, data, ll_min = 1e-29, ndt = True):
+    if ndt == False:
+        params_rep = np.tile(params, (data.shape[0], 1))
+        input_batch = np.concatenate([params_rep, data], axis = 1)
+        out = ktnp.predict(input_batch, weights, biases, activations)
+        return np.sum(out)
+    else:
+        params_rep = np.tile(params[:-1], (data.shape[0], 1))
+        data[0,:] = data[0,:] - params[-1]
+        input_batch = np.concatenate([params_rep, data], axis = 1)
+        out = ktnp.predict(input_batch, weights, biases, activations)
+        return np.sum(out)
 
 def nf_target(params, data):
     return np.log(batch_fptd(data[:, 0] * data[:, 1] * (-1), params[0],
@@ -171,7 +178,6 @@ else:
 
 kde_results = np.array(p.map(kde_posterior, data_grid))
 
-
 #print(target([0, 1.5, 0.5], data_grid[0]))
 # import ipdb; ipdb.set_trace()
 # kde_results = kde_posterior(data_grid[0])
@@ -185,7 +191,7 @@ kde_results = np.array(p.map(kde_posterior, data_grid))
 
 # print("fcn finished!")
 
-pickle.dump((param_grid, data_grid, kde_results), open(output_folder + "kde_sim_test_{}.pickle".format(uuid.uuid1()), "wb"))
+pickle.dump((param_grid, data_grid, kde_results), open(output_folder + "kde_sim_test_ndt_{}.pickle".format(uuid.uuid1()), "wb"))
 
 # pickle.dump((param_grid, fcn_results), open(output_folder + "fcn_sim_random{}.pickle".format(part), "wb"))
 

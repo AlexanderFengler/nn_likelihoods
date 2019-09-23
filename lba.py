@@ -6,6 +6,7 @@ def rlba(v = np.array([1, 1]),
          A = 1, 
          b = 1.5, 
          s = 0.1,
+         ndt = 0.0,
          n_samples = 1000,
          max_t = 20,
          d_lower_lim = 0.01):
@@ -21,8 +22,8 @@ def rlba(v = np.array([1, 1]),
             d = np.random.normal(loc = v, scale = s)
             tmp_rt = (b - k) / d
         
-        rts[i] = np.min(tmp_rt)
-        choices[i]  = np.argmin(tmp_rt)
+        rts[i] = np.min(tmp_rt) + ndt
+        choices[i] = np.argmin(tmp_rt)
     
     # Create some dics
     v_dict = {}
@@ -33,6 +34,7 @@ def rlba(v = np.array([1, 1]),
                            'A': A,
                            'b': b,
                            's': s,
+                           'ndt': ndt,
                            'delta_t': 0,
                            'max_t': max_t,
                            'n_samples': n_samples,
