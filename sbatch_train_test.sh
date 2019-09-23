@@ -10,6 +10,9 @@
 ##SBATCH -J nf_train_test
 #SBATCH -J lba_train_test
 
+# priority
+#SBATCH --account=bibs-frankmj-condo
+
 # output file
 ##SBATCH --output /users/afengler/batch_job_out/ddm_train_test_%A_%a.out
 ##SBATCH --output /users/afengler/batch_job_out/full_ddm_train_test_%A_%a.out

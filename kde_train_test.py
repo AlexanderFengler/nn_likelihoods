@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
     # PICK
     base_simulation_folder = '/users/afengler/data/kde/lba/base_simulations_20000/'
-    target_folder = '/users/afengler/data/tmp'
+    target_folder = '/users/afengler/data/tmp/'
     
     process_params = ['v_0', 'v_1', 'A', 'b', 's']
     files_ = pickle.load(open(base_simulation_folder + 'keep_files.pickle', 'rb'))
