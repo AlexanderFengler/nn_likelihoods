@@ -7,7 +7,8 @@ def rlba(v = np.array([1, 1]),
          b = 1.5, 
          s = 0.1,
          n_samples = 1000,
-         d_lower_lim = 0.1):
+         max_t = 20,
+         d_lower_lim = 0.01):
     
     rts = np.zeros((n_samples, 1))
     choices = np.zeros((n_samples, 1))
@@ -33,7 +34,7 @@ def rlba(v = np.array([1, 1]),
                            'b': b,
                            's': s,
                            'delta_t': 0,
-                           'max_t': 10000,
+                           'max_t': max_t,
                            'n_samples': n_samples,
                            'simulator': 'lba',
                            'boundary_fun_type': 'none',

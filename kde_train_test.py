@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
     # PICK
     base_simulation_folder = '/users/afengler/data/kde/lba/base_simulations_20000/'
-    target_folder = '/users/afengler/data/tmp/'
+    target_folder = '/users/afengler/data/kde/lba/train_test_data_20000'
     
     process_params = ['v_0', 'v_1', 'A', 'b', 's']
     files_ = pickle.load(open(base_simulation_folder + 'keep_files.pickle', 'rb'))
@@ -27,9 +27,9 @@ if __name__ == "__main__":
 
     kde_util.kde_from_simulations(base_simulation_folder = base_simulation_folder,
                                   target_folder = target_folder,
-                                  n_total = 100000,
+                                  n_total = 1000000,
                                   mixture_p = [0.8, 0.1, 0.1],
                                   process_params = process_params,
                                   print_info = False,
                                   files_ = files_,
-                                  p_files = 0.001)
+                                  p_files = 0.01)
