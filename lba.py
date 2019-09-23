@@ -6,14 +6,16 @@ def rlba(v = np.array([1, 1]),
          A = 1, 
          b = 1.5, 
          s = 0.1,
-         n_samples = 1000):
+         n_samples = 1000,
+         d_lower_lim = 0.1):
+    
     rts = np.zeros((n_samples, 1))
     choices = np.zeros((n_samples, 1))
     
     n_choices = len(v)
     for i in range(n_samples):
-        d = np.array([-0.1]*n_choices)
-        while np.max(d) < 0:
+        d = np.array([- 0.1] * n_choices)
+        while np.max(d) < d_lower_lim:
             k = np.random.uniform(low = 0, high = A, size = n_choices)
             d = np.random.normal(loc = v, scale = s)
             tmp_rt = (b - k) / d

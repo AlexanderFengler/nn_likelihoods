@@ -104,19 +104,26 @@ print('Starting to fit model.....')
 ckpt_filename = model_path + "model.h5"
 
 checkpoint = keras.callbacks.ModelCheckpoint(ckpt_filename, 
-             monitor = "val_loss", 
-             verbose = 1, 
-             save_best_only = False)
+                                             monitor = 'val_loss', 
+                                             verbose = 1, 
+                                             save_best_only = False)
                                
-earlystopping = keras.callbacks.EarlyStopping(monitor = "val_loss", 
+earlystopping = keras.callbacks.EarlyStopping(monitor = 'val_loss', 
                                               min_delta = 0, 
-                                              patience = 1)
+                                              verbose = 1, 
+                                              patience = 3)
+
+reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor = 'val_loss', 
+                                              factor = 0.1,
+                                              patience = 2, 
+                                              verbose = 1,
+                                              min_lr = 0.0000001)
 
 history = model.fit(X, y, 
                     validation_data = (X_val, y_val), 
                     epochs = dnn_params["n_epochs"],
                     batch_size = dnn_params["batch_size"], 
-                    callbacks = [checkpoint, earlystopping], 
+                    callbacks = [checkpoint, reduce_lr, earlystopping], 
                     verbose = 2)
 # ---------------------------------------------------------------------------
 

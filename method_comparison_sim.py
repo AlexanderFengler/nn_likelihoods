@@ -92,9 +92,7 @@ def generate_param_grid():
         boundary_param_grid = []
         
     return (param_grid, boundary_param_grid)
-
-               
-                        
+                     
 def generate_data_grid(param_grid, boundary_param_grid):
     data_grid = np.zeros((n_sims, n_data_samples, 2))
     for i in range(n_sims):
@@ -130,9 +128,6 @@ def generate_data_grid_lba(param_grid):
                                                n_samples = n_data_samples)
         data_grid[i] = np.concatenate([rts, choices], axis = 1)
     return data_grid
-
-   
-                                               
 
 param_grid, boundary_param_grid = generate_param_grid() 
 print('param_grid', param_grid[0])

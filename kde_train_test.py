@@ -20,7 +20,7 @@ if __name__ == "__main__":
     target_folder = '/users/afengler/data/kde/lba/train_test_data_20000/'
     
     process_params = ['v_0', 'v_1', 'A', 'b', 's']
-    files_ = pickle.load( open(base_simulation_folder + 'keep_files.pickle', 'rb'))
+    files_ = pickle.load(open(base_simulation_folder + 'keep_files.pickle', 'rb'))
 
     if not os.path.isdir(target_folder):
         os.mkdir(target_folder)

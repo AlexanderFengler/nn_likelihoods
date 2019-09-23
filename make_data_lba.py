@@ -23,7 +23,7 @@ import lba
 def gen_lba_features_kde_imit(v_range = [1, 2],
                               A_range = [0.1, 3],
                               b_range = [0, 1],
-                              s_range = 2,
+                              s_range = [0.1, 0.2],
                               n_choices = 2,
                               n_samples = 20000,
                               n_by_param = 1000,
@@ -98,7 +98,7 @@ def gen_lba_features_kde_imit(v_range = [1, 2],
 
 # Function that generates 'Labels' (ML parlance, here 'label' refers to a navarro-fuss likelihood computed for datapoint of the form (v,a,w,rt,c))
 # ----
-def gen_lba_labels(data = [1,1,0,1], eps = 10**(-29)):
+def gen_lba_labels(data = [1,1,0,1], eps = 1e-16):
     labels = np.zeros((data.shape[0],1))
     
     # extract v_s from data frame
@@ -110,7 +110,7 @@ def gen_lba_labels(data = [1,1,0,1], eps = 10**(-29)):
     # Generate labels
     for i in np.arange(0, labels.shape[0], 1):
         if data.loc[i, 'rt'] <= 0:
-            labels[i] = 0
+            labels[i] = np.log(eps)
         else:
             labels[i] = lba.dlba(rt = data.loc[i, 'rt'], 
                                  choice = data.loc[i, 'choice'],
@@ -118,6 +118,7 @@ def gen_lba_labels(data = [1,1,0,1], eps = 10**(-29)):
                                  A = data.loc[i, 'A'],
                                  b = data.loc[i, 'b'],
                                  s = data.loc[i, 's'],
+                                 return_log = True,
                                  eps = eps)
 
         if (i % 1000) == 0:

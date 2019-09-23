@@ -73,6 +73,7 @@ cdef float[:] draw_gaussian(int n):
 def ddm(float v = 0, # drift by timestep 'delta_t'
         float a = 1, # boundary separation
         float w = 0.5,  # between 0 and 1
+        float ndt = 0.0, # non-decision time
         float s = 1, # noise sigma
         float delta_t = 0.001, # timesteps fraction of seconds
         float max_t = 20, # maximum rt allowed
@@ -111,12 +112,13 @@ def ddm(float v = 0, # drift by timestep 'delta_t'
 
         # Note that for purposes of consistency with Navarro and Fuss, 
         # the choice corresponding the lower barrier is +1, higher barrier is -1
-        rts_view[n, 0] = t # store rt
+        rts_view[n, 0] = t + ndt # store rt
         choices_view[n, 0] = (-1) * sign(y) # store choice
         
     return (rts, choices, {'v': v,
                            'a': a,
                            'w': w,
+                           'ndt': ndt,
                            's': s,
                            'delta_t': delta_t,
                            'max_t': max_t,
@@ -131,6 +133,7 @@ def ddm(float v = 0, # drift by timestep 'delta_t'
 def ddm_flexbound(float v = 0,
                   float a = 1,
                   float w = 0.5,
+                  float ndt = 0.0,
                   float s = 1,
                   float delta_t = 0.001,
                   float max_t = 20,
@@ -190,12 +193,13 @@ def ddm_flexbound(float v = 0,
                 gaussian_values = draw_gaussian(num_draws)
                 m = 0
 
-        rts_view[n, 0] = t # Store rt
+        rts_view[n, 0] = t + ndt # Store rt
         choices_view[n, 0] = sign(y) # Store choice
 
     return (rts, choices,  {'v': v,
                             'a': a,
                             'w': w,
+                            'ndt': ndt,
                             's': s,
                             **boundary_params,
                             'delta_t': delta_t,
@@ -212,8 +216,10 @@ def ddm_flexbound(float v = 0,
 def full_ddm(float v = 0,
              float a = 1,
              float w = 0.5,
+             float ndt = 0.0,
              float dw = 0.05,
              float sdv = 0.1,
+             float dndt = 0.0,
              float s = 1,
              float delta_t = 0.001,
              float max_t = 20,
@@ -253,7 +259,7 @@ def full_ddm(float v = 0,
             if tmp > 0:
                 boundary_view[i] = tmp
     
-    cdef float y, t
+    cdef float y, t, ndt_tmp
     cdef int n, ix
     cdef int m = 0
     cdef float drift_increment = 0.0
@@ -266,6 +272,8 @@ def full_ddm(float v = 0,
         
         # get drift by random displacement of v 
         drift_increment = (v + sdv * gaussian_values[m]) * delta_t
+        ndt_tmp = ndt + (2 * (random_uniform() - 0.5) * dndt)
+        
         # apply uniform displacement on y
         y += 2 * (random_uniform() - 0.5) * dw
         
@@ -290,14 +298,16 @@ def full_ddm(float v = 0,
                 gaussian_values = draw_gaussian(num_draws)
                 m = 0
 
-        rts_view[n, 0] = t # Store rt
+        rts_view[n, 0] = t + ndt_tmp # Store rt
         choices_view[n, 0] = np.sign(y) # Store choice
 
     return (rts, choices,  {'v': v,
                             'a': a,
                             'w': w,
+                            'ndt': ndt,
                             'dw': dw,
                             'sdv': sdv,
+                            'dndt': dndt,
                             's': s,
                             **boundary_params,
                             'delta_t': delta_t,
@@ -316,6 +326,7 @@ def ornstein_uhlenbeck(float v = 0, # drift parameter
                        float a = 1, # initial boundary separation
                        float w = 0.5, # starting point bias
                        float g = 0.1, # decay parameter
+                       float ndt = 0.0,
                        float s = 1, # standard deviation
                        float delta_t = 0.001, # size of timestep
                        float max_t = 20, # maximal time in trial
@@ -387,6 +398,7 @@ def ornstein_uhlenbeck(float v = 0, # drift parameter
                            'a': a,
                            'w': w,
                            'g': g,
+                           'ndt': ndt,
                            's': s,
                            **boundary_params,
                            'delta_t': delta_t,
@@ -431,6 +443,7 @@ def test_check():
 def race_model(v = np.array([0, 0, 0], dtype = DTYPE), # np.array expected, one column of floats
                float a = 1, # initial boundary separation
                w = np.array([0, 0, 0], dtype = DTYPE), # np.array expected, one column of floats
+               ndt = np.array([0.0, 0.0, 0.0], dtype = DTYPE),
                s = np.array([1, 1, 1], dtype = DTYPE), # np.array expected, one column of floats
                float delta_t = 0.001, # time increment step
                float max_t = 20, # maximum rt allowed
@@ -499,19 +512,22 @@ def race_model(v = np.array([0, 0, 0], dtype = DTYPE), # np.array expected, one 
             t += delta_t
             ix += 1
 
-        rts_view[n, 0] = t
         choices_view[n, 0] = np.argmax(particles)
+        rts_view[n, 0] = t + ndt[choices_view[n, 0]]
 
     # Create some dics
     v_dict = {}
     w_dict = {}
+    ndt_dict = {}
     for i in range(n_particles):
         v_dict['v_' + str(i)] = v[i]
         w_dict['w_' + str(i)] = w[i]
+        ndt_dict['ndt_' + str(i)] = ndt[i]
 
     return (rts, choices, {**v_dict,
                            'a': a, 
                            **w_dict,
+                           **ndt_dict,
                            's': s,
                            **boundary_params,
                            'delta_t': delta_t,
@@ -528,6 +544,7 @@ def lca(v = np.array([0, 0, 0], dtype = DTYPE), # drift parameters (np.array exp
         w = np.array([0, 0, 0], dtype = DTYPE), # initial bias parameters (np.array expect: one column of floats)
         float g = 0, # decay parameter
         float b = 1, # inhibition parameter
+        ndt = np.array([0.0, 0.0, 0.0], dtype = DTYPE),
         float s = 1, # variance (can be one value or np.array of size as v and w)
         float delta_t = 0.001, # time-step size in simulator
         float max_t = 20, # maximal time
@@ -609,22 +626,25 @@ def lca(v = np.array([0, 0, 0], dtype = DTYPE), # drift parameters (np.array exp
             t += delta_t # increment time
             ix += 1 # increment boundary index
             
-            
-        rts_view[n, 0] = t # store reaction time for sample n
         choices_view[n, 0] = particles.argmax() # store choices for sample n
+        rts_view[n, 0] = t + ndt[choices_view[n, 0]] # store reaction time for sample n
         
     # Create some dics
     v_dict = {}
     w_dict = {}
+    ndt_dict = {}
+    
     for i in range(n_particles):
         v_dict['v_' + str(i)] = v[i]
         w_dict['w_' + str(i)] = w[i]
+        ndt_dict['ndt_' + str(i)] = ndt[i]
 
     return (rts, choices, {**v_dict,
                            'a': a,
                            **w_dict,
                            'g': g,
                            'b': b,
+                           **ndt_dict,
                            's': s,
                            **boundary_params,
                            'delta_t': delta_t,
