@@ -52,7 +52,7 @@ with open(network_path + 'biases.pickle', 'rb') as tmp_file:
 with open(network_path + 'activations.pickle', 'rb') as tmp_file:
     activations = pickle.load(tmp_file)
 # ----------------------------------------------------------------
-def target(params, data, ll_min = 1e-100, ndt = True):
+def target(params, data, ll_min = 1e-100, ndt = False):
     if ndt == False:
         params_rep = np.tile(params, (data.shape[0], 1))
         input_batch = np.concatenate([params_rep, data], axis = 1)
@@ -194,7 +194,7 @@ kde_results = np.array(p.map(kde_posterior, data_grid))
 
 # print("fcn finished!")
 
-pickle.dump((param_grid, data_grid, kde_results), open(output_folder + "kde_sim_test_ndt_{}.pickle".format(uuid.uuid1()), "wb"))
+pickle.dump((param_grid, data_grid, kde_results), open(output_folder + "kde_sim_test_confirm_{}.pickle".format(uuid.uuid1()), "wb"))
 
 # pickle.dump((param_grid, fcn_results), open(output_folder + "fcn_sim_random{}.pickle".format(part), "wb"))
 
