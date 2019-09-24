@@ -95,7 +95,7 @@ if __name__ == "__main__":
     v_sample = np.random.uniform(low = v[0], high = v[1], size = n_simulators)
     w_sample = np.random.uniform(low = w[0], high = w[1], size = n_simulators)
     a_sample = np.random.uniform(low = a[0], high = a[1], size = n_simulators)
-    ndt_sample = np.random.uniform(low = ndt[0], hight = ndt[1], size = n_simulators)
+    ndt_sample = np.random.uniform(low = ndt[0], high = ndt[1], size = n_simulators)
     # Ornstein 
 #     g_sample = np.random.uniform(low = g[0], high = g[1], size = n_simulators)
     
