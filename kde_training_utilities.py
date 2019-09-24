@@ -246,10 +246,15 @@ def kde_from_simulations(base_simulation_folder = '',
         # MIXTURE COMPONENT 3: Positive uniform part --------------------------------------
         choice_tmp = np.random.choice(tmp_sim_data[2]['possible_choices'],
                                       size = n_unif_up)
-
-        rt_tmp = np.random.uniform(low = 0.0001,
-                                   high = tmp_sim_data[2]['max_t'],
-                                   size = n_unif_up)
+        
+        if tmp_sim_data[2]['max_t'] < 100:
+            rt_tmp = np.random.uniform(low = 0.0001,
+                                       high = tmp_sim_data[2]['max_t'],
+                                       size = n_unif_up)
+        else:
+            rt_tmp = np.random.uniform(low = 0.0001, 
+                                       high = 100,
+                                       size = n_unif_up)
 
         data.iloc[(row_cnt + n_kde + n_unif_down):(row_cnt + n_samples_by_kde), my_columns.index('rt')] = rt_tmp
         data.iloc[(row_cnt + n_kde + n_unif_down):(row_cnt + n_samples_by_kde), my_columns.index('choice')] = choice_tmp
