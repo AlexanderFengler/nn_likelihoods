@@ -22,8 +22,8 @@ import keras_to_numpy as ktnp
 machine = 'ccv'
 method = 'ddm_ndt'
 n_data_samples = 2000
-n_slice_samples = 5000
-n_sims = 10
+n_slice_samples = 1000
+n_sims = 20
 n_cpus = 'all'
 
 stats = pickle.load(open("kde_stats.pickle", "rb"))
@@ -63,7 +63,7 @@ def target(params, data, ll_min = 1e-100, ndt = True): # CAREFUL ABOUT NDT HERE
         params_rep = np.tile(params[:-1], (data.shape[0], 1))
         data[:, 0] = data[:, 0] - params[-1]
         
-        if np.sum(data[:, 0] <= 0) > 0:
+        if np.sum(data[:, 0] <= 0) >= 1:
             return(- 1000 * data.shape[0])
         
         input_batch = np.concatenate([params_rep, data], axis = 1)
@@ -194,7 +194,7 @@ kde_results = np.array(p.map(kde_posterior, data_grid))
 
 # print("fcn finished!")
 
-pickle.dump((param_grid, data_grid, kde_results), open(output_folder + "kde_sim_test_confirm_{}.pickle".format(uuid.uuid1()), "wb"))
+pickle.dump((param_grid, data_grid, kde_results), open(output_folder + "kde_sim_test_ndt_{}.pickle".format(uuid.uuid1()), "wb"))
 
 # pickle.dump((param_grid, fcn_results), open(output_folder + "fcn_sim_random{}.pickle".format(part), "wb"))
 
