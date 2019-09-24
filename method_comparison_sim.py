@@ -63,7 +63,7 @@ def target(params, data, ll_min = 1e-29, ndt = True):
         data[0,:] = data[0,:] - params[-1]
         input_batch = np.concatenate([params_rep, data], axis = 1)
         out = ktnp.predict(input_batch, weights, biases, activations)
-        out[data[0, :] <= 0] = log(ll_min)
+        out[data[0, :] <= 0] = np.log(ll_min)
         return np.sum(out)
 
 def nf_target(params, data):
