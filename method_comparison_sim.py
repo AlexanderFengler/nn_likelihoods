@@ -52,7 +52,7 @@ with open(network_path + 'biases.pickle', 'rb') as tmp_file:
 with open(network_path + 'activations.pickle', 'rb') as tmp_file:
     activations = pickle.load(tmp_file)
 # ----------------------------------------------------------------
-def target(params, data, ll_min = 1e-29, ndt = True):
+def target(params, data, ll_min = 1e-100, ndt = True):
     if ndt == False:
         params_rep = np.tile(params, (data.shape[0], 1))
         input_batch = np.concatenate([params_rep, data], axis = 1)
