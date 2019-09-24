@@ -23,7 +23,7 @@ import boundary_functions as bf
 
 def data_generator(*args):
     # CHOOSE SIMULATOR HERE
-    simulator_data = ds.ddm(*args)
+    simulator_data = ds.ddm_flexbound(*args)
     
     # CHOOSE TARGET DIRECTORY HERE
     file_dir = '/users/afengler/data/kde/ddm/base_simulations_ndt_20000/'

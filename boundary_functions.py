@@ -6,7 +6,7 @@ import numpy as np
 
 # Collection of boundary functions
 
-# Constant: (additive and multiplicative)
+# Constant: (multiplicative)
 def constant(t = 0):
     return 1
 
