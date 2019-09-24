@@ -20,7 +20,7 @@ import keras_to_numpy as ktnp
 
 # INITIALIZATIONS -------------------------------------------------------------
 machine = 'ccv'
-method = 'ddm'
+method = 'ddm_ndt'
 n_data_samples = 2000
 n_slice_samples = 5000
 n_sims = 10
@@ -52,7 +52,7 @@ with open(network_path + 'biases.pickle', 'rb') as tmp_file:
 with open(network_path + 'activations.pickle', 'rb') as tmp_file:
     activations = pickle.load(tmp_file)
 # ----------------------------------------------------------------
-def target(params, data, ll_min = 1e-100, ndt = False):
+def target(params, data, ll_min = 1e-100, ndt = True): # CAREFUL ABOUT NDT HERE
     if ndt == False:
         params_rep = np.tile(params, (data.shape[0], 1))
         input_batch = np.concatenate([params_rep, data], axis = 1)
