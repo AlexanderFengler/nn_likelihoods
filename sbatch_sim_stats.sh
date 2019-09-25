@@ -9,7 +9,7 @@
 ##SBATCH -J lin_col_stats
 ##SBATCH -J full_ddm_sim_stats
 ##SBATCH -J weibull_sim_stats
-#@SBATCH -J lba_sim_stats
+#SBATCH -J lba_sim_stats
 
 # priority
 #SBATCH --account=bibs-frankmj-condo
