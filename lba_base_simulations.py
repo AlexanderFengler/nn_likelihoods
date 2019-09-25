@@ -14,14 +14,14 @@ import pickle
 import uuid
 
 # My own code
-from lba import rlba
+from clba import rlba
 
 def data_generator(*args):
     # CHOOSE SIMULATOR HERE
     simulator_data = rlba(*args)
     
     # CHOOSE TARGET DIRECTORY HERE
-    file_dir =  '/users/afengler/data/kde/lba/base_simulations_20000/'
+    file_dir =  '/users/afengler/data/kde/lba/base_simulations_ndt_20000/'
     
     # USE FOR x7 MACHINE 
     #file_dir = '/media/data_cifs/afengler/tmp/'
@@ -40,6 +40,7 @@ if __name__ == "__main__":
     b = [1.5, 3]
     v = [1, 2]
     s = [0.1, 0.2]
+    ndt = [0, 0.1]
     
     # Simulator parameters
     simulator = 'lba'
@@ -47,7 +48,7 @@ if __name__ == "__main__":
     n_samples = 20000
 
     # Number of simulators to run
-    n_simulators = 100000
+    n_simulators = 500000
 
     v_sample = []
     for i in range(n_simulators):
@@ -58,14 +59,16 @@ if __name__ == "__main__":
 
         v_sample.append(np.array(v_tmp, dtype = np.float32))
 
-    s_sample = np.random.uniform(low = s[0], high = s[1], size = n_simulators)
-    b_sample = np.random.uniform(low = b[0], high = b[1], size = n_simulators)
     A_sample = np.random.uniform(low = A[0], high = A[1], size = n_simulators)
+    b_sample = np.random.uniform(low = b[0], high = b[1], size = n_simulators)
+    s_sample = np.random.uniform(low = s[0], high = s[1], size = n_simulators)
+    ndt_sample = np.random.uniform(low = ndt[0], high = ndt[1], size = n_simulators)
+    
 
     args_list = []
     for i in range(n_simulators):
         # Get current set of parameters
-        process_params = (v_sample[i], A_sample[i], b_sample[i], s_sample[i])
+        process_params = (v_sample[i], A_sample[i], b_sample[i], s_sample[i], ndt_sample[i])
         sampler_params = (n_samples,)
         
         # Append argument list with current parameters

@@ -1,6 +1,6 @@
 import numpy as np
 import scipy as scp
-import ddm_data_simulation as ddm_data_simulator
+#import ddm_data_simulation as ddm_data_simulator
 import scipy.integrate as integrate
 
 from libc.math cimport sin, exp, sqrt, M_PI, fmax, fmin, log
