@@ -26,7 +26,7 @@ def data_generator(*args):
     simulator_data = ds.ddm_flexbound(*args)
     
     # CHOOSE TARGET DIRECTORY HERE
-    file_dir = '/users/afengler/data/kde/ddm/base_simulations_ndt_20000/'
+    file_dir = '/users/afengler/data/kde/angle/base_simulations_ndt_20000/'
     
     # USE FOR x7 MACHINE 
     #file_dir = '/media/data_cifs/afengler/tmp/'
@@ -47,13 +47,15 @@ if __name__ == "__main__":
 #     g = [-1.0, 1.0]
 #     b = [-1.0, 1.0]
     
-    
     # DDM
     v = [-2.0, 2.0]
     a = [0.5, 2.0]
     w = [0.3, 0.7]
     ndt = [0, 1]
     
+    # Bound - Angle
+    theta = [0, np.pi/2 - 0.2]
+
     # LCA
 #     v = [-2.0, 2.0]
 #     w = [0.3, 0.7]
@@ -84,8 +86,8 @@ if __name__ == "__main__":
     max_t = 40
     n_samples = 20000
     print_info = False
-    bound = bf.constant # CHOOSE BOUNDARY FUNCTION
-    boundary_multiplicative = True # CHOOSE WHETHER BOUNDARY IS MULTIPLICATIVE (W.R.T Starting separation) OR NOT
+    bound = bf.angle # CHOOSE BOUNDARY FUNCTION
+    boundary_multiplicative = False # CHOOSE WHETHER BOUNDARY IS MULTIPLICATIVE (W.R.T Starting separation) OR NOT
 
     # Number of simulators to run
     n_simulators = 500000
@@ -96,6 +98,10 @@ if __name__ == "__main__":
     w_sample = np.random.uniform(low = w[0], high = w[1], size = n_simulators)
     a_sample = np.random.uniform(low = a[0], high = a[1], size = n_simulators)
     ndt_sample = np.random.uniform(low = ndt[0], high = ndt[1], size = n_simulators)
+    
+    # BOUND - ANGLE
+    theta_sample = np.random.uniform(low = theta[0], high = theta[1], size = n_simulators) 
+    
     # Ornstein 
 #     g_sample = np.random.uniform(low = g[0], high = g[1], size = n_simulators)
     
@@ -114,7 +120,7 @@ if __name__ == "__main__":
 #     a_sample = np.random.uniform(low = a[0], high = a[1], size = n_simulators)
 #     g_sample = np.random.uniform(low = g[0], high = g[1], size = n_simulators)
 #     b_sample = np.random.uniform(low = b[0], high = b[1], size = n_simulators)
-    #s = np.array([1] * n_particles)
+#     s = np.array([1] * n_particles)
 
     # Full DDM
 #     dw_sample = np.random.uniform(low = dw[0], high = dw[1], size = n_simulators)
@@ -141,11 +147,11 @@ if __name__ == "__main__":
         # Get current set of parameters
         process_params = (v_sample[i], a_sample[i], w_sample[i], ndt_sample[i], s)
         sampler_params = (delta_t, max_t, n_samples, print_info, bound, boundary_multiplicative)
-        boundary_params = ({},)
-        #cnt = (i,)
+        # CHOOSE
+        boundary_params = ({'theta': theta_sample[i]},)
         
         # Append argument list with current parameters
-        args_tmp = process_params + sampler_params + boundary_params # + cnt
+        args_tmp = process_params + sampler_params + boundary_params
         args_list.append(args_tmp)
 
     # Parallel Loop

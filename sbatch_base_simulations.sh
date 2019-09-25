@@ -3,28 +3,17 @@
 # Default resources are 1 core with 2.8GB of memory per core.
 
 # job name:
-##SBATCH -J ornstein_base_sim
-##SBATCH -J ddm_base_sim
-#SBATCH -J ddm_ndt_b_s
-##SBATCH -J lin_col_sim
-##SBATCH -J full_ddm_base_sim
-##SBATCH -J weibull_base_sim
-##SBATCH -J lca
+#SBATCH -J angle_ndt_sim
+
 
 # priority
 #SBATCH --account=bibs-frankmj-condo
 
 # output file
-##SBATCH --output /users/afengler/batch_job_out/full_ddm_base_sim_%A_%a.out
-##SBATCH --output /users/afengler/batch_job_out/ddm_base_sim_%A_%a.out
-#SBATCH --output /users/afengler/batch_job_out/ddm_ndt_b_s_%A_%a.out
-##SBATCH --output /users/afengler/batch_job_out/lin_col_base_sim_%A_%a.out
-##SBATCH --output /users/afengler/batch_job_out/ornstein_base_sim_%A_%a.out
-##SBATCH --output /users/afengler/batch_job_out/weibull_base_sim_%A_%a.out
-##SBATCH --output /users/afengler/batch_job_out/lca_base_sim_%A_%a.out
+#SBATCH --output /users/afengler/batch_job_out/angle_ndt_sim_%A_%a.out
 
 # Request runtime, memory, cores:
-#SBATCH --time=20:00:00
+#SBATCH --time=24:00:00
 #SBATCH --mem=16G
 #SBATCH -c 14
 #SBATCH -N 1

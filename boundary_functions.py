@@ -18,6 +18,12 @@ def linear_collapse(t = 1,
         return (t - node) * (- np.sin(theta) / np.cos(theta))
     else:
         return 0
+    
+
+# Angle (additive)
+def angle(t = 1,
+          theta = 1):
+    return t * (- np.sin(theta) / np.cos(theta))
 
 # Weibull: (additive)
 def weibull_bnd(t = 1,
