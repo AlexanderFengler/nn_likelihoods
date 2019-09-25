@@ -22,7 +22,7 @@
 ##SBATCH --output /users/afengler/batch_job_out/ornstein_sim_stats_%A_%a.out
 ##SBATCH --output /users/afengler/batch_job_out/weibull_sim_stats_%A_%a.out
 ##SBATCH --output /users/afengler/batch_job_out/lin_col_sim_stats_%A_%a.out
-#SBATCH --output /users/afenler/batch_job_out/lba_ndt_sim_stats_%A_%a.out
+#SBATCH --output /users/afengler/batch_job_out/lba_ndt_sim_stats_%A_%a.out
 ##SBATCH --output /users/afengler/batch_job_out/lba_col_sim_stats_%A_%a.out
 
 # Request runtime, memory, cores:
