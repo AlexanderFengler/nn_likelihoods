@@ -19,6 +19,7 @@ if __name__ == "__main__":
     base_simulation_folder = '/users/afengler/data/kde/lba/base_simulations_20000/'
     target_folder = '/users/afengler/data/kde/lba/train_test_data_20000'
     
+    # LBA
     process_params = ['v_0', 'v_1', 'A', 'b', 's']
     files_ = pickle.load(open(base_simulation_folder + 'keep_files.pickle', 'rb'))
 

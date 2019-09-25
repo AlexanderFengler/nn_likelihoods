@@ -134,7 +134,8 @@ def filter_simulations(base_simulation_folder = '',
     assert len(np.unique(max_ts)) == 1
 
     # check that max_rt is <= max_t + 0.00001 (adding for rounding)
-    assert max(max_rts) <= np.unique(max_ts)[0] + 0.0001
+    # SKIPPING BECAUSE OF INCONSISTENCY PROBLEMS WITH NDT --
+    #assert max(max_rts) <= np.unique(max_ts)[0] + 0.0001
 
     # Now filtering
 
