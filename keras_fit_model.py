@@ -14,7 +14,7 @@ from kde_training_utilities import kde_load_data
 from kde_training_utilities import kde_make_train_test_split
 
 # CHOOSE ---------
-method = "lba_analytic" # ddm, linear_collapse, ornstein, full, lba
+method = "lba" # ddm, linear_collapse, ornstein, full, lba
 machine = 'x7'
 # ----------------
 
@@ -111,12 +111,13 @@ checkpoint = keras.callbacks.ModelCheckpoint(ckpt_filename,
 earlystopping = keras.callbacks.EarlyStopping(monitor = 'val_loss', 
                                               min_delta = 0, 
                                               verbose = 1, 
-                                              patience = 3)
+                                              patience = 2)
 
 reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor = 'val_loss', 
                                               factor = 0.1,
-                                              patience = 2, 
+                                              patience = 1, 
                                               verbose = 1,
+                                              min_delta = 0.0001,
                                               min_lr = 0.0000001)
 
 history = model.fit(X, y, 

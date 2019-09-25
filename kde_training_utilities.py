@@ -340,7 +340,7 @@ def kde_make_train_test_split(folder = '',
     return 'success'
 
 def kde_load_data(folder = '',
-                  return_log = False, # function expects log data so if log = false we take exponent
+                  return_log = False, # function expects log_likelihood data so if log = false we take exponent
                   prelog_cutoff = 1e-29 # either 'none' or number (like 1e-29)
                   ):
 
