@@ -24,7 +24,7 @@ import kde_training_utilities as kde_utils
 
 if __name__ == "__main__":
     # Specify base simulation folder
-    base_simulation_folder = '/users/afengler/data/kde/lba/base_simulations_20000/'
+    base_simulation_folder = '/users/afengler/data/kde/ddm/base_simulations_ndt_20000/'
     
     # PARAM RANGES: LINEAR COLLAPSE
     # ORNSTEIN UHLENBECK
@@ -36,13 +36,20 @@ if __name__ == "__main__":
 # #                     'node': [0, 5]
 #                     }
 
-    # LBA
-    param_ranges = {'v_0': [1, 2],
-                    'v_1': [1, 2],
-                    'A': [0, 1],
-                    'b':[1.5, 3],
-                    's':[0.1, 0.2]
-                    }
+#     # LBA
+#     param_ranges = {'v_0': [1, 2],
+#                     'v_1': [1, 2],
+#                     'A': [0, 1],
+#                     'b':[1.5, 3],
+#                     's':[0.1, 0.2]
+#                     }
+    
+    # DDM NDT
+    param_ranges = {'v': [-2.0, 2.0],
+                    'a': [0.5, 2],
+                    'w': [0.3, 0.7],
+                    'ndt': [0, 1]
+                   }
     
     # FILTERS: GENERAL
     filters = {'mode': 20, # != 

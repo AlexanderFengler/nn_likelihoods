@@ -66,7 +66,6 @@ cdef float[:] draw_gaussian(int n):
     return result
 
 # Simulate (rt, choice) tuples from: SIMPLE DDM -----------------------------------------------
-
 # Simplest algorithm
 @cython.boundscheck(False)
 @cython.wraparound(False) 
@@ -230,8 +229,8 @@ def full_ddm(float v = 0,
              boundary_params = {}
              ):
 
-    rts = np.zeros((n_samples, 1), dtype=DTYPE)
-    choices = np.zeros((n_samples, 1), dtype=np.intc)
+    rts = np.zeros((n_samples, 1), dtype = DTYPE)
+    choices = np.zeros((n_samples, 1), dtype = np.intc)
 
     cdef float[:, :] rts_view = rts
     cdef int[:, :] choices_view = choices
@@ -537,6 +536,8 @@ def race_model(v = np.array([0, 0, 0], dtype = DTYPE), # np.array expected, one 
                            'boundary_fun_type': boundary_fun.__name__,
                            'possible_choices': list(np.arange(0, n_particles, 1))})
 # -------------------------------------------------------------------------------------------------
+@cython.boundscheck(False)
+@cython.wraparound(False)
 
 # Simulate (rt, choice) tuples from: Leaky Competing Accumulator Model -----------------------------
 def lca(v = np.array([0, 0, 0], dtype = DTYPE), # drift parameters (np.array expect: one column of floats)
