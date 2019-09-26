@@ -45,14 +45,14 @@ if __name__ == "__main__":
 #                     }
     
     # LBA NDT
-    param_ranges = {'v_0': [1, 2],
-                    'v_1': [1, 2],
-                    'A': [0, 1],
-                    'b':[1.5, 3],
-                    's':[0.1, 0.2],
-                    'ndt':[0, 1]
-                    }
-    base_simulation_folder = '/users/afengler/data/kde/lba/base_simulations_ndt_20000/'
+#     param_ranges = {'v_0': [1, 2],
+#                     'v_1': [1, 2],
+#                     'A': [0, 1],
+#                     'b':[1.5, 3],
+#                     's':[0.1, 0.2],
+#                     'ndt':[0, 1]
+#                     }
+#     base_simulation_folder = '/users/afengler/data/kde/lba/base_simulations_ndt_20000/'
     
     # DDM NDT
 #     param_ranges = {'v': [-2.0, 2.0],
@@ -60,6 +60,15 @@ if __name__ == "__main__":
 #                     'w': [0.3, 0.7],
 #                     'ndt': [0, 1]
 #                    }
+    
+    # DDM ANGLE NDT
+    param_ranges = {'v': [-2.0, 2.0],
+                    'a': [0.5, 2],
+                    'w': [0.3, 0.7],
+                    'ndt': [0, 1],
+                    'theta': [0, np.pi/2 - 0.2]
+                    }   
+    base_simulation_folder = '/users/afengler/data/kde/angle/base_simulations_ndt_20000/'
     
     # FILTERS: GENERAL
     filters = {'mode': 20, # != 
