@@ -3,13 +3,13 @@
 # Default resources are 1 core with 2.8GB of memory per core.
 
 # job name:
-#SBATCH -J ddm_ndt_train_test
+#SBATCH -J angle_ndt_train_test
 
 # priority
 #SBATCH --account=bibs-frankmj-condo
 
 # output file
-#SBATCH --output /users/afengler/batch_job_out/ddm_ndt_train_test_%A_%a.out
+#SBATCH --output /users/afengler/batch_job_out/angle_ndt_train_test_%A_%a.out
 
 # Request runtime, memory, cores:
 #SBATCH --time=24:00:00
