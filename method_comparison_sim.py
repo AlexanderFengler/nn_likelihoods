@@ -22,7 +22,7 @@ import keras_to_numpy as ktnp
 machine = 'ccv'
 method = 'angle_ndt'
 n_data_samples = 2500
-n_slice_samples = 100
+n_slice_samples = 250
 n_sims = 10
 n_cpus = 'all'
 
@@ -126,7 +126,8 @@ def generate_data_grid(param_grid, boundary_param_grid):
                                                boundary_fun = method_params["boundary"], 
                                                n_samples = n_data_samples,
                                                delta_t = 0.01, 
-                                               boundary_params = boundary_dict_tmp)
+                                               boundary_params = boundary_dict_tmp,
+                                               boundary_multiplicative = method_params['boundary_multiplicative'])
         
         data_grid[i] = np.concatenate([rts, choices], axis = 1)
     return data_grid
@@ -155,6 +156,7 @@ if method[:3] == 'lba':
     data_grid = generate_data_grid_lba(param_grid) 
 else:   
     data_grid = generate_data_grid(param_grid, boundary_param_grid)
+    param_grid = np.concatenate([param_grid, boundary_param_grid], axis = 1)
 
 #print(data_grid)
 print('shape of data_grid:', data_grid.shape)

@@ -49,6 +49,7 @@ temp = {
     {
     "dgp": cd.ddm_flexbound,
     "boundary": bf.constant,
+    "boundary_multiplicative": True,
     "data_folder": "/users/afengler/data/kde/ddm/train_test_data_ndt_20000",
     "data_folder_x7": "/media/data_cifs/afengler/data/kde/ddm/train_test_data_ndt_20000",
 #     custom_objects: {"huber_loss": tf.losses.huber_loss}
@@ -69,6 +70,7 @@ temp = {
     {
     "dgp": cd.ddm_flexbound,
     "boundary": bf.constant,
+    "boundary_multiplicative": True,
     "data_folder": "/users/afengler/data/kde/ddm/train_test_data_20000",
 #     custom_objects: {"huber_loss": tf.losses.huber_loss}
 #     fcn_path: "/users/afengler/data/tony/kde/ddm/keras_models/\
@@ -86,6 +88,7 @@ temp = {
     {
     "dgp": cd.ddm_flexbound,
     "boundary": bf.angle,
+    "boundary_multiplicative": False,
     "data_folder": "/users/afengler/data/kde/angle/train_test_data_20000",
     "data_folder_x7": "/media/data_cifs/afengler/data/kde/angle/train_test_data_ndt_20000",
     "output_folder": "/users/afengler/data/kde/angle/method_comparison/",
@@ -103,6 +106,7 @@ temp = {
     {
     "dgp": cd.ornstein_uhlenbeck,
     "boundary": bf.constant,
+    "boundary_multiplicative": True,
     "data_folder": "/users/afengler/data/kde/ornstein_uhlenbeck/train_test_data_20000",
     "output_folder": "/users/afengler/data/kde/ornstein_uhlenbeck/method_comparison/",
     "output_folder_x7": "/media/data_cifs/afengler/data/kde/ornstein_uhlenbeck/method_comparison/",
@@ -116,6 +120,7 @@ temp = {
     {
     "dgp": cd.full_ddm,
     "boundary": bf.constant,
+    "boundary_multiplicative": True,
     "data_folder": "/users/afengler/data/kde/full_ddm/train_test_data_20000",
     "output_folder": "/users/afengler/data/kde/full_ddm/method_comparison/",
     "output_folder_x7": "/media/data_cifs/afengler/data/kde/full_ddm/method_comparison/",
@@ -129,6 +134,7 @@ temp = {
     {
     "dgp": cd.ddm_flexbound,
     "boundary": bf.constant,
+    "boundary_multiplicative": True,
     "data_folder": "/users/afengler/data/tony/kde/ddm/train_test_data_fcn",
     "output_folder": "/users/afengler/data/kde/ddm/method_comparison_fcn/",
     "output_folder_x7": "/media/data_cifs/afengler/data/kde/ddm/method_comparison_fcn/",
