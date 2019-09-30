@@ -181,7 +181,7 @@ def generate_data_grid_lba2(param_grid):
         params_tmp.append(np.array(param_grid[i][4])) 
         params_tmp.append(np.array(param_grid[i][5]))
         params_dict_tmp = dict(zip(param_names_tmp, params_tmp))
-        print(params_tmp)
+        print('params_dict: ', params_dict_tmp)
         # Generate data
         rts, choices, _ = method_params["dgp"](**params_dict_tmp,
                                                n_samples = n_data_samples)
