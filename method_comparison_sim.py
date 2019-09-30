@@ -26,8 +26,8 @@ n_slice_samples = 250
 n_sims = 10
 n_cpus = 'all'
 
-stats = pickle.load(open("kde_stats.pickle", "rb"))
-method_params = stats[method]
+#stats = pickle.load(open("kde_stats.pickle", "rb"))
+#method_params = stats[method]
 
 print(stats)
 print(method_params)
