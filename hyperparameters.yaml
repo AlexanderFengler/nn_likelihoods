@@ -9,4 +9,4 @@ model_type: "dnnregressor"
 optimizer: "adam"
 log: True
 loss: "huber"
-gpu_x7: '1'
+gpu_x7: '2'

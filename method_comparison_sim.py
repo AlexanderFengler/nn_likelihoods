@@ -20,10 +20,10 @@ import keras_to_numpy as ktnp
 
 # INITIALIZATIONS -------------------------------------------------------------
 machine = 'ccv'
-method = 'ddm_ndt'
-n_data_samples = 2000
-n_slice_samples = 1000
-n_sims = 20
+method = 'angle_ndt'
+n_data_samples = 2500
+n_slice_samples = 100
+n_sims = 10
 n_cpus = 'all'
 
 stats = pickle.load(open("kde_stats.pickle", "rb"))
@@ -52,23 +52,30 @@ with open(network_path + 'biases.pickle', 'rb') as tmp_file:
 with open(network_path + 'activations.pickle', 'rb') as tmp_file:
     activations = pickle.load(tmp_file)
 # ----------------------------------------------------------------
-def target(params, data, ll_min = 1e-100, ndt = True): # CAREFUL ABOUT NDT HERE
-    if ndt == False:
-        params_rep = np.tile(params, (data.shape[0], 1))
-        input_batch = np.concatenate([params_rep, data], axis = 1)
-        out = ktnp.predict(input_batch, weights, biases, activations)
-        return np.sum(out)
+# def target(params, data, ll_min = 1e-100, ndt = True): # CAREFUL ABOUT NDT HERE
+#     if ndt == False:
+#         params_rep = np.tile(params, (data.shape[0], 1))
+#         input_batch = np.concatenate([params_rep, data], axis = 1)
+#         out = ktnp.predict(input_batch, weights, biases, activations)
+#         return np.sum(out)
     
-    else:
-        params_rep = np.tile(params[:-1], (data.shape[0], 1))
-        data[:, 0] = data[:, 0] - params[-1]
+#     else:
+#         params_rep = np.tile(params[:-1], (data.shape[0], 1))
+#         data[:, 0] = data[:, 0] - params[-1]
         
-        if np.sum(data[:, 0] <= 0) >= 1:
-            return(- 1000 * data.shape[0])
+#         if np.sum(data[:, 0] <= 0) >= 1:
+#             return(- 1000 * data.shape[0])
         
-        input_batch = np.concatenate([params_rep, data], axis = 1)
-        out = ktnp.predict(input_batch, weights, biases, activations)
-        return np.sum(out)
+#         input_batch = np.concatenate([params_rep, data], axis = 1)
+#         out = ktnp.predict(input_batch, weights, biases, activations)
+#         return np.sum(out)
+    
+def target(params, data, likelihood_min = 1e-7): # CAREFUL ABOUT NDT HERE
+    ll_min = np.log(likelihood_min)
+    params_rep = np.tile(params, (data.shape[0], 1))
+    input_batch = np.concatenate([params_rep, data], axis = 1)
+    out = np.max(ktnp.predict(input_batch, weights, biases, activations), ll_min)
+    return np.sum(out)
 
 def nf_target(params, data):
     return np.log(batch_fptd(data[:, 0] * data[:, 1] * (-1), params[0],
@@ -126,7 +133,7 @@ def generate_data_grid(param_grid, boundary_param_grid):
 
 def generate_data_grid_lba(param_grid):
     data_grid = np.zeros((n_sims, n_data_samples, 2))
-    param_names_tmp = ['v', 'A', 'b', 's']
+    param_names_tmp = ['v', 'A', 'b', 's', 'ndt']
     for i in range(n_sims):
         params_tmp = []
         params_tmp.append(np.array(param_grid[i][:(len(param_grid[i]) - 3)]))
@@ -142,14 +149,15 @@ def generate_data_grid_lba(param_grid):
     return data_grid
 
 param_grid, boundary_param_grid = generate_param_grid() 
+
 print('param_grid', param_grid[0])
 if method[:3] == 'lba':
     data_grid = generate_data_grid_lba(param_grid) 
 else:   
     data_grid = generate_data_grid(param_grid, boundary_param_grid)
 
-print(data_grid)
-print(data_grid.shape)
+#print(data_grid)
+print('shape of data_grid:', data_grid.shape)
 # ----------------------------------------------------------------------------------------------------
 
 # RUN POSTERIOR SIMULATIONS --------------------------------------------------------------------------
@@ -160,7 +168,7 @@ def kde_posterior(data):
     model = SliceSampler(bounds = sampler_param_bounds, 
                          target = target, 
                          w = .4 / 1024, 
-                         p = 8)
+                         p = 10)
     model.sample(data, num_samples = n_slice_samples)
     return model.samples
 

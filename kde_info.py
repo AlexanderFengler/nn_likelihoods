@@ -22,8 +22,11 @@ temp = {
 "lba_ndt":{
         "dgp":clba.rlba,
         "data_folder": "/users/afengler/data/kde/lba/train_test_data_ndt_20000",
+        "data_folder_x7": "/media/data_cifs/afengler/data/kde/lba/train_test_data_ndt_20000",
         "output_folder": "/users/afengler/data/kde/lba/posterior_samples/",
         "output_folder_x7": "/media/data_cifs/afengler/data/kde/lba/posterior_samples/",
+        "model_folder": "/users/afengler/data/kde/lba/keras_models/",
+        "model_folder_x7": "/media/data_cifs/afengler/data/kde/lba/keras_models/",
         "param_names": ['v_0', 'v_1', 'A', 'b', 's', 'ndt'],
         "boundary_param_names": [],
         "param_bounds": [[1.0, 2.0], [1.0, 2.0], [0.0, 1.0], [1.5, 3.0], [0.1, 0.2], [0.0, 1.0]],
@@ -46,13 +49,16 @@ temp = {
     {
     "dgp": cd.ddm_flexbound,
     "boundary": bf.constant,
-    "data_folder": "/users/afengler/data/kde/ddm/train_test_data_20000",
+    "data_folder": "/users/afengler/data/kde/ddm/train_test_data_ndt_20000",
+    "data_folder_x7": "/media/data_cifs/afengler/data/kde/ddm/train_test_data_ndt_20000",
 #     custom_objects: {"huber_loss": tf.losses.huber_loss}
 #     fcn_path: "/users/afengler/data/tony/kde/ddm/keras_models/\
 # deep_inference08_12_19_11_15_06/model.h5"
 #    fcn_custom_objects: {"heteroscedastic_loss": tf.losses.huber_loss}
     "output_folder": "/users/afengler/data/kde/ddm/method_comparison/",
     "output_folder_x7": "/media/data_cifs/afengler/data/kde/ddm/method_comparison/",
+    "model_folder": "/users/afengler/data/kde/ddm/keras_models/",
+    "model_folder_x7": "/media/data_cifs/afengler/data/kde/ddm/keras_models/",
     "param_names": ['v', 'a', 'w', 'ndt'],
     "boundary_param_names": [],
     "param_bounds": [[-2.0, 2.0], [0.6, 1.5], [0.3, 0.7], [0.0, 1.0]],   
@@ -76,17 +82,20 @@ temp = {
     #"param_bounds": np.array([[-2, .6, .3], [2, 1.5, .7]]),
     "boundary_param_bounds": []
     },
-"linear_collapse":
+"angle_ndt":
     {
     "dgp": cd.ddm_flexbound,
-    "boundary": bf.linear_collapse,
-    "data_folder": "/users/afengler/data/kde/linear_collapse/train_test_data_20000",
-    "output_folder": "/users/afengler/data/kde/linear_collapse/method_comparison/",
-    "output_folder_x7": "/media/data_cifs/afengler/data/kde/linear_collapse/method_comparison/",
-    "param_names": ["v", "a", "w"],
-    "boundary_param_names": ["node", "theta"],
-    "param_bounds": [[-1.5, 1.5], [0.6, 1.5], [0.31, 0.69]],
-    "boundary_param_bounds": [[1, 2], [0, 1.2]]
+    "boundary": bf.angle,
+    "data_folder": "/users/afengler/data/kde/angle/train_test_data_20000",
+    "data_folder_x7": "/media/data_cifs/afengler/data/kde/angle/train_test_data_ndt_20000",
+    "output_folder": "/users/afengler/data/kde/angle/method_comparison/",
+    "output_folder_x7": "/media/data_cifs/afengler/data/kde/angle/method_comparison/",
+    "model_folder": "/users/afengler/data/kde/angle/keras_models/",
+    "model_folder_x7": "/media/data_cifs/afengler/data/kde/angle/keras_models/",
+    "param_names": ["v", "a", "w", "ndt"],
+    "boundary_param_names": ["theta"],
+    "param_bounds": [[-1.5, 1.5], [0.6, 1.5], [0.31, 0.69], [0, 1]],
+    "boundary_param_bounds": [[0, np.pi / 2 - .2]]
     #"param_bounds": np.array([[-2, .6, .3], [2, 1.5, .7]]),
     #"boundary_param_bounds": np.array([[1, 0], [2, 1.37]])
     },

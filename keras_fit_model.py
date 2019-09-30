@@ -14,7 +14,7 @@ from kde_training_utilities import kde_load_data
 from kde_training_utilities import kde_make_train_test_split
 
 # CHOOSE ---------
-method = "lba" # ddm, linear_collapse, ornstein, full, lba
+method = "angle_ndt" # ddm, linear_collapse, ornstein, full, lba
 machine = 'x7'
 # ----------------
 
@@ -60,7 +60,6 @@ X, y, X_val, y_val = kde_load_data(folder = data_folder,
 
 X = np.array(X)
 X_val = np.array(X_val)
-
 # --------------------------------------------------------------------------------
 
 # MAKE MODEL ---------------------------------------------------------------------
