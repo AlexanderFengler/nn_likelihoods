@@ -148,7 +148,7 @@ def generate_param_grid_lba2():
     else:
         boundary_param_grid = []
         
-    return (param_grid, boundary_param_grid)
+    return param_grid
                      
 def generate_data_grid(param_grid, boundary_param_grid):
     data_grid = np.zeros((n_sims, n_data_samples, 2))
