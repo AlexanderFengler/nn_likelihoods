@@ -74,7 +74,7 @@ def target(params, data, likelihood_min = 1e-7): # CAREFUL ABOUT NDT HERE
     ll_min = np.log(likelihood_min)
     params_rep = np.tile(params, (data.shape[0], 1))
     input_batch = np.concatenate([params_rep, data], axis = 1)
-    out = np.max(ktnp.predict(input_batch, weights, biases, activations), ll_min)
+    out = np.maximum(ktnp.predict(input_batch, weights, biases, activations), ll_min)
     return np.sum(out)
 
 def nf_target(params, data):
