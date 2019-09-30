@@ -33,10 +33,14 @@ print(stats)
 print(method_params)
 
 if machine == 'x7':
+    stats = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
+    method_params = stats[method]
     output_folder = method_params['output_folder_x7']
     with open("model_paths_x7.yaml") as tmp_file:
         network_path = yaml.load(tmp_file)[method]
 if machine == 'ccv':
+    stats = pickle.load(open("/users/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
+    method_params = stats[method]
     output_folder = method_params['output_folder']
     with open("model_paths.yaml") as tmp_file:
         network_path = yaml.load(tmp_file)[method]
