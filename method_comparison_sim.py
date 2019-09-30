@@ -139,7 +139,7 @@ def generate_param_grid_lba2():
     
     # Adjust v_1 so that we are unlikely to get not observations for either choice
     # Works only for two choices
-    param_grid[:, 1] = param_grid[:, 0] + param_grid[:, 4] * np.uniform(low = -2, high = 2, size = n_sims)
+    param_grid[:, 1] = param_grid[:, 0] + (param_grid[:, 4] * np.random.uniform(low = - 2.0, high = 2.0, size = n_sims))
 
     if len(method_params['boundary_param_names']) > 0:
         boundary_param_grid = np.random.uniform(low = boundary_param_lower_bnd,
