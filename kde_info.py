@@ -89,7 +89,7 @@ temp = {
     "dgp": cd.ddm_flexbound,
     "boundary": bf.angle,
     "boundary_multiplicative": False,
-    "data_folder": "/users/afengler/data/kde/angle/train_test_data_20000",
+    "data_folder": "/users/afengler/data/kde/angle/train_test_data_ndt_20000",
     "data_folder_x7": "/media/data_cifs/afengler/data/kde/angle/train_test_data_ndt_20000",
     "output_folder": "/users/afengler/data/kde/angle/method_comparison/",
     "output_folder_x7": "/media/data_cifs/afengler/data/kde/angle/method_comparison/",
