@@ -189,9 +189,6 @@ def generate_data_grid_lba2(param_grid):
     return data_grid
 
 
-
-
-print('param_grid', param_grid)
 if method[:3] == 'lba':
     param_grid = generate_param_grid_lba2()
     data_grid = generate_data_grid_lba2(param_grid) 
@@ -200,6 +197,7 @@ else:
     data_grid = generate_data_grid(param_grid, boundary_param_grid)
     param_grid = np.concatenate([param_grid, boundary_param_grid], axis = 1)
 
+print('param_grid: ', param_grid)
 #print(data_grid)
 print('shape of data_grid:', data_grid.shape)
 # ----------------------------------------------------------------------------------------------------
