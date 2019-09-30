@@ -29,9 +29,6 @@ n_cpus = 'all'
 #stats = pickle.load(open("kde_stats.pickle", "rb"))
 #method_params = stats[method]
 
-print(stats)
-print(method_params)
-
 if machine == 'x7':
     stats = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
     method_params = stats[method]
@@ -44,6 +41,9 @@ if machine == 'ccv':
     output_folder = method_params['output_folder']
     with open("model_paths.yaml") as tmp_file:
         network_path = yaml.load(tmp_file)[method]
+        
+print(stats)
+print(method_params)
 
 # model = keras.models.load_model(network_path, custom_objects=custom_objects)
 # fcn = keras.models.load_model(fcn_path, custom_objects=fcn_custom_objects)
