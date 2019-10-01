@@ -1,4 +1,6 @@
 ddm: /media/data_cifs/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_08_08_19_23_37_48/
+ddm_ndt: /media/data_cifs/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_ndt_09_27_19_19_02_40/
+angle_ndt: /media/data_cifs/afengler/data/kde/angle/keras_models/dnnregressor_angle_ndt_09_28_19_18_05_42/
 full: /media/data_cifs/afengler/data/kde/full_ddm/keras_models/dnnregressor_full_08_17_19_16_27_27/
 lba: /media/data_cifs/afengler/data/kde/lba/keras_models/dnnregressor_analytic_lba_08_21_19_12_01_09/
 linear_collapse: /media/data_cifs/afengler/data/kde/linear_collapse/keras_models/dnnregressor_ddm_08_08_19_19_05_39/

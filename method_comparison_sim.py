@@ -20,9 +20,9 @@ import keras_to_numpy as ktnp
 
 # INITIALIZATIONS -------------------------------------------------------------
 machine = 'ccv'
-method = 'lba_ndt'
+method = 'ddm_ndt'
 n_data_samples = 2500
-n_slice_samples = 5000
+n_slice_samples = 100
 n_sims = 10
 n_cpus = 'all'
 
