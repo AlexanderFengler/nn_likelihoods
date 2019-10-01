@@ -5,3 +5,4 @@ full: /media/data_cifs/afengler/data/kde/full_ddm/keras_models/dnnregressor_full
 lba: /media/data_cifs/afengler/data/kde/lba/keras_models/dnnregressor_analytic_lba_08_21_19_12_01_09/
 linear_collapse: /media/data_cifs/afengler/data/kde/linear_collapse/keras_models/dnnregressor_ddm_08_08_19_19_05_39/
 ornstein: /media/data_cifs/afengler/data/kde/ornstein_uhlenbeck/keras_models/dnnregressor_ornstein_08_15_19_16_36_05/
+ddm_ndt: /media/data_cifs/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_ndt_09_27_19_19_02_40/

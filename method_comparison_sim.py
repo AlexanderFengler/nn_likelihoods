@@ -82,7 +82,7 @@ def target(params, data, likelihood_min = 1e-7): # CAREFUL ABOUT NDT HERE
     return np.sum(out)
 
 def nf_target(params, data):
-    return np.log(batch_fptd(data[:, 0] * data[:, 1] * (-1), params[0],
+    return np.log(batch_fptd(data[:, 0] * data[:, 1] * (- 1), params[0],
          params[1] * 2, params[2])).sum()
 
 # MAKE PARAMETER / DATA GRID -------------------------------------------------------------------------
@@ -195,7 +195,8 @@ if method[:3] == 'lba':
 else:   
     param_grid, boundary_param_grid = generate_param_grid() 
     data_grid = generate_data_grid(param_grid, boundary_param_grid)
-    param_grid = np.concatenate([param_grid, boundary_param_grid], axis = 1)
+    if len(method_params['boundary_param_names']) > 0:
+        param_grid = np.concatenate([param_grid, boundary_param_grid], axis = 1)
 
 print('param_grid: ', param_grid)
 #print(data_grid)
