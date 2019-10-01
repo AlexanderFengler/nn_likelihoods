@@ -3,7 +3,7 @@
 # Default resources are 1 core with 2.8GB of memory per core.
 
 # job name:
-#SBATCH -J method_comparison
+#SBATCH -J mc_ddm_ndt
 
 # priority
 #SBATCH --account=bibs-frankmj-condo
@@ -17,7 +17,7 @@
 #SBATCH -c 7
 #SBATCH -N 1
 ##SBATCH -p gpu --gres=gpu:1
-#SBATCH --array=1-1
+#SBATCH --array=1-50
 
 # Run a command
 #source /users/afengler/miniconda3/etc/profile.d/conda.sh
