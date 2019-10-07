@@ -241,7 +241,7 @@ else:
 #     print(i)
 
 # !!!!!!!!
-kde_results = np.array(p.map(kde_posterior, zip(data_grid, param_grid))
+kde_results = np.array(p.map(kde_posterior, zip(data_grid, param_grid)))
 
 #print(target([0, 1.5, 0.5], data_grid[0]))
 # import ipdb; ipdb.set_trace()
@@ -256,7 +256,6 @@ kde_results = np.array(p.map(kde_posterior, zip(data_grid, param_grid))
 
 # print("fcn finished!")
 
-# !!!!!!!!!
 pickle.dump((param_grid, data_grid, kde_results), 
             open(output_folder + "kde_sim_test_ndt" + file_signature + "{}.pickle".format(uuid.uuid1()), "wb"))
 
