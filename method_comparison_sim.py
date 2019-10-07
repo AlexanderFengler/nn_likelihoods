@@ -20,11 +20,13 @@ import keras_to_numpy as ktnp
 
 # INITIALIZATIONS -------------------------------------------------------------
 machine = 'ccv'
-method = 'ddm_ndt'
+method = 'lba_ndt'
+file_signature = '_param_sp_restr_'
 n_data_samples = 2500
-n_slice_samples = 5000
+n_slice_samples = 100
 n_sims = 10
 n_cpus = 'all'
+
 
 #stats = pickle.load(open("kde_stats.pickle", "rb"))
 #method_params = stats[method]
@@ -125,8 +127,8 @@ def generate_param_grid_lba2():
     boundary_param_lower_bnd = []
 
     for p in range(len(method_params['param_names'])):
-        param_upper_bnd.append(method_params['param_bounds'][p][1])
-        param_lower_bnd.append(method_params['param_bounds'][p][0])
+        param_upper_bnd.append(method_params['param_bounds_sampler'][p][1])
+        param_lower_bnd.append(method_params['param_bounds_sampler'][p][0])
 
     if len(method_params['boundary_param_names']) > 0:
         for p in range(len(method_params['boundary_param_names'])):
@@ -245,7 +247,8 @@ kde_results = np.array(p.map(kde_posterior, data_grid))
 
 # print("fcn finished!")
 
-pickle.dump((param_grid, data_grid, kde_results), open(output_folder + "kde_sim_test_ndt_{}.pickle".format(uuid.uuid1()), "wb"))
+pickle.dump((param_grid, data_grid, kde_results), 
+            open(output_folder + "kde_sim_test_ndt" + "file_signature" + "{}.pickle".format(uuid.uuid1()), "wb"))
 
 # pickle.dump((param_grid, fcn_results), open(output_folder + "fcn_sim_random{}.pickle".format(part), "wb"))
 
