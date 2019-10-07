@@ -21,9 +21,9 @@ import keras_to_numpy as ktnp
 # INITIALIZATIONS -------------------------------------------------------------
 machine = 'ccv'
 method = 'lba_ndt'
-file_signature = '_param_sp_restr_mini_'
+file_signature = '_start_true_'
 n_data_samples = 2500
-n_slice_samples = 100
+n_slice_samples = 10000
 n_sims = 10
 n_cpus = 'all'
 
@@ -240,7 +240,6 @@ else:
 # for i in zip(data_grid, param_grid):
 #     print(i)
 
-# !!!!!!!!
 kde_results = np.array(p.map(kde_posterior, zip(data_grid, param_grid)))
 
 #print(target([0, 1.5, 0.5], data_grid[0]))

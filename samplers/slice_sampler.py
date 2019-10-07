@@ -154,7 +154,7 @@ class SliceSampler:
             self.lp = np.zeros(num_samples) # sample log likelihoods
 
             # Random initialization of starting points
-            if init == 'random':
+            if init[0] == 'r':
                 tmp = np.zeros(self.dims)
                 for dim in range(self.dims):
                     tmp[dim] = np.random.uniform(self.bounds[dim][0], self.bounds[dim][1])    
