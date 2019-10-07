@@ -21,10 +21,10 @@ import keras_to_numpy as ktnp
 # INITIALIZATIONS -------------------------------------------------------------
 machine = 'ccv'
 method = 'lba_ndt'
-file_signature = '_param_sp_restr_'
-n_data_samples = 100
-n_slice_samples = 10000
-n_sims = 5
+file_signature = '_param_sp_restr_mini_'
+n_data_samples = 2500
+n_slice_samples = 100
+n_sims = 10
 n_cpus = 'all'
 
 
@@ -212,12 +212,12 @@ if method[:3] == 'lba':
 else:
     sampler_param_bounds = np.array(method_params["param_bounds_sampler"] + method_params["boundary_param_bounds"])
 
-def kde_posterior(data, param_grid):
+def kde_posterior(args): # args = (data, true_params)
     model = SliceSampler(bounds = sampler_param_bounds, 
                          target = target, 
                          w = .4 / 1024, 
                          p = 8)
-    model.sample(data, num_samples = n_slice_samples)
+    model.sample(args[0], num_samples = n_slice_samples, init = args[1])
     return model.samples
 
 #test navarro-fuss
@@ -237,11 +237,11 @@ else:
 
 
 # TMP
-for i in zip(data_grid, param_grid):
-    print(i)
+# for i in zip(data_grid, param_grid):
+#     print(i)
 
 # !!!!!!!!
-#kde_results = np.array(p.map(kde_posterior, data_grid, param_grid))
+kde_results = np.array(p.map(kde_posterior, zip(data_grid, param_grid))
 
 #print(target([0, 1.5, 0.5], data_grid[0]))
 # import ipdb; ipdb.set_trace()
@@ -257,8 +257,8 @@ for i in zip(data_grid, param_grid):
 # print("fcn finished!")
 
 # !!!!!!!!!
-# pickle.dump((param_grid, data_grid, kde_results), 
-#             open(output_folder + "kde_sim_test_ndt" + file_signature + "{}.pickle".format(uuid.uuid1()), "wb"))
+pickle.dump((param_grid, data_grid, kde_results), 
+            open(output_folder + "kde_sim_test_ndt" + file_signature + "{}.pickle".format(uuid.uuid1()), "wb"))
 
 # pickle.dump((param_grid, fcn_results), open(output_folder + "fcn_sim_random{}.pickle".format(part), "wb"))
 
