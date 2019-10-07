@@ -207,7 +207,10 @@ print('shape of data_grid:', data_grid.shape)
 
 # RUN POSTERIOR SIMULATIONS --------------------------------------------------------------------------
 
-sampler_param_bounds = np.array(method_params["param_bounds"] + method_params["boundary_param_bounds"])
+if method[:3] == 'lba':
+    sampler_param_bounds = np.array(method_params["param_bounds_sampler"] + method_params["boundary_param_bounds"])
+else:
+    sampler_param_bounds = np.array(method_params["param_bounds_sampler"] + method_params["boundary_param_bounds"])
 
 def kde_posterior(data):
     model = SliceSampler(bounds = sampler_param_bounds, 
