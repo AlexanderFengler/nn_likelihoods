@@ -22,9 +22,9 @@ import keras_to_numpy as ktnp
 machine = 'ccv'
 method = 'lba_ndt'
 file_signature = '_param_sp_restr_'
-n_data_samples = 2500
-n_slice_samples = 100
-n_sims = 10
+n_data_samples = 100
+n_slice_samples = 10000
+n_sims = 5
 n_cpus = 'all'
 
 
@@ -76,7 +76,7 @@ with open(network_path + 'activations.pickle', 'rb') as tmp_file:
 #         out = ktnp.predict(input_batch, weights, biases, activations)
 #         return np.sum(out)
     
-def target(params, data, likelihood_min = 1e-7): # CAREFUL ABOUT NDT HERE
+def target(params, data, likelihood_min = 1e-7): 
     ll_min = np.log(likelihood_min)
     params_rep = np.tile(params, (data.shape[0], 1))
     input_batch = np.concatenate([params_rep, data], axis = 1)
@@ -212,11 +212,11 @@ if method[:3] == 'lba':
 else:
     sampler_param_bounds = np.array(method_params["param_bounds_sampler"] + method_params["boundary_param_bounds"])
 
-def kde_posterior(data):
+def kde_posterior(data, param_grid):
     model = SliceSampler(bounds = sampler_param_bounds, 
                          target = target, 
                          w = .4 / 1024, 
-                         p = 10)
+                         p = 8)
     model.sample(data, num_samples = n_slice_samples)
     return model.samples
 
@@ -235,7 +235,13 @@ if n_cpus == 'all':
 else: 
     p = mp.Pool(n_cpus)
 
-kde_results = np.array(p.map(kde_posterior, data_grid))
+
+# TMP
+for i in zip(data_grid, param_grid):
+    print(i)
+
+# !!!!!!!!
+#kde_results = np.array(p.map(kde_posterior, data_grid, param_grid))
 
 #print(target([0, 1.5, 0.5], data_grid[0]))
 # import ipdb; ipdb.set_trace()
@@ -250,8 +256,9 @@ kde_results = np.array(p.map(kde_posterior, data_grid))
 
 # print("fcn finished!")
 
-pickle.dump((param_grid, data_grid, kde_results), 
-            open(output_folder + "kde_sim_test_ndt" + "file_signature" + "{}.pickle".format(uuid.uuid1()), "wb"))
+# !!!!!!!!!
+# pickle.dump((param_grid, data_grid, kde_results), 
+#             open(output_folder + "kde_sim_test_ndt" + file_signature + "{}.pickle".format(uuid.uuid1()), "wb"))
 
 # pickle.dump((param_grid, fcn_results), open(output_folder + "fcn_sim_random{}.pickle".format(part), "wb"))
 

@@ -146,9 +146,11 @@ def dlba(rt = 0.5,
          A = 1,
          b = 1.5,
          s = 0.1,
+         ndt = 0.0,
          return_log = True,
          eps = 1e-16):
     
+    rt = rt - ndt # adjusting rt values for non-decision time
     n_choices = len(v)
     l_f_t = 0
     
@@ -169,7 +171,8 @@ def dlba(rt = 0.5,
                 else:
                     l_f_t += np.log(1.0 - tmp)
     else:
-        l_f_t += (np.log(eps) * n_choices)
+        # l_f_t += (np.log(eps) * n_choices) # n_choices seems wrong here
+        l_f_t += np.log(eps)
             
     if return_log: 
         return l_f_t
