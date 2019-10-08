@@ -235,12 +235,12 @@ def kde_posterior(args): # args = (data, true_params)
     return model.samples
 
 #test navarro-fuss
-def nf_posterior(data):
+def nf_posterior(args):
     model = SliceSampler(bounds = sampler_param_bounds,
                          target = nf_target, 
                          w = .4 / 1024, 
                          p = 8)
-    model.sample(data, num_samples = n_slice_samples)
+    model.sample(args[0], num_samples = n_slice_samples, init = args[1])
     return model.samples
 
 def lba_posterior(args):
