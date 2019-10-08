@@ -21,12 +21,12 @@ import keras_to_numpy as ktnp
 # INITIALIZATIONS -------------------------------------------------------------
 machine = 'ccv'
 method = 'lba_analytic'
+analytic = True
 file_signature = '_start_true_'
 n_data_samples = 2500
 n_slice_samples = 10000
 n_sims = 10
 n_cpus = 'all'
-
 
 #stats = pickle.load(open("kde_stats.pickle", "rb"))
 #method_params = stats[method]
@@ -51,12 +51,13 @@ print(method_params)
 # fcn = keras.models.load_model(fcn_path, custom_objects=fcn_custom_objects)
 
 # Load weights, biases and activations of current network --------
-with open(network_path + "weights.pickle", "rb") as tmp_file:
-    weights = pickle.load(tmp_file)
-with open(network_path + 'biases.pickle', 'rb') as tmp_file:
-    biases = pickle.load(tmp_file)
-with open(network_path + 'activations.pickle', 'rb') as tmp_file:
-    activations = pickle.load(tmp_file)
+if analytic == False:
+    with open(network_path + "weights.pickle", "rb") as tmp_file:
+        weights = pickle.load(tmp_file)
+    with open(network_path + 'biases.pickle', 'rb') as tmp_file:
+        biases = pickle.load(tmp_file)
+    with open(network_path + 'activations.pickle', 'rb') as tmp_file:
+        activations = pickle.load(tmp_file)
 # ----------------------------------------------------------------
 # def target(params, data, ll_min = 1e-100, ndt = True): # CAREFUL ABOUT NDT HERE
 #     if ndt == False:
