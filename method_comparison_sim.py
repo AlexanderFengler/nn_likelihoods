@@ -13,6 +13,7 @@ import boundary_functions as bf
 import multiprocessing as mp
 import cddm_data_simulation as cd
 from cdwiener import batch_fptd
+import clba
 #from np_network import np_predict
 #from kde_info import KDEStats
 
@@ -89,12 +90,13 @@ def nf_target(params, data):
          params[1] * 2, params[2])).sum()
 
 def lba_target(params, data):
-    return clba.batch_dlba2(rt = data[:,0], 
+    return clba.batch_dlba2(rt = data[:, 0], 
                             choice = data[:, 1], 
                             v = params[:2],
                             A = params[2], 
                             b = params[3], 
-                            s = params[4])
+                            s = params[4],
+                            ndt = params[5])
 
 # MAKE PARAMETER / DATA GRID -------------------------------------------------------------------------
 
