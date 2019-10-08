@@ -11,12 +11,13 @@ temp = {
         "data_folder": "/users/afengler/data/kde/lba/train_test_data_20000",
         "data_folder_x7": "/media/data_cifs/afengler/data/kde/lba/train_test_data_20000",
         "output_folder": "/users/afengler/data/kde/lba/posterior_samples/",
-        "output_folder_x7": "/media/data_cifs/afengler/data/kde/lba/posterior_samples/",
+        "output_folder_x7": "/media/data_cifs/afengler/data/kde/lba/method_comparison/",
         "model_folder": "/users/afengler/data/kde/lba/keras_models/",
         "model_folder_x7": "/media/data_cifs/afengler/data/kde/lba/keras_models/",
         "param_names": ['v_0', 'v_1', 'A', 'b', 's'],
         "boundary_param_names": [],
         "param_bounds": [[1.0, 2.0], [1.0, 2.0], [0.0, 1.0], [1.5, 3.0], [0.1, 0.2]],
+        "param_bounds_sampler": [[1.25, 1.75], [1.25, 1.75], [0.2, 0.8], [1.75, 2.75], [0.11, 0.19], [0.1, 0.9]], 
         "boundary_param_bounds": []
        },
 "lba_ndt":{
@@ -44,6 +45,7 @@ temp = {
         "param_names": ['v_0', 'v_1', 'A', 'b', 's'],
         "boundary_param_names": [],
         "param_bounds": [[1.0, 2.0], [1.0, 2.0], [0.0, 1.0], [1.5, 3.0], [0.1, 0.2]],
+        "param_bounds_sampler": [[1.25, 1.75], [1.25, 1.75], [0.2, 0.8], [1.75, 2.75], [0.11, 0.19], [0.1, 0.9]], 
         "boundary_param_bounds": []
        },
 "ddm_ndt":

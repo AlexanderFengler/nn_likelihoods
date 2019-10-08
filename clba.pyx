@@ -139,7 +139,30 @@ def rlba(v = np.array([1, 1], dtype = DTYPE),
                            'possible_choices': [i for i in range(n_choices)]})
 
 
-# Function computes probability of choice at rt provided parameters for all options
+#Function computes probability of choice at rt provided parameters for all options
+def batch_dlba2(rt = np.array([1,2,3]),
+                choice = np.array([0, 1, 0]),
+                v = np.array([1, 1]),
+                A = 1,
+                b = 1.5,
+                s = 0.1,
+                ndt = 0.0,
+                return_log = True,
+                eps = 1e-16):
+    log_eps = np.log(eps)
+    rt_higher_zero  = rt - ndt > 0
+    zeros = len(rt) - np.sum(rt_higher_zero)
+    rt = rt[rt_higher_zero] - ndt
+    tmp = np.zeros((2, len(rt), 2))
+    tmp[0, :, 0] = np.log(flba(rt = rt, A = A, b = b, v = v[0], s = s))
+    tmp[0, :, 1] = np.log(flba(rt = rt, A = A, b = b, v = v[1], s = s))
+    tmp[1, :, 0] = np.log(1 - Flba(rt = rt, A = A, b = b, v = v[1], s = s))
+    tmp[1, :, 1] = np.log(1 - Flba(rt = rt, A = A, b = b, v = v[0], s = s))
+    tmp[tmp < log_eps] = log_eps
+    tmp = tmp[0, :, :] + tmp [1, :, :]
+    return np.sum(tmp[choice[rt_higher_zero] == 0, 0]) + np.sum(tmp[choice[rt_higher_zero] == 1, 1]) + (log_eps * zeros)
+
+
 def dlba(rt = 0.5, 
          choice = 0,
          v = np.array([1, 1]),
@@ -186,8 +209,10 @@ def Flba(rt = 0.5,
          b = 1.5,
          s = 0.1):
     return (1 + ((1 / A) * ((b - A - (rt * v)) * norm.cdf((b - A - (rt * v)) / (rt * s)) - \
-        (b - (rt * v)) * norm.cdf((b - (rt * v)) / (rt * s)) + \
-                    (rt * s) * (norm.pdf((b - A - (rt * v)) / (rt * s)) - norm.pdf((b - (rt * v)) / (rt * s))))))
+           (b - (rt * v)) * norm.cdf((b - (rt * v)) / (rt * s)) + \
+           (rt * s) * (norm.pdf((b - A - (rt * v)) / (rt * s)) - norm.pdf((b - (rt * v)) / (rt * s))))))
+
+
 
 # Function computes pdf of a given lba ray
 def flba(rt = 0.5, 
@@ -199,3 +224,12 @@ def flba(rt = 0.5,
                      s * norm.pdf((b - A - (rt * v)) / (rt * s)) + \
                      v * norm.cdf((b - (rt * v)) / (rt * s)) + \
                      (-s) * norm.pdf((b - (rt * v)) / (rt * s)) ))
+
+# def Flba_batch(rt = [0.5, 1],
+#                v = 1,
+#                A = 1, 
+#                b = 1.5,
+#                s = 0.1):
+#     return (1 + ((1 / A) * ((b - A - (rt * v)) * norm.cdf((b - A - (rt * v)) / (rt * s)) - \
+#         (b - (rt * v)) * norm.cdf((b - (rt * v)) / (rt * s)) + \
+#                     (rt * s) * (norm.pdf((b - A - (rt * v)) / (rt * s)) - norm.pdf((b - (rt * v)) / (rt * s))))))

@@ -20,7 +20,7 @@ import keras_to_numpy as ktnp
 
 # INITIALIZATIONS -------------------------------------------------------------
 machine = 'ccv'
-method = 'lba_ndt'
+method = 'lba_analytic'
 file_signature = '_start_true_'
 n_data_samples = 2500
 n_slice_samples = 10000
@@ -86,6 +86,14 @@ def target(params, data, likelihood_min = 1e-7):
 def nf_target(params, data):
     return np.log(batch_fptd(data[:, 0] * data[:, 1] * (- 1), params[0],
          params[1] * 2, params[2])).sum()
+
+def lba_target(params, data):
+    return clba.batch_dlba2(rt = data[:,0], 
+                            choice = data[:, 1], 
+                            v = params[:2],
+                            A = params[2], 
+                            b = params[3], 
+                            s = params[4])
 
 # MAKE PARAMETER / DATA GRID -------------------------------------------------------------------------
 
@@ -229,6 +237,14 @@ def nf_posterior(data):
     model.sample(data, num_samples = n_slice_samples)
     return model.samples
 
+def lba_posterior(args):
+    model = SliceSampler(bounds = sampler_param_bounds,
+                         target = lba_target,
+                         w = .4 / 1024,
+                         p = 8)
+    model.sample(args[0], num_samples = n_slice_samples, init = args[1])
+    return model.samples
+
 if n_cpus == 'all':
     p = mp.Pool(mp.cpu_count())
     
@@ -240,7 +256,12 @@ else:
 # for i in zip(data_grid, param_grid):
 #     print(i)
 
-kde_results = np.array(p.map(kde_posterior, zip(data_grid, param_grid)))
+if method == 'lba_analytic':
+    kde_results = np.array(p.map(lba_posterior, zip(data_grid, param_grid)))
+if method == 'ddm_analytic':
+    kde_results = np.array(p.map(nf_posterior, zip(data_grid, param_grid)))
+else:
+    kde_results = np.array(p.map(kde_posterior, zip(data_grid, param_grid)))
 
 #print(target([0, 1.5, 0.5], data_grid[0]))
 # import ipdb; ipdb.set_trace()
