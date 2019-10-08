@@ -21,11 +21,11 @@ import keras_to_numpy as ktnp
 
 # INITIALIZATIONS -------------------------------------------------------------
 machine = 'ccv'
-method = 'lba_analytic'
+method = 'ddm_analytic'
 analytic = True
 file_signature = '_start_true_'
 n_data_samples = 2500
-n_slice_samples = 10000
+n_slice_samples = 100
 n_sims = 10
 n_cpus = 'all'
 
@@ -85,9 +85,12 @@ def target(params, data, likelihood_min = 1e-7):
     out = np.maximum(ktnp.predict(input_batch, weights, biases, activations), ll_min)
     return np.sum(out)
 
-def nf_target(params, data):
-    return np.log(batch_fptd(data[:, 0] * data[:, 1] * (- 1), params[0],
-         params[1] * 2, params[2])).sum()
+def nf_target(params, data, likelihood_min = 1e-16):
+    return np.maximum(np.log(batch_fptd(data[:, 0] * data[:, 1] * (- 1),
+                                        params[0],
+                                        params[1] * 2, 
+                                        params[2],
+                                        params[3])).sum(), np.log(likelihood_min))
 
 def lba_target(params, data):
     return clba.batch_dlba2(rt = data[:, 0], 

@@ -22,7 +22,7 @@ END: Cython Metadata */
 #else
 #define CYTHON_ABI "0_29_12"
 #define CYTHON_HEX_VERSION 0x001D0CF0
-#define CYTHON_FUTURE_DIVISION 0
+#define CYTHON_FUTURE_DIVISION 1
 #include <stddef.h>
 #ifndef offsetof
   #define offsetof(type, member) ( (size_t) & ((type*)0) -> member )
@@ -1137,9 +1137,6 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_GetAttrStr(PyObject* obj, PyObject
 /* GetBuiltinName.proto */
 static PyObject *__Pyx_GetBuiltinName(PyObject *name);
 
-/* None.proto */
-static CYTHON_INLINE long __Pyx_div_long(long, long);
-
 /* PyDictVersioning.proto */
 #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
 #define __PYX_DICT_VERSION_INIT  ((PY_UINT64_T) -1)
@@ -1550,6 +1547,9 @@ static CYTHON_INLINE int __Pyx_PyList_Append(PyObject* list, PyObject* x) {
 /* None.proto */
 static CYTHON_INLINE void __Pyx_RaiseUnboundLocalError(const char *varname);
 
+/* None.proto */
+static CYTHON_INLINE long __Pyx_div_long(long, long);
+
 /* ImportFrom.proto */
 static PyObject* __Pyx_ImportFrom(PyObject* module, PyObject* name);
 
@@ -1784,6 +1784,7 @@ static const char __pyx_k_abs[] = "abs";
 static const char __pyx_k_eps[] = "eps";
 static const char __pyx_k_k_l[] = "k_l";
 static const char __pyx_k_k_s[] = "k_s";
+static const char __pyx_k_ndt[] = "ndt";
 static const char __pyx_k_new[] = "__new__";
 static const char __pyx_k_obj[] = "obj";
 static const char __pyx_k_scp[] = "scp";
@@ -1863,9 +1864,7 @@ static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
 static const char __pyx_k_likelihoods_view[] = "likelihoods_view";
 static const char __pyx_k_pyx_unpickle_Enum[] = "__pyx_unpickle_Enum";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
-static const char __pyx_k_ddm_data_simulator[] = "ddm_data_simulator";
 static const char __pyx_k_strided_and_direct[] = "<strided and direct>";
-static const char __pyx_k_ddm_data_simulation[] = "ddm_data_simulation";
 static const char __pyx_k_strided_and_indirect[] = "<strided and indirect>";
 static const char __pyx_k_contiguous_and_direct[] = "<contiguous and direct>";
 static const char __pyx_k_MemoryView_of_r_object[] = "<MemoryView of %r object>";
@@ -1929,8 +1928,6 @@ static PyObject *__pyx_n_s_class;
 static PyObject *__pyx_n_s_cline_in_traceback;
 static PyObject *__pyx_kp_s_contiguous_and_direct;
 static PyObject *__pyx_kp_s_contiguous_and_indirect;
-static PyObject *__pyx_n_s_ddm_data_simulation;
-static PyObject *__pyx_n_s_ddm_data_simulator;
 static PyObject *__pyx_n_s_dict;
 static PyObject *__pyx_n_s_dtype_is_object;
 static PyObject *__pyx_n_s_encode;
@@ -1963,6 +1960,7 @@ static PyObject *__pyx_n_s_n;
 static PyObject *__pyx_n_s_name;
 static PyObject *__pyx_n_s_name_2;
 static PyObject *__pyx_n_s_ndim;
+static PyObject *__pyx_n_s_ndt;
 static PyObject *__pyx_n_s_new;
 static PyObject *__pyx_kp_s_no_default___reduce___due_to_non;
 static PyObject *__pyx_n_s_np;
@@ -2012,7 +2010,7 @@ static PyObject *__pyx_n_s_w;
 static PyObject *__pyx_n_s_w_view;
 static PyObject *__pyx_n_s_zeros;
 static PyObject *__pyx_pf_8cdwiener_fptd(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_t, PyObject *__pyx_v_v, PyObject *__pyx_v_a, PyObject *__pyx_v_w, PyObject *__pyx_v_eps); /* proto */
-static PyObject *__pyx_pf_8cdwiener_2batch_fptd(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_t, double __pyx_v_v, double __pyx_v_a, double __pyx_v_w, double __pyx_v_eps); /* proto */
+static PyObject *__pyx_pf_8cdwiener_2batch_fptd(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_t, double __pyx_v_v, double __pyx_v_a, double __pyx_v_w, double __pyx_v_ndt, double __pyx_v_eps); /* proto */
 static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_t, PyObject *__pyx_v_v, PyObject *__pyx_v_a, PyObject *__pyx_v_w, double __pyx_v_eps); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array_2__getbuffer__(struct __pyx_array_obj *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
@@ -2207,7 +2205,7 @@ static double __pyx_f_8cdwiener_fptd_small(double __pyx_v_t, double __pyx_v_w, i
  *     cdef int floor = np.floor(temp)
  *     cdef int ceiling = - np.ceil(temp)
  */
-  __pyx_v_temp = __Pyx_div_long((__pyx_v_k - 1), 2);
+  __pyx_v_temp = (((double)(__pyx_v_k - 1)) / 2.0);
 
   /* "cdwiener.pyx":20
  * cdef double fptd_small(double t, double w, int k):
@@ -3045,7 +3043,7 @@ static PyObject *__pyx_pf_8cdwiener_fptd(CYTHON_UNUSED PyObject *__pyx_self, PyO
 /* "cdwiener.pyx":64
  * # --------------------------------
  * 
- * def batch_fptd(t, double v, double a, double w, double eps=1e-9):             # <<<<<<<<<<<<<<
+ * def batch_fptd(t, double v = 1, double a = 1, double w = 0.5, double ndt = 1.0, double eps = 1e-10):             # <<<<<<<<<<<<<<
  *     # Use when rts and choices vary, but parameters are held constant
  *     cdef int i
  */
@@ -3058,17 +3056,20 @@ static PyObject *__pyx_pw_8cdwiener_3batch_fptd(PyObject *__pyx_self, PyObject *
   double __pyx_v_v;
   double __pyx_v_a;
   double __pyx_v_w;
+  double __pyx_v_ndt;
   double __pyx_v_eps;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("batch_fptd (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_t,&__pyx_n_s_v,&__pyx_n_s_a,&__pyx_n_s_w,&__pyx_n_s_eps,0};
-    PyObject* values[5] = {0,0,0,0,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_t,&__pyx_n_s_v,&__pyx_n_s_a,&__pyx_n_s_w,&__pyx_n_s_ndt,&__pyx_n_s_eps,0};
+    PyObject* values[6] = {0,0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
+        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+        CYTHON_FALLTHROUGH;
         case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
         CYTHON_FALLTHROUGH;
         case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
@@ -3089,27 +3090,33 @@ static PyObject *__pyx_pw_8cdwiener_3batch_fptd(PyObject *__pyx_self, PyObject *
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_v)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("batch_fptd", 0, 4, 5, 1); __PYX_ERR(0, 64, __pyx_L3_error)
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_v);
+          if (value) { values[1] = value; kw_args--; }
         }
         CYTHON_FALLTHROUGH;
         case  2:
-        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_a)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("batch_fptd", 0, 4, 5, 2); __PYX_ERR(0, 64, __pyx_L3_error)
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_a);
+          if (value) { values[2] = value; kw_args--; }
         }
         CYTHON_FALLTHROUGH;
         case  3:
-        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_w)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("batch_fptd", 0, 4, 5, 3); __PYX_ERR(0, 64, __pyx_L3_error)
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_w);
+          if (value) { values[3] = value; kw_args--; }
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_eps);
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ndt);
           if (value) { values[4] = value; kw_args--; }
+        }
+        CYTHON_FALLTHROUGH;
+        case  5:
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_eps);
+          if (value) { values[5] = value; kw_args--; }
         }
       }
       if (unlikely(kw_args > 0)) {
@@ -3117,42 +3124,64 @@ static PyObject *__pyx_pw_8cdwiener_3batch_fptd(PyObject *__pyx_self, PyObject *
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
+        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+        CYTHON_FALLTHROUGH;
         case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
         CYTHON_FALLTHROUGH;
         case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-        values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
-        values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-        values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        CYTHON_FALLTHROUGH;
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
         break;
         default: goto __pyx_L5_argtuple_error;
       }
     }
     __pyx_v_t = values[0];
-    __pyx_v_v = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_v == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 64, __pyx_L3_error)
-    __pyx_v_a = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_a == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 64, __pyx_L3_error)
-    __pyx_v_w = __pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_w == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 64, __pyx_L3_error)
-    if (values[4]) {
-      __pyx_v_eps = __pyx_PyFloat_AsDouble(values[4]); if (unlikely((__pyx_v_eps == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 64, __pyx_L3_error)
+    if (values[1]) {
+      __pyx_v_v = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_v == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 64, __pyx_L3_error)
     } else {
-      __pyx_v_eps = ((double)1e-9);
+      __pyx_v_v = ((double)1.0);
+    }
+    if (values[2]) {
+      __pyx_v_a = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_a == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 64, __pyx_L3_error)
+    } else {
+      __pyx_v_a = ((double)1.0);
+    }
+    if (values[3]) {
+      __pyx_v_w = __pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_w == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 64, __pyx_L3_error)
+    } else {
+      __pyx_v_w = ((double)0.5);
+    }
+    if (values[4]) {
+      __pyx_v_ndt = __pyx_PyFloat_AsDouble(values[4]); if (unlikely((__pyx_v_ndt == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 64, __pyx_L3_error)
+    } else {
+      __pyx_v_ndt = ((double)1.0);
+    }
+    if (values[5]) {
+      __pyx_v_eps = __pyx_PyFloat_AsDouble(values[5]); if (unlikely((__pyx_v_eps == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 64, __pyx_L3_error)
+    } else {
+      __pyx_v_eps = ((double)1e-10);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("batch_fptd", 0, 4, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 64, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("batch_fptd", 0, 1, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 64, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("cdwiener.batch_fptd", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_8cdwiener_2batch_fptd(__pyx_self, __pyx_v_t, __pyx_v_v, __pyx_v_a, __pyx_v_w, __pyx_v_eps);
+  __pyx_r = __pyx_pf_8cdwiener_2batch_fptd(__pyx_self, __pyx_v_t, __pyx_v_v, __pyx_v_a, __pyx_v_w, __pyx_v_ndt, __pyx_v_eps);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_8cdwiener_2batch_fptd(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_t, double __pyx_v_v, double __pyx_v_a, double __pyx_v_w, double __pyx_v_eps) {
+static PyObject *__pyx_pf_8cdwiener_2batch_fptd(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_t, double __pyx_v_v, double __pyx_v_a, double __pyx_v_w, double __pyx_v_ndt, double __pyx_v_eps) {
   int __pyx_v_i;
   __Pyx_memviewslice __pyx_v_t_view = { 0, 0, { 0 }, { 0 }, { 0 } };
   int __pyx_v_n;
@@ -3180,23 +3209,31 @@ static PyObject *__pyx_pf_8cdwiener_2batch_fptd(CYTHON_UNUSED PyObject *__pyx_se
   Py_ssize_t __pyx_t_14;
   Py_ssize_t __pyx_t_15;
   Py_ssize_t __pyx_t_16;
-  PyObject *__pyx_t_17 = NULL;
-  PyObject *(*__pyx_t_18)(PyObject *);
+  Py_ssize_t __pyx_t_17;
+  Py_ssize_t __pyx_t_18;
   Py_ssize_t __pyx_t_19;
   Py_ssize_t __pyx_t_20;
-  double __pyx_t_21;
-  double __pyx_t_22;
+  PyObject *__pyx_t_21 = NULL;
+  PyObject *(*__pyx_t_22)(PyObject *);
   Py_ssize_t __pyx_t_23;
-  int __pyx_t_24;
-  Py_ssize_t __pyx_t_25;
-  Py_ssize_t __pyx_t_26;
+  Py_ssize_t __pyx_t_24;
+  double __pyx_t_25;
+  double __pyx_t_26;
   Py_ssize_t __pyx_t_27;
-  Py_ssize_t __pyx_t_28;
+  int __pyx_t_28;
   Py_ssize_t __pyx_t_29;
   Py_ssize_t __pyx_t_30;
   Py_ssize_t __pyx_t_31;
   Py_ssize_t __pyx_t_32;
   Py_ssize_t __pyx_t_33;
+  Py_ssize_t __pyx_t_34;
+  Py_ssize_t __pyx_t_35;
+  Py_ssize_t __pyx_t_36;
+  Py_ssize_t __pyx_t_37;
+  Py_ssize_t __pyx_t_38;
+  Py_ssize_t __pyx_t_39;
+  Py_ssize_t __pyx_t_40;
+  Py_ssize_t __pyx_t_41;
   __Pyx_RefNannySetupContext("batch_fptd", 0);
 
   /* "cdwiener.pyx":67
@@ -3358,7 +3395,7 @@ static PyObject *__pyx_pf_8cdwiener_2batch_fptd(CYTHON_UNUSED PyObject *__pyx_se
  *         elif t_view[i] < 0:
  *             t_view[i] = (-1) * t_view[i]             # <<<<<<<<<<<<<<
  * 
- *             sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
+ *             # adjust rt for ndt
  */
       __pyx_t_14 = __pyx_v_i;
       __pyx_t_10 = -1;
@@ -3382,12 +3419,12 @@ static PyObject *__pyx_pf_8cdwiener_2batch_fptd(CYTHON_UNUSED PyObject *__pyx_se
       }
       *((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_15 * __pyx_v_t_view.strides[0]) )) = (-1.0 * (*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_14 * __pyx_v_t_view.strides[0]) ))));
 
-      /* "cdwiener.pyx":79
- *             t_view[i] = (-1) * t_view[i]
+      /* "cdwiener.pyx":80
  * 
- *             sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)             # <<<<<<<<<<<<<<
- *             leading_term = calculate_leading_term(t_view[i], (-1) * v, a, 1 - w)
- *             if sgn_lambda >= 0:
+ *             # adjust rt for ndt
+ *             t_view[i] = t_view[i] - ndt             # <<<<<<<<<<<<<<
+ * 
+ *             if t_view[i] <= 0:
  */
       __pyx_t_16 = __pyx_v_i;
       __pyx_t_10 = -1;
@@ -3397,108 +3434,77 @@ static PyObject *__pyx_pf_8cdwiener_2batch_fptd(CYTHON_UNUSED PyObject *__pyx_se
       } else if (unlikely(__pyx_t_16 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
       if (unlikely(__pyx_t_10 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_10);
-        __PYX_ERR(0, 79, __pyx_L1_error)
+        __PYX_ERR(0, 80, __pyx_L1_error)
       }
-      __pyx_t_3 = __pyx_f_8cdwiener_choice_function((*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_16 * __pyx_v_t_view.strides[0]) ))), __pyx_v_eps); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 79, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_3);
-      if ((likely(PyTuple_CheckExact(__pyx_t_3))) || (PyList_CheckExact(__pyx_t_3))) {
-        PyObject* sequence = __pyx_t_3;
-        Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
-        if (unlikely(size != 3)) {
-          if (size > 3) __Pyx_RaiseTooManyValuesError(3);
-          else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-          __PYX_ERR(0, 79, __pyx_L1_error)
-        }
-        #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        if (likely(PyTuple_CheckExact(sequence))) {
-          __pyx_t_5 = PyTuple_GET_ITEM(sequence, 0); 
-          __pyx_t_2 = PyTuple_GET_ITEM(sequence, 1); 
-          __pyx_t_6 = PyTuple_GET_ITEM(sequence, 2); 
-        } else {
-          __pyx_t_5 = PyList_GET_ITEM(sequence, 0); 
-          __pyx_t_2 = PyList_GET_ITEM(sequence, 1); 
-          __pyx_t_6 = PyList_GET_ITEM(sequence, 2); 
-        }
-        __Pyx_INCREF(__pyx_t_5);
-        __Pyx_INCREF(__pyx_t_2);
-        __Pyx_INCREF(__pyx_t_6);
-        #else
-        __pyx_t_5 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 79, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 79, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_6 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 79, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_6);
-        #endif
-        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      } else {
-        Py_ssize_t index = -1;
-        __pyx_t_17 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 79, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_17);
-        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_18 = Py_TYPE(__pyx_t_17)->tp_iternext;
-        index = 0; __pyx_t_5 = __pyx_t_18(__pyx_t_17); if (unlikely(!__pyx_t_5)) goto __pyx_L6_unpacking_failed;
-        __Pyx_GOTREF(__pyx_t_5);
-        index = 1; __pyx_t_2 = __pyx_t_18(__pyx_t_17); if (unlikely(!__pyx_t_2)) goto __pyx_L6_unpacking_failed;
-        __Pyx_GOTREF(__pyx_t_2);
-        index = 2; __pyx_t_6 = __pyx_t_18(__pyx_t_17); if (unlikely(!__pyx_t_6)) goto __pyx_L6_unpacking_failed;
-        __Pyx_GOTREF(__pyx_t_6);
-        if (__Pyx_IternextUnpackEndCheck(__pyx_t_18(__pyx_t_17), 3) < 0) __PYX_ERR(0, 79, __pyx_L1_error)
-        __pyx_t_18 = NULL;
-        __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
-        goto __pyx_L7_unpacking_done;
-        __pyx_L6_unpacking_failed:;
-        __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
-        __pyx_t_18 = NULL;
-        if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-        __PYX_ERR(0, 79, __pyx_L1_error)
-        __pyx_L7_unpacking_done:;
-      }
-      __Pyx_XDECREF_SET(__pyx_v_sgn_lambda, __pyx_t_5);
-      __pyx_t_5 = 0;
-      __Pyx_XDECREF_SET(__pyx_v_k_l, __pyx_t_2);
-      __pyx_t_2 = 0;
-      __Pyx_XDECREF_SET(__pyx_v_k_s, __pyx_t_6);
-      __pyx_t_6 = 0;
-
-      /* "cdwiener.pyx":80
- * 
- *             sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
- *             leading_term = calculate_leading_term(t_view[i], (-1) * v, a, 1 - w)             # <<<<<<<<<<<<<<
- *             if sgn_lambda >= 0:
- *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(t_view[i] / (a**2),
- */
-      __pyx_t_19 = __pyx_v_i;
+      __pyx_t_17 = __pyx_v_i;
       __pyx_t_10 = -1;
-      if (__pyx_t_19 < 0) {
-        __pyx_t_19 += __pyx_v_t_view.shape[0];
-        if (unlikely(__pyx_t_19 < 0)) __pyx_t_10 = 0;
-      } else if (unlikely(__pyx_t_19 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
+      if (__pyx_t_17 < 0) {
+        __pyx_t_17 += __pyx_v_t_view.shape[0];
+        if (unlikely(__pyx_t_17 < 0)) __pyx_t_10 = 0;
+      } else if (unlikely(__pyx_t_17 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
       if (unlikely(__pyx_t_10 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_10);
         __PYX_ERR(0, 80, __pyx_L1_error)
       }
-      __pyx_v_leading_term = __pyx_f_8cdwiener_calculate_leading_term((*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_19 * __pyx_v_t_view.strides[0]) ))), (-1.0 * __pyx_v_v), __pyx_v_a, (1.0 - __pyx_v_w));
+      *((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_17 * __pyx_v_t_view.strides[0]) )) = ((*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_16 * __pyx_v_t_view.strides[0]) ))) - __pyx_v_ndt);
 
-      /* "cdwiener.pyx":81
- *             sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
- *             leading_term = calculate_leading_term(t_view[i], (-1) * v, a, 1 - w)
- *             if sgn_lambda >= 0:             # <<<<<<<<<<<<<<
- *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(t_view[i] / (a**2),
- *                     1 - w, k_l))
- */
-      __pyx_t_3 = PyObject_RichCompare(__pyx_v_sgn_lambda, __pyx_int_0, Py_GE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 81, __pyx_L1_error)
-      __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 81, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (__pyx_t_11) {
-
-        /* "cdwiener.pyx":82
- *             leading_term = calculate_leading_term(t_view[i], (-1) * v, a, 1 - w)
- *             if sgn_lambda >= 0:
- *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(t_view[i] / (a**2),             # <<<<<<<<<<<<<<
- *                     1 - w, k_l))
+      /* "cdwiener.pyx":82
+ *             t_view[i] = t_view[i] - ndt
+ * 
+ *             if t_view[i] <= 0:             # <<<<<<<<<<<<<<
+ *                 likelihoods_view[i] = 1e-48
  *             else:
  */
+      __pyx_t_18 = __pyx_v_i;
+      __pyx_t_10 = -1;
+      if (__pyx_t_18 < 0) {
+        __pyx_t_18 += __pyx_v_t_view.shape[0];
+        if (unlikely(__pyx_t_18 < 0)) __pyx_t_10 = 0;
+      } else if (unlikely(__pyx_t_18 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
+      if (unlikely(__pyx_t_10 != -1)) {
+        __Pyx_RaiseBufferIndexError(__pyx_t_10);
+        __PYX_ERR(0, 82, __pyx_L1_error)
+      }
+      __pyx_t_11 = (((*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_18 * __pyx_v_t_view.strides[0]) ))) <= 0.0) != 0);
+      if (__pyx_t_11) {
+
+        /* "cdwiener.pyx":83
+ * 
+ *             if t_view[i] <= 0:
+ *                 likelihoods_view[i] = 1e-48             # <<<<<<<<<<<<<<
+ *             else:
+ *                 sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
+ */
+        __pyx_t_19 = __pyx_v_i;
+        __pyx_t_10 = -1;
+        if (__pyx_t_19 < 0) {
+          __pyx_t_19 += __pyx_v_likelihoods_view.shape[0];
+          if (unlikely(__pyx_t_19 < 0)) __pyx_t_10 = 0;
+        } else if (unlikely(__pyx_t_19 >= __pyx_v_likelihoods_view.shape[0])) __pyx_t_10 = 0;
+        if (unlikely(__pyx_t_10 != -1)) {
+          __Pyx_RaiseBufferIndexError(__pyx_t_10);
+          __PYX_ERR(0, 83, __pyx_L1_error)
+        }
+        *((double *) ( /* dim=0 */ (__pyx_v_likelihoods_view.data + __pyx_t_19 * __pyx_v_likelihoods_view.strides[0]) )) = 1e-48;
+
+        /* "cdwiener.pyx":82
+ *             t_view[i] = t_view[i] - ndt
+ * 
+ *             if t_view[i] <= 0:             # <<<<<<<<<<<<<<
+ *                 likelihoods_view[i] = 1e-48
+ *             else:
+ */
+        goto __pyx_L6;
+      }
+
+      /* "cdwiener.pyx":85
+ *                 likelihoods_view[i] = 1e-48
+ *             else:
+ *                 sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)             # <<<<<<<<<<<<<<
+ *                 leading_term = calculate_leading_term(t_view[i], (-1) * v, a, 1 - w)
+ *                 if sgn_lambda >= 0:
+ */
+      /*else*/ {
         __pyx_t_20 = __pyx_v_i;
         __pyx_t_10 = -1;
         if (__pyx_t_20 < 0) {
@@ -3507,107 +3513,219 @@ static PyObject *__pyx_pf_8cdwiener_2batch_fptd(CYTHON_UNUSED PyObject *__pyx_se
         } else if (unlikely(__pyx_t_20 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
         if (unlikely(__pyx_t_10 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_10);
-          __PYX_ERR(0, 82, __pyx_L1_error)
-        }
-        __pyx_t_21 = (*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_20 * __pyx_v_t_view.strides[0]) )));
-        __pyx_t_22 = pow(__pyx_v_a, 2.0);
-        if (unlikely(__pyx_t_22 == 0)) {
-          PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-          __PYX_ERR(0, 82, __pyx_L1_error)
-        }
-
-        /* "cdwiener.pyx":83
- *             if sgn_lambda >= 0:
- *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(t_view[i] / (a**2),
- *                     1 - w, k_l))             # <<<<<<<<<<<<<<
- *             else:
- *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(t_view[i] / (a**2),
- */
-        __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_v_k_l); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 83, __pyx_L1_error)
-
-        /* "cdwiener.pyx":82
- *             leading_term = calculate_leading_term(t_view[i], (-1) * v, a, 1 - w)
- *             if sgn_lambda >= 0:
- *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(t_view[i] / (a**2),             # <<<<<<<<<<<<<<
- *                     1 - w, k_l))
- *             else:
- */
-        __pyx_t_23 = __pyx_v_i;
-        __pyx_t_24 = -1;
-        if (__pyx_t_23 < 0) {
-          __pyx_t_23 += __pyx_v_likelihoods_view.shape[0];
-          if (unlikely(__pyx_t_23 < 0)) __pyx_t_24 = 0;
-        } else if (unlikely(__pyx_t_23 >= __pyx_v_likelihoods_view.shape[0])) __pyx_t_24 = 0;
-        if (unlikely(__pyx_t_24 != -1)) {
-          __Pyx_RaiseBufferIndexError(__pyx_t_24);
-          __PYX_ERR(0, 82, __pyx_L1_error)
-        }
-        *((double *) ( /* dim=0 */ (__pyx_v_likelihoods_view.data + __pyx_t_23 * __pyx_v_likelihoods_view.strides[0]) )) = fmax(1e-48, (__pyx_v_leading_term * __pyx_f_8cdwiener_fptd_large((__pyx_t_21 / __pyx_t_22), (1.0 - __pyx_v_w), __pyx_t_10)));
-
-        /* "cdwiener.pyx":81
- *             sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
- *             leading_term = calculate_leading_term(t_view[i], (-1) * v, a, 1 - w)
- *             if sgn_lambda >= 0:             # <<<<<<<<<<<<<<
- *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(t_view[i] / (a**2),
- *                     1 - w, k_l))
- */
-        goto __pyx_L8;
-      }
-
-      /* "cdwiener.pyx":85
- *                     1 - w, k_l))
- *             else:
- *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(t_view[i] / (a**2),             # <<<<<<<<<<<<<<
- *                     1 - w, k_s))
- *         elif t_view[i] > 0:
- */
-      /*else*/ {
-        __pyx_t_25 = __pyx_v_i;
-        __pyx_t_10 = -1;
-        if (__pyx_t_25 < 0) {
-          __pyx_t_25 += __pyx_v_t_view.shape[0];
-          if (unlikely(__pyx_t_25 < 0)) __pyx_t_10 = 0;
-        } else if (unlikely(__pyx_t_25 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
-        if (unlikely(__pyx_t_10 != -1)) {
-          __Pyx_RaiseBufferIndexError(__pyx_t_10);
           __PYX_ERR(0, 85, __pyx_L1_error)
         }
-        __pyx_t_22 = (*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_25 * __pyx_v_t_view.strides[0]) )));
-        __pyx_t_21 = pow(__pyx_v_a, 2.0);
-        if (unlikely(__pyx_t_21 == 0)) {
-          PyErr_SetString(PyExc_ZeroDivisionError, "float division");
+        __pyx_t_3 = __pyx_f_8cdwiener_choice_function((*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_20 * __pyx_v_t_view.strides[0]) ))), __pyx_v_eps); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 85, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_3);
+        if ((likely(PyTuple_CheckExact(__pyx_t_3))) || (PyList_CheckExact(__pyx_t_3))) {
+          PyObject* sequence = __pyx_t_3;
+          Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
+          if (unlikely(size != 3)) {
+            if (size > 3) __Pyx_RaiseTooManyValuesError(3);
+            else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
+            __PYX_ERR(0, 85, __pyx_L1_error)
+          }
+          #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+          if (likely(PyTuple_CheckExact(sequence))) {
+            __pyx_t_5 = PyTuple_GET_ITEM(sequence, 0); 
+            __pyx_t_2 = PyTuple_GET_ITEM(sequence, 1); 
+            __pyx_t_6 = PyTuple_GET_ITEM(sequence, 2); 
+          } else {
+            __pyx_t_5 = PyList_GET_ITEM(sequence, 0); 
+            __pyx_t_2 = PyList_GET_ITEM(sequence, 1); 
+            __pyx_t_6 = PyList_GET_ITEM(sequence, 2); 
+          }
+          __Pyx_INCREF(__pyx_t_5);
+          __Pyx_INCREF(__pyx_t_2);
+          __Pyx_INCREF(__pyx_t_6);
+          #else
+          __pyx_t_5 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 85, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 85, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_2);
+          __pyx_t_6 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 85, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_6);
+          #endif
+          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+        } else {
+          Py_ssize_t index = -1;
+          __pyx_t_21 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 85, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_21);
+          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+          __pyx_t_22 = Py_TYPE(__pyx_t_21)->tp_iternext;
+          index = 0; __pyx_t_5 = __pyx_t_22(__pyx_t_21); if (unlikely(!__pyx_t_5)) goto __pyx_L7_unpacking_failed;
+          __Pyx_GOTREF(__pyx_t_5);
+          index = 1; __pyx_t_2 = __pyx_t_22(__pyx_t_21); if (unlikely(!__pyx_t_2)) goto __pyx_L7_unpacking_failed;
+          __Pyx_GOTREF(__pyx_t_2);
+          index = 2; __pyx_t_6 = __pyx_t_22(__pyx_t_21); if (unlikely(!__pyx_t_6)) goto __pyx_L7_unpacking_failed;
+          __Pyx_GOTREF(__pyx_t_6);
+          if (__Pyx_IternextUnpackEndCheck(__pyx_t_22(__pyx_t_21), 3) < 0) __PYX_ERR(0, 85, __pyx_L1_error)
+          __pyx_t_22 = NULL;
+          __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
+          goto __pyx_L8_unpacking_done;
+          __pyx_L7_unpacking_failed:;
+          __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
+          __pyx_t_22 = NULL;
+          if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
           __PYX_ERR(0, 85, __pyx_L1_error)
+          __pyx_L8_unpacking_done:;
         }
+        __Pyx_XDECREF_SET(__pyx_v_sgn_lambda, __pyx_t_5);
+        __pyx_t_5 = 0;
+        __Pyx_XDECREF_SET(__pyx_v_k_l, __pyx_t_2);
+        __pyx_t_2 = 0;
+        __Pyx_XDECREF_SET(__pyx_v_k_s, __pyx_t_6);
+        __pyx_t_6 = 0;
 
         /* "cdwiener.pyx":86
  *             else:
- *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(t_view[i] / (a**2),
- *                     1 - w, k_s))             # <<<<<<<<<<<<<<
- *         elif t_view[i] > 0:
- *             sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
+ *                 sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
+ *                 leading_term = calculate_leading_term(t_view[i], (-1) * v, a, 1 - w)             # <<<<<<<<<<<<<<
+ *                 if sgn_lambda >= 0:
+ *                     likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(t_view[i] / (a**2),
  */
-        __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_v_k_s); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 86, __pyx_L1_error)
-
-        /* "cdwiener.pyx":85
- *                     1 - w, k_l))
- *             else:
- *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(t_view[i] / (a**2),             # <<<<<<<<<<<<<<
- *                     1 - w, k_s))
- *         elif t_view[i] > 0:
- */
-        __pyx_t_26 = __pyx_v_i;
-        __pyx_t_24 = -1;
-        if (__pyx_t_26 < 0) {
-          __pyx_t_26 += __pyx_v_likelihoods_view.shape[0];
-          if (unlikely(__pyx_t_26 < 0)) __pyx_t_24 = 0;
-        } else if (unlikely(__pyx_t_26 >= __pyx_v_likelihoods_view.shape[0])) __pyx_t_24 = 0;
-        if (unlikely(__pyx_t_24 != -1)) {
-          __Pyx_RaiseBufferIndexError(__pyx_t_24);
-          __PYX_ERR(0, 85, __pyx_L1_error)
+        __pyx_t_23 = __pyx_v_i;
+        __pyx_t_10 = -1;
+        if (__pyx_t_23 < 0) {
+          __pyx_t_23 += __pyx_v_t_view.shape[0];
+          if (unlikely(__pyx_t_23 < 0)) __pyx_t_10 = 0;
+        } else if (unlikely(__pyx_t_23 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
+        if (unlikely(__pyx_t_10 != -1)) {
+          __Pyx_RaiseBufferIndexError(__pyx_t_10);
+          __PYX_ERR(0, 86, __pyx_L1_error)
         }
-        *((double *) ( /* dim=0 */ (__pyx_v_likelihoods_view.data + __pyx_t_26 * __pyx_v_likelihoods_view.strides[0]) )) = fmax(1e-48, (__pyx_v_leading_term * __pyx_f_8cdwiener_fptd_small((__pyx_t_22 / __pyx_t_21), (1.0 - __pyx_v_w), __pyx_t_10)));
+        __pyx_v_leading_term = __pyx_f_8cdwiener_calculate_leading_term((*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_23 * __pyx_v_t_view.strides[0]) ))), (-1.0 * __pyx_v_v), __pyx_v_a, (1.0 - __pyx_v_w));
+
+        /* "cdwiener.pyx":87
+ *                 sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
+ *                 leading_term = calculate_leading_term(t_view[i], (-1) * v, a, 1 - w)
+ *                 if sgn_lambda >= 0:             # <<<<<<<<<<<<<<
+ *                     likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(t_view[i] / (a**2),
+ *                         1 - w, k_l))
+ */
+        __pyx_t_3 = PyObject_RichCompare(__pyx_v_sgn_lambda, __pyx_int_0, Py_GE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 87, __pyx_L1_error)
+        __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 87, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+        if (__pyx_t_11) {
+
+          /* "cdwiener.pyx":88
+ *                 leading_term = calculate_leading_term(t_view[i], (-1) * v, a, 1 - w)
+ *                 if sgn_lambda >= 0:
+ *                     likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(t_view[i] / (a**2),             # <<<<<<<<<<<<<<
+ *                         1 - w, k_l))
+ *                 else:
+ */
+          __pyx_t_24 = __pyx_v_i;
+          __pyx_t_10 = -1;
+          if (__pyx_t_24 < 0) {
+            __pyx_t_24 += __pyx_v_t_view.shape[0];
+            if (unlikely(__pyx_t_24 < 0)) __pyx_t_10 = 0;
+          } else if (unlikely(__pyx_t_24 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
+          if (unlikely(__pyx_t_10 != -1)) {
+            __Pyx_RaiseBufferIndexError(__pyx_t_10);
+            __PYX_ERR(0, 88, __pyx_L1_error)
+          }
+          __pyx_t_25 = (*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_24 * __pyx_v_t_view.strides[0]) )));
+          __pyx_t_26 = pow(__pyx_v_a, 2.0);
+          if (unlikely(__pyx_t_26 == 0)) {
+            PyErr_SetString(PyExc_ZeroDivisionError, "float division");
+            __PYX_ERR(0, 88, __pyx_L1_error)
+          }
+
+          /* "cdwiener.pyx":89
+ *                 if sgn_lambda >= 0:
+ *                     likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(t_view[i] / (a**2),
+ *                         1 - w, k_l))             # <<<<<<<<<<<<<<
+ *                 else:
+ *                     likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(t_view[i] / (a**2),
+ */
+          __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_v_k_l); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 89, __pyx_L1_error)
+
+          /* "cdwiener.pyx":88
+ *                 leading_term = calculate_leading_term(t_view[i], (-1) * v, a, 1 - w)
+ *                 if sgn_lambda >= 0:
+ *                     likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(t_view[i] / (a**2),             # <<<<<<<<<<<<<<
+ *                         1 - w, k_l))
+ *                 else:
+ */
+          __pyx_t_27 = __pyx_v_i;
+          __pyx_t_28 = -1;
+          if (__pyx_t_27 < 0) {
+            __pyx_t_27 += __pyx_v_likelihoods_view.shape[0];
+            if (unlikely(__pyx_t_27 < 0)) __pyx_t_28 = 0;
+          } else if (unlikely(__pyx_t_27 >= __pyx_v_likelihoods_view.shape[0])) __pyx_t_28 = 0;
+          if (unlikely(__pyx_t_28 != -1)) {
+            __Pyx_RaiseBufferIndexError(__pyx_t_28);
+            __PYX_ERR(0, 88, __pyx_L1_error)
+          }
+          *((double *) ( /* dim=0 */ (__pyx_v_likelihoods_view.data + __pyx_t_27 * __pyx_v_likelihoods_view.strides[0]) )) = fmax(1e-48, (__pyx_v_leading_term * __pyx_f_8cdwiener_fptd_large((__pyx_t_25 / __pyx_t_26), (1.0 - __pyx_v_w), __pyx_t_10)));
+
+          /* "cdwiener.pyx":87
+ *                 sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
+ *                 leading_term = calculate_leading_term(t_view[i], (-1) * v, a, 1 - w)
+ *                 if sgn_lambda >= 0:             # <<<<<<<<<<<<<<
+ *                     likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(t_view[i] / (a**2),
+ *                         1 - w, k_l))
+ */
+          goto __pyx_L9;
+        }
+
+        /* "cdwiener.pyx":91
+ *                         1 - w, k_l))
+ *                 else:
+ *                     likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(t_view[i] / (a**2),             # <<<<<<<<<<<<<<
+ *                         1 - w, k_s))
+ *         elif t_view[i] > 0:
+ */
+        /*else*/ {
+          __pyx_t_29 = __pyx_v_i;
+          __pyx_t_10 = -1;
+          if (__pyx_t_29 < 0) {
+            __pyx_t_29 += __pyx_v_t_view.shape[0];
+            if (unlikely(__pyx_t_29 < 0)) __pyx_t_10 = 0;
+          } else if (unlikely(__pyx_t_29 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
+          if (unlikely(__pyx_t_10 != -1)) {
+            __Pyx_RaiseBufferIndexError(__pyx_t_10);
+            __PYX_ERR(0, 91, __pyx_L1_error)
+          }
+          __pyx_t_26 = (*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_29 * __pyx_v_t_view.strides[0]) )));
+          __pyx_t_25 = pow(__pyx_v_a, 2.0);
+          if (unlikely(__pyx_t_25 == 0)) {
+            PyErr_SetString(PyExc_ZeroDivisionError, "float division");
+            __PYX_ERR(0, 91, __pyx_L1_error)
+          }
+
+          /* "cdwiener.pyx":92
+ *                 else:
+ *                     likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(t_view[i] / (a**2),
+ *                         1 - w, k_s))             # <<<<<<<<<<<<<<
+ *         elif t_view[i] > 0:
+ *             # adjust rt for ndt
+ */
+          __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_v_k_s); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 92, __pyx_L1_error)
+
+          /* "cdwiener.pyx":91
+ *                         1 - w, k_l))
+ *                 else:
+ *                     likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(t_view[i] / (a**2),             # <<<<<<<<<<<<<<
+ *                         1 - w, k_s))
+ *         elif t_view[i] > 0:
+ */
+          __pyx_t_30 = __pyx_v_i;
+          __pyx_t_28 = -1;
+          if (__pyx_t_30 < 0) {
+            __pyx_t_30 += __pyx_v_likelihoods_view.shape[0];
+            if (unlikely(__pyx_t_30 < 0)) __pyx_t_28 = 0;
+          } else if (unlikely(__pyx_t_30 >= __pyx_v_likelihoods_view.shape[0])) __pyx_t_28 = 0;
+          if (unlikely(__pyx_t_28 != -1)) {
+            __Pyx_RaiseBufferIndexError(__pyx_t_28);
+            __PYX_ERR(0, 91, __pyx_L1_error)
+          }
+          *((double *) ( /* dim=0 */ (__pyx_v_likelihoods_view.data + __pyx_t_30 * __pyx_v_likelihoods_view.strides[0]) )) = fmax(1e-48, (__pyx_v_leading_term * __pyx_f_8cdwiener_fptd_small((__pyx_t_26 / __pyx_t_25), (1.0 - __pyx_v_w), __pyx_t_10)));
+        }
+        __pyx_L9:;
       }
-      __pyx_L8:;
+      __pyx_L6:;
 
       /* "cdwiener.pyx":76
  *         if t_view[i] == 0:
@@ -3619,266 +3737,347 @@ static PyObject *__pyx_pf_8cdwiener_2batch_fptd(CYTHON_UNUSED PyObject *__pyx_se
       goto __pyx_L5;
     }
 
-    /* "cdwiener.pyx":87
- *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(t_view[i] / (a**2),
- *                     1 - w, k_s))
+    /* "cdwiener.pyx":93
+ *                     likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(t_view[i] / (a**2),
+ *                         1 - w, k_s))
  *         elif t_view[i] > 0:             # <<<<<<<<<<<<<<
- *             sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
- *             leading_term = calculate_leading_term(t_view[i], v, a, w)
+ *             # adjust rt for ndt
+ *             t_view[i] = t_view[i] - ndt
  */
-    __pyx_t_27 = __pyx_v_i;
+    __pyx_t_31 = __pyx_v_i;
     __pyx_t_10 = -1;
-    if (__pyx_t_27 < 0) {
-      __pyx_t_27 += __pyx_v_t_view.shape[0];
-      if (unlikely(__pyx_t_27 < 0)) __pyx_t_10 = 0;
-    } else if (unlikely(__pyx_t_27 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
+    if (__pyx_t_31 < 0) {
+      __pyx_t_31 += __pyx_v_t_view.shape[0];
+      if (unlikely(__pyx_t_31 < 0)) __pyx_t_10 = 0;
+    } else if (unlikely(__pyx_t_31 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
     if (unlikely(__pyx_t_10 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_10);
-      __PYX_ERR(0, 87, __pyx_L1_error)
+      __PYX_ERR(0, 93, __pyx_L1_error)
     }
-    __pyx_t_11 = (((*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_27 * __pyx_v_t_view.strides[0]) ))) > 0.0) != 0);
+    __pyx_t_11 = (((*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_31 * __pyx_v_t_view.strides[0]) ))) > 0.0) != 0);
     if (__pyx_t_11) {
 
-      /* "cdwiener.pyx":88
- *                     1 - w, k_s))
+      /* "cdwiener.pyx":95
  *         elif t_view[i] > 0:
- *             sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)             # <<<<<<<<<<<<<<
- *             leading_term = calculate_leading_term(t_view[i], v, a, w)
- *             if sgn_lambda >= 0:
+ *             # adjust rt for ndt
+ *             t_view[i] = t_view[i] - ndt             # <<<<<<<<<<<<<<
+ * 
+ *             if t_view[i] <= 0:
  */
-      __pyx_t_28 = __pyx_v_i;
+      __pyx_t_32 = __pyx_v_i;
       __pyx_t_10 = -1;
-      if (__pyx_t_28 < 0) {
-        __pyx_t_28 += __pyx_v_t_view.shape[0];
-        if (unlikely(__pyx_t_28 < 0)) __pyx_t_10 = 0;
-      } else if (unlikely(__pyx_t_28 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
+      if (__pyx_t_32 < 0) {
+        __pyx_t_32 += __pyx_v_t_view.shape[0];
+        if (unlikely(__pyx_t_32 < 0)) __pyx_t_10 = 0;
+      } else if (unlikely(__pyx_t_32 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
       if (unlikely(__pyx_t_10 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_10);
-        __PYX_ERR(0, 88, __pyx_L1_error)
+        __PYX_ERR(0, 95, __pyx_L1_error)
       }
-      __pyx_t_3 = __pyx_f_8cdwiener_choice_function((*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_28 * __pyx_v_t_view.strides[0]) ))), __pyx_v_eps); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 88, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_3);
-      if ((likely(PyTuple_CheckExact(__pyx_t_3))) || (PyList_CheckExact(__pyx_t_3))) {
-        PyObject* sequence = __pyx_t_3;
-        Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
-        if (unlikely(size != 3)) {
-          if (size > 3) __Pyx_RaiseTooManyValuesError(3);
-          else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-          __PYX_ERR(0, 88, __pyx_L1_error)
-        }
-        #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        if (likely(PyTuple_CheckExact(sequence))) {
-          __pyx_t_6 = PyTuple_GET_ITEM(sequence, 0); 
-          __pyx_t_2 = PyTuple_GET_ITEM(sequence, 1); 
-          __pyx_t_5 = PyTuple_GET_ITEM(sequence, 2); 
-        } else {
-          __pyx_t_6 = PyList_GET_ITEM(sequence, 0); 
-          __pyx_t_2 = PyList_GET_ITEM(sequence, 1); 
-          __pyx_t_5 = PyList_GET_ITEM(sequence, 2); 
-        }
-        __Pyx_INCREF(__pyx_t_6);
-        __Pyx_INCREF(__pyx_t_2);
-        __Pyx_INCREF(__pyx_t_5);
-        #else
-        __pyx_t_6 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 88, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 88, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_5 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 88, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_5);
-        #endif
-        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      } else {
-        Py_ssize_t index = -1;
-        __pyx_t_17 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 88, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_17);
-        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_18 = Py_TYPE(__pyx_t_17)->tp_iternext;
-        index = 0; __pyx_t_6 = __pyx_t_18(__pyx_t_17); if (unlikely(!__pyx_t_6)) goto __pyx_L9_unpacking_failed;
-        __Pyx_GOTREF(__pyx_t_6);
-        index = 1; __pyx_t_2 = __pyx_t_18(__pyx_t_17); if (unlikely(!__pyx_t_2)) goto __pyx_L9_unpacking_failed;
-        __Pyx_GOTREF(__pyx_t_2);
-        index = 2; __pyx_t_5 = __pyx_t_18(__pyx_t_17); if (unlikely(!__pyx_t_5)) goto __pyx_L9_unpacking_failed;
-        __Pyx_GOTREF(__pyx_t_5);
-        if (__Pyx_IternextUnpackEndCheck(__pyx_t_18(__pyx_t_17), 3) < 0) __PYX_ERR(0, 88, __pyx_L1_error)
-        __pyx_t_18 = NULL;
-        __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
-        goto __pyx_L10_unpacking_done;
-        __pyx_L9_unpacking_failed:;
-        __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
-        __pyx_t_18 = NULL;
-        if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-        __PYX_ERR(0, 88, __pyx_L1_error)
-        __pyx_L10_unpacking_done:;
-      }
-      __Pyx_XDECREF_SET(__pyx_v_sgn_lambda, __pyx_t_6);
-      __pyx_t_6 = 0;
-      __Pyx_XDECREF_SET(__pyx_v_k_l, __pyx_t_2);
-      __pyx_t_2 = 0;
-      __Pyx_XDECREF_SET(__pyx_v_k_s, __pyx_t_5);
-      __pyx_t_5 = 0;
-
-      /* "cdwiener.pyx":89
- *         elif t_view[i] > 0:
- *             sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
- *             leading_term = calculate_leading_term(t_view[i], v, a, w)             # <<<<<<<<<<<<<<
- *             if sgn_lambda >= 0:
- *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(t_view[i] / (a**2),
- */
-      __pyx_t_29 = __pyx_v_i;
+      __pyx_t_33 = __pyx_v_i;
       __pyx_t_10 = -1;
-      if (__pyx_t_29 < 0) {
-        __pyx_t_29 += __pyx_v_t_view.shape[0];
-        if (unlikely(__pyx_t_29 < 0)) __pyx_t_10 = 0;
-      } else if (unlikely(__pyx_t_29 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
+      if (__pyx_t_33 < 0) {
+        __pyx_t_33 += __pyx_v_t_view.shape[0];
+        if (unlikely(__pyx_t_33 < 0)) __pyx_t_10 = 0;
+      } else if (unlikely(__pyx_t_33 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
       if (unlikely(__pyx_t_10 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_10);
-        __PYX_ERR(0, 89, __pyx_L1_error)
+        __PYX_ERR(0, 95, __pyx_L1_error)
       }
-      __pyx_v_leading_term = __pyx_f_8cdwiener_calculate_leading_term((*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_29 * __pyx_v_t_view.strides[0]) ))), __pyx_v_v, __pyx_v_a, __pyx_v_w);
+      *((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_33 * __pyx_v_t_view.strides[0]) )) = ((*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_32 * __pyx_v_t_view.strides[0]) ))) - __pyx_v_ndt);
 
-      /* "cdwiener.pyx":90
- *             sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
- *             leading_term = calculate_leading_term(t_view[i], v, a, w)
- *             if sgn_lambda >= 0:             # <<<<<<<<<<<<<<
- *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(t_view[i] / (a**2),
- *                     w, k_l))
+      /* "cdwiener.pyx":97
+ *             t_view[i] = t_view[i] - ndt
+ * 
+ *             if t_view[i] <= 0:             # <<<<<<<<<<<<<<
+ *                 likelihoods_view[i] = 1e-48
+ *             else:
  */
-      __pyx_t_3 = PyObject_RichCompare(__pyx_v_sgn_lambda, __pyx_int_0, Py_GE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 90, __pyx_L1_error)
-      __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 90, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __pyx_t_34 = __pyx_v_i;
+      __pyx_t_10 = -1;
+      if (__pyx_t_34 < 0) {
+        __pyx_t_34 += __pyx_v_t_view.shape[0];
+        if (unlikely(__pyx_t_34 < 0)) __pyx_t_10 = 0;
+      } else if (unlikely(__pyx_t_34 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
+      if (unlikely(__pyx_t_10 != -1)) {
+        __Pyx_RaiseBufferIndexError(__pyx_t_10);
+        __PYX_ERR(0, 97, __pyx_L1_error)
+      }
+      __pyx_t_11 = (((*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_34 * __pyx_v_t_view.strides[0]) ))) <= 0.0) != 0);
       if (__pyx_t_11) {
 
-        /* "cdwiener.pyx":91
- *             leading_term = calculate_leading_term(t_view[i], v, a, w)
- *             if sgn_lambda >= 0:
- *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(t_view[i] / (a**2),             # <<<<<<<<<<<<<<
- *                     w, k_l))
+        /* "cdwiener.pyx":98
+ * 
+ *             if t_view[i] <= 0:
+ *                 likelihoods_view[i] = 1e-48             # <<<<<<<<<<<<<<
  *             else:
+ *                 sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
  */
-        __pyx_t_30 = __pyx_v_i;
+        __pyx_t_35 = __pyx_v_i;
         __pyx_t_10 = -1;
-        if (__pyx_t_30 < 0) {
-          __pyx_t_30 += __pyx_v_t_view.shape[0];
-          if (unlikely(__pyx_t_30 < 0)) __pyx_t_10 = 0;
-        } else if (unlikely(__pyx_t_30 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
+        if (__pyx_t_35 < 0) {
+          __pyx_t_35 += __pyx_v_likelihoods_view.shape[0];
+          if (unlikely(__pyx_t_35 < 0)) __pyx_t_10 = 0;
+        } else if (unlikely(__pyx_t_35 >= __pyx_v_likelihoods_view.shape[0])) __pyx_t_10 = 0;
         if (unlikely(__pyx_t_10 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_10);
-          __PYX_ERR(0, 91, __pyx_L1_error)
+          __PYX_ERR(0, 98, __pyx_L1_error)
         }
-        __pyx_t_21 = (*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_30 * __pyx_v_t_view.strides[0]) )));
-        __pyx_t_22 = pow(__pyx_v_a, 2.0);
-        if (unlikely(__pyx_t_22 == 0)) {
-          PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-          __PYX_ERR(0, 91, __pyx_L1_error)
-        }
+        *((double *) ( /* dim=0 */ (__pyx_v_likelihoods_view.data + __pyx_t_35 * __pyx_v_likelihoods_view.strides[0]) )) = 1e-48;
 
-        /* "cdwiener.pyx":92
- *             if sgn_lambda >= 0:
- *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(t_view[i] / (a**2),
- *                     w, k_l))             # <<<<<<<<<<<<<<
- *             else:
- *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(t_view[i] / (a**2),
- */
-        __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_v_k_l); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 92, __pyx_L1_error)
-
-        /* "cdwiener.pyx":91
- *             leading_term = calculate_leading_term(t_view[i], v, a, w)
- *             if sgn_lambda >= 0:
- *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(t_view[i] / (a**2),             # <<<<<<<<<<<<<<
- *                     w, k_l))
+        /* "cdwiener.pyx":97
+ *             t_view[i] = t_view[i] - ndt
+ * 
+ *             if t_view[i] <= 0:             # <<<<<<<<<<<<<<
+ *                 likelihoods_view[i] = 1e-48
  *             else:
  */
-        __pyx_t_31 = __pyx_v_i;
-        __pyx_t_24 = -1;
-        if (__pyx_t_31 < 0) {
-          __pyx_t_31 += __pyx_v_likelihoods_view.shape[0];
-          if (unlikely(__pyx_t_31 < 0)) __pyx_t_24 = 0;
-        } else if (unlikely(__pyx_t_31 >= __pyx_v_likelihoods_view.shape[0])) __pyx_t_24 = 0;
-        if (unlikely(__pyx_t_24 != -1)) {
-          __Pyx_RaiseBufferIndexError(__pyx_t_24);
-          __PYX_ERR(0, 91, __pyx_L1_error)
-        }
-        *((double *) ( /* dim=0 */ (__pyx_v_likelihoods_view.data + __pyx_t_31 * __pyx_v_likelihoods_view.strides[0]) )) = fmax(1e-48, (__pyx_v_leading_term * __pyx_f_8cdwiener_fptd_large((__pyx_t_21 / __pyx_t_22), __pyx_v_w, __pyx_t_10)));
-
-        /* "cdwiener.pyx":90
- *             sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
- *             leading_term = calculate_leading_term(t_view[i], v, a, w)
- *             if sgn_lambda >= 0:             # <<<<<<<<<<<<<<
- *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(t_view[i] / (a**2),
- *                     w, k_l))
- */
-        goto __pyx_L11;
+        goto __pyx_L10;
       }
 
-      /* "cdwiener.pyx":94
- *                     w, k_l))
+      /* "cdwiener.pyx":100
+ *                 likelihoods_view[i] = 1e-48
  *             else:
- *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(t_view[i] / (a**2),             # <<<<<<<<<<<<<<
- *                     w, k_s))
- * 
+ *                 sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)             # <<<<<<<<<<<<<<
+ *                 leading_term = calculate_leading_term(t_view[i], v, a, w)
+ *                 if sgn_lambda >= 0:
  */
       /*else*/ {
-        __pyx_t_32 = __pyx_v_i;
+        __pyx_t_36 = __pyx_v_i;
         __pyx_t_10 = -1;
-        if (__pyx_t_32 < 0) {
-          __pyx_t_32 += __pyx_v_t_view.shape[0];
-          if (unlikely(__pyx_t_32 < 0)) __pyx_t_10 = 0;
-        } else if (unlikely(__pyx_t_32 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
+        if (__pyx_t_36 < 0) {
+          __pyx_t_36 += __pyx_v_t_view.shape[0];
+          if (unlikely(__pyx_t_36 < 0)) __pyx_t_10 = 0;
+        } else if (unlikely(__pyx_t_36 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
         if (unlikely(__pyx_t_10 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_10);
-          __PYX_ERR(0, 94, __pyx_L1_error)
+          __PYX_ERR(0, 100, __pyx_L1_error)
         }
-        __pyx_t_22 = (*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_32 * __pyx_v_t_view.strides[0]) )));
-        __pyx_t_21 = pow(__pyx_v_a, 2.0);
-        if (unlikely(__pyx_t_21 == 0)) {
-          PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-          __PYX_ERR(0, 94, __pyx_L1_error)
+        __pyx_t_3 = __pyx_f_8cdwiener_choice_function((*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_36 * __pyx_v_t_view.strides[0]) ))), __pyx_v_eps); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 100, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_3);
+        if ((likely(PyTuple_CheckExact(__pyx_t_3))) || (PyList_CheckExact(__pyx_t_3))) {
+          PyObject* sequence = __pyx_t_3;
+          Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
+          if (unlikely(size != 3)) {
+            if (size > 3) __Pyx_RaiseTooManyValuesError(3);
+            else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
+            __PYX_ERR(0, 100, __pyx_L1_error)
+          }
+          #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+          if (likely(PyTuple_CheckExact(sequence))) {
+            __pyx_t_6 = PyTuple_GET_ITEM(sequence, 0); 
+            __pyx_t_2 = PyTuple_GET_ITEM(sequence, 1); 
+            __pyx_t_5 = PyTuple_GET_ITEM(sequence, 2); 
+          } else {
+            __pyx_t_6 = PyList_GET_ITEM(sequence, 0); 
+            __pyx_t_2 = PyList_GET_ITEM(sequence, 1); 
+            __pyx_t_5 = PyList_GET_ITEM(sequence, 2); 
+          }
+          __Pyx_INCREF(__pyx_t_6);
+          __Pyx_INCREF(__pyx_t_2);
+          __Pyx_INCREF(__pyx_t_5);
+          #else
+          __pyx_t_6 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 100, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_6);
+          __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 100, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_2);
+          __pyx_t_5 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 100, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          #endif
+          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+        } else {
+          Py_ssize_t index = -1;
+          __pyx_t_21 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 100, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_21);
+          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+          __pyx_t_22 = Py_TYPE(__pyx_t_21)->tp_iternext;
+          index = 0; __pyx_t_6 = __pyx_t_22(__pyx_t_21); if (unlikely(!__pyx_t_6)) goto __pyx_L11_unpacking_failed;
+          __Pyx_GOTREF(__pyx_t_6);
+          index = 1; __pyx_t_2 = __pyx_t_22(__pyx_t_21); if (unlikely(!__pyx_t_2)) goto __pyx_L11_unpacking_failed;
+          __Pyx_GOTREF(__pyx_t_2);
+          index = 2; __pyx_t_5 = __pyx_t_22(__pyx_t_21); if (unlikely(!__pyx_t_5)) goto __pyx_L11_unpacking_failed;
+          __Pyx_GOTREF(__pyx_t_5);
+          if (__Pyx_IternextUnpackEndCheck(__pyx_t_22(__pyx_t_21), 3) < 0) __PYX_ERR(0, 100, __pyx_L1_error)
+          __pyx_t_22 = NULL;
+          __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
+          goto __pyx_L12_unpacking_done;
+          __pyx_L11_unpacking_failed:;
+          __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
+          __pyx_t_22 = NULL;
+          if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
+          __PYX_ERR(0, 100, __pyx_L1_error)
+          __pyx_L12_unpacking_done:;
+        }
+        __Pyx_XDECREF_SET(__pyx_v_sgn_lambda, __pyx_t_6);
+        __pyx_t_6 = 0;
+        __Pyx_XDECREF_SET(__pyx_v_k_l, __pyx_t_2);
+        __pyx_t_2 = 0;
+        __Pyx_XDECREF_SET(__pyx_v_k_s, __pyx_t_5);
+        __pyx_t_5 = 0;
+
+        /* "cdwiener.pyx":101
+ *             else:
+ *                 sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
+ *                 leading_term = calculate_leading_term(t_view[i], v, a, w)             # <<<<<<<<<<<<<<
+ *                 if sgn_lambda >= 0:
+ *                     likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(t_view[i] / (a**2),
+ */
+        __pyx_t_37 = __pyx_v_i;
+        __pyx_t_10 = -1;
+        if (__pyx_t_37 < 0) {
+          __pyx_t_37 += __pyx_v_t_view.shape[0];
+          if (unlikely(__pyx_t_37 < 0)) __pyx_t_10 = 0;
+        } else if (unlikely(__pyx_t_37 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
+        if (unlikely(__pyx_t_10 != -1)) {
+          __Pyx_RaiseBufferIndexError(__pyx_t_10);
+          __PYX_ERR(0, 101, __pyx_L1_error)
+        }
+        __pyx_v_leading_term = __pyx_f_8cdwiener_calculate_leading_term((*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_37 * __pyx_v_t_view.strides[0]) ))), __pyx_v_v, __pyx_v_a, __pyx_v_w);
+
+        /* "cdwiener.pyx":102
+ *                 sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
+ *                 leading_term = calculate_leading_term(t_view[i], v, a, w)
+ *                 if sgn_lambda >= 0:             # <<<<<<<<<<<<<<
+ *                     likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(t_view[i] / (a**2),
+ *                         w, k_l))
+ */
+        __pyx_t_3 = PyObject_RichCompare(__pyx_v_sgn_lambda, __pyx_int_0, Py_GE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 102, __pyx_L1_error)
+        __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 102, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+        if (__pyx_t_11) {
+
+          /* "cdwiener.pyx":103
+ *                 leading_term = calculate_leading_term(t_view[i], v, a, w)
+ *                 if sgn_lambda >= 0:
+ *                     likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(t_view[i] / (a**2),             # <<<<<<<<<<<<<<
+ *                         w, k_l))
+ *                 else:
+ */
+          __pyx_t_38 = __pyx_v_i;
+          __pyx_t_10 = -1;
+          if (__pyx_t_38 < 0) {
+            __pyx_t_38 += __pyx_v_t_view.shape[0];
+            if (unlikely(__pyx_t_38 < 0)) __pyx_t_10 = 0;
+          } else if (unlikely(__pyx_t_38 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
+          if (unlikely(__pyx_t_10 != -1)) {
+            __Pyx_RaiseBufferIndexError(__pyx_t_10);
+            __PYX_ERR(0, 103, __pyx_L1_error)
+          }
+          __pyx_t_25 = (*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_38 * __pyx_v_t_view.strides[0]) )));
+          __pyx_t_26 = pow(__pyx_v_a, 2.0);
+          if (unlikely(__pyx_t_26 == 0)) {
+            PyErr_SetString(PyExc_ZeroDivisionError, "float division");
+            __PYX_ERR(0, 103, __pyx_L1_error)
+          }
+
+          /* "cdwiener.pyx":104
+ *                 if sgn_lambda >= 0:
+ *                     likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(t_view[i] / (a**2),
+ *                         w, k_l))             # <<<<<<<<<<<<<<
+ *                 else:
+ *                     likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(t_view[i] / (a**2),
+ */
+          __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_v_k_l); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 104, __pyx_L1_error)
+
+          /* "cdwiener.pyx":103
+ *                 leading_term = calculate_leading_term(t_view[i], v, a, w)
+ *                 if sgn_lambda >= 0:
+ *                     likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(t_view[i] / (a**2),             # <<<<<<<<<<<<<<
+ *                         w, k_l))
+ *                 else:
+ */
+          __pyx_t_39 = __pyx_v_i;
+          __pyx_t_28 = -1;
+          if (__pyx_t_39 < 0) {
+            __pyx_t_39 += __pyx_v_likelihoods_view.shape[0];
+            if (unlikely(__pyx_t_39 < 0)) __pyx_t_28 = 0;
+          } else if (unlikely(__pyx_t_39 >= __pyx_v_likelihoods_view.shape[0])) __pyx_t_28 = 0;
+          if (unlikely(__pyx_t_28 != -1)) {
+            __Pyx_RaiseBufferIndexError(__pyx_t_28);
+            __PYX_ERR(0, 103, __pyx_L1_error)
+          }
+          *((double *) ( /* dim=0 */ (__pyx_v_likelihoods_view.data + __pyx_t_39 * __pyx_v_likelihoods_view.strides[0]) )) = fmax(1e-48, (__pyx_v_leading_term * __pyx_f_8cdwiener_fptd_large((__pyx_t_25 / __pyx_t_26), __pyx_v_w, __pyx_t_10)));
+
+          /* "cdwiener.pyx":102
+ *                 sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
+ *                 leading_term = calculate_leading_term(t_view[i], v, a, w)
+ *                 if sgn_lambda >= 0:             # <<<<<<<<<<<<<<
+ *                     likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(t_view[i] / (a**2),
+ *                         w, k_l))
+ */
+          goto __pyx_L13;
         }
 
-        /* "cdwiener.pyx":95
- *             else:
- *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(t_view[i] / (a**2),
- *                     w, k_s))             # <<<<<<<<<<<<<<
+        /* "cdwiener.pyx":106
+ *                         w, k_l))
+ *                 else:
+ *                     likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(t_view[i] / (a**2),             # <<<<<<<<<<<<<<
+ *                         w, k_s))
+ * 
+ */
+        /*else*/ {
+          __pyx_t_40 = __pyx_v_i;
+          __pyx_t_10 = -1;
+          if (__pyx_t_40 < 0) {
+            __pyx_t_40 += __pyx_v_t_view.shape[0];
+            if (unlikely(__pyx_t_40 < 0)) __pyx_t_10 = 0;
+          } else if (unlikely(__pyx_t_40 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
+          if (unlikely(__pyx_t_10 != -1)) {
+            __Pyx_RaiseBufferIndexError(__pyx_t_10);
+            __PYX_ERR(0, 106, __pyx_L1_error)
+          }
+          __pyx_t_26 = (*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_40 * __pyx_v_t_view.strides[0]) )));
+          __pyx_t_25 = pow(__pyx_v_a, 2.0);
+          if (unlikely(__pyx_t_25 == 0)) {
+            PyErr_SetString(PyExc_ZeroDivisionError, "float division");
+            __PYX_ERR(0, 106, __pyx_L1_error)
+          }
+
+          /* "cdwiener.pyx":107
+ *                 else:
+ *                     likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(t_view[i] / (a**2),
+ *                         w, k_s))             # <<<<<<<<<<<<<<
  * 
  *     return likelihoods
  */
-        __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_v_k_s); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 95, __pyx_L1_error)
+          __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_v_k_s); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 107, __pyx_L1_error)
 
-        /* "cdwiener.pyx":94
- *                     w, k_l))
- *             else:
- *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(t_view[i] / (a**2),             # <<<<<<<<<<<<<<
- *                     w, k_s))
+          /* "cdwiener.pyx":106
+ *                         w, k_l))
+ *                 else:
+ *                     likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(t_view[i] / (a**2),             # <<<<<<<<<<<<<<
+ *                         w, k_s))
  * 
  */
-        __pyx_t_33 = __pyx_v_i;
-        __pyx_t_24 = -1;
-        if (__pyx_t_33 < 0) {
-          __pyx_t_33 += __pyx_v_likelihoods_view.shape[0];
-          if (unlikely(__pyx_t_33 < 0)) __pyx_t_24 = 0;
-        } else if (unlikely(__pyx_t_33 >= __pyx_v_likelihoods_view.shape[0])) __pyx_t_24 = 0;
-        if (unlikely(__pyx_t_24 != -1)) {
-          __Pyx_RaiseBufferIndexError(__pyx_t_24);
-          __PYX_ERR(0, 94, __pyx_L1_error)
+          __pyx_t_41 = __pyx_v_i;
+          __pyx_t_28 = -1;
+          if (__pyx_t_41 < 0) {
+            __pyx_t_41 += __pyx_v_likelihoods_view.shape[0];
+            if (unlikely(__pyx_t_41 < 0)) __pyx_t_28 = 0;
+          } else if (unlikely(__pyx_t_41 >= __pyx_v_likelihoods_view.shape[0])) __pyx_t_28 = 0;
+          if (unlikely(__pyx_t_28 != -1)) {
+            __Pyx_RaiseBufferIndexError(__pyx_t_28);
+            __PYX_ERR(0, 106, __pyx_L1_error)
+          }
+          *((double *) ( /* dim=0 */ (__pyx_v_likelihoods_view.data + __pyx_t_41 * __pyx_v_likelihoods_view.strides[0]) )) = fmax(1e-48, (__pyx_v_leading_term * __pyx_f_8cdwiener_fptd_small((__pyx_t_26 / __pyx_t_25), __pyx_v_w, __pyx_t_10)));
         }
-        *((double *) ( /* dim=0 */ (__pyx_v_likelihoods_view.data + __pyx_t_33 * __pyx_v_likelihoods_view.strides[0]) )) = fmax(1e-48, (__pyx_v_leading_term * __pyx_f_8cdwiener_fptd_small((__pyx_t_22 / __pyx_t_21), __pyx_v_w, __pyx_t_10)));
+        __pyx_L13:;
       }
-      __pyx_L11:;
+      __pyx_L10:;
 
-      /* "cdwiener.pyx":87
- *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(t_view[i] / (a**2),
- *                     1 - w, k_s))
+      /* "cdwiener.pyx":93
+ *                     likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(t_view[i] / (a**2),
+ *                         1 - w, k_s))
  *         elif t_view[i] > 0:             # <<<<<<<<<<<<<<
- *             sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
- *             leading_term = calculate_leading_term(t_view[i], v, a, w)
+ *             # adjust rt for ndt
+ *             t_view[i] = t_view[i] - ndt
  */
     }
     __pyx_L5:;
   }
 
-  /* "cdwiener.pyx":97
- *                     w, k_s))
+  /* "cdwiener.pyx":109
+ *                         w, k_s))
  * 
  *     return likelihoods             # <<<<<<<<<<<<<<
  * 
@@ -3892,7 +4091,7 @@ static PyObject *__pyx_pf_8cdwiener_2batch_fptd(CYTHON_UNUSED PyObject *__pyx_se
   /* "cdwiener.pyx":64
  * # --------------------------------
  * 
- * def batch_fptd(t, double v, double a, double w, double eps=1e-9):             # <<<<<<<<<<<<<<
+ * def batch_fptd(t, double v = 1, double a = 1, double w = 0.5, double ndt = 1.0, double eps = 1e-10):             # <<<<<<<<<<<<<<
  *     # Use when rts and choices vary, but parameters are held constant
  *     cdef int i
  */
@@ -3904,7 +4103,7 @@ static PyObject *__pyx_pf_8cdwiener_2batch_fptd(CYTHON_UNUSED PyObject *__pyx_se
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_XDECREF(__pyx_t_17);
+  __Pyx_XDECREF(__pyx_t_21);
   __Pyx_AddTraceback("cdwiener.batch_fptd", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
@@ -3919,7 +4118,7 @@ static PyObject *__pyx_pf_8cdwiener_2batch_fptd(CYTHON_UNUSED PyObject *__pyx_se
   return __pyx_r;
 }
 
-/* "cdwiener.pyx":99
+/* "cdwiener.pyx":111
  *     return likelihoods
  * 
  * def array_fptd(t, v, a, w, double eps=1e-9):             # <<<<<<<<<<<<<<
@@ -3968,19 +4167,19 @@ static PyObject *__pyx_pw_8cdwiener_5array_fptd(PyObject *__pyx_self, PyObject *
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_v)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("array_fptd", 0, 4, 5, 1); __PYX_ERR(0, 99, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("array_fptd", 0, 4, 5, 1); __PYX_ERR(0, 111, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_a)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("array_fptd", 0, 4, 5, 2); __PYX_ERR(0, 99, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("array_fptd", 0, 4, 5, 2); __PYX_ERR(0, 111, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_w)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("array_fptd", 0, 4, 5, 3); __PYX_ERR(0, 99, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("array_fptd", 0, 4, 5, 3); __PYX_ERR(0, 111, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
@@ -3990,7 +4189,7 @@ static PyObject *__pyx_pw_8cdwiener_5array_fptd(PyObject *__pyx_self, PyObject *
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "array_fptd") < 0)) __PYX_ERR(0, 99, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "array_fptd") < 0)) __PYX_ERR(0, 111, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -4009,14 +4208,14 @@ static PyObject *__pyx_pw_8cdwiener_5array_fptd(PyObject *__pyx_self, PyObject *
     __pyx_v_a = values[2];
     __pyx_v_w = values[3];
     if (values[4]) {
-      __pyx_v_eps = __pyx_PyFloat_AsDouble(values[4]); if (unlikely((__pyx_v_eps == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 99, __pyx_L3_error)
+      __pyx_v_eps = __pyx_PyFloat_AsDouble(values[4]); if (unlikely((__pyx_v_eps == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 111, __pyx_L3_error)
     } else {
       __pyx_v_eps = ((double)1e-9);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("array_fptd", 0, 4, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 99, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("array_fptd", 0, 4, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 111, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("cdwiener.array_fptd", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -4093,83 +4292,83 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
   Py_ssize_t __pyx_t_47;
   __Pyx_RefNannySetupContext("array_fptd", 0);
 
-  /* "cdwiener.pyx":102
+  /* "cdwiener.pyx":114
  *     # Use when all inputs vary, but we want to feed in an array of them
  *     cdef int i
  *     cdef int n = t.shape[0]             # <<<<<<<<<<<<<<
  *     cdef double[:] t_view = t
  *     cdef double[:] v_view = v
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_t, __pyx_n_s_shape); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 102, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_t, __pyx_n_s_shape); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 102, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 102, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_n = __pyx_t_3;
 
-  /* "cdwiener.pyx":103
+  /* "cdwiener.pyx":115
  *     cdef int i
  *     cdef int n = t.shape[0]
  *     cdef double[:] t_view = t             # <<<<<<<<<<<<<<
  *     cdef double[:] v_view = v
  *     cdef double[:] a_view = a
  */
-  __pyx_t_4 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_v_t, PyBUF_WRITABLE); if (unlikely(!__pyx_t_4.memview)) __PYX_ERR(0, 103, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_v_t, PyBUF_WRITABLE); if (unlikely(!__pyx_t_4.memview)) __PYX_ERR(0, 115, __pyx_L1_error)
   __pyx_v_t_view = __pyx_t_4;
   __pyx_t_4.memview = NULL;
   __pyx_t_4.data = NULL;
 
-  /* "cdwiener.pyx":104
+  /* "cdwiener.pyx":116
  *     cdef int n = t.shape[0]
  *     cdef double[:] t_view = t
  *     cdef double[:] v_view = v             # <<<<<<<<<<<<<<
  *     cdef double[:] a_view = a
  *     cdef double[:] w_view = w
  */
-  __pyx_t_4 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_v_v, PyBUF_WRITABLE); if (unlikely(!__pyx_t_4.memview)) __PYX_ERR(0, 104, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_v_v, PyBUF_WRITABLE); if (unlikely(!__pyx_t_4.memview)) __PYX_ERR(0, 116, __pyx_L1_error)
   __pyx_v_v_view = __pyx_t_4;
   __pyx_t_4.memview = NULL;
   __pyx_t_4.data = NULL;
 
-  /* "cdwiener.pyx":105
+  /* "cdwiener.pyx":117
  *     cdef double[:] t_view = t
  *     cdef double[:] v_view = v
  *     cdef double[:] a_view = a             # <<<<<<<<<<<<<<
  *     cdef double[:] w_view = w
  * 
  */
-  __pyx_t_4 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_v_a, PyBUF_WRITABLE); if (unlikely(!__pyx_t_4.memview)) __PYX_ERR(0, 105, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_v_a, PyBUF_WRITABLE); if (unlikely(!__pyx_t_4.memview)) __PYX_ERR(0, 117, __pyx_L1_error)
   __pyx_v_a_view = __pyx_t_4;
   __pyx_t_4.memview = NULL;
   __pyx_t_4.data = NULL;
 
-  /* "cdwiener.pyx":106
+  /* "cdwiener.pyx":118
  *     cdef double[:] v_view = v
  *     cdef double[:] a_view = a
  *     cdef double[:] w_view = w             # <<<<<<<<<<<<<<
  * 
  *     likelihoods = np.zeros(n)
  */
-  __pyx_t_4 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_v_w, PyBUF_WRITABLE); if (unlikely(!__pyx_t_4.memview)) __PYX_ERR(0, 106, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_v_w, PyBUF_WRITABLE); if (unlikely(!__pyx_t_4.memview)) __PYX_ERR(0, 118, __pyx_L1_error)
   __pyx_v_w_view = __pyx_t_4;
   __pyx_t_4.memview = NULL;
   __pyx_t_4.data = NULL;
 
-  /* "cdwiener.pyx":108
+  /* "cdwiener.pyx":120
  *     cdef double[:] w_view = w
  * 
  *     likelihoods = np.zeros(n)             # <<<<<<<<<<<<<<
  *     cdef double[:] likelihoods_view = likelihoods
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 108, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 120, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 108, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 120, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_n); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 108, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_n); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 120, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_6 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_5))) {
@@ -4184,25 +4383,25 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
   __pyx_t_2 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_6, __pyx_t_1) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_1);
   __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 108, __pyx_L1_error)
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 120, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_v_likelihoods = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "cdwiener.pyx":109
+  /* "cdwiener.pyx":121
  * 
  *     likelihoods = np.zeros(n)
  *     cdef double[:] likelihoods_view = likelihoods             # <<<<<<<<<<<<<<
  * 
  *     for i in range(n):
  */
-  __pyx_t_4 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_v_likelihoods, PyBUF_WRITABLE); if (unlikely(!__pyx_t_4.memview)) __PYX_ERR(0, 109, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_v_likelihoods, PyBUF_WRITABLE); if (unlikely(!__pyx_t_4.memview)) __PYX_ERR(0, 121, __pyx_L1_error)
   __pyx_v_likelihoods_view = __pyx_t_4;
   __pyx_t_4.memview = NULL;
   __pyx_t_4.data = NULL;
 
-  /* "cdwiener.pyx":111
+  /* "cdwiener.pyx":123
  *     cdef double[:] likelihoods_view = likelihoods
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -4214,7 +4413,7 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
   for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
     __pyx_v_i = __pyx_t_8;
 
-    /* "cdwiener.pyx":112
+    /* "cdwiener.pyx":124
  * 
  *     for i in range(n):
  *         if t_view[i] == 0:             # <<<<<<<<<<<<<<
@@ -4229,12 +4428,12 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
     } else if (unlikely(__pyx_t_9 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
     if (unlikely(__pyx_t_10 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_10);
-      __PYX_ERR(0, 112, __pyx_L1_error)
+      __PYX_ERR(0, 124, __pyx_L1_error)
     }
     __pyx_t_11 = (((*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_9 * __pyx_v_t_view.strides[0]) ))) == 0.0) != 0);
     if (__pyx_t_11) {
 
-      /* "cdwiener.pyx":113
+      /* "cdwiener.pyx":125
  *     for i in range(n):
  *         if t_view[i] == 0:
  *             likelihoods_view[i] = 1e-48             # <<<<<<<<<<<<<<
@@ -4249,11 +4448,11 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
       } else if (unlikely(__pyx_t_12 >= __pyx_v_likelihoods_view.shape[0])) __pyx_t_10 = 0;
       if (unlikely(__pyx_t_10 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_10);
-        __PYX_ERR(0, 113, __pyx_L1_error)
+        __PYX_ERR(0, 125, __pyx_L1_error)
       }
       *((double *) ( /* dim=0 */ (__pyx_v_likelihoods_view.data + __pyx_t_12 * __pyx_v_likelihoods_view.strides[0]) )) = 1e-48;
 
-      /* "cdwiener.pyx":112
+      /* "cdwiener.pyx":124
  * 
  *     for i in range(n):
  *         if t_view[i] == 0:             # <<<<<<<<<<<<<<
@@ -4263,7 +4462,7 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
       goto __pyx_L5;
     }
 
-    /* "cdwiener.pyx":114
+    /* "cdwiener.pyx":126
  *         if t_view[i] == 0:
  *             likelihoods_view[i] = 1e-48
  *         elif t_view[i] < 0:             # <<<<<<<<<<<<<<
@@ -4278,12 +4477,12 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
     } else if (unlikely(__pyx_t_13 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
     if (unlikely(__pyx_t_10 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_10);
-      __PYX_ERR(0, 114, __pyx_L1_error)
+      __PYX_ERR(0, 126, __pyx_L1_error)
     }
     __pyx_t_11 = (((*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_13 * __pyx_v_t_view.strides[0]) ))) < 0.0) != 0);
     if (__pyx_t_11) {
 
-      /* "cdwiener.pyx":115
+      /* "cdwiener.pyx":127
  *             likelihoods_view[i] = 1e-48
  *         elif t_view[i] < 0:
  *             t_view[i] = (-1) * t_view[i]             # <<<<<<<<<<<<<<
@@ -4298,7 +4497,7 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
       } else if (unlikely(__pyx_t_14 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
       if (unlikely(__pyx_t_10 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_10);
-        __PYX_ERR(0, 115, __pyx_L1_error)
+        __PYX_ERR(0, 127, __pyx_L1_error)
       }
       __pyx_t_15 = __pyx_v_i;
       __pyx_t_10 = -1;
@@ -4308,11 +4507,11 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
       } else if (unlikely(__pyx_t_15 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
       if (unlikely(__pyx_t_10 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_10);
-        __PYX_ERR(0, 115, __pyx_L1_error)
+        __PYX_ERR(0, 127, __pyx_L1_error)
       }
       *((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_15 * __pyx_v_t_view.strides[0]) )) = (-1.0 * (*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_14 * __pyx_v_t_view.strides[0]) ))));
 
-      /* "cdwiener.pyx":117
+      /* "cdwiener.pyx":129
  *             t_view[i] = (-1) * t_view[i]
  * 
  *             sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)             # <<<<<<<<<<<<<<
@@ -4327,9 +4526,9 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
       } else if (unlikely(__pyx_t_16 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
       if (unlikely(__pyx_t_10 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_10);
-        __PYX_ERR(0, 117, __pyx_L1_error)
+        __PYX_ERR(0, 129, __pyx_L1_error)
       }
-      __pyx_t_2 = __pyx_f_8cdwiener_choice_function((*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_16 * __pyx_v_t_view.strides[0]) ))), __pyx_v_eps); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 117, __pyx_L1_error)
+      __pyx_t_2 = __pyx_f_8cdwiener_choice_function((*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_16 * __pyx_v_t_view.strides[0]) ))), __pyx_v_eps); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 129, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       if ((likely(PyTuple_CheckExact(__pyx_t_2))) || (PyList_CheckExact(__pyx_t_2))) {
         PyObject* sequence = __pyx_t_2;
@@ -4337,7 +4536,7 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
         if (unlikely(size != 3)) {
           if (size > 3) __Pyx_RaiseTooManyValuesError(3);
           else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-          __PYX_ERR(0, 117, __pyx_L1_error)
+          __PYX_ERR(0, 129, __pyx_L1_error)
         }
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
         if (likely(PyTuple_CheckExact(sequence))) {
@@ -4353,17 +4552,17 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
         __Pyx_INCREF(__pyx_t_1);
         __Pyx_INCREF(__pyx_t_6);
         #else
-        __pyx_t_5 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 117, __pyx_L1_error)
+        __pyx_t_5 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 129, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_1 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 117, __pyx_L1_error)
+        __pyx_t_1 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 129, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_6 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 117, __pyx_L1_error)
+        __pyx_t_6 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 129, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         #endif
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       } else {
         Py_ssize_t index = -1;
-        __pyx_t_17 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 117, __pyx_L1_error)
+        __pyx_t_17 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 129, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_17);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_t_18 = Py_TYPE(__pyx_t_17)->tp_iternext;
@@ -4373,7 +4572,7 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
         __Pyx_GOTREF(__pyx_t_1);
         index = 2; __pyx_t_6 = __pyx_t_18(__pyx_t_17); if (unlikely(!__pyx_t_6)) goto __pyx_L6_unpacking_failed;
         __Pyx_GOTREF(__pyx_t_6);
-        if (__Pyx_IternextUnpackEndCheck(__pyx_t_18(__pyx_t_17), 3) < 0) __PYX_ERR(0, 117, __pyx_L1_error)
+        if (__Pyx_IternextUnpackEndCheck(__pyx_t_18(__pyx_t_17), 3) < 0) __PYX_ERR(0, 129, __pyx_L1_error)
         __pyx_t_18 = NULL;
         __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
         goto __pyx_L7_unpacking_done;
@@ -4381,7 +4580,7 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
         __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
         __pyx_t_18 = NULL;
         if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-        __PYX_ERR(0, 117, __pyx_L1_error)
+        __PYX_ERR(0, 129, __pyx_L1_error)
         __pyx_L7_unpacking_done:;
       }
       __Pyx_XDECREF_SET(__pyx_v_sgn_lambda, __pyx_t_5);
@@ -4391,7 +4590,7 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
       __Pyx_XDECREF_SET(__pyx_v_k_s, __pyx_t_6);
       __pyx_t_6 = 0;
 
-      /* "cdwiener.pyx":118
+      /* "cdwiener.pyx":130
  * 
  *             sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
  *             leading_term = calculate_leading_term(t_view[i], (-1) * v_view[i], a_view[i],             # <<<<<<<<<<<<<<
@@ -4406,7 +4605,7 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
       } else if (unlikely(__pyx_t_19 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
       if (unlikely(__pyx_t_10 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_10);
-        __PYX_ERR(0, 118, __pyx_L1_error)
+        __PYX_ERR(0, 130, __pyx_L1_error)
       }
       __pyx_t_20 = __pyx_v_i;
       __pyx_t_10 = -1;
@@ -4416,7 +4615,7 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
       } else if (unlikely(__pyx_t_20 >= __pyx_v_v_view.shape[0])) __pyx_t_10 = 0;
       if (unlikely(__pyx_t_10 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_10);
-        __PYX_ERR(0, 118, __pyx_L1_error)
+        __PYX_ERR(0, 130, __pyx_L1_error)
       }
       __pyx_t_21 = __pyx_v_i;
       __pyx_t_10 = -1;
@@ -4426,10 +4625,10 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
       } else if (unlikely(__pyx_t_21 >= __pyx_v_a_view.shape[0])) __pyx_t_10 = 0;
       if (unlikely(__pyx_t_10 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_10);
-        __PYX_ERR(0, 118, __pyx_L1_error)
+        __PYX_ERR(0, 130, __pyx_L1_error)
       }
 
-      /* "cdwiener.pyx":119
+      /* "cdwiener.pyx":131
  *             sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
  *             leading_term = calculate_leading_term(t_view[i], (-1) * v_view[i], a_view[i],
  *                     1 - w_view[i])             # <<<<<<<<<<<<<<
@@ -4444,10 +4643,10 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
       } else if (unlikely(__pyx_t_22 >= __pyx_v_w_view.shape[0])) __pyx_t_10 = 0;
       if (unlikely(__pyx_t_10 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_10);
-        __PYX_ERR(0, 119, __pyx_L1_error)
+        __PYX_ERR(0, 131, __pyx_L1_error)
       }
 
-      /* "cdwiener.pyx":118
+      /* "cdwiener.pyx":130
  * 
  *             sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
  *             leading_term = calculate_leading_term(t_view[i], (-1) * v_view[i], a_view[i],             # <<<<<<<<<<<<<<
@@ -4456,19 +4655,19 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
  */
       __pyx_v_leading_term = __pyx_f_8cdwiener_calculate_leading_term((*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_19 * __pyx_v_t_view.strides[0]) ))), (-1.0 * (*((double *) ( /* dim=0 */ (__pyx_v_v_view.data + __pyx_t_20 * __pyx_v_v_view.strides[0]) )))), (*((double *) ( /* dim=0 */ (__pyx_v_a_view.data + __pyx_t_21 * __pyx_v_a_view.strides[0]) ))), (1.0 - (*((double *) ( /* dim=0 */ (__pyx_v_w_view.data + __pyx_t_22 * __pyx_v_w_view.strides[0]) )))));
 
-      /* "cdwiener.pyx":120
+      /* "cdwiener.pyx":132
  *             leading_term = calculate_leading_term(t_view[i], (-1) * v_view[i], a_view[i],
  *                     1 - w_view[i])
  *             if sgn_lambda >= 0:             # <<<<<<<<<<<<<<
  *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(
  *                     t_view[i] / (a_view[i]**2), 1 - w_view[i], k_l))
  */
-      __pyx_t_2 = PyObject_RichCompare(__pyx_v_sgn_lambda, __pyx_int_0, Py_GE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 120, __pyx_L1_error)
-      __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 120, __pyx_L1_error)
+      __pyx_t_2 = PyObject_RichCompare(__pyx_v_sgn_lambda, __pyx_int_0, Py_GE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 132, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 132, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       if (__pyx_t_11) {
 
-        /* "cdwiener.pyx":122
+        /* "cdwiener.pyx":134
  *             if sgn_lambda >= 0:
  *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(
  *                     t_view[i] / (a_view[i]**2), 1 - w_view[i], k_l))             # <<<<<<<<<<<<<<
@@ -4483,7 +4682,7 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
         } else if (unlikely(__pyx_t_23 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
         if (unlikely(__pyx_t_10 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_10);
-          __PYX_ERR(0, 122, __pyx_L1_error)
+          __PYX_ERR(0, 134, __pyx_L1_error)
         }
         __pyx_t_24 = (*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_23 * __pyx_v_t_view.strides[0]) )));
         __pyx_t_25 = __pyx_v_i;
@@ -4494,12 +4693,12 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
         } else if (unlikely(__pyx_t_25 >= __pyx_v_a_view.shape[0])) __pyx_t_10 = 0;
         if (unlikely(__pyx_t_10 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_10);
-          __PYX_ERR(0, 122, __pyx_L1_error)
+          __PYX_ERR(0, 134, __pyx_L1_error)
         }
         __pyx_t_26 = pow((*((double *) ( /* dim=0 */ (__pyx_v_a_view.data + __pyx_t_25 * __pyx_v_a_view.strides[0]) ))), 2.0);
         if (unlikely(__pyx_t_26 == 0)) {
           PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-          __PYX_ERR(0, 122, __pyx_L1_error)
+          __PYX_ERR(0, 134, __pyx_L1_error)
         }
         __pyx_t_27 = __pyx_v_i;
         __pyx_t_10 = -1;
@@ -4509,11 +4708,11 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
         } else if (unlikely(__pyx_t_27 >= __pyx_v_w_view.shape[0])) __pyx_t_10 = 0;
         if (unlikely(__pyx_t_10 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_10);
-          __PYX_ERR(0, 122, __pyx_L1_error)
+          __PYX_ERR(0, 134, __pyx_L1_error)
         }
-        __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_v_k_l); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 122, __pyx_L1_error)
+        __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_v_k_l); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 134, __pyx_L1_error)
 
-        /* "cdwiener.pyx":121
+        /* "cdwiener.pyx":133
  *                     1 - w_view[i])
  *             if sgn_lambda >= 0:
  *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(             # <<<<<<<<<<<<<<
@@ -4528,11 +4727,11 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
         } else if (unlikely(__pyx_t_28 >= __pyx_v_likelihoods_view.shape[0])) __pyx_t_29 = 0;
         if (unlikely(__pyx_t_29 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_29);
-          __PYX_ERR(0, 121, __pyx_L1_error)
+          __PYX_ERR(0, 133, __pyx_L1_error)
         }
         *((double *) ( /* dim=0 */ (__pyx_v_likelihoods_view.data + __pyx_t_28 * __pyx_v_likelihoods_view.strides[0]) )) = fmax(1e-48, (__pyx_v_leading_term * __pyx_f_8cdwiener_fptd_large((__pyx_t_24 / __pyx_t_26), (1.0 - (*((double *) ( /* dim=0 */ (__pyx_v_w_view.data + __pyx_t_27 * __pyx_v_w_view.strides[0]) )))), __pyx_t_10)));
 
-        /* "cdwiener.pyx":120
+        /* "cdwiener.pyx":132
  *             leading_term = calculate_leading_term(t_view[i], (-1) * v_view[i], a_view[i],
  *                     1 - w_view[i])
  *             if sgn_lambda >= 0:             # <<<<<<<<<<<<<<
@@ -4542,7 +4741,7 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
         goto __pyx_L8;
       }
 
-      /* "cdwiener.pyx":124
+      /* "cdwiener.pyx":136
  *                     t_view[i] / (a_view[i]**2), 1 - w_view[i], k_l))
  *             else:
  *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(             # <<<<<<<<<<<<<<
@@ -4551,7 +4750,7 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
  */
       /*else*/ {
 
-        /* "cdwiener.pyx":125
+        /* "cdwiener.pyx":137
  *             else:
  *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(
  *                     t_view[i] / (a_view[i]**2), 1 - w_view[i], k_s))             # <<<<<<<<<<<<<<
@@ -4566,7 +4765,7 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
         } else if (unlikely(__pyx_t_30 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
         if (unlikely(__pyx_t_10 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_10);
-          __PYX_ERR(0, 125, __pyx_L1_error)
+          __PYX_ERR(0, 137, __pyx_L1_error)
         }
         __pyx_t_26 = (*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_30 * __pyx_v_t_view.strides[0]) )));
         __pyx_t_31 = __pyx_v_i;
@@ -4577,12 +4776,12 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
         } else if (unlikely(__pyx_t_31 >= __pyx_v_a_view.shape[0])) __pyx_t_10 = 0;
         if (unlikely(__pyx_t_10 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_10);
-          __PYX_ERR(0, 125, __pyx_L1_error)
+          __PYX_ERR(0, 137, __pyx_L1_error)
         }
         __pyx_t_24 = pow((*((double *) ( /* dim=0 */ (__pyx_v_a_view.data + __pyx_t_31 * __pyx_v_a_view.strides[0]) ))), 2.0);
         if (unlikely(__pyx_t_24 == 0)) {
           PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-          __PYX_ERR(0, 125, __pyx_L1_error)
+          __PYX_ERR(0, 137, __pyx_L1_error)
         }
         __pyx_t_32 = __pyx_v_i;
         __pyx_t_10 = -1;
@@ -4592,11 +4791,11 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
         } else if (unlikely(__pyx_t_32 >= __pyx_v_w_view.shape[0])) __pyx_t_10 = 0;
         if (unlikely(__pyx_t_10 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_10);
-          __PYX_ERR(0, 125, __pyx_L1_error)
+          __PYX_ERR(0, 137, __pyx_L1_error)
         }
-        __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_v_k_s); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 125, __pyx_L1_error)
+        __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_v_k_s); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 137, __pyx_L1_error)
 
-        /* "cdwiener.pyx":124
+        /* "cdwiener.pyx":136
  *                     t_view[i] / (a_view[i]**2), 1 - w_view[i], k_l))
  *             else:
  *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(             # <<<<<<<<<<<<<<
@@ -4611,13 +4810,13 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
         } else if (unlikely(__pyx_t_33 >= __pyx_v_likelihoods_view.shape[0])) __pyx_t_29 = 0;
         if (unlikely(__pyx_t_29 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_29);
-          __PYX_ERR(0, 124, __pyx_L1_error)
+          __PYX_ERR(0, 136, __pyx_L1_error)
         }
         *((double *) ( /* dim=0 */ (__pyx_v_likelihoods_view.data + __pyx_t_33 * __pyx_v_likelihoods_view.strides[0]) )) = fmax(1e-48, (__pyx_v_leading_term * __pyx_f_8cdwiener_fptd_small((__pyx_t_26 / __pyx_t_24), (1.0 - (*((double *) ( /* dim=0 */ (__pyx_v_w_view.data + __pyx_t_32 * __pyx_v_w_view.strides[0]) )))), __pyx_t_10)));
       }
       __pyx_L8:;
 
-      /* "cdwiener.pyx":114
+      /* "cdwiener.pyx":126
  *         if t_view[i] == 0:
  *             likelihoods_view[i] = 1e-48
  *         elif t_view[i] < 0:             # <<<<<<<<<<<<<<
@@ -4627,7 +4826,7 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
       goto __pyx_L5;
     }
 
-    /* "cdwiener.pyx":126
+    /* "cdwiener.pyx":138
  *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(
  *                     t_view[i] / (a_view[i]**2), 1 - w_view[i], k_s))
  *         elif t_view[i] > 0:             # <<<<<<<<<<<<<<
@@ -4642,12 +4841,12 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
     } else if (unlikely(__pyx_t_34 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
     if (unlikely(__pyx_t_10 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_10);
-      __PYX_ERR(0, 126, __pyx_L1_error)
+      __PYX_ERR(0, 138, __pyx_L1_error)
     }
     __pyx_t_11 = (((*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_34 * __pyx_v_t_view.strides[0]) ))) > 0.0) != 0);
     if (__pyx_t_11) {
 
-      /* "cdwiener.pyx":127
+      /* "cdwiener.pyx":139
  *                     t_view[i] / (a_view[i]**2), 1 - w_view[i], k_s))
  *         elif t_view[i] > 0:
  *             sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)             # <<<<<<<<<<<<<<
@@ -4662,9 +4861,9 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
       } else if (unlikely(__pyx_t_35 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
       if (unlikely(__pyx_t_10 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_10);
-        __PYX_ERR(0, 127, __pyx_L1_error)
+        __PYX_ERR(0, 139, __pyx_L1_error)
       }
-      __pyx_t_2 = __pyx_f_8cdwiener_choice_function((*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_35 * __pyx_v_t_view.strides[0]) ))), __pyx_v_eps); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 127, __pyx_L1_error)
+      __pyx_t_2 = __pyx_f_8cdwiener_choice_function((*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_35 * __pyx_v_t_view.strides[0]) ))), __pyx_v_eps); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 139, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       if ((likely(PyTuple_CheckExact(__pyx_t_2))) || (PyList_CheckExact(__pyx_t_2))) {
         PyObject* sequence = __pyx_t_2;
@@ -4672,7 +4871,7 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
         if (unlikely(size != 3)) {
           if (size > 3) __Pyx_RaiseTooManyValuesError(3);
           else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-          __PYX_ERR(0, 127, __pyx_L1_error)
+          __PYX_ERR(0, 139, __pyx_L1_error)
         }
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
         if (likely(PyTuple_CheckExact(sequence))) {
@@ -4688,17 +4887,17 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
         __Pyx_INCREF(__pyx_t_1);
         __Pyx_INCREF(__pyx_t_5);
         #else
-        __pyx_t_6 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 127, __pyx_L1_error)
+        __pyx_t_6 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 139, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_1 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 127, __pyx_L1_error)
+        __pyx_t_1 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 139, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_5 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 127, __pyx_L1_error)
+        __pyx_t_5 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 139, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         #endif
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       } else {
         Py_ssize_t index = -1;
-        __pyx_t_17 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 127, __pyx_L1_error)
+        __pyx_t_17 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 139, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_17);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_t_18 = Py_TYPE(__pyx_t_17)->tp_iternext;
@@ -4708,7 +4907,7 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
         __Pyx_GOTREF(__pyx_t_1);
         index = 2; __pyx_t_5 = __pyx_t_18(__pyx_t_17); if (unlikely(!__pyx_t_5)) goto __pyx_L9_unpacking_failed;
         __Pyx_GOTREF(__pyx_t_5);
-        if (__Pyx_IternextUnpackEndCheck(__pyx_t_18(__pyx_t_17), 3) < 0) __PYX_ERR(0, 127, __pyx_L1_error)
+        if (__Pyx_IternextUnpackEndCheck(__pyx_t_18(__pyx_t_17), 3) < 0) __PYX_ERR(0, 139, __pyx_L1_error)
         __pyx_t_18 = NULL;
         __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
         goto __pyx_L10_unpacking_done;
@@ -4716,7 +4915,7 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
         __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
         __pyx_t_18 = NULL;
         if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-        __PYX_ERR(0, 127, __pyx_L1_error)
+        __PYX_ERR(0, 139, __pyx_L1_error)
         __pyx_L10_unpacking_done:;
       }
       __Pyx_XDECREF_SET(__pyx_v_sgn_lambda, __pyx_t_6);
@@ -4726,7 +4925,7 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
       __Pyx_XDECREF_SET(__pyx_v_k_s, __pyx_t_5);
       __pyx_t_5 = 0;
 
-      /* "cdwiener.pyx":128
+      /* "cdwiener.pyx":140
  *         elif t_view[i] > 0:
  *             sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
  *             leading_term = calculate_leading_term(t_view[i], v_view[i],             # <<<<<<<<<<<<<<
@@ -4741,7 +4940,7 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
       } else if (unlikely(__pyx_t_36 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
       if (unlikely(__pyx_t_10 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_10);
-        __PYX_ERR(0, 128, __pyx_L1_error)
+        __PYX_ERR(0, 140, __pyx_L1_error)
       }
       __pyx_t_37 = __pyx_v_i;
       __pyx_t_10 = -1;
@@ -4751,10 +4950,10 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
       } else if (unlikely(__pyx_t_37 >= __pyx_v_v_view.shape[0])) __pyx_t_10 = 0;
       if (unlikely(__pyx_t_10 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_10);
-        __PYX_ERR(0, 128, __pyx_L1_error)
+        __PYX_ERR(0, 140, __pyx_L1_error)
       }
 
-      /* "cdwiener.pyx":129
+      /* "cdwiener.pyx":141
  *             sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
  *             leading_term = calculate_leading_term(t_view[i], v_view[i],
  *                     a_view[i], w_view[i])             # <<<<<<<<<<<<<<
@@ -4769,7 +4968,7 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
       } else if (unlikely(__pyx_t_38 >= __pyx_v_a_view.shape[0])) __pyx_t_10 = 0;
       if (unlikely(__pyx_t_10 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_10);
-        __PYX_ERR(0, 129, __pyx_L1_error)
+        __PYX_ERR(0, 141, __pyx_L1_error)
       }
       __pyx_t_39 = __pyx_v_i;
       __pyx_t_10 = -1;
@@ -4779,10 +4978,10 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
       } else if (unlikely(__pyx_t_39 >= __pyx_v_w_view.shape[0])) __pyx_t_10 = 0;
       if (unlikely(__pyx_t_10 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_10);
-        __PYX_ERR(0, 129, __pyx_L1_error)
+        __PYX_ERR(0, 141, __pyx_L1_error)
       }
 
-      /* "cdwiener.pyx":128
+      /* "cdwiener.pyx":140
  *         elif t_view[i] > 0:
  *             sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
  *             leading_term = calculate_leading_term(t_view[i], v_view[i],             # <<<<<<<<<<<<<<
@@ -4791,19 +4990,19 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
  */
       __pyx_v_leading_term = __pyx_f_8cdwiener_calculate_leading_term((*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_36 * __pyx_v_t_view.strides[0]) ))), (*((double *) ( /* dim=0 */ (__pyx_v_v_view.data + __pyx_t_37 * __pyx_v_v_view.strides[0]) ))), (*((double *) ( /* dim=0 */ (__pyx_v_a_view.data + __pyx_t_38 * __pyx_v_a_view.strides[0]) ))), (*((double *) ( /* dim=0 */ (__pyx_v_w_view.data + __pyx_t_39 * __pyx_v_w_view.strides[0]) ))));
 
-      /* "cdwiener.pyx":130
+      /* "cdwiener.pyx":142
  *             leading_term = calculate_leading_term(t_view[i], v_view[i],
  *                     a_view[i], w_view[i])
  *             if sgn_lambda >= 0:             # <<<<<<<<<<<<<<
  *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(
  *                     t_view[i] / (a_view[i]**2), w_view[i], k_l))
  */
-      __pyx_t_2 = PyObject_RichCompare(__pyx_v_sgn_lambda, __pyx_int_0, Py_GE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 130, __pyx_L1_error)
-      __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 130, __pyx_L1_error)
+      __pyx_t_2 = PyObject_RichCompare(__pyx_v_sgn_lambda, __pyx_int_0, Py_GE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 142, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 142, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       if (__pyx_t_11) {
 
-        /* "cdwiener.pyx":132
+        /* "cdwiener.pyx":144
  *             if sgn_lambda >= 0:
  *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(
  *                     t_view[i] / (a_view[i]**2), w_view[i], k_l))             # <<<<<<<<<<<<<<
@@ -4818,7 +5017,7 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
         } else if (unlikely(__pyx_t_40 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
         if (unlikely(__pyx_t_10 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_10);
-          __PYX_ERR(0, 132, __pyx_L1_error)
+          __PYX_ERR(0, 144, __pyx_L1_error)
         }
         __pyx_t_24 = (*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_40 * __pyx_v_t_view.strides[0]) )));
         __pyx_t_41 = __pyx_v_i;
@@ -4829,12 +5028,12 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
         } else if (unlikely(__pyx_t_41 >= __pyx_v_a_view.shape[0])) __pyx_t_10 = 0;
         if (unlikely(__pyx_t_10 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_10);
-          __PYX_ERR(0, 132, __pyx_L1_error)
+          __PYX_ERR(0, 144, __pyx_L1_error)
         }
         __pyx_t_26 = pow((*((double *) ( /* dim=0 */ (__pyx_v_a_view.data + __pyx_t_41 * __pyx_v_a_view.strides[0]) ))), 2.0);
         if (unlikely(__pyx_t_26 == 0)) {
           PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-          __PYX_ERR(0, 132, __pyx_L1_error)
+          __PYX_ERR(0, 144, __pyx_L1_error)
         }
         __pyx_t_42 = __pyx_v_i;
         __pyx_t_10 = -1;
@@ -4844,11 +5043,11 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
         } else if (unlikely(__pyx_t_42 >= __pyx_v_w_view.shape[0])) __pyx_t_10 = 0;
         if (unlikely(__pyx_t_10 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_10);
-          __PYX_ERR(0, 132, __pyx_L1_error)
+          __PYX_ERR(0, 144, __pyx_L1_error)
         }
-        __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_v_k_l); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 132, __pyx_L1_error)
+        __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_v_k_l); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 144, __pyx_L1_error)
 
-        /* "cdwiener.pyx":131
+        /* "cdwiener.pyx":143
  *                     a_view[i], w_view[i])
  *             if sgn_lambda >= 0:
  *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(             # <<<<<<<<<<<<<<
@@ -4863,11 +5062,11 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
         } else if (unlikely(__pyx_t_43 >= __pyx_v_likelihoods_view.shape[0])) __pyx_t_29 = 0;
         if (unlikely(__pyx_t_29 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_29);
-          __PYX_ERR(0, 131, __pyx_L1_error)
+          __PYX_ERR(0, 143, __pyx_L1_error)
         }
         *((double *) ( /* dim=0 */ (__pyx_v_likelihoods_view.data + __pyx_t_43 * __pyx_v_likelihoods_view.strides[0]) )) = fmax(1e-48, (__pyx_v_leading_term * __pyx_f_8cdwiener_fptd_large((__pyx_t_24 / __pyx_t_26), (*((double *) ( /* dim=0 */ (__pyx_v_w_view.data + __pyx_t_42 * __pyx_v_w_view.strides[0]) ))), __pyx_t_10)));
 
-        /* "cdwiener.pyx":130
+        /* "cdwiener.pyx":142
  *             leading_term = calculate_leading_term(t_view[i], v_view[i],
  *                     a_view[i], w_view[i])
  *             if sgn_lambda >= 0:             # <<<<<<<<<<<<<<
@@ -4877,7 +5076,7 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
         goto __pyx_L11;
       }
 
-      /* "cdwiener.pyx":134
+      /* "cdwiener.pyx":146
  *                     t_view[i] / (a_view[i]**2), w_view[i], k_l))
  *             else:
  *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(             # <<<<<<<<<<<<<<
@@ -4886,7 +5085,7 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
  */
       /*else*/ {
 
-        /* "cdwiener.pyx":135
+        /* "cdwiener.pyx":147
  *             else:
  *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(
  *                     t_view[i] / (a_view[i]**2), w_view[i], k_s))             # <<<<<<<<<<<<<<
@@ -4901,7 +5100,7 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
         } else if (unlikely(__pyx_t_44 >= __pyx_v_t_view.shape[0])) __pyx_t_10 = 0;
         if (unlikely(__pyx_t_10 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_10);
-          __PYX_ERR(0, 135, __pyx_L1_error)
+          __PYX_ERR(0, 147, __pyx_L1_error)
         }
         __pyx_t_26 = (*((double *) ( /* dim=0 */ (__pyx_v_t_view.data + __pyx_t_44 * __pyx_v_t_view.strides[0]) )));
         __pyx_t_45 = __pyx_v_i;
@@ -4912,12 +5111,12 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
         } else if (unlikely(__pyx_t_45 >= __pyx_v_a_view.shape[0])) __pyx_t_10 = 0;
         if (unlikely(__pyx_t_10 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_10);
-          __PYX_ERR(0, 135, __pyx_L1_error)
+          __PYX_ERR(0, 147, __pyx_L1_error)
         }
         __pyx_t_24 = pow((*((double *) ( /* dim=0 */ (__pyx_v_a_view.data + __pyx_t_45 * __pyx_v_a_view.strides[0]) ))), 2.0);
         if (unlikely(__pyx_t_24 == 0)) {
           PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-          __PYX_ERR(0, 135, __pyx_L1_error)
+          __PYX_ERR(0, 147, __pyx_L1_error)
         }
         __pyx_t_46 = __pyx_v_i;
         __pyx_t_10 = -1;
@@ -4927,11 +5126,11 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
         } else if (unlikely(__pyx_t_46 >= __pyx_v_w_view.shape[0])) __pyx_t_10 = 0;
         if (unlikely(__pyx_t_10 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_10);
-          __PYX_ERR(0, 135, __pyx_L1_error)
+          __PYX_ERR(0, 147, __pyx_L1_error)
         }
-        __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_v_k_s); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 135, __pyx_L1_error)
+        __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_v_k_s); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 147, __pyx_L1_error)
 
-        /* "cdwiener.pyx":134
+        /* "cdwiener.pyx":146
  *                     t_view[i] / (a_view[i]**2), w_view[i], k_l))
  *             else:
  *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(             # <<<<<<<<<<<<<<
@@ -4946,13 +5145,13 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
         } else if (unlikely(__pyx_t_47 >= __pyx_v_likelihoods_view.shape[0])) __pyx_t_29 = 0;
         if (unlikely(__pyx_t_29 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_29);
-          __PYX_ERR(0, 134, __pyx_L1_error)
+          __PYX_ERR(0, 146, __pyx_L1_error)
         }
         *((double *) ( /* dim=0 */ (__pyx_v_likelihoods_view.data + __pyx_t_47 * __pyx_v_likelihoods_view.strides[0]) )) = fmax(1e-48, (__pyx_v_leading_term * __pyx_f_8cdwiener_fptd_small((__pyx_t_26 / __pyx_t_24), (*((double *) ( /* dim=0 */ (__pyx_v_w_view.data + __pyx_t_46 * __pyx_v_w_view.strides[0]) ))), __pyx_t_10)));
       }
       __pyx_L11:;
 
-      /* "cdwiener.pyx":126
+      /* "cdwiener.pyx":138
  *                 likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(
  *                     t_view[i] / (a_view[i]**2), 1 - w_view[i], k_s))
  *         elif t_view[i] > 0:             # <<<<<<<<<<<<<<
@@ -4963,7 +5162,7 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
     __pyx_L5:;
   }
 
-  /* "cdwiener.pyx":137
+  /* "cdwiener.pyx":149
  *                     t_view[i] / (a_view[i]**2), w_view[i], k_s))
  * 
  *     return likelihoods             # <<<<<<<<<<<<<<
@@ -4974,7 +5173,7 @@ static PyObject *__pyx_pf_8cdwiener_4array_fptd(CYTHON_UNUSED PyObject *__pyx_se
   __pyx_r = __pyx_v_likelihoods;
   goto __pyx_L0;
 
-  /* "cdwiener.pyx":99
+  /* "cdwiener.pyx":111
  *     return likelihoods
  * 
  * def array_fptd(t, v, a, w, double eps=1e-9):             # <<<<<<<<<<<<<<
@@ -18550,8 +18749,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_cline_in_traceback, __pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 0, 1, 1},
   {&__pyx_kp_s_contiguous_and_direct, __pyx_k_contiguous_and_direct, sizeof(__pyx_k_contiguous_and_direct), 0, 0, 1, 0},
   {&__pyx_kp_s_contiguous_and_indirect, __pyx_k_contiguous_and_indirect, sizeof(__pyx_k_contiguous_and_indirect), 0, 0, 1, 0},
-  {&__pyx_n_s_ddm_data_simulation, __pyx_k_ddm_data_simulation, sizeof(__pyx_k_ddm_data_simulation), 0, 0, 1, 1},
-  {&__pyx_n_s_ddm_data_simulator, __pyx_k_ddm_data_simulator, sizeof(__pyx_k_ddm_data_simulator), 0, 0, 1, 1},
   {&__pyx_n_s_dict, __pyx_k_dict, sizeof(__pyx_k_dict), 0, 0, 1, 1},
   {&__pyx_n_s_dtype_is_object, __pyx_k_dtype_is_object, sizeof(__pyx_k_dtype_is_object), 0, 0, 1, 1},
   {&__pyx_n_s_encode, __pyx_k_encode, sizeof(__pyx_k_encode), 0, 0, 1, 1},
@@ -18584,6 +18781,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_name, __pyx_k_name, sizeof(__pyx_k_name), 0, 0, 1, 1},
   {&__pyx_n_s_name_2, __pyx_k_name_2, sizeof(__pyx_k_name_2), 0, 0, 1, 1},
   {&__pyx_n_s_ndim, __pyx_k_ndim, sizeof(__pyx_k_ndim), 0, 0, 1, 1},
+  {&__pyx_n_s_ndt, __pyx_k_ndt, sizeof(__pyx_k_ndt), 0, 0, 1, 1},
   {&__pyx_n_s_new, __pyx_k_new, sizeof(__pyx_k_new), 0, 0, 1, 1},
   {&__pyx_kp_s_no_default___reduce___due_to_non, __pyx_k_no_default___reduce___due_to_non, sizeof(__pyx_k_no_default___reduce___due_to_non), 0, 0, 1, 0},
   {&__pyx_n_s_np, __pyx_k_np, sizeof(__pyx_k_np), 0, 0, 1, 1},
@@ -18859,26 +19057,26 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   /* "cdwiener.pyx":64
  * # --------------------------------
  * 
- * def batch_fptd(t, double v, double a, double w, double eps=1e-9):             # <<<<<<<<<<<<<<
+ * def batch_fptd(t, double v = 1, double a = 1, double w = 0.5, double ndt = 1.0, double eps = 1e-10):             # <<<<<<<<<<<<<<
  *     # Use when rts and choices vary, but parameters are held constant
  *     cdef int i
  */
-  __pyx_tuple__22 = PyTuple_Pack(14, __pyx_n_s_t, __pyx_n_s_v, __pyx_n_s_a, __pyx_n_s_w, __pyx_n_s_eps, __pyx_n_s_i, __pyx_n_s_t_view, __pyx_n_s_n, __pyx_n_s_likelihoods, __pyx_n_s_likelihoods_view, __pyx_n_s_sgn_lambda, __pyx_n_s_k_l, __pyx_n_s_k_s, __pyx_n_s_leading_term); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(0, 64, __pyx_L1_error)
+  __pyx_tuple__22 = PyTuple_Pack(15, __pyx_n_s_t, __pyx_n_s_v, __pyx_n_s_a, __pyx_n_s_w, __pyx_n_s_ndt, __pyx_n_s_eps, __pyx_n_s_i, __pyx_n_s_t_view, __pyx_n_s_n, __pyx_n_s_likelihoods, __pyx_n_s_likelihoods_view, __pyx_n_s_sgn_lambda, __pyx_n_s_k_l, __pyx_n_s_k_s, __pyx_n_s_leading_term); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(0, 64, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__22);
   __Pyx_GIVEREF(__pyx_tuple__22);
-  __pyx_codeobj__23 = (PyObject*)__Pyx_PyCode_New(5, 0, 14, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__22, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cdwiener_pyx, __pyx_n_s_batch_fptd, 64, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__23)) __PYX_ERR(0, 64, __pyx_L1_error)
+  __pyx_codeobj__23 = (PyObject*)__Pyx_PyCode_New(6, 0, 15, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__22, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cdwiener_pyx, __pyx_n_s_batch_fptd, 64, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__23)) __PYX_ERR(0, 64, __pyx_L1_error)
 
-  /* "cdwiener.pyx":99
+  /* "cdwiener.pyx":111
  *     return likelihoods
  * 
  * def array_fptd(t, v, a, w, double eps=1e-9):             # <<<<<<<<<<<<<<
  *     # Use when all inputs vary, but we want to feed in an array of them
  *     cdef int i
  */
-  __pyx_tuple__24 = PyTuple_Pack(17, __pyx_n_s_t, __pyx_n_s_v, __pyx_n_s_a, __pyx_n_s_w, __pyx_n_s_eps, __pyx_n_s_i, __pyx_n_s_n, __pyx_n_s_t_view, __pyx_n_s_v_view, __pyx_n_s_a_view, __pyx_n_s_w_view, __pyx_n_s_likelihoods, __pyx_n_s_likelihoods_view, __pyx_n_s_sgn_lambda, __pyx_n_s_k_l, __pyx_n_s_k_s, __pyx_n_s_leading_term); if (unlikely(!__pyx_tuple__24)) __PYX_ERR(0, 99, __pyx_L1_error)
+  __pyx_tuple__24 = PyTuple_Pack(17, __pyx_n_s_t, __pyx_n_s_v, __pyx_n_s_a, __pyx_n_s_w, __pyx_n_s_eps, __pyx_n_s_i, __pyx_n_s_n, __pyx_n_s_t_view, __pyx_n_s_v_view, __pyx_n_s_a_view, __pyx_n_s_w_view, __pyx_n_s_likelihoods, __pyx_n_s_likelihoods_view, __pyx_n_s_sgn_lambda, __pyx_n_s_k_l, __pyx_n_s_k_s, __pyx_n_s_leading_term); if (unlikely(!__pyx_tuple__24)) __PYX_ERR(0, 111, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__24);
   __Pyx_GIVEREF(__pyx_tuple__24);
-  __pyx_codeobj__25 = (PyObject*)__Pyx_PyCode_New(5, 0, 17, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__24, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cdwiener_pyx, __pyx_n_s_array_fptd, 99, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__25)) __PYX_ERR(0, 99, __pyx_L1_error)
+  __pyx_codeobj__25 = (PyObject*)__Pyx_PyCode_New(5, 0, 17, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__24, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cdwiener_pyx, __pyx_n_s_array_fptd, 111, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__25)) __PYX_ERR(0, 111, __pyx_L1_error)
 
   /* "View.MemoryView":286
  *         return self.name
@@ -19290,9 +19488,9 @@ if (!__Pyx_RefNanny) {
   /* "cdwiener.pyx":1
  * import numpy as np             # <<<<<<<<<<<<<<
  * import scipy as scp
- * import ddm_data_simulation as ddm_data_simulator
+ * #import ddm_data_simulation as ddm_data_simulator
  */
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_numpy, 0, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_numpy, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -19300,29 +19498,17 @@ if (!__Pyx_RefNanny) {
   /* "cdwiener.pyx":2
  * import numpy as np
  * import scipy as scp             # <<<<<<<<<<<<<<
- * import ddm_data_simulation as ddm_data_simulator
+ * #import ddm_data_simulation as ddm_data_simulator
  * import scipy.integrate as integrate
  */
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_scipy, 0, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_scipy, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_scp, __pyx_t_1) < 0) __PYX_ERR(0, 2, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cdwiener.pyx":3
- * import numpy as np
- * import scipy as scp
- * import ddm_data_simulation as ddm_data_simulator             # <<<<<<<<<<<<<<
- * import scipy.integrate as integrate
- * 
- */
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_ddm_data_simulation, 0, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 3, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_ddm_data_simulator, __pyx_t_1) < 0) __PYX_ERR(0, 3, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
   /* "cdwiener.pyx":4
  * import scipy as scp
- * import ddm_data_simulation as ddm_data_simulator
+ * #import ddm_data_simulation as ddm_data_simulator
  * import scipy.integrate as integrate             # <<<<<<<<<<<<<<
  * 
  * from libc.math cimport sin, exp, sqrt, M_PI, fmax, fmin, log
@@ -19332,7 +19518,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_INCREF(__pyx_n_s__19);
   __Pyx_GIVEREF(__pyx_n_s__19);
   PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s__19);
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_scipy_integrate, __pyx_t_1, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 4, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_scipy_integrate, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 4, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_integrate, __pyx_t_2) < 0) __PYX_ERR(0, 4, __pyx_L1_error)
@@ -19353,7 +19539,7 @@ if (!__Pyx_RefNanny) {
   /* "cdwiener.pyx":64
  * # --------------------------------
  * 
- * def batch_fptd(t, double v, double a, double w, double eps=1e-9):             # <<<<<<<<<<<<<<
+ * def batch_fptd(t, double v = 1, double a = 1, double w = 0.5, double ndt = 1.0, double eps = 1e-10):             # <<<<<<<<<<<<<<
  *     # Use when rts and choices vary, but parameters are held constant
  *     cdef int i
  */
@@ -19362,22 +19548,22 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_batch_fptd, __pyx_t_2) < 0) __PYX_ERR(0, 64, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "cdwiener.pyx":99
+  /* "cdwiener.pyx":111
  *     return likelihoods
  * 
  * def array_fptd(t, v, a, w, double eps=1e-9):             # <<<<<<<<<<<<<<
  *     # Use when all inputs vary, but we want to feed in an array of them
  *     cdef int i
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8cdwiener_5array_fptd, NULL, __pyx_n_s_cdwiener); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 99, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8cdwiener_5array_fptd, NULL, __pyx_n_s_cdwiener); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 111, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_array_fptd, __pyx_t_2) < 0) __PYX_ERR(0, 99, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_array_fptd, __pyx_t_2) < 0) __PYX_ERR(0, 111, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "cdwiener.pyx":1
  * import numpy as np             # <<<<<<<<<<<<<<
  * import scipy as scp
- * import ddm_data_simulation as ddm_data_simulator
+ * #import ddm_data_simulation as ddm_data_simulator
  */
   __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
@@ -19606,14 +19792,6 @@ static PyObject *__Pyx_GetBuiltinName(PyObject *name) {
 #endif
     }
     return result;
-}
-
-/* None */
-static CYTHON_INLINE long __Pyx_div_long(long a, long b) {
-    long q = a / b;
-    long r = a - q*b;
-    q -= ((r != 0) & ((r ^ b) < 0));
-    return q;
 }
 
 /* PyDictVersioning */
@@ -21541,6 +21719,14 @@ static PyObject* __Pyx_PyInt_AddObjC(PyObject *op1, PyObject *op2, CYTHON_UNUSED
 /* None */
 static CYTHON_INLINE void __Pyx_RaiseUnboundLocalError(const char *varname) {
     PyErr_Format(PyExc_UnboundLocalError, "local variable '%s' referenced before assignment", varname);
+}
+
+/* None */
+static CYTHON_INLINE long __Pyx_div_long(long a, long b) {
+    long q = a / b;
+    long r = a - q*b;
+    q -= ((r != 0) & ((r ^ b) < 0));
+    return q;
 }
 
 /* ImportFrom */

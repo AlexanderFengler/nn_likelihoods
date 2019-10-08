@@ -87,6 +87,27 @@ temp = {
     #"param_bounds": np.array([[-2, .6, .3], [2, 1.5, .7]]),
     "boundary_param_bounds": []
     },
+"ddm_analytic":
+    {
+    "dgp": cd.ddm,
+    "boundary": bf.constant,
+    "boundary_multiplicative": True,
+    "data_folder": "/users/afengler/data/kde/ddm/train_test_data_20000",
+#     custom_objects: {"huber_loss": tf.losses.huber_loss}
+#     fcn_path: "/users/afengler/data/tony/kde/ddm/keras_models/\
+# deep_inference08_12_19_11_15_06/model.h5"
+#    fcn_custom_objects: {"heteroscedastic_loss": tf.losses.huber_loss}
+    "output_folder": "/users/afengler/data/analytic/ddm/method_comparison/",
+    "output_folder_x7": "/media/data_cifs/afengler/data/analytic/ddm/method_comparison/",
+    "param_names": ['v', 'a', 'w', 'ndt'],
+    "boundary_param_names": [],
+    "boundary_param_bounds": [],
+    "boundary_param_names": [],
+    "param_bounds_sampler": [[-2.0, 2.0], [0.6, 1.5], [0.30, 0.70]], 
+    #"param_bounds": [[-1.9, 1.9], [0.6, 1.5], [0.31, 0.69]],
+    #"param_bounds": np.array([[-2, .6, .3], [2, 1.5, .7]]),
+    "boundary_param_bounds": []
+    },
 "angle_ndt":
     {
     "dgp": cd.ddm_flexbound,
