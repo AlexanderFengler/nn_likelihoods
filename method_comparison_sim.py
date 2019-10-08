@@ -86,11 +86,11 @@ def target(params, data, likelihood_min = 1e-7):
     return np.sum(out)
 
 def nf_target(params, data, likelihood_min = 1e-16):
-    return np.maximum(np.log(batch_fptd(data[:, 0] * data[:, 1] * (- 1),
+    return np.sum(np.maximum(np.log(batch_fptd(data[:, 0] * data[:, 1] * (- 1),
                                         params[0],
                                         params[1] * 2, 
                                         params[2],
-                                        params[3])).sum(), np.log(likelihood_min))
+                                        params[3])).sum(), np.log(likelihood_min)))
 
 def lba_target(params, data):
     return clba.batch_dlba2(rt = data[:, 0], 
