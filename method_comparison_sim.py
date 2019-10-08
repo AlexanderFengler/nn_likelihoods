@@ -266,7 +266,7 @@ else:
 
 if method == 'lba_analytic':
     kde_results = np.array(p.map(lba_posterior, zip(data_grid, param_grid)))
-if method == 'ddm_analytic':
+elif method == 'ddm_analytic':
     kde_results = np.array(p.map(nf_posterior, zip(data_grid, param_grid)))
 else:
     kde_results = np.array(p.map(kde_posterior, zip(data_grid, param_grid)))
