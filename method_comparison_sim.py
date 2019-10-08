@@ -25,7 +25,7 @@ method = 'lba_analytic'
 analytic = True
 file_signature = '_start_true_'
 n_data_samples = 2500
-n_slice_samples = 100
+n_slice_samples = 10000
 n_sims = 10
 n_cpus = 'all'
 
