@@ -90,7 +90,7 @@ def nf_target(params, data, likelihood_min = 1e-16):
                                         params[0],
                                         params[1] * 2, 
                                         params[2],
-                                        params[3])).sum(), np.log(likelihood_min)))
+                                        params[3])), np.log(likelihood_min)))
 
 def lba_target(params, data):
     return clba.batch_dlba2(rt = data[:, 0], 
