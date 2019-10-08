@@ -103,7 +103,7 @@ temp = {
     "boundary_param_names": [],
     "boundary_param_bounds": [],
     "boundary_param_names": [],
-    "param_bounds_sampler": [[-2.0, 2.0], [0.6, 1.5], [0.30, 0.70]], 
+    "param_bounds_sampler": [[-2.0, 2.0], [0.6, 1.5], [0.30, 0.70], [0.0, 1.0]], 
     #"param_bounds": [[-1.9, 1.9], [0.6, 1.5], [0.31, 0.69]],
     #"param_bounds": np.array([[-2, .6, .3], [2, 1.5, .7]]),
     "boundary_param_bounds": []
