@@ -25,8 +25,8 @@ method = 'ddm_analytic'
 analytic = True
 file_signature = '_start_true_'
 n_data_samples = 2500
-n_slice_samples = 100
-n_sims = 10
+n_slice_samples = 500
+n_sims = 5
 n_cpus = 'all'
 
 #stats = pickle.load(open("kde_stats.pickle", "rb"))
