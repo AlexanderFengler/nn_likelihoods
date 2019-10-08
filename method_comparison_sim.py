@@ -111,8 +111,8 @@ def generate_param_grid():
     boundary_param_lower_bnd = []
 
     for p in range(len(method_params['param_names'])):
-        param_upper_bnd.append(method_params['param_bounds'][p][1])
-        param_lower_bnd.append(method_params['param_bounds'][p][0])
+        param_upper_bnd.append(method_params['param_bounds_sampler'][p][1])
+        param_lower_bnd.append(method_params['param_bounds_sampler'][p][0])
 
     if len(method_params['boundary_param_names']) > 0:
         for p in range(len(method_params['boundary_param_names'])):
