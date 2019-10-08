@@ -52,7 +52,9 @@ print(method_params)
 # fcn = keras.models.load_model(fcn_path, custom_objects=fcn_custom_objects)
 
 # Load weights, biases and activations of current network --------
-if analytic == False:
+if analytic:
+    pass
+else:
     with open(network_path + "weights.pickle", "rb") as tmp_file:
         weights = pickle.load(tmp_file)
     with open(network_path + 'biases.pickle', 'rb') as tmp_file:
