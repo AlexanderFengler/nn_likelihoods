@@ -89,7 +89,7 @@ temp = {
     },
 "ddm_analytic":
     {
-    "dgp": cd.ddm,
+    "dgp": cd.ddm_flexbound,
     "boundary": bf.constant,
     "boundary_multiplicative": True,
     "data_folder": "/users/afengler/data/kde/ddm/train_test_data_20000",
