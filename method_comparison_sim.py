@@ -62,31 +62,18 @@ else:
     with open(network_path + 'activations.pickle', 'rb') as tmp_file:
         activations = pickle.load(tmp_file)
 # ----------------------------------------------------------------
-# def target(params, data, ll_min = 1e-100, ndt = True): # CAREFUL ABOUT NDT HERE
-#     if ndt == False:
-#         params_rep = np.tile(params, (data.shape[0], 1))
-#         input_batch = np.concatenate([params_rep, data], axis = 1)
-#         out = ktnp.predict(input_batch, weights, biases, activations)
-#         return np.sum(out)
-    
-#     else:
-#         params_rep = np.tile(params[:-1], (data.shape[0], 1))
-#         data[:, 0] = data[:, 0] - params[-1]
-        
-#         if np.sum(data[:, 0] <= 0) >= 1:
-#             return(- 1000 * data.shape[0])
-        
-#         input_batch = np.concatenate([params_rep, data], axis = 1)
-#         out = ktnp.predict(input_batch, weights, biases, activations)
-#         return np.sum(out)
-    
-def target(params, data, likelihood_min = 1e-7): 
+
+# DEFINE TARGET LIKELIHOODS FOR CORRESPONDING MODELS -------------------------------------------------
+
+# MLP TARGET
+def mlp_target(params, data, likelihood_min = 1e-7): 
     ll_min = np.log(likelihood_min)
     params_rep = np.tile(params, (data.shape[0], 1))
     input_batch = np.concatenate([params_rep, data], axis = 1)
     out = np.maximum(ktnp.predict(input_batch, weights, biases, activations), ll_min)
     return np.sum(out)
 
+# NAVARRO FUSS (DDM)
 def nf_target(params, data, likelihood_min = 1e-16):
     return np.sum(np.maximum(np.log(batch_fptd(data[:, 0] * data[:, 1] * (- 1),
                                         params[0],
@@ -94,6 +81,7 @@ def nf_target(params, data, likelihood_min = 1e-16):
                                         params[2],
                                         params[3])), np.log(likelihood_min)))
 
+# LBA ANALYTIC 
 def lba_target(params, data):
     return clba.batch_dlba2(rt = data[:, 0], 
                             choice = data[:, 1], 
@@ -102,6 +90,8 @@ def lba_target(params, data):
                             b = params[3], 
                             s = params[4],
                             ndt = params[5])
+
+# ----------------------------------------------------------------------------------------------------
 
 # MAKE PARAMETER / DATA GRID -------------------------------------------------------------------------
 
@@ -133,7 +123,6 @@ def generate_param_grid():
         boundary_param_grid = []
         
     return (param_grid, boundary_param_grid)
-
 
 # REFORMULATE param bounds
 def generate_param_grid_lba2():
@@ -223,14 +212,16 @@ print('shape of data_grid:', data_grid.shape)
 
 # RUN POSTERIOR SIMULATIONS --------------------------------------------------------------------------
 
+# Get full parameter vector including bounds
 if method[:3] == 'lba':
     sampler_param_bounds = np.array(method_params["param_bounds_sampler"] + method_params["boundary_param_bounds"])
 else:
     sampler_param_bounds = np.array(method_params["param_bounds_sampler"] + method_params["boundary_param_bounds"])
 
-def kde_posterior(args): # args = (data, true_params)
+# Define posterior samplers for respective likelihood functions
+def mlp_posterior(args): # args = (data, true_params)
     model = SliceSampler(bounds = sampler_param_bounds, 
-                         target = target, 
+                         target = mlp_target, 
                          w = .4 / 1024, 
                          p = 8)
     model.sample(args[0], num_samples = n_slice_samples, init = args[1])
@@ -253,23 +244,20 @@ def lba_posterior(args):
     model.sample(args[0], num_samples = n_slice_samples, init = args[1])
     return model.samples
 
+# Make available the specified amount of cpus
 if n_cpus == 'all':
     p = mp.Pool(mp.cpu_count())
     
 else: 
     p = mp.Pool(n_cpus)
 
-
-# TMP
-# for i in zip(data_grid, param_grid):
-#     print(i)
-
+# Run the sampler with correct target as specified above
 if method == 'lba_analytic':
     kde_results = np.array(p.map(lba_posterior, zip(data_grid, param_grid)))
 elif method == 'ddm_analytic':
     kde_results = np.array(p.map(nf_posterior, zip(data_grid, param_grid)))
 else:
-    kde_results = np.array(p.map(kde_posterior, zip(data_grid, param_grid)))
+    kde_results = np.array(p.map(mlp_posterior, zip(data_grid, param_grid)))
 
 #print(target([0, 1.5, 0.5], data_grid[0]))
 # import ipdb; ipdb.set_trace()
@@ -284,6 +272,7 @@ else:
 
 # print("fcn finished!")
 
+# Store files
 pickle.dump((param_grid, data_grid, kde_results), 
             open(output_folder + "kde_sim_test_ndt" + file_signature + "{}.pickle".format(uuid.uuid1()), "wb"))
 
