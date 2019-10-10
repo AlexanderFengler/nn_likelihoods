@@ -40,9 +40,10 @@ temp = {
     "boundary_multiplicative": True,
     "data_folder": "/users/afengler/data/kde/ddm/train_test_data_ndt_20000",
     "data_folder_x7": "/media/data_cifs/afengler/data/kde/ddm/train_test_data_ndt_20000",
-    "custom_objects": {"huber_loss": tf.losses.huber_loss}
-    "fcn_path": "/users/afengler/data/tony/kde/ddm/keras_models/\deep_inference08_12_19_11_15_06/model.h5"
-    "fcn_custom_objects": {"heteroscedastic_loss": tf.losses.huber_loss}
+    "data_folder_fcn": "/users/afengler/data/analytic/ddm/fcn_train_test_data_2000",
+    "data_folder_fcn_x7": "/media/data_cifs/afengler/data/analytic/ddm/fcn_train_test_data_2000",
+    "custom_objects": {"huber_loss": tf.losses.huber_loss},
+    "fcn_custom_objects": {"heteroscedastic_loss": tf.losses.huber_loss},
     "output_folder": "/users/afengler/data/kde/ddm/method_comparison/",
     "output_folder_x7": "/media/data_cifs/afengler/data/kde/ddm/method_comparison/",
     "model_folder": "/users/afengler/data/kde/ddm/keras_models/",
@@ -57,11 +58,8 @@ temp = {
     "dgp": cd.ddm_flexbound,
     "boundary": bf.constant,
     "boundary_multiplicative": True,
-    "data_folder": "/users/afengler/data/kde/ddm/train_test_data_20000",
-#     custom_objects: {"huber_loss": tf.losses.huber_loss}
-#     fcn_path: "/users/afengler/data/tony/kde/ddm/keras_models/\
-# deep_inference08_12_19_11_15_06/model.h5"
-#    fcn_custom_objects: {"heteroscedastic_loss": tf.losses.huber_loss}
+    "data_folder": "/users/afengler/data/analytic/ddm/train_test_data_20000",
+    "data_folder_x7": "/media/data_cifs/afengler/data/analytic/ddm/train_test_data_20000",
     "output_folder": "/users/afengler/data/analytic/ddm/method_comparison/",
     "output_folder_x7": "/media/data_cifs/afengler/data/analytic/ddm/method_comparison/",
     "param_names": ['v', 'a', 'w', 'ndt'],
