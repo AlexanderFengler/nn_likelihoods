@@ -56,8 +56,8 @@ def generate_param_grid(n_datasets = 100):
 
     if len(method_params['boundary_param_names']) > 0:
         for p in range(len(method_params['boundary_param_names'])):
-            boundary_param_upper_bnd.append(method_params['boundary_param_bounds'][p][1])
-            boundary_param_lower_bnd.append(method_params['boundary_param_bounds'][p][0])                                    
+            boundary_param_upper_bnd.append(method_params['boundary_param_bounds_sampler'][p][1])
+            boundary_param_lower_bnd.append(method_params['boundary_param_bounds_sampler'][p][0])                                    
 
     param_grid = np.random.uniform(low = param_lower_bnd, 
                                    high = param_upper_bnd, 
@@ -66,7 +66,7 @@ def generate_param_grid(n_datasets = 100):
     if len(method_params['boundary_param_names']) > 0:
         boundary_param_grid = np.random.uniform(low = boundary_param_lower_bnd,
                                                 high = boundary_param_upper_bnd,
-                                                size = (n_datasets, len(method_params['boundary_param_bounds'])))
+                                                size = (n_datasets, len(method_params['boundary_param_bounds_sampler'])))
     else:
         boundary_param_grid = []
         
@@ -105,7 +105,7 @@ timestamp = datetime.now().strftime('%m_%d_%y_%H_%M_%S')
 
 # INITIALIZATIONS -------------------------------------------------------------
 machine = 'x7'
-method = 'ddm_ndt'
+method = 'angle_ndt'
 analytic = True
 file_signature = '_start_true_'
 n_data_samples = 2500
@@ -159,7 +159,7 @@ model = make_fcn(n_params = param_grid.shape[1])
 
 # Keras callbacks
 # Define callbacks
-ckpt_filename = model_path + "model.h5"
+ckpt_filename = model_path + "/model.h5"
 
 checkpoint = keras.callbacks.ModelCheckpoint(ckpt_filename, 
                                              monitor = 'val_loss', 

@@ -5,7 +5,6 @@ import yaml
 import pandas as pd
 from itertools import product
 from samplers import SliceSampler
-#from slice_sampler import SliceSampler
 import pickle
 import uuid
 
@@ -14,8 +13,6 @@ import multiprocessing as mp
 import cddm_data_simulation as cd
 from cdwiener import batch_fptd
 import clba
-#from np_network import np_predict
-#from kde_info import KDEStats
 
 import keras_to_numpy as ktnp
 
@@ -28,9 +25,6 @@ n_data_samples = 2500
 n_slice_samples = 10000
 n_sims = 10
 n_cpus = 'all'
-
-#stats = pickle.load(open("kde_stats.pickle", "rb"))
-#method_params = stats[method]
 
 if machine == 'x7':
     stats = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
@@ -47,10 +41,6 @@ if machine == 'ccv':
         
 print(stats)
 print(method_params)
-
-# model = keras.models.load_model(network_path, custom_objects=custom_objects)
-# fcn = keras.models.load_model(fcn_path, custom_objects=fcn_custom_objects)
-
 # Load weights, biases and activations of current network --------
 if analytic:
     pass
@@ -259,37 +249,6 @@ elif method == 'ddm_analytic':
 else:
     kde_results = np.array(p.map(mlp_posterior, zip(data_grid, param_grid)))
 
-#print(target([0, 1.5, 0.5], data_grid[0]))
-# import ipdb; ipdb.set_trace()
-# kde_results = kde_posterior(data_grid[0])
-
-# if method == "ddm":
-#     nf_results = p.map(test_nf, data_grid)
-
-# print("nf finished!")
-
-# fcn_results = fcn.predict(data_grid)
-
-# print("fcn finished!")
-
 # Store files
 pickle.dump((param_grid, data_grid, kde_results), 
             open(output_folder + "kde_sim_test_ndt" + file_signature + "{}.pickle".format(uuid.uuid1()), "wb"))
-
-# pickle.dump((param_grid, fcn_results), open(output_folder + "fcn_sim_random{}.pickle".format(part), "wb"))
-
-# if method == "ddm":
-#     pickle.dump((param_grid, data_grid, nf_results), open(output_folder + "nf_sim_{}.pickle".format(uuid.uuid1()), "wb"))
-# ------------------------------------------------------------------------------------------------------
-    
-# UNUSED ---------
-# n_sims_per_param = 10
-# n_sims = n_sims_per_param ** len(param_names)
-
-# data_grid = np.zeros((n_sims, n_data_samples, 2))
-# data_grid = data_grid[(data_grid.shape[0] // 2):]
-# data_grid = data_grid[(part * data_grid.shape[0] // 4):((part + 1) * data_grid.shape[0] // 4)]
-
-# param_grid = np.linspace(param_bounds[0], param_bounds[1], num=n_sims_per_param)
-# param_grid = np.array(list(product(*param_grid.T)))
-# param_grid = param_grid[(part * param_grid.shape[0] // 4):((part + 1) * param_grid.shape[0] // 4)]
