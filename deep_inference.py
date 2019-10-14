@@ -122,7 +122,6 @@ if machine == 'x7':
 from tensorflow.python.client import device_lib
 print(device_lib.list_local_devices())
 
-
 #stats = pickle.load(open("kde_stats.pickle", "rb"))
 #method_params = stats[method]
 
@@ -180,9 +179,10 @@ reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor = 'val_loss',
 
 #earlystopper = keras.callbacks.EarlyStopping(monitor = "val_loss", patience = 5, verbose = 1)
 #checkpoint = keras.callbacks.ModelCheckpoint(model_path + '/model.h5', monitor = "val_loss", verbose = 1, save_best_only = False)
-csv_logger = keras.callbacks.CSVLogger(model_path + '/history.csv')
-# Fit model
 
+csv_logger = keras.callbacks.CSVLogger(model_path + '/history.csv')
+
+# Fit model
 model.compile(loss = heteroscedastic_loss, optimizer = "adam")
 history = model.fit(data_grid, param_grid, 
                     validation_split = .01,
@@ -191,5 +191,4 @@ history = model.fit(data_grid, param_grid,
                     callbacks = [checkpoint, reduce_lr, earlystopping, csv_logger])
 
 print(history)
-
 model.save(model_path + "/model_final.h5")

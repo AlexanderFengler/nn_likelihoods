@@ -8,3 +8,4 @@ ornstein: /media/data_cifs/afengler/data/kde/ornstein_uhlenbeck/keras_models/dnn
 ddm_ndt: /media/data_cifs/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_ndt_09_27_19_19_02_40/
 ddm_analytic: /not/a/real/path
 fcn_ddm_ndt: /media/data_cifs/afengler/data/kde/ddm/keras_models/deep_inference_10_12_19_00_12_58/
+fcn_angle_ndt: /media/data_cifs/afengler/data/kde/angle/keras_models/deep_inference_10_12_19_11_58_42/

@@ -18,9 +18,15 @@ import keras_to_numpy as ktnp
 
 # INITIALIZATIONS -------------------------------------------------------------
 machine = 'ccv'
-method = 'lba_analytic'
+method = 'ddm_analytic'
 analytic = True
-file_signature = '_start_true_'
+
+# IF WE WANT TO USE A PREVIOUS SET OF PARAMETERS: FOR COMPARISON OF POSTERIORS FOR EXAMPLE
+param_origin = 'previous'
+method_comparison_folder = "/media/data_cifs/afengler/data/kde/ddm/method_comparison/"
+param_file_signature  = 'kde_sim_test_ndt_'
+
+out_file_signature = 'analytic_sim_test_ndt_'
 n_data_samples = 2500
 n_slice_samples = 10000
 n_sims = 10
@@ -66,10 +72,10 @@ def mlp_target(params, data, likelihood_min = 1e-7):
 # NAVARRO FUSS (DDM)
 def nf_target(params, data, likelihood_min = 1e-16):
     return np.sum(np.maximum(np.log(batch_fptd(data[:, 0] * data[:, 1] * (- 1),
-                                        params[0],
-                                        params[1] * 2, 
-                                        params[2],
-                                        params[3])), np.log(likelihood_min)))
+                                               params[0],
+                                               params[1] * 2, 
+                                               params[2],
+                                               params[3])), np.log(likelihood_min)))
 
 # LBA ANALYTIC 
 def lba_target(params, data):
@@ -186,17 +192,39 @@ def generate_data_grid_lba2(param_grid):
     return data_grid
 
 
-if method[:3] == 'lba':
-    param_grid = generate_param_grid_lba2()
-    data_grid = generate_data_grid_lba2(param_grid) 
-else:   
-    param_grid, boundary_param_grid = generate_param_grid() 
-    data_grid = generate_data_grid(param_grid, boundary_param_grid)
-    if len(method_params['boundary_param_names']) > 0:
-        param_grid = np.concatenate([param_grid, boundary_param_grid], axis = 1)
+if param_origin != 'previous':
+    if method[:3] == 'lba':
+        param_grid = generate_param_grid_lba2()
+        data_grid = generate_data_grid_lba2(param_grid) 
+    else:   
+        param_grid, boundary_param_grid = generate_param_grid() 
+        data_grid = generate_data_grid(param_grid, boundary_param_grid)
+        if len(method_params['boundary_param_names']) > 0:
+            param_grid = np.concatenate([param_grid, boundary_param_grid], axis = 1)
+            
+else:
+    # Get list of files
+    param_file_signature_len = len(param_file_signature)
+    files = os.listdir(method_comparison_folder)
+
+    # Get data in desired format
+    dats = []
+    for file_ in files:
+        if file_[:param_file_signature_len] == param_file_signature:
+            dats.append(pickle.load(open(method_comparison_folder + file_ , 'rb')))
+
+    dat_tmp_0 = []
+    dat_tmp_1 = []
+    for dat in dats:
+        dat_tmp_0.append(dat[0])
+        dat_tmp_1.append(dat[1])
+
+    dat_total = [np.concatenate(dat_tmp_0, axis = 0), np.concatenate(dat_tmp_1, axis = 0)]
+    data_grid = dat_total[1]
+    param_grid = dat_total[0]
+   
 
 print('param_grid: ', param_grid)
-#print(data_grid)
 print('shape of data_grid:', data_grid.shape)
 # ----------------------------------------------------------------------------------------------------
 
@@ -243,12 +271,12 @@ else:
 
 # Run the sampler with correct target as specified above
 if method == 'lba_analytic':
-    kde_results = np.array(p.map(lba_posterior, zip(data_grid, param_grid)))
+    posterior_samples = np.array(p.map(lba_posterior, zip(data_grid, param_grid)))
 elif method == 'ddm_analytic':
-    kde_results = np.array(p.map(nf_posterior, zip(data_grid, param_grid)))
+    posterior_samples = np.array(p.map(nf_posterior, zip(data_grid, param_grid)))
 else:
-    kde_results = np.array(p.map(mlp_posterior, zip(data_grid, param_grid)))
+    posterior_samples = np.array(p.map(mlp_posterior, zip(data_grid, param_grid)))
 
 # Store files
-pickle.dump((param_grid, data_grid, kde_results), 
-            open(output_folder + "kde_sim_test_ndt" + file_signature + "{}.pickle".format(uuid.uuid1()), "wb"))
+pickle.dump((param_grid, data_grid, posterior_samples), 
+            open(output_folder + out_file_signature + "{}.pickle".format(uuid.uuid1()), "wb"))

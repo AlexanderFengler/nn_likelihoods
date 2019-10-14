@@ -19,7 +19,7 @@ import clba
 #print(device_lib.list_local_devices())
 
 machine = 'x7'
-method = 'ddm_ndt'
+method = 'angle_ndt'
 #param_origin = 'previous'
 
 #analytic = True
@@ -29,7 +29,7 @@ method = 'ddm_ndt'
 fcn_custom_objects = {"heteroscedastic_loss": tf.losses.huber_loss}
 
 # Get list of files
-method_comparison_folder = "/media/data_cifs/afengler/data/kde/ddm/method_comparison/"
+method_comparison_folder = "/media/data_cifs/afengler/data/kde/angle/method_comparison/"
 file_signature  = 'kde_sim_test_ndt_'
 file_signature_len = len(file_signature)
 files = os.listdir(method_comparison_folder)
@@ -39,7 +39,6 @@ dats = []
 for file_ in files:
     if file_[:file_signature_len] == file_signature:
         dats.append(pickle.load(open(method_comparison_folder + file_ , 'rb')))
-
 
 dat_tmp_0 = []
 dat_tmp_1 = []
