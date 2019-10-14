@@ -7,6 +7,7 @@ from itertools import product
 from samplers import SliceSampler
 import pickle
 import uuid
+import os
 
 import boundary_functions as bf
 import multiprocessing as mp
