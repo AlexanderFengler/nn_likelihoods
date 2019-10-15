@@ -13,13 +13,13 @@
 
 # Request runtime, memory, cores:
 #SBATCH --time=36:00:00
-#SBATCH --mem=128G
+#SBATCH --mem=32G
 #SBATCH -c 20
 #SBATCH -N 1
 ##SBATCH -p gpu --gres=gpu:1
-#SBATCH --array=1-1
+#SBATCH --array=1-50
 
 # Run a command
 #source /users/afengler/miniconda3/etc/profile.d/conda.sh
 #conda activate tony
-python -u /users/afengler/git_repos/nn_likelihoods/method_comparison_sim.py
+python -u /users/afengler/git_repos/nn_likelihoods/method_comparison_sim.py $SLURM_ARRAY_TASK_ID

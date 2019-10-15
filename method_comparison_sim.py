@@ -8,6 +8,7 @@ from samplers import SliceSampler
 import pickle
 import uuid
 import os
+import sys
 
 import boundary_functions as bf
 import multiprocessing as mp
@@ -26,6 +27,8 @@ n_data_samples = 2500
 n_slice_samples = 10000
 n_sims = 10
 n_cpus = 'all'
+file_id = sys.argv[1]
+print('argument list: ', str(sys.argv))
 
 # IF WE WANT TO USE A PREVIOUS SET OF PARAMETERS: FOR COMPARISON OF POSTERIORS FOR EXAMPLE
 param_origin = 'previous'
@@ -214,10 +217,13 @@ else:
 
     # Get data in desired format
     dats = []
+    signature_cnt = 0
     for file_ in files:
         if file_[:param_file_signature_len] == param_file_signature:
-            dats.append(pickle.load(open(method_comparison_folder + file_ , 'rb')))
-
+            if signature_cnt == int(file_id - 1):
+                dats.append(pickle.load(open(method_comparison_folder + file_ , 'rb')))
+            signature_cnt += 1
+    
     dat_tmp_0 = []
     dat_tmp_1 = []
     for dat in dats:
