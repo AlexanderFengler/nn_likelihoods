@@ -220,7 +220,7 @@ else:
     signature_cnt = 0
     for file_ in files:
         if file_[:param_file_signature_len] == param_file_signature:
-            if signature_cnt == int(file_id - 1):
+            if signature_cnt == (int(file_id) - 1):
                 dats.append(pickle.load(open(method_comparison_folder + file_ , 'rb')))
             signature_cnt += 1
     
