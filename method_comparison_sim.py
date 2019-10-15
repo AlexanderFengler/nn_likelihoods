@@ -21,18 +21,20 @@ import keras_to_numpy as ktnp
 machine = 'ccv'
 method = 'ddm_analytic'
 analytic = True
-
-# IF WE WANT TO USE A PREVIOUS SET OF PARAMETERS: FOR COMPARISON OF POSTERIORS FOR EXAMPLE
-param_origin = 'previous'
-#method_comparison_folder_x7 = "/media/data_cifs/afengler/data/kde/ddm/method_comparison/"
-method_comparison_folder_ccv = '/users/afengler/data/kde/ddm/method_comparison/'
-param_file_signature  = 'kde_sim_test_ndt_'
-
 out_file_signature = 'analytic_sim_test_ndt_'
 n_data_samples = 2500
 n_slice_samples = 10000
 n_sims = 10
 n_cpus = 'all'
+
+# IF WE WANT TO USE A PREVIOUS SET OF PARAMETERS: FOR COMPARISON OF POSTERIORS FOR EXAMPLE
+param_origin = 'previous'
+param_file_signature  = 'kde_sim_test_ndt_'
+
+if machine == 'x7':
+    method_comparison_folder = "/media/data_cifs/afengler/data/kde/ddm/method_comparison/"
+if machine == 'ccv':
+    method_comparison_folder = '/users/afengler/data/kde/ddm/method_comparison/'
 
 if machine == 'x7':
     stats = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
@@ -49,6 +51,7 @@ if machine == 'ccv':
         
 print(stats)
 print(method_params)
+
 # Load weights, biases and activations of current network --------
 if analytic:
     pass
