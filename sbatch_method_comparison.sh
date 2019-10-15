@@ -12,9 +12,9 @@
 #SBATCH --output /users/afengler/batch_job_out/method_comparison%A_%a.out
 
 # Request runtime, memory, cores:
-#SBATCH --time=24:00:00
+#SBATCH --time=36:00:00
 #SBATCH --mem=128G
-#SBATCH -c 36
+#SBATCH -c 20
 #SBATCH -N 1
 ##SBATCH -p gpu --gres=gpu:1
 #SBATCH --array=1-1
