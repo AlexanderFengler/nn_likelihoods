@@ -24,7 +24,8 @@ analytic = True
 
 # IF WE WANT TO USE A PREVIOUS SET OF PARAMETERS: FOR COMPARISON OF POSTERIORS FOR EXAMPLE
 param_origin = 'previous'
-method_comparison_folder = "/media/data_cifs/afengler/data/kde/ddm/method_comparison/"
+#method_comparison_folder_x7 = "/media/data_cifs/afengler/data/kde/ddm/method_comparison/"
+method_comparison_folder_ccv = '/users/afengler/data/kde/ddm/method_comparison/'
 param_file_signature  = 'kde_sim_test_ndt_'
 
 out_file_signature = 'analytic_sim_test_ndt_'
