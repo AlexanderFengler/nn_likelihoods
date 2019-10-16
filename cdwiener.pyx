@@ -61,7 +61,7 @@ def fptd(t, v, a, w, eps=1e-10):
         return 1e-29
 # --------------------------------
 
-def batch_fptd(t, double v = 1, double a = 1, double w = 0.5, double ndt = 1.0, double eps = 1e-10):
+def batch_fptd(t, double v = 1, double a = 1, double w = 0.5, double ndt = 1.0, double eps = 1e-20):
     # Use when rts and choices vary, but parameters are held constant
     cdef int i
     cdef double[:] t_view = t

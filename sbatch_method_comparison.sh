@@ -13,8 +13,8 @@
 
 # Request runtime, memory, cores:
 #SBATCH --time=36:00:00
-#SBATCH --mem=32G
-#SBATCH -c 20
+#SBATCH --mem=24G
+#SBATCH -c 12
 #SBATCH -N 1
 ##SBATCH -p gpu --gres=gpu:1
 #SBATCH --array=1-50
