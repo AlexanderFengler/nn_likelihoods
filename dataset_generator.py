@@ -186,5 +186,5 @@ data_grid = generate_data_grid(param_grid,
 
 
 # Dump file
-pickle.dump((data_grid, param_grid, meta_dat), open(output_folder + 'base_data_param_recov_unif_reps_' + str(int(n_reps)) \
+pickle.dump((param_grid, data_grid, meta_dat), open(output_folder + 'base_data_param_recov_unif_reps_' + str(int(n_reps)) \
                                                     + '_n_' + str(int(n_data_samples)) + '.pickle', 'wb'))
