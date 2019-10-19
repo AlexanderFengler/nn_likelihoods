@@ -64,11 +64,10 @@ temp = {
     "output_folder_x7": "/media/data_cifs/afengler/data/analytic/ddm/method_comparison/",
     "param_names": ['v', 'a', 'w', 'ndt'],
     "boundary_param_names": [],
-    "boundary_param_bounds": [],
-    "boundary_param_names": [],
+    "boundary_param_bounds_sampler": [],
+    "boundary_param_bounds_network": [],
     "param_bounds_network": [[-2.0, 2.0], [0.5, 1.5], [0.3, 0.7], [0.0, 1.0]],
     "param_bounds_sampler": [[-2.0, 2.0], [0.6, 1.5], [0.30, 0.70], [0.0, 1.0]],
-    "boundary_param_bounds": []
     },
 "angle_ndt":{
     "dgp": cd.ddm_flexbound,

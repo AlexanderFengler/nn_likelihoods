@@ -99,6 +99,45 @@ def lba_target(params, data):
 
 # MAKE PARAMETER / DATA GRID -------------------------------------------------------------------------
 
+# v, a, w, ndt. angle
+def param_grid_perturbation_experiment(n_experiments = 100,
+                                       n_datasets_by_experiment = 1,
+                                       perturbation_sizes = [[0.0, 0.05, 0.1, 0.2],
+                                                             [0.0, 0.05, 0.1, 0.2],
+                                                             [0.0, 0.05, 0.1, 0.2],
+                                                             [0.0, 0.05, 0.1, 0.2],
+                                                             [0.0, 0.05, 0.1, 0.2]]):
+    
+    n_perturbation_levels = len(perturbation_sizes[0])
+    n_params = len(method_params['param_names']) + len(method_params['boundary_params_names'])
+    param_bounds = method_params['param_bounds_samples'] + method_params['boundary_param_bounds']
+    params_upper_bnd = [bnd[0] for bnd in param_bounds]
+    params_lower_bnd = [bdn[1] for bnd in param_bounds]
+    
+    meta_dat = pd.DataFrame(np.zeros(n_experiments * (n_params * (n_perturbation_levels + 1) * n_datasets_by_experiment), 3), 
+                            columns = ['n_exp', 'param', 'perturbation_level'])
+    
+    param_grid = np.zeros((n_experiments * (n_params * (n_perturbation_levels + 1) * n_datasets_by_experiment), n_params))
+    
+    cnt = 0
+    for i in range(n_experiments):
+        param_grid_tmp = np.random.uniform(low = param_lower_bnd, 
+                                           high = param_upper_bnd, 
+                                           size = (1, n_params))
+        param_grid[cnt, :] = param_grid_tmp
+        cnt += 1
+        for p in range(n_params):
+            for l in range(n_perturbation_levels):
+                param_grid_perturbed = param_grid_tmp
+                if param_grid_tmp[p] > ((params_upper_bnd[p] - params_lower_bnd[p]) / 2):
+                    param_grid_perturbed[p] += perturbation_sizes[p][l]
+                else:
+                    param_grid_perturbed[p] -= perturbation_sizes[p][l]
+
+                cnt += 1
+    return param_grid
+
+
 # REFORMULATE param bounds
 def generate_param_grid():
     param_upper_bnd = []
