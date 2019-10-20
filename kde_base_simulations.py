@@ -15,6 +15,7 @@ import time
 import os
 import pickle
 import uuid
+import sys
 
 # My own code
 import kde_class as kde
@@ -27,8 +28,8 @@ def bin_simulator_output(out = [0, 0],
                          params = ['v', 'a', 'w', 'ndt', 'angle']):
 
     # hardcode 'max_t' to 20sec for now
-    n_bins = int(20.0 / bin_dt + 1)
-    #n_bins = int(out[2]['max_t'] / bin_dt + 1)
+    #n_bins = int(20.0 / bin_dt + 1)
+    n_bins = int(out[2]['max_t'] / bin_dt + 1)
     bins = np.linspace(0, out[2]['max_t'], n_bins)
     counts = []
     counts.append(np.histogram(out[0][out[1] == 1], bins = bins)[0] / out[2]['n_samples'])
@@ -49,7 +50,7 @@ def bin_simulator_output(out = [0, 0],
         counts[i] =  np.asmatrix(counts[i]).T
 
     labels = np.concatenate(counts, axis = 1)
-    features = [out[2]['v'], out[2]['a'], out[2]['w'], out[2]['ndt']]
+    features = [out[2]['v'], out[2]['a'], out[2]['w'], out[2]['ndt'], out[2]['theta']]
     return (features, labels)
 
 def data_generator(*args):
@@ -125,8 +126,8 @@ if __name__ == "__main__":
     simulator = 'ddm'
     s = 1
     delta_t = 0.01
-    max_t = 40
-    n_samples = 20000
+    max_t = 10
+    n_samples = 100000
     print_info = False
     bound = bf.angle # CHOOSE BOUNDARY FUNCTION
     boundary_multiplicative = False # CHOOSE WHETHER BOUNDARY IS MULTIPLICATIVE (W.R.T Starting separation) OR NOT
@@ -207,5 +208,7 @@ if __name__ == "__main__":
     
     features = np.array(features)
     labels = np.array(labels)
+    
+    
     
     pickle.dump((features, labels), open('/users/afengler/data/tmp/binned_data_test.pickle', 'wb'))
