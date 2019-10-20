@@ -4,7 +4,8 @@ import scipy as scp
 #from scipy.stats import gamma
 import numpy as np
 import random
-import sysocessing as mp
+import sys
+#import multiocessing as mp
 #import psutil
 import pickle
 import os
