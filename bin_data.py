@@ -45,9 +45,9 @@ def bin_simulator_output(out = [0, 0],
     for i in range(len(counts)):
         counts[i] =  np.asmatrix(counts[i]).T
 
-    label = np.concatenate(counts, axis = 1)
+    labels = np.concatenate(counts, axis = 1)
     features = [out[2]['v'], out[2]['a'], out[2]['w'], out[2]['ndt']]
-    return (features, label)
+    return (features, labels)
 
 files_ = os.listdir('/users/afengler/data/kde/angle/base_simulations_ndt_20000/')
 random.shuffle(files_)
