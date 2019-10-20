@@ -132,7 +132,7 @@ if __name__ == "__main__":
     boundary_multiplicative = False # CHOOSE WHETHER BOUNDARY IS MULTIPLICATIVE (W.R.T Starting separation) OR NOT
 
     # Number of simulators to run
-    n_simulators = 100
+    n_simulators = 1000
 
     # Make function input tuples
     # DDM
@@ -198,5 +198,14 @@ if __name__ == "__main__":
     # Parallel Loop
     with Pool(processes = n_cpus) as pool:
         res = pool.starmap(data_generator_binned, args_list)
-        
-    pickle.dump(res, open('/users/afengler/data/tmp/binned_data_test.pickle', 'wb'))
+    
+    features = []
+    labels = []
+    for i in range(len(res)):
+        features.append(res[i][1])
+        labels.append(res[i][0])
+    
+    features = np.array(features)
+    labels = np.array(labels)
+    
+    pickle.dump((features, labels), open('/users/afengler/data/tmp/binned_data_test.pickle', 'wb'))
