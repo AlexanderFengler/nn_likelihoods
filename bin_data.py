@@ -52,16 +52,16 @@ def bin_simulator_output(out = [0, 0],
     features = [out[2]['v'], out[2]['a'], out[2]['w'], out[2]['ndt']]
     return (features, label)
 
-files_ = os.listdir('/users/afengler/data/kde/ddm/base_simulations_ndt_20000')
+files_ = os.listdir('/users/afengler/data/kde/ddm/base_simulations_ndt_20000/')
 labels = np.zeros((len(files_) - 2, 500, 2))
 features = np.zeros((len(files_) - 2, 3))
    
 cnt = 0
 i = 0
-file_dim = 100
-for file_ in files_[:1000]:
-    if file_[:8] == 'ddm_flex':
-        out = pickle.load(open('/users/afengler/data/kde/ddm/base_simulations_ndt_20000' + file_, 'rb'))
+file_dim = 1000
+for file_ in files_:
+    if file_[:4] == 'ddm_':
+        out = pickle.load(open('/users/afengler/data/kde/ddm/base_simulations_ndt_20000/' + file_, 'rb'))
         features[cnt], labels[cnt] = bin_simulator_output(out = out)
         if cnt % file_dim == 0:
             print(cnt)
