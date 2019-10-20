@@ -53,8 +53,8 @@ def bin_simulator_output(out = [0, 0],
     return (features, label)
 
 files_ = os.listdir('/users/afengler/data/kde/ddm/base_simulations_ndt_20000')
-labels = np.zeros((len(files) - 2, 500, 2))
-features = np.zeros((len(files) - 2, 3))
+labels = np.zeros((len(files_) - 2, 500, 2))
+features = np.zeros((len(files_) - 2, 3))
    
 cnt = 0
 i = 0
