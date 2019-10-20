@@ -133,7 +133,7 @@ if __name__ == "__main__":
     boundary_multiplicative = False # CHOOSE WHETHER BOUNDARY IS MULTIPLICATIVE (W.R.T Starting separation) OR NOT
 
     # Number of simulators to run
-    n_simulators = 1000
+    n_simulators = 1500
 
     # Make function input tuples
     # DDM
@@ -212,3 +212,4 @@ if __name__ == "__main__":
     
     
     pickle.dump((features, labels), open('/users/afengler/data/tmp/binned_data_test.pickle', 'wb'))
+    print('finished')
