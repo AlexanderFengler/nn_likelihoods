@@ -55,20 +55,20 @@ def bin_simulator_output(out = [0, 0],
 files_ = os.listdir('/users/afengler/data/kde/ddm/base_simulations_ndt_20000')
 labels = np.zeros((len(files) - 2, 500, 2))
 features = np.zeros((len(files) - 2, 3))
-
-cnt = 1
-mill_cnt = 0
-file_cnt = 0
-for file_ in files_:
+   
+cnt = 0
+i = 0
+file_dim = 100
+for file_ in files_[:1000]:
     if file_[:8] == 'ddm_flex':
-        out = pickle.load(open('/users/afengler/data/kde/ddm/base_simulations_ndt_20000/' + file_, 'rb'))
-        features[cnt - 1], labels[cnt - 1] = bin_simulator_output(out = out)
-        if cnt % 1000 == 0:
+        out = pickle.load(open('/users/afengler/data/kde/ddm/base_simulations_ndt_20000' + file_, 'rb'))
+        features[cnt], labels[cnt] = bin_simulator_output(out = out)
+        if cnt % file_dim == 0:
             print(cnt)
-            pickle.dump((labels[mill_cnt:(mill_cnt + cnt)], features[mill_cnt:(mill_cnt + cnt)]), open('/users/afengler/data/kde/ddm/base_simulations_ndt_20000_binned/dataset_' + str(file_cnt), 'wb'))
-            mill_cnt += 1000
-            file_cnt += 1
+            pickle.dump((labels[(i * file_dim):((i + 1) * file_dim)], features[(i * file_dim):((i + 1) * file_dim)]), open('/users/afengler/data/kde/ddm/base_simulations_ndt_20000_binned/dataset_' + str(i), 'wb'))
+            i += 1
         cnt += 1
+
 
 
 

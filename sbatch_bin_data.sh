@@ -21,4 +21,4 @@
 
 # Run a command
 
-python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py
+python -u /users/afengler/git_repos/nn_likelihoods/bin_data.py
