@@ -3,16 +3,11 @@ import scipy as scp
 #import tensorflow as tf
 #from scipy.stats import gamma
 import numpy as np
-#import pandas as pd
-#import matplotlib.pyplot as plt
-#from sklearn.neighbors import KernelDensity
 import random
-import sys
-#import multiprocessing as mp
+import sysocessing as mp
 #import psutil
 import pickle
 import os
-#import re
 
 # Own
 #import ddm_data_simulation as ds
@@ -25,7 +20,7 @@ import os
 def bin_simulator_output(out = [0, 0],
                          bin_dt = 0.04,
                          eps_correction = 1e-7,
-                         params = ['v', 'a', 'w', 'ndt']):
+                         params = ['v', 'a', 'w', 'ndt', 'angle']):
 
     # hardcode 'max_t' to 20sec for now
     n_bins = int(20.0 / bin_dt + 1)
@@ -53,7 +48,7 @@ def bin_simulator_output(out = [0, 0],
     features = [out[2]['v'], out[2]['a'], out[2]['w'], out[2]['ndt']]
     return (features, label)
 
-files_ = os.listdir('/users/afengler/data/kde/ddm/base_simulations_ndt_20000/')
+files_ = os.listdir('/users/afengler/data/kde/angle/base_simulations_ndt_20000/')
 random.shuffle(files_)
 
 labels = np.zeros((len(files_) - 2, 500, 2))
@@ -62,15 +57,15 @@ features = np.zeros((len(files_) - 2, 4))
 cnt = 0
 i = 0
 file_dim = 1000
-for file_ in files_[:11000]:
+for file_ in files_[:10100]:
     if file_[:4] == 'ddm_':
-        out = pickle.load(open('/users/afengler/data/kde/ddm/base_simulations_ndt_20000/' + file_, 'rb'))
+        out = pickle.load(open('/users/afengler/data/kde/angle/base_simulations_ndt_20000/' + file_, 'rb'))
         features[cnt], labels[cnt] = bin_simulator_output(out = out)
         cnt += 1
         if (cnt % file_dim) == 0 and cnt > 0:
             print(cnt)
             pickle.dump((labels[(i * file_dim):((i + 1) * file_dim)], features[(i * file_dim):((i + 1) * file_dim)]), 
-                        open('/users/afengler/data/kde/ddm/base_simulations_ndt_20000_binned/dataset_parallel_job_' + sys.argv[1] + '_' + str(i), 'wb'))
+                        open('/users/afengler/data/kde/angle/base_simulations_ndt_20000_binned/dataset_parallel_job_' + sys.argv[1] + '_' + str(i), 'wb'))
             i += 1
         
 
