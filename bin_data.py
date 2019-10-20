@@ -6,7 +6,7 @@ import numpy as np
 #import pandas as pd
 #import matplotlib.pyplot as plt
 #from sklearn.neighbors import KernelDensity
-#import random
+import random
 #import multiprocessing as mp
 #import psutil
 import pickle
