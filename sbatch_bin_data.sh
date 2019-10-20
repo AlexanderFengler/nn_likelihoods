@@ -17,8 +17,8 @@
 #SBATCH --mem=128G
 #SBATCH -c 14
 #SBATCH -N 1
-#SBATCH --array=1-1
+#SBATCH --array=1-50
 
 # Run a command
 
-python -u /users/afengler/git_repos/nn_likelihoods/bin_data.py
+python -u /users/afengler/git_repos/nn_likelihoods/bin_data.py $SLURM_ARRAY_TASK_ID

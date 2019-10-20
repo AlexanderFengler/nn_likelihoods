@@ -53,21 +53,25 @@ def bin_simulator_output(out = [0, 0],
     return (features, label)
 
 files_ = os.listdir('/users/afengler/data/kde/ddm/base_simulations_ndt_20000/')
+random.shuffle(files_)
+
 labels = np.zeros((len(files_) - 2, 500, 2))
 features = np.zeros((len(files_) - 2, 4))
    
 cnt = 0
 i = 0
 file_dim = 1000
-for file_ in files_:
+for file_ in files_[:11000]:
     if file_[:4] == 'ddm_':
         out = pickle.load(open('/users/afengler/data/kde/ddm/base_simulations_ndt_20000/' + file_, 'rb'))
         features[cnt], labels[cnt] = bin_simulator_output(out = out)
-        if cnt % file_dim == 0:
-            print(cnt)
-            pickle.dump((labels[(i * file_dim):((i + 1) * file_dim)], features[(i * file_dim):((i + 1) * file_dim)]), open('/users/afengler/data/kde/ddm/base_simulations_ndt_20000_binned/dataset_' + str(i), 'wb'))
-            i += 1
         cnt += 1
+        if (cnt % file_dim) == 0 and cnt > 0:
+            print(cnt)
+            pickle.dump((labels[(i * file_dim):((i + 1) * file_dim)], features[(i * file_dim):((i + 1) * file_dim)]), 
+                        open('/users/afengler/data/kde/ddm/base_simulations_ndt_20000_binned/dataset_parallel_job_' + sys.argv[1] + '_' + str(i), 'wb'))
+            i += 1
+        
 
 
 
