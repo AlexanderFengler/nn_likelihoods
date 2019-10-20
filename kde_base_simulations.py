@@ -24,13 +24,19 @@ import boundary_functions as bf
 
 def bin_simulator_output(out = [0, 0],
                          bin_dt = 0.04,
+                         n_bins = 0,
                          eps_correction = 1e-7,
-                         params = ['v', 'a', 'w', 'ndt']): # ['v', 'a', 'w', 'ndt', 'angle']
+                         params = ['v', 'a', 'w', 'ndt']
+                        ): # ['v', 'a', 'w', 'ndt', 'angle']
 
     # hardcode 'max_t' to 20sec for now
-    #n_bins = int(20.0 / bin_dt + 1)
-    n_bins = int(out[2]['max_t'] / bin_dt + 1)
-    bins = np.linspace(0, out[2]['max_t'], n_bins)
+    #n_bins = int(20.0 / bin_dt)
+    if n_bins == 0:
+        n_bins = int(out[2]['max_t'] / bin_dt)
+        bins = np.linspace(0, out[2]['max_t'], n_bins + 1)
+    else:    
+        bins = np.linspace(0, out[2]['max_t'], n_bins + 1)
+    
     counts = []
     counts.append(np.histogram(out[0][out[1] == 1], bins = bins)[0] / out[2]['n_samples'])
     counts.append(np.histogram(out[0][out[1] == -1], bins = bins)[0] / out[2]['n_samples'])
@@ -50,7 +56,7 @@ def bin_simulator_output(out = [0, 0],
         counts[i] =  np.asmatrix(counts[i]).T
 
     labels = np.concatenate(counts, axis = 1)
-    features = [out[2]['v'], out[2]['a'], out[2]['w'], out[2]['ndt'], out[2]['theta']]
+    features = [out[2]['v'], out[2]['a'], out[2]['w'], out[2]['ndt']] #out[2]['theta']]
     return (features, labels)
 
 def data_generator(*args):
@@ -75,6 +81,7 @@ def data_generator_binned(*args):
     #file_dir = '/users/afengler/data/kde/angle/base_simulations_ndt_20000/'
     features, labels = bin_simulator_output(out = simulator_data,
                                             bin_dt = 0.04, 
+                                            n_bins = 256,
                                             eps_correction = 1e-7,
                                             params = ['v','a', 'w', 'ndt']) #['v','a', 'w', 'ndt', 'theta']
     return (features, labels)     
