@@ -123,6 +123,8 @@ if __name__ == "__main__":
 #     scale = [0.1, 10]
 
     # Simulator parameters
+    file_id = sys.argv[1]
+    file_signature = 'binned_data_test_'
     simulator = 'ddm'
     s = 1
     delta_t = 0.01
@@ -133,7 +135,7 @@ if __name__ == "__main__":
     boundary_multiplicative = False # CHOOSE WHETHER BOUNDARY IS MULTIPLICATIVE (W.R.T Starting separation) OR NOT
 
     # Number of simulators to run
-    n_simulators = 1500
+    n_simulators = 10000
 
     # Make function input tuples
     # DDM
@@ -200,6 +202,7 @@ if __name__ == "__main__":
     with Pool(processes = n_cpus) as pool:
         res = pool.starmap(data_generator_binned, args_list)
     
+    # FOR BINNED DATA
     features = []
     labels = []
     for i in range(len(res)):
@@ -209,7 +212,8 @@ if __name__ == "__main__":
     features = np.array(features)
     labels = np.array(labels)
     
+    # Storing files
+    pickle.dump((features, labels), open('/users/afengler/data/angle/' + file_signature + file_id + '.pickle', 'wb'))
+    pickle.dump({'n_simulations': n_samples, 'bin_dt': 0.04, 'max_t': max_t}, open('/users/afengler/data/angle/meta_' + file_signature + '.pickle', 'wb'))
     
-    
-    pickle.dump((features, labels), open('/users/afengler/data/tmp/binned_data_test.pickle', 'wb'))
     print('finished')

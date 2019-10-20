@@ -17,8 +17,8 @@
 #SBATCH --mem=16G
 #SBATCH -c 14
 #SBATCH -N 1
-#SBATCH --array=1-1
+#SBATCH --array=1-100
 
 # Run a command
 
-python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py
+python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py $SLURM_ARRAY_TASK_ID
