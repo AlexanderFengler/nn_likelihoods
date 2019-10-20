@@ -21,6 +21,37 @@ import kde_class as kde
 import cddm_data_simulation as ds
 import boundary_functions as bf
 
+def bin_simulator_output(out = [0, 0],
+                         bin_dt = 0.04,
+                         eps_correction = 1e-7,
+                         params = ['v', 'a', 'w', 'ndt', 'angle']):
+
+    # hardcode 'max_t' to 20sec for now
+    n_bins = int(20.0 / bin_dt + 1)
+    #n_bins = int(out[2]['max_t'] / bin_dt + 1)
+    bins = np.linspace(0, out[2]['max_t'], n_bins)
+    counts = []
+    counts.append(np.histogram(out[0][out[1] == 1], bins = bins)[0] / out[2]['n_samples'])
+    counts.append(np.histogram(out[0][out[1] == -1], bins = bins)[0] / out[2]['n_samples'])
+
+    n_small = 0
+    n_big = 0
+
+    for i in range(len(counts)):
+        n_small += sum(counts[i] < eps_correction)
+        n_big += sum(counts[i] >= eps_correction)
+
+    for i in range(len(counts)):
+        counts[i][counts[i] <= eps_correction] = eps_correction
+        counts[i][counts[i] > eps_correction] = counts[i][counts[i] > eps_correction] - (eps_correction * (n_small / n_big))    
+
+    for i in range(len(counts)):
+        counts[i] =  np.asmatrix(counts[i]).T
+
+    label = np.concatenate(counts, axis = 1)
+    features = [out[2]['v'], out[2]['a'], out[2]['w'], out[2]['ndt']]
+    return (features, label)s
+
 def data_generator(*args):
     # CHOOSE SIMULATOR HERE
     simulator_data = ds.ddm_flexbound(*args)
@@ -36,6 +67,17 @@ def data_generator(*args):
     pickle.dump(simulator_data, open( file_name + '.pickle', "wb" ) )
     print(args)
 
+    
+    
+def data_generator_binned(*args):
+    simulator_data = ds.ddm_flexbound(*args)
+    #file_dir = '/users/afengler/data/kde/angle/base_simulations_ndt_20000/'
+    features, labels = bin_simulator_output(out = simulator_data,
+                                            bin_dt = 0.04, 
+                                            eps_correction = 1e-7,
+                                            params = ['v','a', 'w', 'ndt', 'theta'])
+    return (features, labels)     
+    
 if __name__ == "__main__":
     # Get cpu cnt
     n_cpus = psutil.cpu_count(logical = False)
@@ -90,7 +132,7 @@ if __name__ == "__main__":
     boundary_multiplicative = False # CHOOSE WHETHER BOUNDARY IS MULTIPLICATIVE (W.R.T Starting separation) OR NOT
 
     # Number of simulators to run
-    n_simulators = 500000
+    n_simulators = 100
 
     # Make function input tuples
     # DDM
@@ -153,7 +195,8 @@ if __name__ == "__main__":
         # Append argument list with current parameters
         args_tmp = process_params + sampler_params + boundary_params
         args_list.append(args_tmp)
-
     # Parallel Loop
     with Pool(processes = n_cpus) as pool:
-        res = pool.starmap(data_generator, args_list)
+        res = pool.starmap(data_generator_binned, args_list)
+        
+    pickle.dump(res, open('/users/afengler/data/tmp/binned_data_test.pickle', 'wb'))
