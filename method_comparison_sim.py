@@ -34,7 +34,6 @@ print('argument list: ', str(sys.argv))
 param_origin = 'previous'
 param_file_signature  = 'base_data_perturbation_experiment_nexp_10_n_' + sys.argv[2]
 
-base_data_perturbation_experiment_nexp_10_n_1000_10.pickle
 
 if machine == 'x7':
     method_comparison_folder = "/media/data_cifs/afengler/data/kde/ddm/method_comparison/"
