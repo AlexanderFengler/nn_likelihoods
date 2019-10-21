@@ -5,6 +5,7 @@ from itertools import product
 import pickle
 import uuid
 import os
+import sys
 
 import boundary_functions as bf
 import multiprocessing as mp
@@ -20,23 +21,24 @@ analytic = True
 type_of_experiment = 'uniform' # 'uniform', 'perturbation_experiment'
 n_parameter_sets = 1000
 n_reps = 10
-n_data_samples = 3000
-out_file_signature = 'v1'
+#file_id = sys.argv[1]
+n_data_samples = int(sys.argv[1])
+n_experiments = 10   #int(sys.arg[2])
+file_id = sys.argv[2]
 
-n_experiments = 100
+
 n_datasets_by_experiment = 1
 
-#file_id = sys.argv[1]
 #print('argument list: ', str(sys.argv))
 
 # IF WE WANT TO USE A PREVIOUS SET OF PARAMETERS: FOR COMPARISON OF POSTERIORS FOR EXAMPLE
-param_origin = 'previous'
-param_file_signature  = 'kde_sim_test_ndt_'
+#param_origin = 'previous'
+#param_file_signature  = 'kde_sim_test_ndt_'
 
 if machine == 'x7':
-    method_comparison_folder = "/media/data_cifs/afengler/data/kde/ddm/method_comparison/"
+    method_comparison_folder = "/media/data_cifs/afengler/data/analytic/ddm/method_comparison/"
 if machine == 'ccv':
-    method_comparison_folder = '/users/afengler/data/kde/ddm/method_comparison/'
+    method_comparison_folder = '/users/afengler/data/analytic/ddm/method_comparison/'
 
 if machine == 'x7':
     stats = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
@@ -111,8 +113,8 @@ def param_grid_uniform(n = 1000,
     params_lower_bnd = [bnd[1] for bnd in param_bounds]  
     param_grid = np.zeros((n_reps, n,  n_params))
     param_grid[:, :, :] = np.random.uniform(low = params_lower_bnd,
-                                   high = params_upper_bnd,
-                                   size = (n, n_params))
+                                            high = params_upper_bnd,
+                                            size = (n, n_params))
     
     param_grid = np.reshape(param_grid, (-1, n_params))
     return param_grid 
@@ -160,17 +162,13 @@ def generate_data_grid(param_grid,
 meta_dat = []
 
 if type_of_experiment == 'perturbation_experiment':
-    param_grid, meta_dat = param_grid_perturbation_experiment(n_experiments = 100,
+    param_grid, meta_dat = param_grid_perturbation_experiment(n_experiments = n_experiments,
                                                               n_datasets_by_experiment = 1,
                                                               perturbation_sizes = [[0.05, 0.1, 0.2],
                                                                                     [0.05, 0.1, 0.2],
                                                                                     [0.05, 0.1, 0.2],
-                                                                                    [0.05, 0.1, 0.2],
                                                                                     [0.05, 0.1, 0.2]],
-                                                              file_signature = out_file_signature,
-                                                              file_folder = output_folder,
-                                                              method_params = method_params,
-                                                              save_file = False)
+                                                              method_params = method_params)
 if type_of_experiment == 'uniform':
     param_grid = param_grid_uniform(n = n_parameter_sets,
                                     n_reps = n_reps,
@@ -186,5 +184,11 @@ data_grid = generate_data_grid(param_grid,
 
 
 # Dump file
-pickle.dump((param_grid, data_grid, meta_dat), open(output_folder + 'base_data_param_recov_unif_reps_' + str(int(n_reps)) \
-                                                    + '_n_' + str(int(n_data_samples)) + '.pickle', 'wb'))
+if type_of_experiment == 'perturbation_experiment':
+    pickle.dump((param_grid, data_grid, meta_dat), open(output_folder + 'base_data_perturbation_experiment_nexp_' + \
+                                                        str(int(n_experiments)) \
+                                                        + '_n_' + str(int(n_data_samples)) + '_' + file_id + '.pickle', 'wb'))
+
+if type_of_experiment == 'uniform':
+    pickle.dump((param_grid, data_grid, meta_dat), open(output_folder + 'base_data_param_recov_unif_reps_' + str(int(n_reps)) \
+                                                        + '_n_' + str(int(n_data_samples)) + '.pickle', 'wb'))

@@ -57,9 +57,11 @@ def bin_simulator_output(out = [0, 0],
 
     labels = np.concatenate(counts, axis = 1)
     features = [out[2]['v'], out[2]['a'], out[2]['w'], out[2]['ndt']] #out[2]['theta']]
-    return (features, labels)
+    return (features, labels, {'max_t': out[2]['max_t'], 
+                               'bin_dt': bin_dt, 
+                               'n_samples': out[2]['n_samples']})
 
-def data_generator(*args):
+def data_generator_ddm(*args):  # CAN I MAKE CONTEXT DEPENDENT???
     # CHOOSE SIMULATOR HERE
     simulator_data = ds.ddm_flexbound(*args)
     
@@ -72,23 +74,143 @@ def data_generator(*args):
     # STORE
     file_name = file_dir + simulator + '_' + uuid.uuid1().hex
     pickle.dump(simulator_data, open( file_name + '.pickle', "wb" ) )
-    print(args)
-
-    
-    
-def data_generator_binned(*args):
-    simulator_data = ds.ddm_flexbound(*args)
-    #file_dir = '/users/afengler/data/kde/angle/base_simulations_ndt_20000/'
-    features, labels = bin_simulator_output(out = simulator_data,
-                                            bin_dt = 0.04, 
-                                            n_bins = 256,
-                                            eps_correction = 1e-7,
-                                            params = ['v', 'a', 'w', 'ndt', 'theta']) #['v','a', 'w', 'ndt', 'theta']
-    return (features, labels)     
+    print(args)    
     
 if __name__ == "__main__":
+    
+    # INITIALIZATIONS ----------------------------------------------------------------------------------------
     # Get cpu cnt
     n_cpus = psutil.cpu_count(logical = False)
+    machine = 'x7'
+    
+    # Choose simulator and datatype
+    method = 'ddm_ndt'
+    binned = True
+    
+    # Load meta data from kde_info.pickle file
+    if machine == 'x7':
+        method_folder = "/media/data_cifs/afengler/data/kde/ddm/"
+
+    if machine == 'ccv':
+        method_folder = '/users/afengler/data/kde/ddm/'
+
+    if machine == 'x7':
+        stats = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
+        method_params = stats[method]
+    if machine == 'ccv':
+        stats = pickle.load(open("/users/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
+        method_params = stats[method]
+
+    out_folder = method_folder + 'base_simulations_folder_name/'
+    file_id = sys.argv[1]
+    file_signature = 'binned_data_test_'
+    
+    # Simulator parameters
+    s = 1 # Choose
+    delta_t = 0.01 # Choose
+    max_t = 10 # Choose
+    n_samples = 100000 # Choose
+    n_simulators = 10000 # Choose
+    print_info = False # Choose
+    bound = method_params['boundary']
+    boundary_multiplicative = method_params['boundary_multiplicative'] 
+    
+    # Extra params
+    bin_dt = 0.04
+    n_bins = 256
+    # --------------------------------------------------------------------------------------------------------
+    
+    # GENERATE A SET OF PARAMETERS ---------------------------------------------------------------------------
+    process_param_names = method_params['param_names']
+    boundary_param_names = method_params['boundary_param_names']
+    param_names_full = process_param_names + boundary_param_names
+    process_param_upper_bnd = []
+    process_param_lower_bnd = []
+    
+    for i in range(len(process_param_names)):
+        process_param_upper_bnd.append(method_params['param_bounds_network'][i][0]) 
+        process_param_lower_bnd.append(method_params['param_bounds_network'][i][1])
+        
+    param_samples = tuple(map(tuple, np.random.uniform(low = process_param_lower_bnd,
+                                      high = process_param_upper_bnd,
+                                      size = (n_simulators, len(process_param_names)))))
+
+    if len(boundary_param_names) > 0:
+        boundary_param_lower_bnd = []
+        boundary_param_upper_bnd = []
+        
+        for i in range(len(boundary_param_names)):
+            boundary_param_lower_bnd.append(method_params['boundary_param_bounds_network'][i][0])
+            boundary_param_upper_bnd.append(method_params['boundary_param_bounds_network'][i][0])
+                                      
+        boundary_param_samples = np.random.uniform(low = boundary_param_lower_bnd,
+                                                   high = bonudary_param_upper_bnd,
+                                                   size = (n_simulators, len(boundary_param_names)))
+                                      
+
+    # --------------------------------------------------------------------------------------------------------
+    
+    # DEFINE FUNCTIONS THAAT NEED INITIALIZATION DEPENDEND ON CONTEXT ----------------------------------------
+    def data_generator_ddm_binned(*args):
+    simulator_data = ds.ddm_flexbound(*args)
+    #file_dir = '/users/afengler/data/kde/angle/base_simulations_ndt_20000/'
+    features, labels, meta = bin_simulator_output(out = simulator_data,
+                                                  bin_dt = bin_dat, 
+                                                  n_bins = n_bins,
+                                                  eps_correction = 1e-7,
+                                                  params = param_names_full) 
+    return (features, labels, meta) 
+    # --------------------------------------------------------------------------------------------------------
+    
+    # MAKE SUITABLE FOR PARALLEL SIMULATION ------------------------------------------------------------------
+    args_list = []
+    for i in range(n_simulators):
+        # Get current set of parameters
+        process_params = param_samples[i]
+        #process_params = (v_sample[i], a_sample[i], w_sample[i], ndt_sample[i], s)
+        sampler_params = (delta_t, max_t, n_samples, print_info, bound, boundary_multiplicative)
+                          
+        if len(boundary_param_names) > 0:
+            boundary_params = (dict(zip(boundary_param_names, boundary_param_samples[i])) ,)
+        else:
+            boundary_params = ({},)
+        
+        # Append argument list with current parameters
+        args_tmp = process_params + sampler_params + boundary_params
+        args_list.append(args_tmp)
+    # --------------------------------------------------------------------------------------------------------
+                   
+    # RUN SIMULATIONS AND STORE DATA -------------------------------------------------------------------------
+    # BINNED VERSION
+    if binned:
+        # Parallel Loop
+        with Pool(processes = n_cpus) as pool:
+            res = pool.starmap(data_generator_ddm_binned, args_list)
+
+        features = []
+        labels = []
+        for i in range(len(res)):
+            features.append(res[i][1])
+            labels.append(res[i][0])
+
+        features = np.array(features)
+        labels = np.array(labels)
+        meta = res[0][2]
+        
+        # Storing files
+        pickle.dump((features, labels), open(out_folder + file_signature + file_id + '.pickle', 'wb'))
+        pickle.dump(meta, open(out_folder + 'meta_' + file_signature + '.pickle', 'wb'))
+    
+    # STANDARD OUTPUT
+    else:
+        # Parallel Loop
+        with Pool(processes = n_cpus) as pool:
+            res = pool.starmap(data_generator_ddm, args_list)
+    # --------------------------------------------------------------------------------------------------------
+    print('finished')
+
+
+# UNUSED ---------------------------------------------------------------
 
     # Parameter ranges (for the simulator)
 #     v = [-2, 2]
@@ -96,15 +218,15 @@ if __name__ == "__main__":
 #     a = [0.5, 2]
 #     g = [-1.0, 1.0]
 #     b = [-1.0, 1.0]
-    
+
     # DDM
-    v = [-2.0, 2.0]
-    a = [0.5, 2.0]
-    w = [0.3, 0.7]
-    ndt = [0, 1]
+#     v = [-2.0, 2.0]
+#     a = [0.5, 2.0]
+#     w = [0.3, 0.7]
+#     ndt = [0, 1]
     
     # Bound - Angle
-    theta = [0, np.pi/2 - 0.2]
+#     theta = [0, np.pi/2 - 0.2]
 
     # LCA
 #     v = [-2.0, 2.0]
@@ -129,31 +251,19 @@ if __name__ == "__main__":
 #     shape = [1.1, 50]
 #     scale = [0.1, 10]
 
-    # Simulator parameters
-    file_id = sys.argv[1]
-    file_signature = 'binned_data_test_'
-    simulator = 'ddm'
-    s = 1
-    delta_t = 0.01
-    max_t = 10
-    n_samples = 100000
-    print_info = False
-    #bound = bf.angle # CHOOSE BOUNDARY FUNCTION
-    bound = bf.angle
-    boundary_multiplicative = False # CHOOSE WHETHER BOUNDARY IS MULTIPLICATIVE (W.R.T Starting separation) OR NOT
 
-    # Number of simulators to run
-    n_simulators = 10000
-
-    # Make function input tuples
+# Make function input tuples
     # DDM
-    v_sample = np.random.uniform(low = v[0], high = v[1], size = n_simulators)
-    w_sample = np.random.uniform(low = w[0], high = w[1], size = n_simulators)
-    a_sample = np.random.uniform(low = a[0], high = a[1], size = n_simulators)
-    ndt_sample = np.random.uniform(low = ndt[0], high = ndt[1], size = n_simulators)
+#     v_sample = np.random.uniform(low = v[0], high = v[1], size = n_simulators)
+#     w_sample = np.random.uniform(low = w[0], high = w[1], size = n_simulators)
+#     a_sample = np.random.uniform(low = a[0], high = a[1], size = n_simulators)
+#     ndt_sample = np.random.uniform(low = ndt[0], high = ndt[1], size = n_simulators)
     
     # BOUND - ANGLE
-    theta_sample = np.random.uniform(low = theta[0], high = theta[1], size = n_simulators) 
+#     theta_sample = np.random.uniform(low = theta[0], high = theta[1], size = n_simulators) 
+    
+    # BOUND - ANGLE
+    
     
     # Ornstein 
 #     g_sample = np.random.uniform(low = g[0], high = g[1], size = n_simulators)
@@ -194,35 +304,3 @@ if __name__ == "__main__":
 
     # Defining main function to iterate over:
     # Folder in which we would like to dump files
-
-    args_list = []
-    for i in range(n_simulators):
-        # Get current set of parameters
-        process_params = (v_sample[i], a_sample[i], w_sample[i], ndt_sample[i], s)
-        sampler_params = (delta_t, max_t, n_samples, print_info, bound, boundary_multiplicative)
-        # CHOOSE
-        boundary_params = ({'theta': theta_sample[i]},)
-        #boundary_params = ({}, )
-        
-        # Append argument list with current parameters
-        args_tmp = process_params + sampler_params + boundary_params
-        args_list.append(args_tmp)
-    # Parallel Loop
-    with Pool(processes = n_cpus) as pool:
-        res = pool.starmap(data_generator_binned, args_list)
-    
-    # FOR BINNED DATA
-    features = []
-    labels = []
-    for i in range(len(res)):
-        features.append(res[i][1])
-        labels.append(res[i][0])
-    
-    features = np.array(features)
-    labels = np.array(labels)
-    
-    # Storing files
-    pickle.dump((features, labels), open('/users/afengler/data/kde/angle/base_simulations_ndt_100000_binned/' + file_signature + file_id + '.pickle', 'wb'))
-    pickle.dump({'n_simulations': n_samples, 'bin_dt': 0.04, 'max_t': max_t}, open('/users/afengler/data/kde/angle/base_simulations_ndt_100000_binned/meta_' + file_signature + '.pickle', 'wb'))
-    
-    print('finished')

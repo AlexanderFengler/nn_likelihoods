@@ -23,7 +23,7 @@ machine = 'ccv'
 method = 'ddm_analytic'
 analytic = True
 out_file_signature = 'analytic_sim_test_ndt_'
-n_data_samples = 2500
+n_data_samples = int(sys.argv[2])
 n_slice_samples = 10000
 n_sims = 10
 n_cpus = 'all'
@@ -32,7 +32,9 @@ print('argument list: ', str(sys.argv))
 
 # IF WE WANT TO USE A PREVIOUS SET OF PARAMETERS: FOR COMPARISON OF POSTERIORS FOR EXAMPLE
 param_origin = 'previous'
-param_file_signature  = 'kde_sim_test_ndt_'
+param_file_signature  = 'base_data_perturbation_experiment_nexp_10_n_' + sys.argv[2]
+
+base_data_perturbation_experiment_nexp_10_n_1000_10.pickle
 
 if machine == 'x7':
     method_comparison_folder = "/media/data_cifs/afengler/data/kde/ddm/method_comparison/"
