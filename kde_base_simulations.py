@@ -104,7 +104,7 @@ if __name__ == "__main__":
     ndt = [0, 1]
     
     # Bound - Angle
-   # theta = [0, np.pi/2 - 0.2]
+    theta = [0, np.pi/2 - 0.2]
 
     # LCA
 #     v = [-2.0, 2.0]
