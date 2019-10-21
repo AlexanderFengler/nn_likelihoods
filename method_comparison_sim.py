@@ -285,9 +285,9 @@ print('shape of data_grid:', data_grid.shape)
 
 # Get full parameter vector including bounds
 if method[:3] == 'lba':
-    sampler_param_bounds = np.array(method_params["param_bounds_sampler"] + method_params["boundary_param_bounds"])
+    sampler_param_bounds = np.array(method_params["param_bounds_sampler"] + method_params["boundary_param_bounds_sampler"])
 else:
-    sampler_param_bounds = np.array(method_params["param_bounds_sampler"] + method_params["boundary_param_bounds"])
+    sampler_param_bounds = np.array(method_params["param_bounds_sampler"] + method_params["boundary_param_bounds_sampler"])
 
 # Define posterior samplers for respective likelihood functions
 def mlp_posterior(args): # args = (data, true_params)
