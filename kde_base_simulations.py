@@ -83,7 +83,7 @@ def data_generator_binned(*args):
                                             bin_dt = 0.04, 
                                             n_bins = 256,
                                             eps_correction = 1e-7,
-                                            params = ['v','a', 'w', 'ndt']) #['v','a', 'w', 'ndt', 'theta']
+                                            params = ['v', 'a', 'w', 'ndt', 'theta']) #['v','a', 'w', 'ndt', 'theta']
     return (features, labels)     
     
 if __name__ == "__main__":
@@ -139,8 +139,8 @@ if __name__ == "__main__":
     n_samples = 100000
     print_info = False
     #bound = bf.angle # CHOOSE BOUNDARY FUNCTION
-    bound = bf.constant
-    boundary_multiplicative = True # CHOOSE WHETHER BOUNDARY IS MULTIPLICATIVE (W.R.T Starting separation) OR NOT
+    bound = bf.angle
+    boundary_multiplicative = False # CHOOSE WHETHER BOUNDARY IS MULTIPLICATIVE (W.R.T Starting separation) OR NOT
 
     # Number of simulators to run
     n_simulators = 10000
@@ -153,7 +153,7 @@ if __name__ == "__main__":
     ndt_sample = np.random.uniform(low = ndt[0], high = ndt[1], size = n_simulators)
     
     # BOUND - ANGLE
-    #theta_sample = np.random.uniform(low = theta[0], high = theta[1], size = n_simulators) 
+    theta_sample = np.random.uniform(low = theta[0], high = theta[1], size = n_simulators) 
     
     # Ornstein 
 #     g_sample = np.random.uniform(low = g[0], high = g[1], size = n_simulators)
@@ -201,8 +201,8 @@ if __name__ == "__main__":
         process_params = (v_sample[i], a_sample[i], w_sample[i], ndt_sample[i], s)
         sampler_params = (delta_t, max_t, n_samples, print_info, bound, boundary_multiplicative)
         # CHOOSE
-        # boundary_params = ({'theta': theta_sample[i]},)
-        boundary_params = ({}, )
+        boundary_params = ({'theta': theta_sample[i]},)
+        #boundary_params = ({}, )
         
         # Append argument list with current parameters
         args_tmp = process_params + sampler_params + boundary_params
@@ -222,7 +222,7 @@ if __name__ == "__main__":
     labels = np.array(labels)
     
     # Storing files
-    pickle.dump((features, labels), open('/users/afengler/data/kde/ddm/base_simulations_ndt_100000_binned/' + file_signature + file_id + '.pickle', 'wb'))
-    pickle.dump({'n_simulations': n_samples, 'bin_dt': 0.04, 'max_t': max_t}, open('/users/afengler/data/kde/ddm/base_simulations_ndt_100000_binned/meta_' + file_signature + '.pickle', 'wb'))
+    pickle.dump((features, labels), open('/users/afengler/data/kde/angle/base_simulations_ndt_100000_binned/' + file_signature + file_id + '.pickle', 'wb'))
+    pickle.dump({'n_simulations': n_samples, 'bin_dt': 0.04, 'max_t': max_t}, open('/users/afengler/data/kde/angle/base_simulations_ndt_100000_binned/meta_' + file_signature + '.pickle', 'wb'))
     
     print('finished')
