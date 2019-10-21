@@ -22,7 +22,7 @@ import keras_to_numpy as ktnp
 machine = 'ccv'
 method = 'ddm_analytic'
 analytic = True
-out_file_signature = 'analytic_sim_test_ndt_'
+out_file_signature = 'post_samp_perturb_nexp_10_n_' + sys.arg[2] + '_' + sys.arg[1]
 n_data_samples = int(sys.argv[2])
 n_slice_samples = 10000
 n_sims = 10
@@ -36,9 +36,9 @@ param_file_signature  = 'base_data_perturbation_experiment_nexp_10_n_' + sys.arg
 
 
 if machine == 'x7':
-    method_comparison_folder = "/media/data_cifs/afengler/data/kde/ddm/method_comparison/"
+    method_comparison_folder = "/media/data_cifs/afengler/data/analytic/ddm/method_comparison/"
 if machine == 'ccv':
-    method_comparison_folder = '/users/afengler/data/kde/ddm/method_comparison/'
+    method_comparison_folder = '/users/afengler/data/analytic/ddm/method_comparison/'
 
 if machine == 'x7':
     stats = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
