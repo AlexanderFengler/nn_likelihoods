@@ -270,9 +270,11 @@ else:
         dat_tmp_0.append(dat[0])
         dat_tmp_1.append(dat[1])
 
-    dat_total = [np.concatenate(dat_tmp_0, axis = 0), np.concatenate(dat_tmp_1, axis = 0)]
-    data_grid = dat_total[1]
-    param_grid = dat_total[0]
+    #dat_total = [np.concatenate(dat_tmp_0, axis = 0), np.concatenate(dat_tmp_1, axis = 0)]  
+#     data_grid = dat_total[1]
+#     param_grid = dat_total[0]
+    data_grid = dat[1]
+    param_grid = dat[0]
    
 
 print('param_grid: ', param_grid)
