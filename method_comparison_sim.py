@@ -20,9 +20,9 @@ import keras_to_numpy as ktnp
 
 # INITIALIZATIONS -------------------------------------------------------------
 machine = 'ccv'
-method = 'ddm_analytic'
-analytic = True
-out_file_signature = 'post_samp_perturb_nexp_10_n_' + sys.argv[2] + '_' + sys.argv[1]
+method = 'ddm_ndt'
+analytic = False
+out_file_signature = 'post_samp_perturb_nexp_1_n_' + sys.argv[2] + '_' + sys.argv[1]
 n_data_samples = int(sys.argv[2])
 n_slice_samples = 10000
 n_sims = 10
@@ -264,18 +264,18 @@ else:
                 dats.append(pickle.load(open(method_comparison_folder + file_ , 'rb')))
             signature_cnt += 1
     
-    dat_tmp_0 = []
-    dat_tmp_1 = []
-    for dat in dats:
-        dat_tmp_0.append(dat[0])
-        dat_tmp_1.append(dat[1])
+    param_grid = dats[0][0]
+    data_grid = dats[0][1]
+    
+#     dat_tmp_0 = []
+#     dat_tmp_1 = []
+#     for dat in dats:
+#         dat_tmp_0.append(dat[0])
+#         dat_tmp_1.append(dat[1])
 
-    #dat_total = [np.concatenate(dat_tmp_0, axis = 0), np.concatenate(dat_tmp_1, axis = 0)]  
-#     data_grid = dat_total[1]
-#     param_grid = dat_total[0]
-    data_grid = dat[1]
-    param_grid = dat[0]
-   
+#    dat_total = [np.concatenate(dat_tmp_0, axis = 0), np.concatenate(dat_tmp_1, axis = 0)]  
+#    data_grid = dat_total[1]
+#    param_grid = dat_total[0]
 
 print('param_grid: ', param_grid)
 print('shape of data_grid:', data_grid.shape)
@@ -287,7 +287,7 @@ print('shape of data_grid:', data_grid.shape)
 if method[:3] == 'lba':
     sampler_param_bounds = np.array(method_params["param_bounds_sampler"] + method_params["boundary_param_bounds_sampler"])
 else:
-    sampler_param_bounds = np.array(method_params["param_bounds_sampler"] + method_params["boundary_param_bounds_sampler"])
+    sampler_param_bounds = np.array(method_params["param_bounds_sampler"] + method_params["boundary_param_bounds_sampleripython"])
 
 # Define posterior samplers for respective likelihood functions
 def mlp_posterior(args): # args = (data, true_params)

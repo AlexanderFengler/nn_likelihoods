@@ -3,7 +3,6 @@
 from scipy.stats import gamma
 import numpy as np
 
-
 # Collection of boundary functions
 
 # Constant: (multiplicative)

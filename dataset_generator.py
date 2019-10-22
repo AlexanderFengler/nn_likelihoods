@@ -16,15 +16,14 @@ import clba
 
 # INITIALIZATIONS -------------------------------------------------------------
 machine = 'x7'
-method = 'ddm_analytic'
-analytic = True
-type_of_experiment = 'uniform' # 'uniform', 'perturbation_experiment'
+method = 'ddm_ndt'
+type_of_experiment = 'perturbation_experiment' # 'uniform', 'perturbation_experiment'
 n_parameter_sets = 1000
 n_reps = 10
 #file_id = sys.argv[1]
-n_data_samples = int(sys.argv[1])
-n_experiments = 10   #int(sys.arg[2])
-file_id = sys.argv[2]
+n_experiments = int(sys.argv[1])
+n_data_samples = int(sys.argv[2])
+file_id = sys.argv[3]
 
 
 n_datasets_by_experiment = 1

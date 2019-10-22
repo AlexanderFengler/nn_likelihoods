@@ -52,7 +52,8 @@ temp = {
     "boundary_param_names": [],
     "param_bounds_network": [[-2.0, 2.0], [0.5, 1.5], [0.3, 0.7], [0.0, 1.0]],   
     "param_bounds_sampler": [[-1.9, 1.9], [0.6, 1.4], [0.31, 0.69], [0.1, 0.9]],
-    "boundary_param_bounds": []
+    "boundary_param_bounds_network": [],
+    "boundary_param_bounds_sampler": [],
     },
 "ddm_analytic":{
     "dgp": cd.ddm_flexbound,
