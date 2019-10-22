@@ -22,7 +22,7 @@ import keras_to_numpy as ktnp
 machine = 'ccv'
 method = 'ddm_ndt'
 analytic = False
-out_file_signature = 'post_samp_perturb_nexp_1_n_' + sys.argv[2] + '_' + sys.argv[1]
+out_file_signature = 'post_samp_perturbation_experiment_nexp_1_n_' + sys.argv[2] + '_' + sys.argv[1]
 n_data_samples = int(sys.argv[2])
 n_slice_samples = 10000
 n_sims = 10
@@ -32,13 +32,13 @@ print('argument list: ', str(sys.argv))
 
 # IF WE WANT TO USE A PREVIOUS SET OF PARAMETERS: FOR COMPARISON OF POSTERIORS FOR EXAMPLE
 param_origin = 'previous'
-param_file_signature  = 'base_data_perturbation_experiment_nexp_10_n_' + sys.argv[2]
+param_file_signature  = 'base_data_perturbation_experiment_nexp_1_n_' + sys.argv[2]
 
 
 if machine == 'x7':
-    method_comparison_folder = "/media/data_cifs/afengler/data/analytic/ddm/method_comparison/"
+    method_comparison_folder = "/media/data_cifs/afengler/data/kde/ddm/method_comparison/"
 if machine == 'ccv':
-    method_comparison_folder = '/users/afengler/data/analytic/ddm/method_comparison/'
+    method_comparison_folder = '/users/afengler/data/kde/ddm/method_comparison/'
 
 if machine == 'x7':
     stats = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
@@ -287,7 +287,7 @@ print('shape of data_grid:', data_grid.shape)
 if method[:3] == 'lba':
     sampler_param_bounds = np.array(method_params["param_bounds_sampler"] + method_params["boundary_param_bounds_sampler"])
 else:
-    sampler_param_bounds = np.array(method_params["param_bounds_sampler"] + method_params["boundary_param_bounds_sampleripython"])
+    sampler_param_bounds = np.array(method_params["param_bounds_sampler"] + method_params["boundary_param_bounds_sampler"])
 
 # Define posterior samplers for respective likelihood functions
 def mlp_posterior(args): # args = (data, true_params)
