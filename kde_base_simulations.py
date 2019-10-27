@@ -66,7 +66,7 @@ def data_generator_ddm(*args):  # CAN I MAKE CONTEXT DEPENDENT???
     simulator_data = ds.ddm_flexbound(*args)
     
     # CHOOSE TARGET DIRECTORY HERE
-    file_dir = '/users/afengler/data/kde/angle/base_simulations_ndt_20000/'
+    file_dir = '/users/afengler/data/kde/weibull_cdf/base_simulations_ndt_20000/'
     
     # USE FOR x7 MACHINE 
     #file_dir = '/media/data_cifs/afengler/tmp/'
@@ -81,11 +81,11 @@ if __name__ == "__main__":
     # INITIALIZATIONS ----------------------------------------------------------------------------------------
     # Get cpu cnt
     n_cpus = psutil.cpu_count(logical = False)
-    machine = 'x7'
+    machine = 'ccv'
     
     # Choose simulator and datatype
-    method = 'ddm_ndt'
-    binned = True
+    method = 'weibull_cdf_ndt'
+    binned = False
     
     # Load meta data from kde_info.pickle file
     if machine == 'x7':
@@ -108,9 +108,9 @@ if __name__ == "__main__":
     # Simulator parameters
     s = 1 # Choose
     delta_t = 0.01 # Choose
-    max_t = 10 # Choose
-    n_samples = 100000 # Choose
-    n_simulators = 10000 # Choose
+    max_t = 20 # Choose
+    n_samples = 20000 # Choose
+    n_simulators = 750000 # Choose
     print_info = False # Choose
     bound = method_params['boundary']
     boundary_multiplicative = method_params['boundary_multiplicative'] 
@@ -152,13 +152,13 @@ if __name__ == "__main__":
     
     # DEFINE FUNCTIONS THAAT NEED INITIALIZATION DEPENDEND ON CONTEXT ----------------------------------------
     def data_generator_ddm_binned(*args):
-    simulator_data = ds.ddm_flexbound(*args)
-    #file_dir = '/users/afengler/data/kde/angle/base_simulations_ndt_20000/'
-    features, labels, meta = bin_simulator_output(out = simulator_data,
-                                                  bin_dt = bin_dat, 
-                                                  n_bins = n_bins,
-                                                  eps_correction = 1e-7,
-                                                  params = param_names_full) 
+        simulator_data = ds.ddm_flexbound(*args)
+        #file_dir = '/users/afengler/data/kde/angle/base_simulations_ndt_20000/'
+        features, labels, meta = bin_simulator_output(out = simulator_data,
+                                                      bin_dt = bin_dat, 
+                                                      n_bins = n_bins,
+                                                      eps_correction = 1e-7,
+                                                      params = param_names_full) 
     return (features, labels, meta) 
     # --------------------------------------------------------------------------------------------------------
     
