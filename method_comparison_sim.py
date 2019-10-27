@@ -20,8 +20,8 @@ import keras_to_numpy as ktnp
 
 # INITIALIZATIONS -------------------------------------------------------------
 machine = 'ccv'
-method = 'ddm_ndt'
-analytic = False
+method = 'ddm_analytic'
+analytic = True
 out_file_signature = 'post_samp_perturbation_experiment_nexp_1_n_' + sys.argv[2] + '_' + sys.argv[1]
 n_data_samples = int(sys.argv[2])
 n_slice_samples = 10000
@@ -332,4 +332,4 @@ else:
 
 # Store files
 pickle.dump((param_grid, data_grid, posterior_samples), 
-            open(output_folder + out_file_signature + "{}.pickle".format(uuid.uuid1()), "wb"))
+            open(output_folder + out_file_signature + ".pickle", "wb"))

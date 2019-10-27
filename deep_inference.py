@@ -15,7 +15,7 @@ def heteroscedastic_loss(true, pred):
     point = pred[:, :params]
     var = pred[:, params:]
     precision = 1 / var
-    return keras.backend.sum((precision * (true - point)) ** 2 + keras.backend.log(var), - 1)
+    return keras.backend.sum((precision * (true - point)) ** 2 + keras.backend.log(var), - 1) # actually think this is wrong
 
 def make_fcn(n_params = 5,
              input_dims = (None, 2),

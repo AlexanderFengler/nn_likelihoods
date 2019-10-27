@@ -16,8 +16,7 @@ def linear_collapse(t = 1,
     if t >= node:
         return (t - node) * (- np.sin(theta) / np.cos(theta))
     else:
-        return 0
-    
+        return 0  
 
 # Angle (additive)
 def angle(t = 1,
@@ -50,6 +49,13 @@ def generalized_logistic_bnd(t = 1,
                              M = 3.,
                              v = 0.5):
     return 1 - (1 / np.power(1 + np.exp(- B * (t - M)), 1 / v))
+
+
+# Weibull survival fun (multiplicative)
+def weibull_cdf(t = 1,
+                a  = 1,
+                beta = 1):
+    return (np.exp( - np.power(t / beta, a)))
 
 # # Gamma shape: (additive)
 # def gamma_bnd(t = 1,
