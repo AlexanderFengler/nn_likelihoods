@@ -188,29 +188,32 @@ def filter_simulations_fast(base_simulation_folder = '',
     
     # Initialize data frame
     sim_stat_data = pd.DataFrame(np.zeros((n_datasets, len(init_cols))), columns = init_cols)
+    
 
     # MAX RT BY SIMULATION: TEST SHOULD BE CONSISTENT
     n_simulations = file_[0][2]['n_samples']
     n_choices = len(file_[0][2]['possible_choices'])
     choices = file_[0][2]['possible_choices']
     max_rts = np.zeros((n_datasets, 1))
+   
     
     max_t = file_[0][2]['max_t']
     max_ts = np.zeros((n_datasets, 1))
-    max_ts[:] = max_t 
+    #max_ts[:] = max_t 
 
     stds = np.zeros((n_datasets, n_choices))
     mean_rts = np.zeros((n_datasets, n_choices))
     choice_cnts = np.zeros((n_datasets, n_choices))
     modes = np.zeros((n_datasets, n_choices))
     mode_cnts = np.zeros((n_datasets, n_choices))
+    
 
     sim_stat_data = [None] * n_datasets
 
     cnt = 0     
     for i in range(n_datasets):
         max_rts[i] = (file_[i][0].max().round(2))
- 
+        max_ts[i] = (file_[i][2]['max_t'])
         # Standard deviation of reaction times
         choice_cnt = 0
         for choice_tmp in choices:
@@ -294,10 +297,31 @@ def filter_simulations_fast(base_simulation_folder = '',
 
     # Write files:
     #pickle.dump(list(sim_stat_data.loc[keep, 'file']), open(base_simulation_folder + '/keep_files.pickle', 'wb'))
-    pickle.dump(sim_stat_data, open(base_simulation_folder + '/simulator_statistics.pickle', 'wb'))
+    pickle.dump(sim_stat_data, 
+                open(base_simulation_folder + '/simulator_statistics' + '_' + str(file_id) + '.pickle', 'wb'))
+                     
+    return sim_stat_data                     
 
-    return sim_stat_data
+def kde_from_simulations_fast(base_simulation_folder = '',
+                              file_name_prefix = '',
+                              file_id = 1,
+                              n_by_param = 3000,
+                              mixture_p = [0.8, 0.1, 0.1],
+                              process_params = ['v', 'a', 'w', 'c1', 'c2'],
+                              print_info = False
+                             ):
+    file_ = pickle.load(open( base_simulation_folder + file_name_prefix + '_' + str(file_id) + '.pickle', 'rb' ) )
+    stat_ = pickle.load(open( base_simulation_folder + '/simulator_statistics' + '_' + str(file_id) + '.pickle', 'rb' ) )
 
+    # Initialize dataframe
+    my_columns = process_params + ['rt', 'choice', 'log_l']
+    data = pd.DataFrame(np.zeros((len(file_) * n_by_param, len(my_columns))),
+                        columns = my_columns)             
+     
+                    
+    # CONTINUE HERE                   
+                     
+                     
 def kde_from_simulations(base_simulation_folder = '',
                          target_folder = '',
                          n_total = 10000,
