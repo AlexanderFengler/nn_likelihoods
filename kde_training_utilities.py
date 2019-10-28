@@ -208,7 +208,7 @@ def filter_simulations_fast(base_simulation_folder = '',
     sim_stat_data = [None] * n_datasets
 
     cnt = 0     
-    for i in range(n_datsets_by_file):
+    for i in range(n_datsets):
         max_rts[i] = (tmp[i][0].max().round(2))
  
         # Standard deviation of reaction times
