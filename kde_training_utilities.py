@@ -170,6 +170,134 @@ def filter_simulations(base_simulation_folder = '',
 
     return sim_stat_data
 
+def filter_simulations_fast(base_simulation_folder = '',
+                            file_name_prefix = '',
+                            file_id = 0,
+                            param_ranges = 'none', # either 'none' or dict that specifies allowed ranges for parameters
+                            filters = {'mode': 20, # != (checking if mode is max_rt)
+                                       'choice_cnt': 10, # > (checking that each choice receive at least 10 samples in simulator)
+                                       'mean_rt': 15, # < (checking that mean_rt is smaller than specified value
+                                       'std': 0, # > (checking that std is positive for each choice)
+                                       'mode_cnt_rel': 0.5  # < (checking that mode does not receive more than a proportion of samples for each choice)
+                                 }
+                      ):
+
+    file_ = pickle.load(open( base_simulation_folder + files_[0], 'rb' ))
+    init_cols = list(file_[0][2].keys())
+    n_datasets = len(file_)
+    
+    # Initialize data frame
+    sim_stat_data = pd.DataFrame(np.zeros((n_datasets, len(init_cols))), columns = init_cols)
+
+    # MAX RT BY SIMULATION: TEST SHOULD BE CONSISTENT
+    n_simulations = init_file[0][2]['n_samples']
+    n_choices = len(init_file[0][2]['possible_choices'])
+    choices = init_file[0][2]['possible_choices']
+    max_rts = np.zeros((n_datasets, 1))
+    
+    max_t = init_file[0][2]['max_t']
+    max_ts = np.zeros((n_datasets, 1))
+    max_ts[:] = max_t 
+
+    stds = np.zeros((n_datasets, n_choices))
+    mean_rts = np.zeros((n_datasets, n_choices))
+    choice_cnts = np.zeros((n_datasets, n_choices))
+    modes = np.zeros((n_datasets, n_choices))
+    mode_cnts = np.zeros((n_datasets, n_choices))
+
+    sim_stat_data = [None] * n_files
+
+    cnt = 0     
+    for i in range(n_datsets_by_file):
+        max_rts[i] = (tmp[i][0].max().round(2))
+ 
+        # Standard deviation of reaction times
+        choice_cnt = 0
+        for choice_tmp in choices:
+
+            tmp_rts = tmp[i][0][tmp[i][1] == choice_tmp]
+            n_c = len(tmp_rts)
+            choice_cnts[cnt, choice_cnt] = n_c
+
+            mode_tmp = mode(tmp_rts)
+
+            if n_c > 0:
+                mean_rts[cnt, choice_cnt] = np.mean(tmp_rts)
+                stds[cnt, choice_cnt] = np.std(tmp_rts)
+                modes[cnt, choice_cnt] = float(mode_tmp[0])
+                mode_cnts[cnt, choice_cnt] = int(mode_tmp[1])
+            else:
+                mean_rts[cnt, choice_cnt] = -1
+                stds[cnt, choice_cnt] = -1
+                modes[cnt, choice_cnt] = -1
+                mode_cnts[cnt, choice_cnt] = 0
+
+            choice_cnt += 1
+
+        # Basic data column
+        sim_stat_data[cnt] = [tmp[2][key] for key in list(tmp[2].keys())]
+
+        cnt += 1
+        if cnt % 1000 == 0:
+            print(cnt)
+
+    sim_stat_data = pd.DataFrame(sim_stat_data, columns = file_[0][2].keys())
+
+    # Compute some more columns
+    for i in range(0, n_choices, 1):
+        sim_stat_data['mean_rt_' + str(i)] = mean_rts[:, i]
+        sim_stat_data['std_' + str(i)] = stds[:, i]
+        sim_stat_data['choice_cnt_' + str(i)] = choice_cnts[:,i]
+        sim_stat_data['mode_' + str(i)] = modes[:, i]
+        sim_stat_data['mode_cnt_' + str(i)] = mode_cnts[:, i]
+
+        # Derived Columns
+        sim_stat_data['choice_prop_' + str(i)] = sim_stat_data['choice_cnt_' + str(i)] / n_simulations
+        sim_stat_data['mode_cnt_rel_' + str(i)] = sim_stat_data['mode_cnt_' + str(i)] / sim_stat_data['choice_cnt_' + str(i)]
+
+    # Clean-up
+    sim_stat_data = sim_stat_data.round(decimals = 2)
+    sim_stat_data = sim_stat_data.fillna(value = 0)
+
+    # check that max_t is consistently the same value across simulations
+    #assert len(np.unique(max_ts)) == 1
+
+    # check that max_rt is <= max_t + 0.00001 (adding for rounding)
+    # SKIPPING BECAUSE OF INCONSISTENCY PROBLEMS WITH NDT --
+    #assert max(max_rts) <= np.unique(max_ts)[0] + 0.0001
+
+    # Now filtering
+
+    # FILTER 1: PARAMETER RANGES
+    if param_ranges == 'none':
+            keep = sim_stat_data['a'] >= 0 # should return a vector of all true's
+    else:
+        cnt = 0
+        for param in param_ranges.keys():
+            if cnt == 0:
+                keep = (sim_stat_data[param] >= param_ranges[param][0]) & (sim_stat_data[param] <= param_ranges[param][1])
+            else:
+                keep = (keep) & \
+                       (sim_stat_data[param] >= param_ranges[param][0]) & (sim_stat_data[param] <= param_ranges[param][1])
+            cnt += 1
+
+    # FILTER 2: SANITY CHECKS (Filter-bank)
+    for i in range(0, n_choices, 1):
+        keep = (keep) & \
+               (sim_stat_data['mode_' + str(i)] != filters['mode']) & \
+               (sim_stat_data['choice_cnt_' + str(i)] > filters['choice_cnt']) & \
+               (sim_stat_data['mean_rt_' + str(i)] < filters['mean_rt']) & \
+               (sim_stat_data['std_' + str(i)] > filters['std']) & \
+               (sim_stat_data['mode_cnt_rel_' + str(i)] < filters['mode_cnt_rel'])
+
+    # Add keep_file column to
+    sim_stat_data['keep_file'] = keep
+
+    # Write files:
+    #pickle.dump(list(sim_stat_data.loc[keep, 'file']), open(base_simulation_folder + '/keep_files.pickle', 'wb'))
+    pickle.dump(sim_stat_data, open(base_simulation_folder + '/simulator_statistics.pickle', 'wb'))
+
+    return sim_stat_data
 
 def kde_from_simulations(base_simulation_folder = '',
                          target_folder = '',
