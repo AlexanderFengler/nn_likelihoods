@@ -56,7 +56,9 @@ def bin_simulator_output(out = [0, 0],
         counts[i] =  np.asmatrix(counts[i]).T
 
     labels = np.concatenate(counts, axis = 1)
-    features = [out[2]['v'], out[2]['a'], out[2]['w'], out[2]['ndt']] #out[2]['theta']]
+    
+    features = [out[2][param] for param in params]
+    #features = [out[2]['v'], out[2]['a'], out[2]['w'], out[2]['ndt']] #out[2]['theta']]
     return (features, labels, {'max_t': out[2]['max_t'], 
                                'bin_dt': bin_dt, 
                                'n_samples': out[2]['n_samples']})
@@ -104,7 +106,7 @@ if __name__ == "__main__":
     s = 1 # Choose
     delta_t = 0.01 # Choose
     max_t = 10 # Choose
-    n_samples = 100000 # Choose
+    n_samples = 20000 # Choose
     n_simulators = 10000 # Choose
     print_info = False # Choose
     bound = method_params['boundary']
