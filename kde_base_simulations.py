@@ -61,19 +61,10 @@ def bin_simulator_output(out = [0, 0],
                                'bin_dt': bin_dt, 
                                'n_samples': out[2]['n_samples']})
 
-def data_generator_ddm(*args):  # CAN I MAKE CONTEXT DEPENDENT???
+def data_generator_ddm(*args):
     # CHOOSE SIMULATOR HERE
     simulator_data = ds.ddm_flexbound(*args)
     
-    # CHOOSE TARGET DIRECTORY HERE
-    #file_dir = '/users/afengler/data/kde/weibull_cdf/base_simulations_ndt_20000/'
-    
-    # USE FOR x7 MACHINE 
-    #file_dir = '/media/data_cifs/afengler/tmp/'
-
-    # STORE
-    #file_name = file_dir + simulator + '_' + uuid.uuid1().hex
-    #pickle.dump(simulator_data, open( file_name + '.pickle', "wb" ) )
     print(args)
     return simulator_data
     
@@ -94,10 +85,10 @@ if __name__ == "__main__":
     
     # Load meta data from kde_info.pickle file
     if machine == 'x7':
-        method_folder = '/media/data_cifs/afengler/data/kde/' + method + '/'
+        method_folder = '/media/data_cifs/afengler/data/kde/weibull_cdf/'
 
     if machine == 'ccv':
-        method_folder = '/users/afengler/data/kde/' + method + '/'
+        method_folder = '/users/afengler/data/kde/weibull_cdf/'
 
     if machine == 'x7':
         stats = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
@@ -106,19 +97,19 @@ if __name__ == "__main__":
         stats = pickle.load(open("/users/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
         method_params = stats[method]
 
+    #out_folder = method_folder + 'base_simulations_ndt_20000/'
     out_folder = method_folder + 'base_simulations_ndt_20000/'
-    
 
     
     # Simulator parameters
     s = 1 # Choose
     delta_t = 0.01 # Choose
     max_t = 20 # Choose
-    n_samples = 1000 # Choose
+    n_samples = 20000 # Choose
     n_simulators = 10000 # Choose
     print_info = False # Choose
     bound = method_params['boundary']
-    boundary_multiplicative = method_params['boundary_multiplicative'] 
+    boundary_multiplicative = method_params['boundary_multiplicative']
     
     # Extra params
     bin_dt = 0.04
@@ -137,8 +128,8 @@ if __name__ == "__main__":
         process_param_lower_bnd.append(method_params['param_bounds_network'][i][1])
         
     param_samples = tuple(map(tuple, np.random.uniform(low = process_param_lower_bnd,
-                                      high = process_param_upper_bnd,
-                                      size = (n_simulators, len(process_param_names)))))
+                                                       high = process_param_upper_bnd,
+                                                       size = (n_simulators, len(process_param_names)))))
 
     if len(boundary_param_names) > 0:
         boundary_param_lower_bnd = []
@@ -151,8 +142,6 @@ if __name__ == "__main__":
         boundary_param_samples = np.random.uniform(low = boundary_param_lower_bnd,
                                                    high = boundary_param_upper_bnd,
                                                    size = (n_simulators, len(boundary_param_names)))
-                                      
-
     # --------------------------------------------------------------------------------------------------------
     
     # DEFINE FUNCTIONS THAAT NEED INITIALIZATION DEPENDEND ON CONTEXT ----------------------------------------
@@ -171,16 +160,17 @@ if __name__ == "__main__":
     for i in range(n_simulators):
         # Get current set of parameters
         process_params = param_samples[i]
-        
-        sampler_params = (delta_t, max_t, n_samples, print_info, bound, boundary_multiplicative)
+        sampler_params = (s, delta_t, max_t, n_samples, print_info, bound, boundary_multiplicative)
                           
         if len(boundary_param_names) > 0:
             boundary_params = (dict(zip(boundary_param_names, boundary_param_samples[i])) ,)
+            print('passed thorugh')
         else:
             boundary_params = ({},)
         
         # Append argument list with current parameters
         args_tmp = process_params + sampler_params + boundary_params
+        print(args_tmp)
         args_list.append(args_tmp)
     # --------------------------------------------------------------------------------------------------------
                    
@@ -216,6 +206,23 @@ if __name__ == "__main__":
 
 
 # UNUSED ---------------------------------------------------------------
+
+# OLD SIMULATOR
+# def data_generator_ddm(*args):  # CAN I MAKE CONTEXT DEPENDENT???
+#     # CHOOSE SIMULATOR HERE
+#     simulator_data = ds.ddm_flexbound(*args)
+    
+#     # CHOOSE TARGET DIRECTORY HERE
+#     #file_dir = '/users/afengler/data/kde/weibull_cdf/base_simulations_ndt_20000/'
+    
+#     # USE FOR x7 MACHINE 
+#     #file_dir = '/media/data_cifs/afengler/tmp/'
+
+#     # STORE
+#     #file_name = file_dir + simulator + '_' + uuid.uuid1().hex
+#     #pickle.dump(simulator_data, open( file_name + '.pickle', "wb" ) )
+#     print(args)
+#     return simulator_data
 
 #process_params = (v_sample[i], a_sample[i], w_sample[i], ndt_sample[i], s)
 
