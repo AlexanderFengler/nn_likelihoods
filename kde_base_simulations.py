@@ -94,7 +94,7 @@ if __name__ == "__main__":
     
     # Load meta data from kde_info.pickle file
     if machine == 'x7':
-        method_folder = "/media/data_cifs/afengler/data/kde/ddm/"
+        method_folder = '/media/data_cifs/afengler/data/kde/' + method + '/'
 
     if machine == 'ccv':
         method_folder = '/users/afengler/data/kde/' + method + '/'
@@ -149,7 +149,7 @@ if __name__ == "__main__":
             boundary_param_upper_bnd.append(method_params['boundary_param_bounds_network'][i][0])
                                       
         boundary_param_samples = np.random.uniform(low = boundary_param_lower_bnd,
-                                                   high = bonudary_param_upper_bnd,
+                                                   high = boundary_param_upper_bnd,
                                                    size = (n_simulators, len(boundary_param_names)))
                                       
 
@@ -171,7 +171,7 @@ if __name__ == "__main__":
     for i in range(n_simulators):
         # Get current set of parameters
         process_params = param_samples[i]
-        #process_params = (v_sample[i], a_sample[i], w_sample[i], ndt_sample[i], s)
+        
         sampler_params = (delta_t, max_t, n_samples, print_info, bound, boundary_multiplicative)
                           
         if len(boundary_param_names) > 0:
@@ -216,6 +216,8 @@ if __name__ == "__main__":
 
 
 # UNUSED ---------------------------------------------------------------
+
+#process_params = (v_sample[i], a_sample[i], w_sample[i], ndt_sample[i], s)
 
     # Parameter ranges (for the simulator)
 #     v = [-2, 2]
