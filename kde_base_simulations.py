@@ -79,7 +79,7 @@ if __name__ == "__main__":
     
     # Choose simulator and datatype
     #method = 'weibull_cdf_ndt'
-    method = 'angle_ndt'
+    method = 'weibull_cdf_ndt'
     
     #binned = False
     binned = True
