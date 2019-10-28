@@ -66,15 +66,16 @@ def data_generator_ddm(*args):  # CAN I MAKE CONTEXT DEPENDENT???
     simulator_data = ds.ddm_flexbound(*args)
     
     # CHOOSE TARGET DIRECTORY HERE
-    file_dir = '/users/afengler/data/kde/weibull_cdf/base_simulations_ndt_20000/'
+    #file_dir = '/users/afengler/data/kde/weibull_cdf/base_simulations_ndt_20000/'
     
     # USE FOR x7 MACHINE 
     #file_dir = '/media/data_cifs/afengler/tmp/'
 
     # STORE
-    file_name = file_dir + simulator + '_' + uuid.uuid1().hex
-    pickle.dump(simulator_data, open( file_name + '.pickle', "wb" ) )
-    print(args)    
+    #file_name = file_dir + simulator + '_' + uuid.uuid1().hex
+    #pickle.dump(simulator_data, open( file_name + '.pickle', "wb" ) )
+    print(args)
+    return simulator_data
     
 if __name__ == "__main__":
     
@@ -87,12 +88,16 @@ if __name__ == "__main__":
     method = 'weibull_cdf_ndt'
     binned = False
     
+    # out file name components
+    file_id = sys.argv[1]
+    file_signature =  method + '_base_simulations_'
+    
     # Load meta data from kde_info.pickle file
     if machine == 'x7':
         method_folder = "/media/data_cifs/afengler/data/kde/ddm/"
 
     if machine == 'ccv':
-        method_folder = '/users/afengler/data/kde/ddm/'
+        method_folder = '/users/afengler/data/kde/' + method + '/'
 
     if machine == 'x7':
         stats = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
@@ -101,16 +106,16 @@ if __name__ == "__main__":
         stats = pickle.load(open("/users/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
         method_params = stats[method]
 
-    out_folder = method_folder + 'base_simulations_folder_name/'
-    file_id = sys.argv[1]
-    file_signature = 'binned_data_test_'
+    out_folder = method_folder + 'base_simulations_ndt_20000/'
+    
+
     
     # Simulator parameters
     s = 1 # Choose
     delta_t = 0.01 # Choose
     max_t = 20 # Choose
-    n_samples = 20000 # Choose
-    n_simulators = 750000 # Choose
+    n_samples = 1000 # Choose
+    n_simulators = 10000 # Choose
     print_info = False # Choose
     bound = method_params['boundary']
     boundary_multiplicative = method_params['boundary_multiplicative'] 
@@ -153,13 +158,12 @@ if __name__ == "__main__":
     # DEFINE FUNCTIONS THAAT NEED INITIALIZATION DEPENDEND ON CONTEXT ----------------------------------------
     def data_generator_ddm_binned(*args):
         simulator_data = ds.ddm_flexbound(*args)
-        #file_dir = '/users/afengler/data/kde/angle/base_simulations_ndt_20000/'
         features, labels, meta = bin_simulator_output(out = simulator_data,
                                                       bin_dt = bin_dat, 
                                                       n_bins = n_bins,
                                                       eps_correction = 1e-7,
                                                       params = param_names_full) 
-    return (features, labels, meta) 
+        return (features, labels, meta) 
     # --------------------------------------------------------------------------------------------------------
     
     # MAKE SUITABLE FOR PARALLEL SIMULATION ------------------------------------------------------------------
@@ -206,6 +210,7 @@ if __name__ == "__main__":
         # Parallel Loop
         with Pool(processes = n_cpus) as pool:
             res = pool.starmap(data_generator_ddm, args_list)
+            pickle.dump(res, open(out_folder + file_signature + file_id + '.pickle', 'wb'))
     # --------------------------------------------------------------------------------------------------------
     print('finished')
 

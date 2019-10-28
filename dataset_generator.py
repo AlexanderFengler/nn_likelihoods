@@ -87,9 +87,9 @@ def param_grid_perturbation_experiment(n_experiments = n_experiments,
             for l in range(n_perturbation_levels):
                 param_grid_perturbed = param_grid_tmp.copy()
                 if param_grid_tmp[p] > ((params_upper_bnd[p] - params_lower_bnd[p]) / 2):
-                    param_grid_perturbed[p] += perturbation_sizes[p][l]
-                else:
                     param_grid_perturbed[p] -= perturbation_sizes[p][l]
+                else:
+                    param_grid_perturbed[p] += perturbation_sizes[p][l]
                 
                 param_grid[cnt, :] = param_grid_perturbed
                 meta_dat.loc[cnt, :] = [int(i), int(p), int(l)]
