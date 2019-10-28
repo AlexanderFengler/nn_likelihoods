@@ -79,7 +79,7 @@ if __name__ == "__main__":
     
     # Choose simulator and datatype
     #method = 'weibull_cdf_ndt'
-    method = 'ddm_ndt'
+    method = 'angle_ndt'
     
     #binned = False
     binned = True
@@ -91,11 +91,11 @@ if __name__ == "__main__":
     # Load meta data from kde_info.pickle file
     if machine == 'x7':
         #method_folder = '/media/data_cifs/afengler/data/kde/weibull_cdf/'
-        method_folder = '/users/afengler/data/kde/ddm/'
+        method_folder = '/users/afengler/data/kde/angle/'
 
     if machine == 'ccv':
         #method_folder = '/users/afengler/data/kde/weibull_cdf/'
-        method_folder = '/users/afengler/data/kde/ddm/'
+        method_folder = '/users/afengler/data/kde/angle/'
         
     if machine == 'x7':
         stats = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
