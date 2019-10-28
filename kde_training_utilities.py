@@ -182,7 +182,7 @@ def filter_simulations_fast(base_simulation_folder = '',
                                  }
                       ):
 
-    file_ = pickle.load(open( base_simulation_folder + files_[0], 'rb' ))
+    file_ = pickle.load(open( base_simulation_folder + file_name_prefix + '_' + str(file_id) + '.pickle', 'rb' ))
     init_cols = list(file_[0][2].keys())
     n_datasets = len(file_)
     
