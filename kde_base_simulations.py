@@ -78,7 +78,7 @@ if __name__ == "__main__":
     machine = 'ccv'
     
     # Choose simulator and datatype
-    method = 'ddm_ndt'
+    method = 'weibull_cdf_ndt'
     binned = False
     
     # out file name components
@@ -87,10 +87,10 @@ if __name__ == "__main__":
     
     # Load meta data from kde_info.pickle file
     if machine == 'x7':
-        method_folder = '/media/data_cifs/afengler/data/kde/ddm/'
+        method_folder = '/media/data_cifs/afengler/data/kde/weibull_cdf/'
 
     if machine == 'ccv':
-        method_folder = '/users/afengler/data/kde/ddm/'
+        method_folder = '/users/afengler/data/kde/weibull_cdf/'
 
     if machine == 'x7':
         stats = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
@@ -101,12 +101,13 @@ if __name__ == "__main__":
 
     #out_folder = method_folder + 'base_simulations_ndt_20000/'
     out_folder = method_folder + 'base_simulations_ndt_20000/'
-
+    #out_folder = method_folder + 'base_simulations_ndt_binned_100000'
+    
     # Simulator parameters
     s = 1 # Choose
     delta_t = 0.01 # Choose
-    max_t = 20 # Choose
-    n_samples = 100000 # Choose
+    max_t = 20  # Choose
+    n_samples = 20000 # Choose
     n_simulators = 10000 # Choose
     print_info = False # Choose
     bound = method_params['boundary']
@@ -145,17 +146,6 @@ if __name__ == "__main__":
                                                    size = (n_simulators, len(boundary_param_names)))
     # --------------------------------------------------------------------------------------------------------
     
-    # DEFINE FUNCTIONS THAAT NEED INITIALIZATION DEPENDEND ON CONTEXT ----------------------------------------
-    def data_generator_ddm_binned(*args):
-        simulator_data = ds.ddm_flexbound(*args)
-        features, labels, meta = bin_simulator_output(out = simulator_data,
-                                                      bin_dt = bin_dt, 
-                                                      n_bins = n_bins,
-                                                      eps_correction = 1e-7,
-                                                      params = param_names_full) 
-        return (features, labels, meta) 
-    # --------------------------------------------------------------------------------------------------------
-    
     # MAKE SUITABLE FOR PARALLEL SIMULATION ------------------------------------------------------------------
     args_list = []
     for i in range(n_simulators):
@@ -174,7 +164,18 @@ if __name__ == "__main__":
         #sprint(args_tmp)
         args_list.append(args_tmp)
     # --------------------------------------------------------------------------------------------------------
-                   
+          
+    # DEFINE FUNCTIONS THAAT NEED INITIALIZATION DEPENDEND ON CONTEXT ----------------------------------------
+    def data_generator_ddm_binned(*args):
+        simulator_data = ds.ddm_flexbound(*args)
+        features, labels, meta = bin_simulator_output(out = simulator_data,
+                                                      bin_dt = bin_dt, 
+                                                      n_bins = n_bins,
+                                                      eps_correction = 1e-7,
+                                                      params = param_names_full) 
+        return (features, labels, meta) 
+    # --------------------------------------------------------------------------------------------------------
+    
     # RUN SIMULATIONS AND STORE DATA -------------------------------------------------------------------------
     # BINNED VERSION
     if binned:
