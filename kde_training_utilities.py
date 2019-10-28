@@ -205,7 +205,7 @@ def filter_simulations_fast(base_simulation_folder = '',
     modes = np.zeros((n_datasets, n_choices))
     mode_cnts = np.zeros((n_datasets, n_choices))
 
-    sim_stat_data = [None] * n_files
+    sim_stat_data = [None] * n_datasets
 
     cnt = 0     
     for i in range(n_datsets_by_file):
