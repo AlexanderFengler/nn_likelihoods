@@ -209,7 +209,7 @@ def filter_simulations_fast(base_simulation_folder = '',
 
     cnt = 0     
     for i in range(n_datasets):
-        max_rts[i] = (tmp[i][0].max().round(2))
+        max_rts[i] = (file_[i][0].max().round(2))
  
         # Standard deviation of reaction times
         choice_cnt = 0
