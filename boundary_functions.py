@@ -53,9 +53,9 @@ def generalized_logistic_bnd(t = 1,
 
 # Weibull survival fun (multiplicative)
 def weibull_cdf(t = 1,
-                a  = 1,
+                alpha  = 1,
                 beta = 1):
-    return (np.exp( - np.power(t / beta, a)))
+    return (np.exp( - np.power(t / beta, alpha)))
 
 # # Gamma shape: (additive)
 # def gamma_bnd(t = 1,

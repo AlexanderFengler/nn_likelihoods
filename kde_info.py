@@ -98,7 +98,7 @@ temp = {
     "model_folder": "/users/afengler/data/kde/weibull_cdf/keras_models/",
     "model_folder_x7": "/media/data_cifs/afengler/data/kde/weibull_cdf/keras_models/",
     "param_names": ["v", "a", "w", "ndt"],
-    "boundary_param_names": ["a", "beta"],
+    "boundary_param_names": ["alpha", "beta"],
     "param_bounds_network": [[-1.5, 1.5], [0.6, 1.5], [0.3, 0.7], [0.0, 1.0]],
     "param_bounds_sampler": [[-1.51, 1.49], [0.6, 1.4], [0.31, 0.69], [0.1, 0.9]],
     "boundary_param_bounds_network": [[0.5, 5.0], [0.5, 7.0]],

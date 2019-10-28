@@ -25,7 +25,7 @@ import boundary_functions as bf
 def bin_simulator_output(out = [0, 0],
                          bin_dt = 0.04,
                          n_bins = 0,
-                         eps_correction = 1e-7,
+                         eps_correction = 1e-7, # min p for a bin
                          params = ['v', 'a', 'w', 'ndt']
                         ): # ['v', 'a', 'w', 'ndt', 'angle']
 
@@ -76,7 +76,7 @@ if __name__ == "__main__":
     machine = 'ccv'
     
     # Choose simulator and datatype
-    method = 'weibull_cdf_ndt'
+    method = 'weibull_cdf'
     binned = False
     
     # out file name components
@@ -103,8 +103,8 @@ if __name__ == "__main__":
     # Simulator parameters
     s = 1 # Choose
     delta_t = 0.01 # Choose
-    max_t = 20 # Choose
-    n_samples = 20000 # Choose
+    max_t = 10 # Choose
+    n_samples = 100000 # Choose
     n_simulators = 10000 # Choose
     print_info = False # Choose
     bound = method_params['boundary']
@@ -136,7 +136,7 @@ if __name__ == "__main__":
         
         for i in range(len(boundary_param_names)):
             boundary_param_lower_bnd.append(method_params['boundary_param_bounds_network'][i][0])
-            boundary_param_upper_bnd.append(method_params['boundary_param_bounds_network'][i][0])
+            boundary_param_upper_bnd.append(method_params['boundary_param_bounds_network'][i][1])
                                       
         boundary_param_samples = np.random.uniform(low = boundary_param_lower_bnd,
                                                    high = boundary_param_upper_bnd,
@@ -147,7 +147,7 @@ if __name__ == "__main__":
     def data_generator_ddm_binned(*args):
         simulator_data = ds.ddm_flexbound(*args)
         features, labels, meta = bin_simulator_output(out = simulator_data,
-                                                      bin_dt = bin_dat, 
+                                                      bin_dt = bin_dt, 
                                                       n_bins = n_bins,
                                                       eps_correction = 1e-7,
                                                       params = param_names_full) 
@@ -163,13 +163,13 @@ if __name__ == "__main__":
                           
         if len(boundary_param_names) > 0:
             boundary_params = (dict(zip(boundary_param_names, boundary_param_samples[i])) ,)
-            print('passed thorugh')
+            #print('passed thorugh')
         else:
             boundary_params = ({},)
         
         # Append argument list with current parameters
         args_tmp = process_params + sampler_params + boundary_params
-        print(args_tmp)
+        #print(args_tmp)
         args_list.append(args_tmp)
     # --------------------------------------------------------------------------------------------------------
                    
