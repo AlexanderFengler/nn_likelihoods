@@ -215,7 +215,7 @@ def filter_simulations_fast(base_simulation_folder = '',
         choice_cnt = 0
         for choice_tmp in choices:
 
-            tmp_rts = tmp[i][0][tmp[i][1] == choice_tmp]
+            tmp_rts = file_[i][0][file_[i][1] == choice_tmp]
             n_c = len(tmp_rts)
             choice_cnts[cnt, choice_cnt] = n_c
             mode_tmp = mode(tmp_rts)
@@ -234,7 +234,7 @@ def filter_simulations_fast(base_simulation_folder = '',
             choice_cnt += 1
 
         # Basic data column
-        sim_stat_data[cnt] = [tmp[2][key] for key in list(tmp[2].keys())]
+        sim_stat_data[cnt] = [file_[i][2][key] for key in list(file_[i][2].keys())]
 
         cnt += 1
         if cnt % 1000 == 0:
