@@ -78,8 +78,11 @@ if __name__ == "__main__":
     machine = 'ccv'
     
     # Choose simulator and datatype
-    method = 'weibull_cdf_ndt'
-    binned = False
+    #method = 'weibull_cdf_ndt'
+    method = 'ddm_ndt'
+    
+    #binned = False
+    binned = True
     
     # out file name components
     file_id = sys.argv[1]
@@ -87,11 +90,13 @@ if __name__ == "__main__":
     
     # Load meta data from kde_info.pickle file
     if machine == 'x7':
-        method_folder = '/media/data_cifs/afengler/data/kde/weibull_cdf/'
+        #method_folder = '/media/data_cifs/afengler/data/kde/weibull_cdf/'
+        method_folder = '/users/afengler/data/kde/ddm/'
 
     if machine == 'ccv':
-        method_folder = '/users/afengler/data/kde/weibull_cdf/'
-
+        #method_folder = '/users/afengler/data/kde/weibull_cdf/'
+        method_folder = '/users/afengler/data/kde/ddm/'
+        
     if machine == 'x7':
         stats = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
         method_params = stats[method]
@@ -100,14 +105,15 @@ if __name__ == "__main__":
         method_params = stats[method]
 
     #out_folder = method_folder + 'base_simulations_ndt_20000/'
-    out_folder = method_folder + 'base_simulations_ndt_20000/'
-    #out_folder = method_folder + 'base_simulations_ndt_binned_100000'
+    #out_folder = method_folder + 'base_simulations_ndt_20000/'
+    out_folder = method_folder + 'base_simulations_ndt_binned_100000'
     
     # Simulator parameters
     s = 1 # Choose
     delta_t = 0.01 # Choose
-    max_t = 20  # Choose
-    n_samples = 20000 # Choose
+    max_t = 10  # Choose
+    #n_samples = 20000 # Choose
+    n_samples = 100000 # Choose
     n_simulators = 10000 # Choose
     print_info = False # Choose
     bound = method_params['boundary']
