@@ -190,12 +190,12 @@ def filter_simulations_fast(base_simulation_folder = '',
     sim_stat_data = pd.DataFrame(np.zeros((n_datasets, len(init_cols))), columns = init_cols)
 
     # MAX RT BY SIMULATION: TEST SHOULD BE CONSISTENT
-    n_simulations = init_file[0][2]['n_samples']
-    n_choices = len(init_file[0][2]['possible_choices'])
-    choices = init_file[0][2]['possible_choices']
+    n_simulations = file_[0][2]['n_samples']
+    n_choices = len(file_[0][2]['possible_choices'])
+    choices = file_[0][2]['possible_choices']
     max_rts = np.zeros((n_datasets, 1))
     
-    max_t = init_file[0][2]['max_t']
+    max_t = file_[0][2]['max_t']
     max_ts = np.zeros((n_datasets, 1))
     max_ts[:] = max_t 
 
@@ -218,7 +218,6 @@ def filter_simulations_fast(base_simulation_folder = '',
             tmp_rts = tmp[i][0][tmp[i][1] == choice_tmp]
             n_c = len(tmp_rts)
             choice_cnts[cnt, choice_cnt] = n_c
-
             mode_tmp = mode(tmp_rts)
 
             if n_c > 0:
