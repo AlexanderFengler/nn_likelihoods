@@ -76,7 +76,7 @@ if __name__ == "__main__":
     machine = 'ccv'
     
     # Choose simulator and datatype
-    method = 'weibull_cdf'
+    method = 'weibull_cdf_ndt'
     binned = False
     
     # out file name components
@@ -169,7 +169,7 @@ if __name__ == "__main__":
         
         # Append argument list with current parameters
         args_tmp = process_params + sampler_params + boundary_params
-        #print(args_tmp)
+        #sprint(args_tmp)
         args_list.append(args_tmp)
     # --------------------------------------------------------------------------------------------------------
                    
