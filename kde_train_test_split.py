@@ -3,7 +3,7 @@ import kde_training_utilities as kde_utils
 
 if __name__ == "__main__":
     # CHOOSE FOLDER
-    machine = 'x7'
+    machine = 'ccv'
     if machine == 'ccv':
         # CCV 
         my_folder = 'users/afengler/data/kde/weibull_cdf/train_test_data_ndt_20000/'
