@@ -6,7 +6,7 @@ if __name__ == "__main__":
     machine = 'ccv'
     if machine == 'ccv':
         # CCV 
-        my_folder = 'users/afengler/data/kde/weibull_cdf/train_test_data_ndt_20000/'
+        my_folder = '/users/afengler/data/kde/weibull_cdf/train_test_data_ndt_20000/'
     if machine == 'x7':
         # X7
         my_folder = '/media/data_cifs/afengler/data/kde/weibull_cdf/train_test_data_ndt_20000/'
