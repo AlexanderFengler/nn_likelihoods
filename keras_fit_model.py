@@ -143,30 +143,3 @@ model_paths = yaml.load(open("model_paths.yaml"))
 model_paths[method] = model_path
 yaml.dump(model_paths, open("model_paths.yaml", "w"))
 # ----------------------------------------------------------------------------
-
-# UNUSED --------------------------
-
-# def extract_info(model):
-#     biases = []
-#     activations = []
-#     weights = []
-#     for layer in model.layers:
-#         if layer.name == "input_1":
-#             continue
-#         weights.append(layer.get_weights()[0])
-#         biases.append(layer.get_weights()[1])
-#         activations.append(layer.get_config()["activation"])
-#     return weights, biases, activations
-
-# weights, biases, activations = extract_info(model)
-
-# pickle.dump(weights, open(model_path + "weights.pickle" ,"wb"))
-# pickle.dump(biases, open(model_path + "biases.pickle" ,"wb"))
-# pickle.dump(activations, open(model_path + "activations.pickle" ,"wb"))
-
-# kde_make_train_test_split(folder = data_folder + "/",
-#                           p_train = 0.99)
-
-# Seems unnecessary
-# if not params["log"]:
-#     y = np.exp(y)
