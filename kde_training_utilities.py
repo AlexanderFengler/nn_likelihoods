@@ -370,9 +370,9 @@ def kde_from_simulations_fast(base_simulation_folder = '',
                                            high = 100,
                                            size = n_unif_up)
 
-            data.iloc[(lb + n_kde + n_unif_down):(lb + n_samples_by_kde), my_columns.index('rt')] = rt_tmp
-            data.iloc[(lb + n_kde + n_unif_down):(lb + n_samples_by_kde), my_columns.index('choice')] = choice_tmp
-            data.iloc[(lb + n_kde + n_unif_down):(lb + n_samples_by_kde), my_columns.index('log_l')] = tmp_kde.kde_eval(data = (rt_tmp, choice_tmp))
+            data.iloc[(lb + n_kde + n_unif_down):(lb + n_by_param), my_columns.index('rt')] = rt_tmp
+            data.iloc[(lb + n_kde + n_unif_down):(lb + n_by_param), my_columns.index('choice')] = choice_tmp
+            data.iloc[(lb + n_kde + n_unif_down):(lb + n_by_param), my_columns.index('log_l')] = tmp_kde.kde_eval(data = (rt_tmp, choice_tmp))
             # ----------------------------------------------------------------------------------
 
             if i % 100 == 0:
