@@ -46,11 +46,11 @@ if __name__ == "__main__":
 #                                   files_ = files_,
 #                                   p_files = 0.01)
 
-    kde_from_simulations_fast(base_simulation_folder = base_simulation_folder,
-                              file_name_prefix = file_name_prefix,
-                              file_id = file_id,
-                              target_folder = target_folder,
-                              n_by_param = 1000,
-                              mixture_p = [0.8, 0.1, 0.1],
-                              process_params = ['v', 'a', 'w', 'ndt', 'alpha', 'beta'],
-                              print_info = False)
+    kde_util.kde_from_simulations_fast(base_simulation_folder = base_simulation_folder,
+                                       file_name_prefix = file_name_prefix,
+                                       file_id = file_id,
+                                       target_folder = target_folder,
+                                       n_by_param = 1000,
+                                       mixture_p = [0.8, 0.1, 0.1],
+                                       process_params = ['v', 'a', 'w', 'ndt', 'alpha', 'beta'],
+                                       print_info = False)
