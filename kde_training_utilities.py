@@ -329,10 +329,10 @@ def kde_from_simulations_fast(base_simulation_folder = '',
         if stat_['keep_file'][i]:
             # Read in simulator file
             tmp_sim_data = file_[i]
-            lb = i * n_by_param
+            lb = cnt * n_by_param
             # Make empty dataframe of appropriate size
             for param in process_params:
-                data.iloc[(i * n_by_param):(i + n_by_param), my_columns.index(param)] = tmp_sim_data[2][param]
+                data.iloc[(lb):(lb + n_by_param), my_columns.index(param)] = tmp_sim_data[2][param]
 
             # MIXTURE COMPONENT 1: Get simulated data from kde -------------------------------
             tmp_kde = kde_class.logkde(tmp_sim_data)
@@ -374,8 +374,8 @@ def kde_from_simulations_fast(base_simulation_folder = '',
             data.iloc[(lb + n_kde + n_unif_down):(lb + n_by_param), my_columns.index('choice')] = choice_tmp
             data.iloc[(lb + n_kde + n_unif_down):(lb + n_by_param), my_columns.index('log_l')] = tmp_kde.kde_eval(data = (rt_tmp, choice_tmp))
             # ----------------------------------------------------------------------------------
-
-            if i % 100 == 0:
+            cnt += 1
+            if i % 10 == 0:
                 print(i, 'kdes generated')
     # -----------------------------------------------------------------------------------
 
