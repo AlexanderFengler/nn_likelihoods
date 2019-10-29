@@ -18,7 +18,7 @@ if __name__ == "__main__":
 
     # PICK
     base_simulation_folder = '/users/afengler/data/kde/weibull_cdf/base_simulations_ndt_20000/'
-    target_folder = '/users/afengler/data/kde/weibull_cdf/train_test_data_ndt_20000'
+    target_folder = '/users/afengler/data/kde/weibull_cdf/train_test_data_ndt_20000/'
     file_name_prefix = 'weibull_cdf_ndt_base_simulations'
     file_id = sys.argv[1]
     
