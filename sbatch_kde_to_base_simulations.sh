@@ -20,5 +20,5 @@
 
 # Run a command
 
-python -u /users/afengler/git_repos/nn_likelihoods/kde_train_test.py
+python -u /users/afengler/git_repos/nn_likelihoods/kde_train_test.py $SLURM_ARRAY_TASK_ID
 #python -u /users/afengler/git_repos/nn_likelihoods/navarro_fuss_train_test.py
