@@ -325,7 +325,7 @@ def kde_from_simulations_fast(base_simulation_folder = '',
     # Main while loop --------------------------------------------------------------------
     row_cnt = 0
     cnt = 0
-    for i range(len(file_)):
+    for i in range(len(file_)):
         if stat_['keep_file'][i]:
             # Read in simulator file
             tmp_sim_data = file_[i]
