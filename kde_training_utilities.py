@@ -264,10 +264,6 @@ def filter_simulations_fast(base_simulation_folder = '',
     # check that max_t is consistently the same value across simulations
     #assert len(np.unique(max_ts)) == 1
 
-    # check that max_rt is <= max_t + 0.00001 (adding for rounding)
-    # SKIPPING BECAUSE OF INCONSISTENCY PROBLEMS WITH NDT --
-    #assert max(max_rts) <= np.unique(max_ts)[0] + 0.0001
-
     # Now filtering
 
     # FILTER 1: PARAMETER RANGES
@@ -305,23 +301,97 @@ def filter_simulations_fast(base_simulation_folder = '',
 def kde_from_simulations_fast(base_simulation_folder = '',
                               file_name_prefix = '',
                               file_id = 1,
+                              target_folder = '',
                               n_by_param = 3000,
                               mixture_p = [0.8, 0.1, 0.1],
                               process_params = ['v', 'a', 'w', 'c1', 'c2'],
                               print_info = False
                              ):
+    
     file_ = pickle.load(open( base_simulation_folder + file_name_prefix + '_' + str(file_id) + '.pickle', 'rb' ) )
     stat_ = pickle.load(open( base_simulation_folder + '/simulator_statistics' + '_' + str(file_id) + '.pickle', 'rb' ) )
 
     # Initialize dataframe
     my_columns = process_params + ['rt', 'choice', 'log_l']
-    data = pd.DataFrame(np.zeros((len(file_) * n_by_param, len(my_columns))),
+    data = pd.DataFrame(np.zeros((np.sum(stat_['keep_file']) * n_by_param, len(my_columns))),
                         columns = my_columns)             
      
-                    
-    # CONTINUE HERE                   
-                     
-                     
+    n_kde = int(n_by_param * mixture_p[0])
+    n_unif_down = int(n_by_param * mixture_p[1])
+    n_unif_up = int(n_by_param * mixture_p[2])
+    n_kde = n_kde + (n_by_param - n_kde - n_unif_up - n_unif_down) # correct n_kde if sum != n_by_param
+    
+    # CONTINUE HERE   
+    # Main while loop --------------------------------------------------------------------
+    row_cnt = 0
+    cnt = 0
+    for i range(len(file_)):
+        if stat_['keep_file'][i]:
+            # Read in simulator file
+            tmp_sim_data = file_[i]
+            lb = i * n_by_param
+            # Make empty dataframe of appropriate size
+            for param in process_params:
+                data.iloc[(i * n_by_param):(i + n_by_param), my_columns.index(param)] = tmp_sim_data[2][param]
+
+            # MIXTURE COMPONENT 1: Get simulated data from kde -------------------------------
+            tmp_kde = kde_class.logkde(tmp_sim_data)
+            tmp_kde_samples = tmp_kde.kde_sample(n_samples = n_kde)
+
+            data.iloc[lb:(lb + n_kde), my_columns.index('rt')] = tmp_kde_samples[0].ravel()
+            data.iloc[lb:(lb + n_kde), my_columns.index('choice')] = tmp_kde_samples[1].ravel()
+            data.iloc[lb:(lb + n_kde), my_columns.index('log_l')] = tmp_kde.kde_eval(data = tmp_kde_samples).ravel()
+            # --------------------------------------------------------------------------------
+
+            # MIXTURE COMPONENT 2: Negative uniform part -------------------------------------
+            choice_tmp = np.random.choice(tmp_sim_data[2]['possible_choices'],
+                                          size = n_unif_down)
+
+            rt_tmp = np.random.uniform(low = - 1,
+                                       high = 0.0001,
+                                       size = n_unif_down)
+
+            data.iloc[(lb + n_kde):(lb + n_kde + n_unif_down), my_columns.index('rt')] = rt_tmp
+            data.iloc[(lb + n_kde):(lb + n_kde + n_unif_down), my_columns.index('choice')] = choice_tmp
+            data.iloc[(lb + n_kde):(lb + n_kde + n_unif_down), my_columns.index('log_l')] = -66.77497 # the number corresponds to log(1e-29)
+            # ---------------------------------------------------------------------------------
+
+
+            # MIXTURE COMPONENT 3: Positive uniform part --------------------------------------
+            choice_tmp = np.random.choice(tmp_sim_data[2]['possible_choices'],
+                                          size = n_unif_up)
+
+            if tmp_sim_data[2]['max_t'] < 100:
+                rt_tmp = np.random.uniform(low = 0.0001,
+                                           high = tmp_sim_data[2]['max_t'],
+                                           size = n_unif_up)
+            else:
+                rt_tmp = np.random.uniform(low = 0.0001, 
+                                           high = 100,
+                                           size = n_unif_up)
+
+            data.iloc[(lb + n_kde + n_unif_down):(lb + n_samples_by_kde), my_columns.index('rt')] = rt_tmp
+            data.iloc[(lb + n_kde + n_unif_down):(lb + n_samples_by_kde), my_columns.index('choice')] = choice_tmp
+            data.iloc[(lb + n_kde + n_unif_down):(lb + n_samples_by_kde), my_columns.index('log_l')] = tmp_kde.kde_eval(data = (rt_tmp, choice_tmp))
+            # ----------------------------------------------------------------------------------
+
+            if i % 100 == 0:
+                print(i, 'kdes generated')
+    # -----------------------------------------------------------------------------------
+
+    # Store data
+    print('writing data to file')
+    data.to_pickle(target_folder + '/data_' + uuid.uuid1().hex + '.pickle' , protocol = 4)
+
+    # Write metafile if it doesn't exist already
+    # Hack for now: Just copy one of the base simulations files over
+    if os.path.isfile(target_folder + '/meta_data.pickle'):
+        pass
+    else:
+        pickle.dump(tmp_sim_data,  open(target_folder + '/meta_data.pickle', 'wb') )
+
+    return data
+                                      
 def kde_from_simulations(base_simulation_folder = '',
                          target_folder = '',
                          n_total = 10000,

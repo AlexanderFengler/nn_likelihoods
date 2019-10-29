@@ -16,7 +16,7 @@
 #SBATCH --mem=32G
 #SBATCH -c 14
 #SBATCH -N 1
-#SBATCH --array=1-1
+#SBATCH --array=1-100
 
 # Run a command
-python -u /users/afengler/git_repos/nn_likelihoods/simulator_get_stats.py
+python -u /users/afengler/git_repos/nn_likelihoods/simulator_get_stats.py $SLURM_ARRAY_TASK_ID
