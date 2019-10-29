@@ -48,7 +48,7 @@ if __name__ == "__main__":
     
     # Run filter new
     kde_utils.filter_simulations_fast(base_simulation_folder = base_simulation_folder,
-                                      file_prefix = file_name_prefix,
+                                      file_name_prefix = file_name_prefix,
                                       file_id = file_id,
                                       param_ranges = 'none',
                                       filters = filters)
