@@ -23,7 +23,7 @@ import uuid
 
 # My own code
 import kde_class
-import ddm_data_simulation as ddm_simulator
+#import ddm_data_simulation as ddm_simulator
 import boundary_functions as bf
 
 # Plotting
