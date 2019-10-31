@@ -20,6 +20,7 @@ import time
 import os
 import pickle
 import uuid
+import glob
 
 # My own code
 import kde_class
@@ -504,67 +505,87 @@ def kde_from_simulations(base_simulation_folder = '',
     return data
 
 # TO DO: Specify a 'data_*' file-selection procedure
-def kde_make_train_test_split(folder = '',
-                              p_train = 0.8):
+def kde_make_train_data(path = '',
+                        n_files_out = 10,
+                        file_in_list = 'all' # provide as full directory or 'all'
+                       ):
 
     # Get files in specified folder
-    print('get files in folder')
-    files_ = os.listdir(folder)
 
     # Check if folder currently contains a train-test split
     print('check if we have a train and test sets already')
-    for file_ in files_:
-        if file_[:7] == 'train_f':
-            return 'looks like a train test split exists in folder: Please remove before running this function'
-
-    # If no train-test split in folder: collect 'data_*' files
-    print('folder clean so proceeding...')
-    data_files = []
-    for file_ in files_:
-        if file_[:5] == 'data_':
-            data_files.append(file_)
 
     # Read in and concatenate files
-    print('read, concatenate and shuffle data')
-    data = pd.concat([pd.read_pickle(folder + file_) for file_ in data_files])
-
+    print('read, concatenate data...')
+    if file_in_list == 'all':
+        files_ = glob.glob(path + 'data_*')
+    else:
+        files_ = [file_ for file_ in file_in_list]
+        data = pd.concat([pd.read_pickle(file_) for file_ in files_])
+                         
     # Shuffle data
+    print('shuffle...')
     np.random.shuffle(data.values)
-    data.reset_index(drop = True, inplace = True)
+    data.reset_index(drop = True, 
+                     inplace = True)
 
     # Get meta-data from dataframe
     n_cols = len(list(data.keys()))
 
-    # Get train and test ids
-    print('get training and test indices')
-    train_id = np.random.choice(a = [True, False],
-                                size = data.shape[0],
-                                replace = True,
-                                p = [p_train, 1 - p_train])
-
-    test_id = np.invert(train_id)
-
     # Write to file
     print('writing to file...')
-    data.iloc[train_id, :(n_cols - 1)].to_pickle(folder + 'train_features.pickle',
-                                                          protocol = 4)
-
-    data.iloc[test_id, :(n_cols - 1)].to_pickle(folder + 'test_features.pickle',
-                                                         protocol = 4)
-
-    data.iloc[train_id, (n_cols - 1)].to_pickle(folder + 'train_labels.pickle',
-                                                         protocol = 4)
-
-    data.iloc[test_id, (n_cols - 1)].to_pickle(folder + 'test_labels.pickle',
-                                                        protocol = 4)
-
+    
+    n_samples_by_dataset = int(np.floor(data.shape[0] / n_files_out))
+    
+    for i in range(n_files_out):
+        np.save(path + 'feed_features_' + str(i) + '.npy',
+                data.iloc[(i * n_samples_by_dataset) : ((i + 1) * n_samples_by_dataset), :(n_cols - 1)].values)
+        
+        np.save(path + 'feed_labels_' + str(i) + '.npy',
+                data.iloc[(i * n_samples_by_dataset) : ((i + 1) * n_samples_by_dataset), (n_cols - 1)].values)
+        
+        print(i, ' files written')
+        
     return 'success'
+
+def kde_load_data_new(path = '',
+                      file_id_list = '',
+                      prelog_cutoff = 1e-29):
+    
+    # Read in two datasets to get meta data for the subsequent
+    print('Reading in initial dataset')
+    features_init = np.load(path + 'feed_features_' + str(file_id_list[0]) + '.npy')
+    labels_init = np.load(path + 'feed_labels_' + str(file_id_list[0]) + '.npy')
+    
+    # Collect some meta data 
+    n_files = len(file_id_list)
+    n_samples_by_dataset = features_init.shape[0]
+    
+    # Allocate memory for data  
+    print('Allocating data arrays')
+    features = np.empty((n_files * features_init.shape[0], init_file.shape[1]))
+    labels = np.empty((n_files * features_init.shape[0], 1))
+    
+    # Read in data of initialization files
+    features[:n_samples_by_dataset, :] = features_init
+    labels[:n_samples_by_dataset, :] = labels
+    
+    # Read in remaining files into preallocated np.array
+    for i in range(1, n_files, 1):
+        features[(i * n_samples_by_dataset): ((i + 1) * (n_samples_by_dataset)), :] = np.load(path + 'feed_features_' + \
+                                                                                              str(file_id_list[i] + '.npy'))
+        labels[(i * n_samples_by_dataset): ((i + 1) * (n_samples_by_dataset)), :] = np.load(path + 'feed_labels_' + \
+                                                                                           str(file_id_list[i] + 'npy'))
+                                                                                              
+        print(i, ' files processed')
+    
+    return features, labels
 
 def kde_load_data(folder = '',
                   return_log = False, # function expects log_likelihood data so if log = false we take exponent
                   prelog_cutoff = 1e-29 # either 'none' or number (like 1e-29)
                   ):
-
+    
     # Load training data from file
     train_features = pd.read_pickle(folder + '/train_features.pickle')
     train_labels = np.transpose(np.asmatrix(pd.read_pickle(folder + '/train_labels.pickle')))
@@ -583,5 +604,10 @@ def kde_load_data(folder = '',
     if return_log == False:
         train_labels = np.exp(train_labels)
         test_labels = np.exp(test_labels)
-
+        
     return train_features, train_labels, test_features, test_labels
+                                                                                              
+                                                                                              
+                                                                                              
+                                                                                              
+                                                                                              # UNUSED 
