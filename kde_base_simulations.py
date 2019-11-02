@@ -137,6 +137,8 @@ if __name__ == "__main__":
     n_bins = 256
     
     if binned:
+        out_folder = method_folder + 'base_simulations_' + str(n_samples) + '_binned/'
+    else:
         out_folder = method_folder + 'base_simulations_' + str(n_samples) + '/'
     # --------------------------------------------------------------------------------------------------------
     
