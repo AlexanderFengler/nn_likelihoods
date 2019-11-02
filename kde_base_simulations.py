@@ -110,11 +110,11 @@ if __name__ == "__main__":
     if machine == 'x7':
         stats = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
         method_params = stats[method]
-        dgp = method["dgp"]
+        dgp = method_params["dgp"]
     if machine == 'ccv':
         stats = pickle.load(open("/users/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
         method_params = stats[method]
-        dgp = method['dgp']
+        dgp = method_params['dgp']
 
     #out_folder = method_folder + 'base_simulations_ndt_20000/'
     #out_folder = method_folder + 'base_simulations_ndt_20000/'
