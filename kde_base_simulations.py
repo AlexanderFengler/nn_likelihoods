@@ -136,9 +136,8 @@ if __name__ == "__main__":
     bin_dt = 0.04
     n_bins = 256
     
-    
     if binned:
-        out_folder = method_folder + 'base_simulations_' + str(
+        out_folder = method_folder + 'base_simulations_' + str(n_samples) + '/'
     # --------------------------------------------------------------------------------------------------------
     
     # GENERATE A SET OF PARAMETERS ---------------------------------------------------------------------------
