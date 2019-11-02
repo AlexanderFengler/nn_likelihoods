@@ -86,7 +86,7 @@ if __name__ == "__main__":
     analytic = False
     
     #binned = False
-    binned = True
+    binned = False
     
     # out file name components
     file_id = sys.argv[1]
@@ -120,10 +120,10 @@ if __name__ == "__main__":
     # Simulator parameters
     s = 1 # Choose
     delta_t = 0.01 # Choose
-    #max_t = 20  # Choose
-    max_t = 10
-    #n_samples = 20000 # Choose
-    n_samples = 100000 # Choose
+    max_t = 20  # Choose
+    #max_t = 10
+    n_samples = 20000 # Choose
+    #n_samples = 100000 # Choose
     n_simulators = 10000 # Choose
     print_info = False # Choose
     bound = method_params['boundary']
