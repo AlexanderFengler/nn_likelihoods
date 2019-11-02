@@ -117,11 +117,7 @@ if __name__ == "__main__":
         method_params = stats[method]
         dgp = method_params['dgp']
 
-    #out_folder = method_folder + 'base_simulations_ndt_20000/'
-    #out_folder = method_folder + 'base_simulations_ndt_20000/'
-
-    #out_folder = method_folder + 'base_simulations_ndt_20000_binned/'
-    
+        
     # Simulator parameters
     s = 1 # Choose
     delta_t = 0.01 # Choose
