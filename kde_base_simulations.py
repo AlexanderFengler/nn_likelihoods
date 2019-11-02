@@ -106,6 +106,7 @@ if __name__ == "__main__":
             method_folder = '/users/afengler/data/analytic/' + method + '/'
         else:
             method_folder = '/users/afengler/data/kde/' + method + '/'
+            
         
     if machine == 'x7':
         stats = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
@@ -201,6 +202,10 @@ if __name__ == "__main__":
     # --------------------------------------------------------------------------------------------------------
     
     # RUN SIMULATIONS AND STORE DATA -------------------------------------------------------------------------
+    if not os.path.exists(out_folder):
+        os.makedirs(out_folder)
+    
+    
     # BINNED VERSION
     if binned:
         # Parallel Loop
