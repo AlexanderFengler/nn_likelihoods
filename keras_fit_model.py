@@ -1,5 +1,6 @@
 import tensorflow as tf
 from tensorflow import keras
+from tensorflow.keras.models import load_model
 import numpy as np
 from cdwiener import array_fptd
 import os
@@ -11,10 +12,13 @@ import yaml
 import keras_to_numpy as ktnp
 
 from kde_training_utilities import kde_load_data
-from kde_training_utilities import kde_make_train_test_split
+from kde_training_utilities import kde_load_data_new
+#from kde_training_utilities import kde_make_train_test_split
 
 # CHOOSE ---------
-method = "ddm_ndt" # ddm, linear_collapse, ornstein, full, lba
+method = "weibull_cdf_ndt" # ddm, linear_collapse, ornstein, full, lba
+warm_start = True
+n_training_datasets_to_load = 12
 machine = 'x7'
 # ----------------
 
@@ -29,7 +33,8 @@ else:
     data_folder = stats["data_folder"]
     model_path = stats["model_folder"]
     
-model_path += dnn_params["model_type"] + "_{}_".format(method) + datetime.now().strftime('%m_%d_%y_%H_%M_%S') + "/"
+if not warm_start:
+    model_path += dnn_params["model_type"] + "_{}_".format(method) + datetime.now().strftime('%m_%d_%y_%H_%M_%S') + "/"
 
 print('if it does not exist, make model path')
 
@@ -53,54 +58,71 @@ print(device_lib.list_local_devices())
 # Load the training data
 print('loading data.... ')
 
-X, y, X_val, y_val = kde_load_data(folder = data_folder, 
-                                   return_log = True, # Dont take log if you want to train on actual likelihoods
-                                   prelog_cutoff = 1e-7 # cut out data with likelihood lower than 1e-7
-                                  )
+# X, y, X_val, y_val = kde_load_data(folder = data_folder, 
+#                                    return_log = True, # Dont take log if you want to train on actual likelihoods
+#                                    prelog_cutoff = 1e-7 # cut out data with likelihood lower than 1e-7
+#                                   )
 
-X = np.array(X)
-X_val = np.array(X_val)
+X, y = kde_load_data_new(path = data_folder,
+                         file_id_list = [i for i in range(n_training_datasets_to_load)],
+                         return_log = True,
+                         prelog_cutoff = 1e-7)
+                          
+
+#X = np.array(X)
+#X_val = np.array(X_val)
 # --------------------------------------------------------------------------------
 
 # MAKE MODEL ---------------------------------------------------------------------
 print('Setting up keras model')
 
-input_shape = X.shape[1]
-model = keras.Sequential()
+if not warm_start:
+    input_shape = X.shape[1]
+    model = keras.Sequential()
 
-for i in range(len(dnn_params['hidden_layers'])):
-    if i == 0:
-        model.add(keras.layers.Dense(units = dnn_params["hidden_layers"][i], 
-                                     activation = dnn_params["hidden_activations"][i], 
-                                     input_dim = input_shape))
-    else:
-        model.add(keras.layers.Dense(units = dnn_params["hidden_layers"][i],
-                                     activation = dnn_params["hidden_activations"][i]))
-        
-# Write model specification to yaml file        
-spec = model.to_yaml()
-open(model_path + "model_spec.yaml", "w").write(spec)
+    for i in range(len(dnn_params['hidden_layers'])):
+        if i == 0:
+            model.add(keras.layers.Dense(units = dnn_params["hidden_layers"][i], 
+                                         activation = dnn_params["hidden_activations"][i], 
+                                         input_dim = input_shape))
+        else:
+            model.add(keras.layers.Dense(units = dnn_params["hidden_layers"][i],
+                                         activation = dnn_params["hidden_activations"][i]))
+
+    # Write model specification to yaml file        
+    spec = model.to_yaml()
+    open(model_path + "model_spec.yaml", "w").write(spec)
 
 
-print('STRUCTURE OF GENERATED MODEL: ....')
-print(model.summary())
+    print('STRUCTURE OF GENERATED MODEL: ....')
+    print(model.summary())
 
-if dnn_params['loss'] == 'huber':
-    model.compile(loss = tf.losses.huber_loss, 
-                  optimizer = "adam", 
-                  metrics = ["mse"])
+    if dnn_params['loss'] == 'huber':
+        model.compile(loss = tf.losses.huber_loss, 
+                      optimizer = "adam", 
+                      metrics = ["mse"])
 
-if dnn_params['loss'] == 'mse':
-    model.compile(loss = 'mse', 
-                  optimizer = "adam", 
-                  metrics = ["mse"])
+    if dnn_params['loss'] == 'mse':
+        model.compile(loss = 'mse', 
+                      optimizer = "adam", 
+                      metrics = ["mse"])
+if warm_start:
+    # Returns a compiled model identical to the previous one
+    if machine == 'x7':
+        model_paths = yaml.load(open("model_paths_x7.yaml"))
+    if machine == 'ccv':
+        model_paths = yaml.load(open("model_paths.yaml"))
+    
+    model_path = model_paths[method +  '_' + str(n_training_datasets_to_load)]
+    model = load_model(model_path + 'model_final.h5')
+    
 # ---------------------------------------------------------------------------
 
 # FIT MODEL -----------------------------------------------------------------
 print('Starting to fit model.....')
 
 # Define callbacks
-ckpt_filename = model_path + "model.h5"
+ckpt_filename = model_path + "model_ckpt.h5"
 
 checkpoint = keras.callbacks.ModelCheckpoint(ckpt_filename, 
                                              monitor = 'val_loss', 
@@ -120,11 +142,12 @@ reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor = 'val_loss',
                                               min_lr = 0.0000001)
 
 history = model.fit(X, y, 
-                    validation_data = (X_val, y_val), 
+                    #validation_data = (X_val, y_val), 
+                    validation_split = 0.01,
                     epochs = dnn_params["n_epochs"],
                     batch_size = dnn_params["batch_size"], 
                     callbacks = [checkpoint, reduce_lr, earlystopping], 
-                    verbose = 2)
+                    verbose = 1)
 # ---------------------------------------------------------------------------
 
 # SAVING --------------------------------------------------------------------
@@ -139,7 +162,14 @@ model.save(model_path + "model_final.h5")
 __, ___, ____, = ktnp.extract_architecture(model, save = True, save_path = model_path)
 
 # Update model paths in model_path.yaml
-model_paths = yaml.load(open("model_paths.yaml"))
-model_paths[method] = model_path
-yaml.dump(model_paths, open("model_paths.yaml", "w"))
+if machine == 'x7':
+    if not warm_start:
+        model_paths = yaml.load(open("model_paths_x7.yaml"))
+        model_paths[method + '_' + str(n_training_datasets_to_load)] = model_path
+        yaml.dump(model_paths, open("model_paths_x7.yaml", "w"))
+if machine == 'ccv':
+    if not warm_start:
+        model_paths = yaml.load(open("model_paths.yaml"))
+        model_paths[method + '_' + str(n_training_datasets_to_load)] = model_path
+        yaml.dump(model_paths, open("model_paths.yaml", "w"))
 # ----------------------------------------------------------------------------

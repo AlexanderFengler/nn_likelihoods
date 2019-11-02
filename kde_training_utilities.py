@@ -513,7 +513,7 @@ def kde_make_train_data(path = '',
     # Get files in specified folder
 
     # Check if folder currently contains a train-test split
-    print('check if we have a train and test sets already')
+    #print('check if we have a train and test sets already')
 
     # Read in and concatenate files
     print('read, concatenate data...')
@@ -542,7 +542,7 @@ def kde_make_train_data(path = '',
                 data.iloc[(i * n_samples_by_dataset) : ((i + 1) * n_samples_by_dataset), :(n_cols - 1)].values)
         
         np.save(path + 'feed_labels_' + str(i) + '.npy',
-                data.iloc[(i * n_samples_by_dataset) : ((i + 1) * n_samples_by_dataset), (n_cols - 1)].values)
+                np.expand_dims(data.iloc[(i * n_samples_by_dataset) : ((i + 1) * n_samples_by_dataset), (n_cols - 1)].values, axis = 1))
         
         print(i, ' files written')
         
@@ -550,7 +550,8 @@ def kde_make_train_data(path = '',
 
 def kde_load_data_new(path = '',
                       file_id_list = '',
-                      prelog_cutoff = 1e-29):
+                      prelog_cutoff = 1e-29,
+                      return_log = True):
     
     # Read in two datasets to get meta data for the subsequent
     print('Reading in initial dataset')
@@ -560,24 +561,33 @@ def kde_load_data_new(path = '',
     # Collect some meta data 
     n_files = len(file_id_list)
     n_samples_by_dataset = features_init.shape[0]
+    print(n_files)
+    print(n_samples_by_dataset)
+    print(labels_init.shape[0])
     
     # Allocate memory for data  
     print('Allocating data arrays')
-    features = np.empty((n_files * features_init.shape[0], init_file.shape[1]))
-    labels = np.empty((n_files * features_init.shape[0], 1))
+    features = np.zeros((n_files * features_init.shape[0], features_init.shape[1]))
+    labels = np.zeros((n_files * features_init.shape[0], 1))
     
     # Read in data of initialization files
     features[:n_samples_by_dataset, :] = features_init
-    labels[:n_samples_by_dataset, :] = labels
+    labels[:n_samples_by_dataset, :] = labels_init
     
     # Read in remaining files into preallocated np.array
     for i in range(1, n_files, 1):
         features[(i * n_samples_by_dataset): ((i + 1) * (n_samples_by_dataset)), :] = np.load(path + 'feed_features_' + \
-                                                                                              str(file_id_list[i] + '.npy'))
+                                                                                              str(file_id_list[i]) + '.npy')
         labels[(i * n_samples_by_dataset): ((i + 1) * (n_samples_by_dataset)), :] = np.load(path + 'feed_labels_' + \
-                                                                                           str(file_id_list[i] + 'npy'))
-                                                                                              
+                                                                                           str(file_id_list[i]) + '.npy')
         print(i, ' files processed')
+        
+        
+    if prelog_cutoff != 'none':
+        labels[labels < np.log(prelog_cutoff)] = np.log(prelog_cutoff)
+        
+    if return_log == False:
+        labels = np.exp(labels)
     
     return features, labels
 
@@ -605,9 +615,4 @@ def kde_load_data(folder = '',
         train_labels = np.exp(train_labels)
         test_labels = np.exp(test_labels)
         
-    return train_features, train_labels, test_features, test_labels
-                                                                                              
-                                                                                              
-                                                                                              
-                                                                                              
-                                                                                              # UNUSED 
+    return train_features, train_labels, test_features, test_labels                                                                                                                                                                               
