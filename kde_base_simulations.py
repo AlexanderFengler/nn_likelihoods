@@ -79,10 +79,10 @@ if __name__ == "__main__":
     
     # Choose simulator and datatype
     #method = 'weibull_cdf_ndt'
-    method = 'weibull_cdf_ndt'
+    method = 'ornstein'
     
     #binned = False
-    binned = True
+    binned = False
     
     # out file name components
     file_id = sys.argv[1]
@@ -106,14 +106,14 @@ if __name__ == "__main__":
 
     #out_folder = method_folder + 'base_simulations_ndt_20000/'
     #out_folder = method_folder + 'base_simulations_ndt_20000/'
-    out_folder = method_folder + 'base_simulations_ndt_binned_100000'
+    out_folder = method_folder + 'base_simulations_ndt_20000'
     
     # Simulator parameters
     s = 1 # Choose
     delta_t = 0.01 # Choose
-    max_t = 10  # Choose
+    max_t = 20  # Choose
     #n_samples = 20000 # Choose
-    n_samples = 100000 # Choose
+    n_samples = 20000 # Choose
     n_simulators = 10000 # Choose
     print_info = False # Choose
     bound = method_params['boundary']
