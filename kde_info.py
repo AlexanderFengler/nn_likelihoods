@@ -119,7 +119,7 @@ temp = {
     "boundary_param_bounds_network": [],
     "boundary_param_bounds_sampler": []
     },
-"ddm_full":{
+"full_ddm":{
     "dgp": cd.full_ddm,
     "boundary": bf.constant,
     "boundary_multiplicative": True,
