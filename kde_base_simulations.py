@@ -82,11 +82,11 @@ if __name__ == "__main__":
     
     # Choose simulator and datatype
     #method = 'weibull_cdf_ndt'
-    method = 'ornstein'
+    method = 'full_ddm'
     analytic = False
     
     #binned = False
-    binned = True
+    binned = False
     
     # out file name components
     file_id = sys.argv[1]
@@ -117,13 +117,12 @@ if __name__ == "__main__":
         method_params = stats[method]
         dgp = method_params['dgp']
 
-        
     # Simulator parameters
     s = 1 # Choose
     delta_t = 0.01 # Choose
     max_t = 10  # Choose
-    #n_samples = 20000 # Choose
-    n_samples = 100000 # Choose
+    n_samples = 20000 # Choose
+    #n_samples = 100000 # Choose
     n_simulators = 10000 # Choose
     print_info = False # Choose
     bound = method_params['boundary']
@@ -137,6 +136,10 @@ if __name__ == "__main__":
         out_folder = method_folder + 'base_simulations_' + str(n_samples) + '_binned/'
     else:
         out_folder = method_folder + 'base_simulations_' + str(n_samples) + '/'
+        
+    if not os.path.exists(out_folder):
+        os.makedirs(out_folder)
+    
     # --------------------------------------------------------------------------------------------------------
     
     # GENERATE A SET OF PARAMETERS ---------------------------------------------------------------------------
@@ -198,9 +201,6 @@ if __name__ == "__main__":
     # --------------------------------------------------------------------------------------------------------
     
     # RUN SIMULATIONS AND STORE DATA -------------------------------------------------------------------------
-    if not os.path.exists(out_folder):
-        os.makedirs(out_folder)
-    
     
     # BINNED VERSION
     if binned:

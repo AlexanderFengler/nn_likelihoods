@@ -3,14 +3,14 @@
 # Default resources are 1 core with 2.8GB of memory per core.
 
 # job name:
-#SBATCH -J ornstein_sim
+#SBATCH -J full_ddm_sim
 
 
 # priority
 #SBATCH --account=bibs-frankmj-condo
 
 # output file
-#SBATCH --output /users/afengler/batch_job_out/ornstein_sim_%A_%a.out
+#SBATCH --output /users/afengler/batch_job_out/full_ddm_sim_%A_%a.out
 
 # Request runtime, memory, cores:
 #SBATCH --time=24:00:00

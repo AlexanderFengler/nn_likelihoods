@@ -129,8 +129,8 @@ temp = {
     "output_folder_x7": "/media/data_cifs/afengler/data/kde/full_ddm/method_comparison/",
     "param_names": ["v", "a", "w", "ndt", "dw", "sdv", "dndt"],
     "boundary_param_names": [],
-    "param_bounds_network": [[-2, 2], [0.6, 1.5], [0.3, 0.7], [0.25, 1.25], [0, 0.5], [0, 0.5], [0, 0.5]],
-    "param_bounds_sampler": [[-1.9, 1.9], [0.6, 1.4], [0.31, 0.69], [0.3, 1.2], [0.05, 0.45], [0.05, 0.45], [0.05, 0.45]],
+    "param_bounds_network": [[-2.0, 2.0], [0.6, 1.8], [0.3, 0.7], [0.25, 1.25], [0, 0.4], [0, 0.5], [0, 0.5]],
+    "param_bounds_sampler": [[-1.9, 1.9], [0.65, 1.75], [0.31, 0.69], [0.3, 1.2], [0.05, 0.35], [0.05, 0.45], [0.05, 0.45]],
     "boundary_param_bounds_network": [],
     "boundary_param_bounds_sampler": []
     },
