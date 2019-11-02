@@ -86,7 +86,7 @@ if __name__ == "__main__":
     analytic = False
     
     #binned = False
-    binned = False
+    binned = True
     
     # out file name components
     file_id = sys.argv[1]
