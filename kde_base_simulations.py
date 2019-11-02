@@ -70,7 +70,7 @@ def data_generator_ddm(*args):
     
     simulator_data = dgp(*args)
     
-    print(args)
+    #print(args)
     return simulator_data
     
 if __name__ == "__main__":
@@ -118,7 +118,7 @@ if __name__ == "__main__":
 
     #out_folder = method_folder + 'base_simulations_ndt_20000/'
     #out_folder = method_folder + 'base_simulations_ndt_20000/'
-    out_folder = method_folder + 'base_simulations_ndt_20000'
+    out_folder = method_folder + 'base_simulations_ndt_20000/'
     
     # Simulator parameters
     s = 1 # Choose
