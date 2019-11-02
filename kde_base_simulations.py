@@ -86,7 +86,7 @@ if __name__ == "__main__":
     analytic = False
     
     #binned = False
-    binned = True
+    binned = False
     
     # out file name components
     file_id = sys.argv[1]
@@ -118,8 +118,8 @@ if __name__ == "__main__":
 
     #out_folder = method_folder + 'base_simulations_ndt_20000/'
     #out_folder = method_folder + 'base_simulations_ndt_20000/'
-    #out_folder = method_folder + 'base_simulations_ndt_20000/'
-    out_folder = method_folder + 'base_simulations_ndt_20000_binned/'
+    out_folder = method_folder + 'base_simulations_ndt_20000/'
+    #out_folder = method_folder + 'base_simulations_ndt_20000_binned/'
     
     # Simulator parameters
     s = 1 # Choose
