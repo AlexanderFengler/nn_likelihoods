@@ -25,8 +25,7 @@ if __name__ == "__main__":
     kde_utils.kde_load_data_new(path = my_folder,
                                 file_id_list = file_id_list,
                                 prelog_cutoff = 1e-7)
-    
-    
+     
 #     kde_utils.kde_make_train_test_split(folder = my_folder, 
 #                                         p_train = 0.99)
                                         
