@@ -10,7 +10,7 @@
 #SBATCH --account=bibs-frankmj-condo
 
 # output file
-#SBATCH --output /users/afengler/batch_job_out/weibull_sim_%A_%a.out
+#SBATCH --output /users/afengler/batch_job_out/ornstein_sim_%A_%a.out
 
 # Request runtime, memory, cores:
 #SBATCH --time=24:00:00

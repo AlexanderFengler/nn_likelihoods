@@ -65,7 +65,10 @@ def bin_simulator_output(out = [0, 0],
 
 def data_generator_ddm(*args):
     # CHOOSE SIMULATOR HERE
-    simulator_data = ds.ddm_flexbound(*args)
+    #simulator_data = ds.ddm_flexbound(*args)
+    #simulator_data = ds.ornstein_uhlenbeck(*args)
+    
+    simulator_data = dgp(*args)
     
     print(args)
     return simulator_data
@@ -80,6 +83,7 @@ if __name__ == "__main__":
     # Choose simulator and datatype
     #method = 'weibull_cdf_ndt'
     method = 'ornstein'
+    analytic = True
     
     #binned = False
     binned = False
@@ -91,18 +95,26 @@ if __name__ == "__main__":
     # Load meta data from kde_info.pickle file
     if machine == 'x7':
         #method_folder = '/media/data_cifs/afengler/data/kde/weibull_cdf/'
-        method_folder = '/users/afengler/data/kde/angle/'
+        if analytic:
+            method_folder = '/media/data_cifs/afengler/data/analytic/' + method + '/'
+        else:
+            method_folder = '/media/data_cifs/afengler/data/kde/' + method + '/'
 
     if machine == 'ccv':
         #method_folder = '/users/afengler/data/kde/weibull_cdf/'
-        method_folder = '/users/afengler/data/kde/angle/'
+        if analytic:
+            method_folder = '/users/afengler/data/analytic/' + method + '/'
+        else:
+            method_folder = '/users/afengler/data/kde/' + method + '/'
         
     if machine == 'x7':
         stats = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
         method_params = stats[method]
+        dgp = method["dgp"]
     if machine == 'ccv':
         stats = pickle.load(open("/users/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
         method_params = stats[method]
+        dgp = method['dgp']
 
     #out_folder = method_folder + 'base_simulations_ndt_20000/'
     #out_folder = method_folder + 'base_simulations_ndt_20000/'
