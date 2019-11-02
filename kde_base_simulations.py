@@ -118,7 +118,7 @@ if __name__ == "__main__":
 
     #out_folder = method_folder + 'base_simulations_ndt_20000/'
     #out_folder = method_folder + 'base_simulations_ndt_20000/'
-    out_folder = method_folder + 'base_simulations_ndt_20000/'
+
     #out_folder = method_folder + 'base_simulations_ndt_20000_binned/'
     
     # Simulator parameters
@@ -126,7 +126,7 @@ if __name__ == "__main__":
     delta_t = 0.01 # Choose
     max_t = 20  # Choose
     #n_samples = 20000 # Choose
-    n_samples = 100000 # Choose
+    n_samples = 20000 # Choose
     n_simulators = 10000 # Choose
     print_info = False # Choose
     bound = method_params['boundary']
@@ -135,6 +135,10 @@ if __name__ == "__main__":
     # Extra params
     bin_dt = 0.04
     n_bins = 256
+    
+    
+    if binned:
+        out_folder = method_folder + 'base_simulations_' + str(
     # --------------------------------------------------------------------------------------------------------
     
     # GENERATE A SET OF PARAMETERS ---------------------------------------------------------------------------
@@ -186,7 +190,7 @@ if __name__ == "__main__":
           
     # DEFINE FUNCTIONS THAAT NEED INITIALIZATION DEPENDEND ON CONTEXT ----------------------------------------
     def data_generator_ddm_binned(*args):
-        simulator_data = ds.ddm_flexbound(*args)
+        simulator_data = dgp(*args)
         features, labels, meta = bin_simulator_output(out = simulator_data,
                                                       bin_dt = bin_dt, 
                                                       n_bins = n_bins,
