@@ -1032,7 +1032,7 @@ static PyObject *__pyx_pf_8cdwiener_fptd(CYTHON_UNUSED PyObject *__pyx_self, PyO
   }
 </pre><pre class="cython line score-0">&#xA0;<span class="">062</span>: <span class="c"># --------------------------------</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">063</span>: </pre>
-<pre class="cython line score-112" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">064</span>: <span class="k">def</span> <span class="nf">batch_fptd</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">double</span> <span class="n">v</span> <span class="o">=</span> <span class="mf">1</span><span class="p">,</span> <span class="n">double</span> <span class="n">a</span> <span class="o">=</span> <span class="mf">1</span><span class="p">,</span> <span class="n">double</span> <span class="n">w</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">double</span> <span class="n">ndt</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">double</span> <span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-10</span><span class="p">):</span></pre>
+<pre class="cython line score-112" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">064</span>: <span class="k">def</span> <span class="nf">batch_fptd</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">double</span> <span class="n">v</span> <span class="o">=</span> <span class="mf">1</span><span class="p">,</span> <span class="n">double</span> <span class="n">a</span> <span class="o">=</span> <span class="mf">1</span><span class="p">,</span> <span class="n">double</span> <span class="n">w</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">double</span> <span class="n">ndt</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">double</span> <span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-20</span><span class="p">):</span></pre>
 <pre class='cython code score-112 '>/* Python wrapper */
 static PyObject *__pyx_pw_8cdwiener_3batch_fptd(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static PyMethodDef __pyx_mdef_8cdwiener_3batch_fptd = {"batch_fptd", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_8cdwiener_3batch_fptd, METH_VARARGS|METH_KEYWORDS, 0};
@@ -1148,7 +1148,7 @@ static PyObject *__pyx_pw_8cdwiener_3batch_fptd(PyObject *__pyx_self, PyObject *
     if (values[5]) {
       __pyx_v_eps = __pyx_<span class='py_c_api'>PyFloat_AsDouble</span>(values[5]); if (unlikely((__pyx_v_eps == (double)-1) &amp;&amp; <span class='py_c_api'>PyErr_Occurred</span>())) <span class='error_goto'>__PYX_ERR(0, 64, __pyx_L3_error)</span>
     } else {
-      __pyx_v_eps = ((double)1e-10);
+      __pyx_v_eps = ((double)1e-20);
     }
   }
   goto __pyx_L4_argument_unpacking_done;

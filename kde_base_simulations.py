@@ -84,7 +84,7 @@ if __name__ == "__main__":
     # INITIALIZATIONS ----------------------------------------------------------------------------------------
     # Get cpu cnt
     n_cpus = psutil.cpu_count(logical = False)
-    machine = 'x7'
+    machine = 'ccv'
     
     # Choose simulator and datatype
     method = 'race_model'

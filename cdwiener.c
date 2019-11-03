@@ -3043,7 +3043,7 @@ static PyObject *__pyx_pf_8cdwiener_fptd(CYTHON_UNUSED PyObject *__pyx_self, PyO
 /* "cdwiener.pyx":64
  * # --------------------------------
  * 
- * def batch_fptd(t, double v = 1, double a = 1, double w = 0.5, double ndt = 1.0, double eps = 1e-10):             # <<<<<<<<<<<<<<
+ * def batch_fptd(t, double v = 1, double a = 1, double w = 0.5, double ndt = 1.0, double eps = 1e-20):             # <<<<<<<<<<<<<<
  *     # Use when rts and choices vary, but parameters are held constant
  *     cdef int i
  */
@@ -3163,7 +3163,7 @@ static PyObject *__pyx_pw_8cdwiener_3batch_fptd(PyObject *__pyx_self, PyObject *
     if (values[5]) {
       __pyx_v_eps = __pyx_PyFloat_AsDouble(values[5]); if (unlikely((__pyx_v_eps == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 64, __pyx_L3_error)
     } else {
-      __pyx_v_eps = ((double)1e-10);
+      __pyx_v_eps = ((double)1e-20);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
@@ -4091,7 +4091,7 @@ static PyObject *__pyx_pf_8cdwiener_2batch_fptd(CYTHON_UNUSED PyObject *__pyx_se
   /* "cdwiener.pyx":64
  * # --------------------------------
  * 
- * def batch_fptd(t, double v = 1, double a = 1, double w = 0.5, double ndt = 1.0, double eps = 1e-10):             # <<<<<<<<<<<<<<
+ * def batch_fptd(t, double v = 1, double a = 1, double w = 0.5, double ndt = 1.0, double eps = 1e-20):             # <<<<<<<<<<<<<<
  *     # Use when rts and choices vary, but parameters are held constant
  *     cdef int i
  */
@@ -19057,7 +19057,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   /* "cdwiener.pyx":64
  * # --------------------------------
  * 
- * def batch_fptd(t, double v = 1, double a = 1, double w = 0.5, double ndt = 1.0, double eps = 1e-10):             # <<<<<<<<<<<<<<
+ * def batch_fptd(t, double v = 1, double a = 1, double w = 0.5, double ndt = 1.0, double eps = 1e-20):             # <<<<<<<<<<<<<<
  *     # Use when rts and choices vary, but parameters are held constant
  *     cdef int i
  */
@@ -19539,7 +19539,7 @@ if (!__Pyx_RefNanny) {
   /* "cdwiener.pyx":64
  * # --------------------------------
  * 
- * def batch_fptd(t, double v = 1, double a = 1, double w = 0.5, double ndt = 1.0, double eps = 1e-10):             # <<<<<<<<<<<<<<
+ * def batch_fptd(t, double v = 1, double a = 1, double w = 0.5, double ndt = 1.0, double eps = 1e-20):             # <<<<<<<<<<<<<<
  *     # Use when rts and choices vary, but parameters are held constant
  *     cdef int i
  */
