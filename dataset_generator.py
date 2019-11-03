@@ -187,5 +187,5 @@ if type_of_experiment == 'perturbation_experiment':
                                                         + '_n_' + str(int(n_data_samples)) + '_' + file_id + '.pickle', 'wb'))
 
 if type_of_experiment == 'uniform':
-    pickle.dump((param_grid, data_grid, meta_dat), open(output_folder + 'base_data_param_recov_unif_reps_' + str(int(n_reps)) \
-                                                        + '_n_' + str(int(n_data_samples)) + '.pickle', 'wb'))
+    pickle.dump((param_grid, data_grid), open(output_folder + 'base_data_param_recov_unif_reps_' + str(int(n_reps)) \
+                                                        + '_n_' + str(int(n_data_samples)) + '_' + file_id +  '.pickle', 'wb'))
