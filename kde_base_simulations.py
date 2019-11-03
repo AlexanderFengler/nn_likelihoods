@@ -1,3 +1,5 @@
+# RUN FORMAT: python pyhtonfile method n_choices binned(bool) file_id 
+
 # Basic python utilities
 import numpy as np
 import scipy as scp
@@ -51,10 +53,9 @@ def bin_simulator_output(out = [0, 0],
     n_small = np.sum(counts < eps_correction)
     n_big = counts_size - n_small 
     
-    counts[counts <= eps_correction] = eps_correction
-    #print(counts[counts > eps_correction].shape)
-    counts[counts > eps_correction] -= (eps_correction * (n_small / n_big))
-    #counts[counts > eps_correction] = counts[counts > eps_correction] - (eps_correction * (n_small / n_big))
+    if eps_correction > 0:
+        counts[counts <= eps_correction] = eps_correction
+        counts[counts > eps_correction] -= (eps_correction * (n_small / n_big))
 
     return ([out[2][param] for param in params], # features
             counts, # labels
@@ -84,16 +85,24 @@ if __name__ == "__main__":
     # INITIALIZATIONS ----------------------------------------------------------------------------------------
     # Get cpu cnt
     n_cpus = psutil.cpu_count(logical = False)
-    machine = 'ccv'
+
     
     # Choose simulator and datatype
-    method = 'race_model'
+    machine = sys.argv[1]
+    method = sys.argv[2]
+    n_choices = int(sys.argv[3])
+    binned = bool(sys.argv[4])
+    file_id = sys.argv[5]
+    analytic = ('analytic' in method)
+    
+    #method = 'race_model'
+    #n_choices = 6
     analytic = False
-    binned = True
-    n_choices = 6
+    #binned = True
+
     
     # out file name components
-    file_id = sys.argv[1]
+    #file_id = sys.argv[1]
     file_signature =  method + '_base_simulations_'
     
     # Load meta data from kde_info.pickle file
