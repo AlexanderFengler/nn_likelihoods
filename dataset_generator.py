@@ -13,26 +13,28 @@ import cddm_data_simulation as cd
 from cdwiener import batch_fptd
 import clba
 
-
 # INITIALIZATIONS -------------------------------------------------------------
-machine = 'x7'
-method = 'ddm_ndt'
-type_of_experiment = 'perturbation_experiment' # 'uniform', 'perturbation_experiment'
-n_parameter_sets = 1000
-n_reps = 10
-#file_id = sys.argv[1]
-n_experiments = int(sys.argv[1])
-n_data_samples = int(sys.argv[2])
-file_id = sys.argv[3]
+machine = sys.argv[1]   # 'x7', 'ccv'
+method = sys.argv[2]  # 
+type_of_experiment = sys.argv[3]  # 'uniform', 'perturbation_experiment'
 
+if type_of_experiment == 'uniform':
+    n_parameter_sets = int(sys.argv[4])
+    n_reps = int(sys.argv[5])
+
+#n_parameter_sets = 1000
+#n_reps = 10
+#file_id = sys.argv[1]
+
+if type_of_experiment == 'perturbation_experiment':
+    n_experiments = int(sys.argv[4])
+    n_data_samples = int(sys.argv[5])
+    
+file_id = sys.argv[6]
 
 n_datasets_by_experiment = 1
 
-#print('argument list: ', str(sys.argv))
-
-# IF WE WANT TO USE A PREVIOUS SET OF PARAMETERS: FOR COMPARISON OF POSTERIORS FOR EXAMPLE
-#param_origin = 'previous'
-#param_file_signature  = 'kde_sim_test_ndt_'
+print('argument list: ', str(sys.argv))
 
 if machine == 'x7':
     method_comparison_folder = "/media/data_cifs/afengler/data/analytic/ddm/method_comparison/"
@@ -102,8 +104,6 @@ def param_grid_perturbation_experiment(n_experiments = n_experiments,
 
 def param_grid_uniform(n = 1000,
                        n_reps = 1,
-#                        file_signature = '..',
-#                        file_folder = '..',
                        method_params = {'0': 0}):
     
     n_params = len(method_params['param_names']) + len(method_params['boundary_param_names'])
@@ -172,9 +172,6 @@ if type_of_experiment == 'uniform':
     param_grid = param_grid_uniform(n = n_parameter_sets,
                                     n_reps = n_reps,
                                     method_params = method_params)
-
-    #                                     file_signature = out_file_signature,
-#                                     file_folder = output_folder,
 
 # Generate the corresponding data grid
 data_grid = generate_data_grid(param_grid, 

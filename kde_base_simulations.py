@@ -74,7 +74,7 @@ def data_generator_ddm_binned(*args):
     features, labels, meta = bin_simulator_output(out = simulator_data,
                                                   bin_dt = bin_dt, 
                                                   n_bins = n_bins,
-                                                  eps_correction = 1e-7,
+                                                  eps_correction = 0,
                                                   params = param_names_full) 
     return (features, labels, meta) 
 # --------------------------------------------------------------------------------------------------------
@@ -93,7 +93,17 @@ if __name__ == "__main__":
     binned = bool(sys.argv[5])
     file_id = sys.argv[6]
     analytic = ('analytic' in method)
-    n_simulators = 10000 # Choose
+    
+    n_simulators = 10000 
+    if len(sys.argv) > 7:
+        n_simulators = int(sys.argv[7])
+    
+    # Extra params for binned version
+    bin_dt = 0.04
+    n_bins = 256
+    eps_correction = 1e-7
+    if binned and len(sys.argv) > 8:
+        eps_correction = float(sys.argv[8]) 
         
     # out file name components
     file_signature =  method + '_base_simulations_'
@@ -112,8 +122,7 @@ if __name__ == "__main__":
             method_folder = '/users/afengler/data/analytic/' + method + '/'
         else:
             method_folder = '/users/afengler/data/kde/' + method + '/'
-            
-        
+               
     if machine == 'x7':
         stats = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
         method_params = stats[method]
@@ -139,10 +148,6 @@ if __name__ == "__main__":
     bound = method_params['boundary']
     boundary_multiplicative = method_params['boundary_multiplicative']
     
-    # Extra params
-    bin_dt = 0.04
-    n_bins = 256
-      
     if method != 'lba' and method != 'race_model':
         if binned:
             out_folder = method_folder + 'base_simulations_' + str(n_samples) + '_binned/'
@@ -156,7 +161,6 @@ if __name__ == "__main__":
 
     if not os.path.exists(out_folder):
         os.makedirs(out_folder)
-    
     # --------------------------------------------------------------------------------------------------------
     
     # GENERATE A SET OF PARAMETERS ---------------------------------------------------------------------------
