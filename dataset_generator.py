@@ -134,7 +134,7 @@ def generate_data_grid(param_grid,
     for i in range(n_parameter_sets):
         if n_process_params < n_params:
             param_dict_tmp = dict(zip(method_params["param_names"], param_grid[i, :n_process_params]))
-            boundary_dict_tmp = dict(zip(method_params["boundary_param_names"], boundary_param_grid[i, n_process_params:]))
+            boundary_dict_tmp = dict(zip(method_params["boundary_param_names"], param_grid[i, n_process_params:]))
         else:
             param_dict_tmp = dict(zip(method_params["param_names"], param_grid[i]))
             boundary_dict_tmp = {}
