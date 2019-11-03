@@ -79,7 +79,6 @@ def data_generator_ddm_binned(*args):
     return (features, labels, meta) 
 # --------------------------------------------------------------------------------------------------------
 
-
 if __name__ == "__main__":
     
     # INITIALIZATIONS ----------------------------------------------------------------------------------------
@@ -196,7 +195,7 @@ if __name__ == "__main__":
                                           high = process_param_upper_bnd[i])), )
             param_samples += (param_samples_tmp, )
             #print(param_samples_tmp)
-            if n % 100 == 0:
+            #if n % 100 == 0:
                 #print(n, ' parameter sets sampled')
             
         # Update process param names to account for n_choices
