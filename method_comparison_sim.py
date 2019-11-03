@@ -19,21 +19,27 @@ import clba
 import keras_to_numpy as ktnp
 
 # INITIALIZATIONS -------------------------------------------------------------
-machine = 'ccv'
-method = 'ddm_analytic'
-analytic = True
-out_file_signature = 'post_samp_perturbation_experiment_nexp_1_n_' + sys.argv[2] + '_' + sys.argv[1]
-n_data_samples = int(sys.argv[2])
-n_slice_samples = 10000
-n_sims = 10
+machine = sys.argv[1] # 'ccv', 'x7'
+method = sys.argv[2]
+analytic = ('analytic' in method)
+data_type = sys.argv[3]
+n_data_samples = sys.argv[4]
+n_slice_samples = sys.argv[5]
+file_id = sys.argv[6]
 n_cpus = 'all'
-file_id = sys.argv[1]
+
+#n_sims = 10
+#n_data_samples = int(sys.argv[2])
+
 print('argument list: ', str(sys.argv))
+#out_file_signature 
 
-# IF WE WANT TO USE A PREVIOUS SET OF PARAMETERS: FOR COMPARISON OF POSTERIORS FOR EXAMPLE
-param_origin = 'previous'
-param_file_signature  = 'base_data_perturbation_experiment_nexp_1_n_' + sys.argv[2]
-
+if data_type == 'perturbation_experiment':
+    file_ = 'base_data_perturbation_experiment_nexp_1_n_' + n_data_samples + '_' + file_id + '.pickle'
+    out_file_signature = 'post_samp_perturbation_experiment_nexp_1_n_' + n_data_samples + '_' + file_id
+if data_type == 'uniform':
+    file_ = 'base_data_param_recov_unif_reps_1_n_' + n_data_samples + '_' + file_id + '.pickle'
+    out_file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + n_data_samples + '_' + file_id
 
 if machine == 'x7':
     method_comparison_folder = "/media/data_cifs/afengler/data/kde/ddm/method_comparison/"
@@ -46,6 +52,7 @@ if machine == 'x7':
     output_folder = method_params['output_folder_x7']
     with open("model_paths_x7.yaml") as tmp_file:
         network_path = yaml.load(tmp_file)[method]
+
 if machine == 'ccv':
     stats = pickle.load(open("/users/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
     method_params = stats[method]
@@ -99,183 +106,11 @@ def lba_target(params, data):
 # ----------------------------------------------------------------------------------------------------
 
 # MAKE PARAMETER / DATA GRID -------------------------------------------------------------------------
-
-# v, a, w, ndt. angle
-def param_grid_perturbation_experiment(n_experiments = 100,
-                                       n_datasets_by_experiment = 1,
-                                       perturbation_sizes = [[0.0, 0.05, 0.1, 0.2],
-                                                             [0.0, 0.05, 0.1, 0.2],
-                                                             [0.0, 0.05, 0.1, 0.2],
-                                                             [0.0, 0.05, 0.1, 0.2],
-                                                             [0.0, 0.05, 0.1, 0.2]]):
-    
-    n_perturbation_levels = len(perturbation_sizes[0])
-    n_params = len(method_params['param_names']) + len(method_params['boundary_params_names'])
-    param_bounds = method_params['param_bounds_samples'] + method_params['boundary_param_bounds']
-    params_upper_bnd = [bnd[0] for bnd in param_bounds]
-    params_lower_bnd = [bdn[1] for bnd in param_bounds]
-    
-    meta_dat = pd.DataFrame(np.zeros(n_experiments * (n_params * (n_perturbation_levels + 1) * n_datasets_by_experiment), 3), 
-                            columns = ['n_exp', 'param', 'perturbation_level'])
-    
-    param_grid = np.zeros((n_experiments * (n_params * (n_perturbation_levels + 1) * n_datasets_by_experiment), n_params))
-    
-    cnt = 0
-    for i in range(n_experiments):
-        param_grid_tmp = np.random.uniform(low = param_lower_bnd, 
-                                           high = param_upper_bnd, 
-                                           size = (1, n_params))
-        param_grid[cnt, :] = param_grid_tmp
-        cnt += 1
-        for p in range(n_params):
-            for l in range(n_perturbation_levels):
-                param_grid_perturbed = param_grid_tmp
-                if param_grid_tmp[p] > ((params_upper_bnd[p] - params_lower_bnd[p]) / 2):
-                    param_grid_perturbed[p] += perturbation_sizes[p][l]
-                else:
-                    param_grid_perturbed[p] -= perturbation_sizes[p][l]
-
-                cnt += 1
-    return param_grid
-
-
 # REFORMULATE param bounds
-def generate_param_grid():
-    param_upper_bnd = []
-    param_lower_bnd = []
-    boundary_param_upper_bnd = [] 
-    boundary_param_lower_bnd = []
-
-    for p in range(len(method_params['param_names'])):
-        param_upper_bnd.append(method_params['param_bounds_sampler'][p][1])
-        param_lower_bnd.append(method_params['param_bounds_sampler'][p][0])
-
-    if len(method_params['boundary_param_names']) > 0:
-        for p in range(len(method_params['boundary_param_names'])):
-            boundary_param_upper_bnd.append(method_params['boundary_param_bounds'][p][1])
-            boundary_param_lower_bnd.append(method_params['boundary_param_bounds'][p][0])                                    
-
-    param_grid = np.random.uniform(low = param_lower_bnd, 
-                                   high = param_upper_bnd, 
-                                   size = (n_sims, len(method_params['param_names'])))
-
-    if len(method_params['boundary_param_names']) > 0:
-        boundary_param_grid = np.random.uniform(low = boundary_param_lower_bnd,
-                                                high = boundary_param_upper_bnd,
-                                                size = (n_sims, len(method_params['boundary_param_bounds'])))
-    else:
-        boundary_param_grid = []
+data = pickle.load(open(method_comparison_folder + file_, 'rb'))
         
-    return (param_grid, boundary_param_grid)
-
-# REFORMULATE param bounds
-def generate_param_grid_lba2():
-    param_upper_bnd = []
-    param_lower_bnd = []
-    boundary_param_upper_bnd = [] 
-    boundary_param_lower_bnd = []
-
-    for p in range(len(method_params['param_names'])):
-        param_upper_bnd.append(method_params['param_bounds_sampler'][p][1])
-        param_lower_bnd.append(method_params['param_bounds_sampler'][p][0])
-
-    if len(method_params['boundary_param_names']) > 0:
-        for p in range(len(method_params['boundary_param_names'])):
-            boundary_param_upper_bnd.append(method_params['boundary_param_bounds'][p][1])
-            boundary_param_lower_bnd.append(method_params['boundary_param_bounds'][p][0])                                    
-
-    param_grid = np.random.uniform(low = param_lower_bnd, 
-                                   high = param_upper_bnd, 
-                                   size = (n_sims, len(method_params['param_names'])))
-    
-    # Adjust v_1 so that we are unlikely to get not observations for either choice
-    # Works only for two choices
-    param_grid[:, 1] = param_grid[:, 0] + (param_grid[:, 4] * np.random.uniform(low = - 2.0, high = 2.0, size = n_sims))
-
-    if len(method_params['boundary_param_names']) > 0:
-        boundary_param_grid = np.random.uniform(low = boundary_param_lower_bnd,
-                                                high = boundary_param_upper_bnd,
-                                                size = (n_sims, len(method_params['boundary_param_bounds'])))
-    else:
-        boundary_param_grid = []
-        
-    return param_grid
-                     
-def generate_data_grid(param_grid, boundary_param_grid):
-    data_grid = np.zeros((n_sims, n_data_samples, 2))
-    for i in range(n_sims):
-        param_dict_tmp = dict(zip(method_params["param_names"], param_grid[i]))
-        
-        if len(method_params['boundary_param_names']) > 0:
-            boundary_dict_tmp = dict(zip(method_params["boundary_param_names"], boundary_param_grid[i]))
-        else:
-            boundary_dict_tmp = {}
-            
-        rts, choices, _ = method_params["dgp"](**param_dict_tmp, 
-                                               boundary_fun = method_params["boundary"], 
-                                               n_samples = n_data_samples,
-                                               delta_t = 0.01, 
-                                               boundary_params = boundary_dict_tmp,
-                                               boundary_multiplicative = method_params['boundary_multiplicative'])
-        
-        data_grid[i] = np.concatenate([rts, choices], axis = 1)
-    return data_grid
-
-def generate_data_grid_lba2(param_grid):
-    data_grid = np.zeros((n_sims, n_data_samples, 2))
-    param_names_tmp = ['v', 'A', 'b', 's', 'ndt']
-    for i in range(n_sims):
-        params_tmp = []
-        params_tmp.append(np.array(param_grid[i][:2]))
-        params_tmp.append(np.array(param_grid[i][2]))
-        params_tmp.append(np.array(param_grid[i][3]))
-        params_tmp.append(np.array(param_grid[i][4])) 
-        params_tmp.append(np.array(param_grid[i][5]))
-        params_dict_tmp = dict(zip(param_names_tmp, params_tmp))
-        print('params_dict: ', params_dict_tmp)
-        # Generate data
-        rts, choices, _ = method_params["dgp"](**params_dict_tmp,
-                                               n_samples = n_data_samples)
-        data_grid[i] = np.concatenate([rts, choices], axis = 1)
-    return data_grid
-
-
-if param_origin != 'previous':
-    if method[:3] == 'lba':
-        param_grid = generate_param_grid_lba2()
-        data_grid = generate_data_grid_lba2(param_grid) 
-    else:   
-        param_grid, boundary_param_grid = generate_param_grid() 
-        data_grid = generate_data_grid(param_grid, boundary_param_grid)
-        if len(method_params['boundary_param_names']) > 0:
-            param_grid = np.concatenate([param_grid, boundary_param_grid], axis = 1)
-            
-else:
-    # Get list of files
-    param_file_signature_len = len(param_file_signature)
-    files = os.listdir(method_comparison_folder)
-
-    # Get data in desired format
-    dats = []
-    signature_cnt = 0
-    for file_ in files:
-        if file_[:param_file_signature_len] == param_file_signature:
-            if signature_cnt == (int(file_id) - 1):
-                dats.append(pickle.load(open(method_comparison_folder + file_ , 'rb')))
-            signature_cnt += 1
-    
-    param_grid = dats[0][0]
-    data_grid = dats[0][1]
-    
-#     dat_tmp_0 = []
-#     dat_tmp_1 = []
-#     for dat in dats:
-#         dat_tmp_0.append(dat[0])
-#         dat_tmp_1.append(dat[1])
-
-#    dat_total = [np.concatenate(dat_tmp_0, axis = 0), np.concatenate(dat_tmp_1, axis = 0)]  
-#    data_grid = dat_total[1]
-#    param_grid = dat_total[0]
+param_grid = data[0]
+data_grid = data[1]
 
 print('param_grid: ', param_grid)
 print('shape of data_grid:', data_grid.shape)

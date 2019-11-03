@@ -189,3 +189,57 @@ if type_of_experiment == 'perturbation_experiment':
 if type_of_experiment == 'uniform':
     pickle.dump((param_grid, data_grid), open(output_folder + 'base_data_param_recov_unif_reps_' + str(int(n_reps)) \
                                                         + '_n_' + str(int(n_data_samples)) + '_' + file_id +  '.pickle', 'wb'))
+    
+    
+    
+# WORK IN -------
+# def generate_param_grid_lba2():
+#     param_upper_bnd = []
+#     param_lower_bnd = []
+#     boundary_param_upper_bnd = [] 
+#     boundary_param_lower_bnd = []
+
+#     for p in range(len(method_params['param_names'])):
+#         param_upper_bnd.append(method_params['param_bounds_sampler'][p][1])
+#         param_lower_bnd.append(method_params['param_bounds_sampler'][p][0])
+
+#     if len(method_params['boundary_param_names']) > 0:
+#         for p in range(len(method_params['boundary_param_names'])):
+#             boundary_param_upper_bnd.append(method_params['boundary_param_bounds'][p][1])
+#             boundary_param_lower_bnd.append(method_params['boundary_param_bounds'][p][0])                                    
+
+#     param_grid = np.random.uniform(low = param_lower_bnd, 
+#                                    high = param_upper_bnd, 
+#                                    size = (n_sims, len(method_params['param_names'])))
+    
+#     # Adjust v_1 so that we are unlikely to get not observations for either choice
+#     # Works only for two choices
+#     param_grid[:, 1] = param_grid[:, 0] + (param_grid[:, 4] * np.random.uniform(low = - 2.0, high = 2.0, size = n_sims))
+
+#     if len(method_params['boundary_param_names']) > 0:
+#         boundary_param_grid = np.random.uniform(low = boundary_param_lower_bnd,
+#                                                 high = boundary_param_upper_bnd,
+#                                                 size = (n_sims, len(method_params['boundary_param_bounds'])))
+#     else:
+#         boundary_param_grid = []
+        
+#     return param_grid
+                     
+# def generate_data_grid_lba2(param_grid):
+#     data_grid = np.zeros((n_sims, n_data_samples, 2))
+#     param_names_tmp = ['v', 'A', 'b', 's', 'ndt']
+#     for i in range(n_sims):
+#         params_tmp = []
+#         params_tmp.append(np.array(param_grid[i][:2]))
+#         params_tmp.append(np.array(param_grid[i][2]))
+#         params_tmp.append(np.array(param_grid[i][3]))
+#         params_tmp.append(np.array(param_grid[i][4])) 
+#         params_tmp.append(np.array(param_grid[i][5]))
+#         params_dict_tmp = dict(zip(param_names_tmp, params_tmp))
+#         print('params_dict: ', params_dict_tmp)
+#         # Generate data
+#         rts, choices, _ = method_params["dgp"](**params_dict_tmp,
+#                                                n_samples = n_data_samples)
+#         data_grid[i] = np.concatenate([rts, choices], axis = 1)
+#     return data_grid
+
