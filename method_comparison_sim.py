@@ -41,10 +41,10 @@ if data_type == 'uniform':
     file_ = 'base_data_param_recov_unif_reps_1_n_' + n_data_samples + '_' + file_id + '.pickle'
     out_file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + n_data_samples + '_' + file_id
 
-if machine == 'x7':
-    method_comparison_folder = "/media/data_cifs/afengler/data/kde/ddm/method_comparison/"
-if machine == 'ccv':
-    method_comparison_folder = '/users/afengler/data/kde/ddm/method_comparison/'
+# if machine == 'x7':
+#     method_comparison_folder = "/media/data_cifs/afengler/data/kde/ddm/method_comparison/"
+# if machine == 'ccv':
+#     method_comparison_folder = '/users/afengler/data/kde/ddm/method_comparison/'
 
 if machine == 'x7':
     stats = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
@@ -107,7 +107,7 @@ def lba_target(params, data):
 
 # MAKE PARAMETER / DATA GRID -------------------------------------------------------------------------
 # REFORMULATE param bounds
-data = pickle.load(open(method_comparison_folder + file_, 'rb'))
+data = pickle.load(open(output_folder + file_, 'rb'))
         
 param_grid = data[0]
 data_grid = data[1]
