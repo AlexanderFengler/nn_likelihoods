@@ -29,8 +29,7 @@ def bin_simulator_output(out = [0, 0],
                          params = ['v', 'a', 'w', 'ndt']
                         ): # ['v', 'a', 'w', 'ndt', 'angle']
 
-    # hardcode 'max_t' to 20sec for now
-    #n_bins = int(20.0 / bin_dt)
+    # Generate bins
     if n_bins == 0:
         n_bins = int(out[2]['max_t'] / bin_dt)
         bins = np.linspace(0, out[2]['max_t'], n_bins + 1)
@@ -38,55 +37,58 @@ def bin_simulator_output(out = [0, 0],
         bins = np.linspace(0, out[2]['max_t'], n_bins + 1)
     
     counts = []
-    counts.append(np.histogram(out[0][out[1] == 1], bins = bins)[0] / out[2]['n_samples'])
-    counts.append(np.histogram(out[0][out[1] == -1], bins = bins)[0] / out[2]['n_samples'])
-
+    cnt = 0
+    counts = np.zeros((n_bins, len(out[2]['possible_choices']))
+    counts_size = counts.shape[0] * counts.shape[1]
+    
+    for choice in out[2]['possible_choices']:
+        counts[:, cnt] = np.histogram(out[0][out[1] == choice], bins = bins)[0] / out[2]['n_samples']
+        cnt += 1
+    
+    # Apply correction for empty bins
     n_small = 0
     n_big = 0
-
-    for i in range(len(counts)):
-        n_small += sum(counts[i] < eps_correction)
-        n_big += sum(counts[i] >= eps_correction)
-
-    for i in range(len(counts)):
-        counts[i][counts[i] <= eps_correction] = eps_correction
-        counts[i][counts[i] > eps_correction] = counts[i][counts[i] > eps_correction] - (eps_correction * (n_small / n_big))    
-
-    for i in range(len(counts)):
-        counts[i] =  np.asmatrix(counts[i]).T
-
-    labels = np.concatenate(counts, axis = 1)
+    n_small = sum(counts < eps_correction)
+    n_big = counts_size - n_small 
     
-    features = [out[2][param] for param in params]
-    #features = [out[2]['v'], out[2]['a'], out[2]['w'], out[2]['ndt']] #out[2]['theta']]
-    return (features, labels, {'max_t': out[2]['max_t'], 
-                               'bin_dt': bin_dt, 
-                               'n_samples': out[2]['n_samples']})
+    counts[counts <= eps_corrections] = eps_correction
+    counts[counts > eps_corrections] = counts[counts > eps_correction] - (eps_correction * (n_small / n_big))
+
+    return ([out[2][param] for param in params], # features
+            counts, # labels
+            {'max_t': out[2]['max_t'], 
+             'bin_dt': bin_dt, 
+             'n_samples': out[2]['n_samples']} # meta data
+           )
 
 def data_generator_ddm(*args):
-    # CHOOSE SIMULATOR HERE
-    #simulator_data = ds.ddm_flexbound(*args)
-    #simulator_data = ds.ornstein_uhlenbeck(*args)
-    
     simulator_data = dgp(*args)
-    
-    #print(args)
     return simulator_data
-    
+
+# DEFINE FUNCTIONS THAAT NEED INITIALIZATION DEPENDEND ON CONTEXT ----------------------------------------
+def data_generator_ddm_binned(*args):
+    simulator_data = dgp(*args)
+    features, labels, meta = bin_simulator_output(out = simulator_data,
+                                                  bin_dt = bin_dt, 
+                                                  n_bins = n_bins,
+                                                  eps_correction = 1e-7,
+                                                  params = param_names_full) 
+    return (features, labels, meta) 
+# --------------------------------------------------------------------------------------------------------
+
+
 if __name__ == "__main__":
     
     # INITIALIZATIONS ----------------------------------------------------------------------------------------
     # Get cpu cnt
     n_cpus = psutil.cpu_count(logical = False)
-    machine = 'ccv'
+    machine = 'x7'
     
     # Choose simulator and datatype
-    #method = 'weibull_cdf_ndt'
     method = 'full_ddm'
     analytic = False
-    
-    #binned = False
-    binned = False
+    binned = True
+    n_choices = 2
     
     # out file name components
     file_id = sys.argv[1]
@@ -124,7 +126,7 @@ if __name__ == "__main__":
     #max_t = 10
     n_samples = 20000 # Choose
     #n_samples = 100000 # Choose
-    n_simulators = 10000 # Choose
+    n_simulators = 100 # Choose
     print_info = False # Choose
     bound = method_params['boundary']
     boundary_multiplicative = method_params['boundary_multiplicative']
@@ -150,13 +152,30 @@ if __name__ == "__main__":
     process_param_upper_bnd = []
     process_param_lower_bnd = []
     
+    if n_choices > 2 or method == 'lba':
+        process_param_depends_n = method_params['param_depends_on_n_choice']
+    
     for i in range(len(process_param_names)):
         process_param_upper_bnd.append(method_params['param_bounds_network'][i][0]) 
         process_param_lower_bnd.append(method_params['param_bounds_network'][i][1])
+    
+    # Process params:
+    if n_choices <= 2 and method != 'lba':
+        param_samples = tuple(map(tuple, np.random.uniform(low = process_param_lower_bnd,
+                                                           high = process_param_upper_bnd,
+                                                           size = (n_simulators, len(process_param_names)))))
         
-    param_samples = tuple(map(tuple, np.random.uniform(low = process_param_lower_bnd,
-                                                       high = process_param_upper_bnd,
-                                                       size = (n_simulators, len(process_param_names)))))
+    else:
+        param_samples_tmp = tuple()
+        for i in range(process_param_names):
+            if process_param_depends_n[i]:
+                params_samples_tmp += (np.random.uniform(low = process_param_lower_bnd[i],
+                                                         high = process_param_upper_bnd[i],
+                                                         size = (n_choices)), )
+            else:
+                param_samples_tmp += (np.random.uniform(low = process_param_lower_bnd[i],
+                                      high = process_param_upper_bnd[i]), )
+                
 
     if len(boundary_param_names) > 0:
         boundary_param_lower_bnd = []
@@ -190,17 +209,6 @@ if __name__ == "__main__":
         args_list.append(args_tmp)
     # --------------------------------------------------------------------------------------------------------
           
-    # DEFINE FUNCTIONS THAAT NEED INITIALIZATION DEPENDEND ON CONTEXT ----------------------------------------
-    def data_generator_ddm_binned(*args):
-        simulator_data = dgp(*args)
-        features, labels, meta = bin_simulator_output(out = simulator_data,
-                                                      bin_dt = bin_dt, 
-                                                      n_bins = n_bins,
-                                                      eps_correction = 1e-7,
-                                                      params = param_names_full) 
-        return (features, labels, meta) 
-    # --------------------------------------------------------------------------------------------------------
-    
     # RUN SIMULATIONS AND STORE DATA -------------------------------------------------------------------------
     
     # BINNED VERSION
@@ -231,118 +239,23 @@ if __name__ == "__main__":
             pickle.dump(res, open(out_folder + file_signature + file_id + '.pickle', 'wb'))
     # --------------------------------------------------------------------------------------------------------
     print('finished')
-
-
-# UNUSED ---------------------------------------------------------------
-
-# OLD SIMULATOR
-# def data_generator_ddm(*args):  # CAN I MAKE CONTEXT DEPENDENT???
-#     # CHOOSE SIMULATOR HERE
-#     simulator_data = ds.ddm_flexbound(*args)
-    
-#     # CHOOSE TARGET DIRECTORY HERE
-#     #file_dir = '/users/afengler/data/kde/weibull_cdf/base_simulations_ndt_20000/'
-    
-#     # USE FOR x7 MACHINE 
-#     #file_dir = '/media/data_cifs/afengler/tmp/'
-
-#     # STORE
-#     #file_name = file_dir + simulator + '_' + uuid.uuid1().hex
-#     #pickle.dump(simulator_data, open( file_name + '.pickle', "wb" ) )
-#     print(args)
-#     return simulator_data
-
-#process_params = (v_sample[i], a_sample[i], w_sample[i], ndt_sample[i], s)
-
-    # Parameter ranges (for the simulator)
-#     v = [-2, 2]
-#     w = [0.3, 0.7]
-#     a = [0.5, 2]
-#     g = [-1.0, 1.0]
-#     b = [-1.0, 1.0]
-
-    # DDM
-#     v = [-2.0, 2.0]
-#     a = [0.5, 2.0]
-#     w = [0.3, 0.7]
-#     ndt = [0, 1]
-    
-    # Bound - Angle
-#     theta = [0, np.pi/2 - 0.2]
-
-    # LCA
-#     v = [-2.0, 2.0]
-#     w = [0.3, 0.7]
-#     a = [0.5, 2.0]
-#     g = [-1.0, 0.4]
-#     b = [-1.0, 0.4]
     
     
-    # FULL DDM
-#     dw = [0.0, 0.1]
-#     sdv = [0.0, 0.5]
+# UNUSED -----
 
-    #     c1 = [0, 5]
-#     c2 = [1, 1.5]
-    # Linear Collapse
-#     node = [0, 2]
-#     theta = [0, np.pi/2 - 0.2]
-
-    # Weibull Bound
-#     node = [0, 5]
-#     shape = [1.1, 50]
-#     scale = [0.1, 10]
-
-
-# Make function input tuples
-    # DDM
-#     v_sample = np.random.uniform(low = v[0], high = v[1], size = n_simulators)
-#     w_sample = np.random.uniform(low = w[0], high = w[1], size = n_simulators)
-#     a_sample = np.random.uniform(low = a[0], high = a[1], size = n_simulators)
-#     ndt_sample = np.random.uniform(low = ndt[0], high = ndt[1], size = n_simulators)
-    
-    # BOUND - ANGLE
-#     theta_sample = np.random.uniform(low = theta[0], high = theta[1], size = n_simulators) 
-    
-    # BOUND - ANGLE
-    
-    
-    # Ornstein 
-#     g_sample = np.random.uniform(low = g[0], high = g[1], size = n_simulators)
-    
-    # LCA
-#     n_particles = 2
-#     v_sample = []
-#     w_sample = []
-    
-#     for i in range(n_simulators):
-#         v_tmp = np.random.uniform(low = v[0], high = v[1])
-#         w_tmp = np.random.uniform(low = w[0], high = w[1])
+    #for i in range(len(counts)):
+    #sum(counts[i] >= eps_correction)
         
-#         v_sample.append(np.array([v_tmp] * n_particles, dtype = np.float32))
-#         w_sample.append(np.array([w_tmp] * n_particles, dtype = np.float32))
-        
-#     a_sample = np.random.uniform(low = a[0], high = a[1], size = n_simulators)
-#     g_sample = np.random.uniform(low = g[0], high = g[1], size = n_simulators)
-#     b_sample = np.random.uniform(low = b[0], high = b[1], size = n_simulators)
-#     s = np.array([1] * n_particles)
+       
+#     for i in range(len(counts)):
+#         counts[i][counts[i] <= eps_correction] = eps_correction
+#         counts[i][counts[i] > eps_correction] = counts[i][counts[i] > eps_correction] - (eps_correction * (n_small / n_big))    
 
-    # Full DDM
-#     dw_sample = np.random.uniform(low = dw[0], high = dw[1], size = n_simulators)
-#     sdv_sample = np.random.uniform(low = sdv[0], high = sdv[1], size = n_simulators)
+#     for i in range(len(counts)):
+#         counts[i] =  np.asmatrix(counts[i]).T
+
+#     labels = np.concatenate(counts, axis = 1)
     
-    # Exp c1_c2
-#     c1_sample = np.random.uniform(low = c1[0], high = c1[1], size = n_simulators)
-#     c2_sample = np.random.uniform(low = c2[0], high = c2[1], size = n_simulators)
-
-    # Linear Collapse
-#     node_sample = np.random.uniform(low = node[0], high = node[1], size = n_simulators)
-#     theta_sample = np.random.uniform(low = theta[0], high = theta[1], size = n_simulators)
-
-    # Weibull
-#     node_sample = np.random.uniform(low = node[0], high = node[1], size = n_simulators)
-#     shape_sample = np.random.uniform(low = shape[0], high = shape[1], size = n_simulators)
-#     scale_sample = np.random.uniform(low = scale[0], high = scale[1], size = n_simulators)
-
-    # Defining main function to iterate over:
-    # Folder in which we would like to dump files
+    #features = 
+    #labels = counts.T
+    
