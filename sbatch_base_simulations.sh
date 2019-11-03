@@ -19,4 +19,4 @@
 #SBATCH --array=1-100
 
 # Run a command
-python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv race_model 3 100000 1 $SLURM_ARRAY_TASK_ID
+python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv race_model 4 100000 1 $SLURM_ARRAY_TASK_ID
