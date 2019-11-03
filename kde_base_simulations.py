@@ -190,9 +190,22 @@ if __name__ == "__main__":
                                           high = process_param_upper_bnd[i])), )
             param_samples += (param_samples_tmp, )
             print(param_samples_tmp)
-            
             if n % 100 == 0:
                 print(n, ' parameter sets sampled')
+            
+        # Update process param names to account for n_choices
+        process_param_tmp = []
+        for i in range(len(process_param_names)):
+            param_cnt = 0
+            if process_param_depends_n[i]:
+                for j in range(n_choices):
+                    process_param_tmp.append(process_param_names[i] + '_' + str(j))
+            else:
+                process_param_tmp.append(process_param_names[i])
+        param_names_full = process_param_tmp + boundary_param_names
+        print('param_names_full ', param_names_full)
+            
+
 
                 
                 
