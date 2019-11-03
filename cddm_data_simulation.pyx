@@ -442,7 +442,8 @@ def test_check():
 def race_model(v = np.array([0, 0, 0], dtype = DTYPE), # np.array expected, one column of floats
                float a = 1, # initial boundary separation
                w = np.array([0, 0, 0], dtype = DTYPE), # np.array expected, one column of floats
-               ndt = np.array([0.0, 0.0, 0.0], dtype = DTYPE),
+               ndt = 1, # for now we we don't allow ndt by choice
+               #ndt = np.array([0.0, 0.0, 0.0], dtype = DTYPE),
                s = np.array([1, 1, 1], dtype = DTYPE), # np.array expected, one column of floats
                float delta_t = 0.001, # time increment step
                float max_t = 20, # maximum rt allowed
@@ -512,21 +513,23 @@ def race_model(v = np.array([0, 0, 0], dtype = DTYPE), # np.array expected, one 
             ix += 1
 
         choices_view[n, 0] = np.argmax(particles)
-        rts_view[n, 0] = t + ndt[choices_view[n, 0]]
+        #rts_view[n, 0] = t + ndt[choices_view[n, 0]]
+        rts_view[n , 0] = t + ndt # for now no ndt per choice option
 
     # Create some dics
     v_dict = {}
     w_dict = {}
-    ndt_dict = {}
+    #ndt_dict = {}
     for i in range(n_particles):
         v_dict['v_' + str(i)] = v[i]
         w_dict['w_' + str(i)] = w[i]
-        ndt_dict['ndt_' + str(i)] = ndt[i]
+        #ndt_dict['ndt_' + str(i)] = ndt[i] # for now no ndt by choice
 
     return (rts, choices, {**v_dict,
                            'a': a, 
                            **w_dict,
-                           **ndt_dict,
+                           'ndt': ndt,
+                           # **ndt_dict, # for now no ndt by choice
                            's': s,
                            **boundary_params,
                            'delta_t': delta_t,

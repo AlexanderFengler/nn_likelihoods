@@ -38,7 +38,7 @@ def bin_simulator_output(out = [0, 0],
     
     counts = []
     cnt = 0
-    counts = np.zeros((n_bins, len(out[2]['possible_choices']))
+    counts = np.zeros( (n_bins, len(out[2]['possible_choices']) ) )
     counts_size = counts.shape[0] * counts.shape[1]
     
     for choice in out[2]['possible_choices']:
@@ -48,11 +48,13 @@ def bin_simulator_output(out = [0, 0],
     # Apply correction for empty bins
     n_small = 0
     n_big = 0
-    n_small = sum(counts < eps_correction)
+    n_small = np.sum(counts < eps_correction)
     n_big = counts_size - n_small 
     
-    counts[counts <= eps_corrections] = eps_correction
-    counts[counts > eps_corrections] = counts[counts > eps_correction] - (eps_correction * (n_small / n_big))
+    counts[counts <= eps_correction] = eps_correction
+    #print(counts[counts > eps_correction].shape)
+    counts[counts > eps_correction] -= (eps_correction * (n_small / n_big))
+    #counts[counts > eps_correction] = counts[counts > eps_correction] - (eps_correction * (n_small / n_big))
 
     return ([out[2][param] for param in params], # features
             counts, # labels
@@ -85,10 +87,10 @@ if __name__ == "__main__":
     machine = 'x7'
     
     # Choose simulator and datatype
-    method = 'full_ddm'
+    method = 'race_model'
     analytic = False
     binned = True
-    n_choices = 2
+    n_choices = 3
     
     # out file name components
     file_id = sys.argv[1]
@@ -120,7 +122,11 @@ if __name__ == "__main__":
         dgp = method_params['dgp']
 
     # Simulator parameters
-    s = 1 # Choose
+    if n_choices <= 2 and method != 'lba':
+        s = 1 # Choose
+    else:
+        s = np.array([1 for i in range(n_choices)], dtype = np.float32)
+        
     delta_t = 0.01 # Choose
     max_t = 20  # Choose
     #max_t = 10
@@ -165,16 +171,27 @@ if __name__ == "__main__":
                                                            high = process_param_upper_bnd,
                                                            size = (n_simulators, len(process_param_names)))))
         
+        print('passing')
+        
     else:
-        param_samples_tmp = tuple()
-        for i in range(process_param_names):
-            if process_param_depends_n[i]:
-                params_samples_tmp += (np.random.uniform(low = process_param_lower_bnd[i],
-                                                         high = process_param_upper_bnd[i],
-                                                         size = (n_choices)), )
-            else:
-                param_samples_tmp += (np.random.uniform(low = process_param_lower_bnd[i],
-                                      high = process_param_upper_bnd[i]), )
+        param_samples = tuple()
+        for n in range(n_simulators):
+            param_samples_tmp = tuple()
+            for i in range(len(process_param_names)):
+                if process_param_depends_n[i]:
+                    param_samples_tmp += (np.float32(np.random.uniform(low = process_param_lower_bnd[i],
+                                                                       high = process_param_upper_bnd[i],
+                                                                       size = (n_choices))), )
+                else:
+                    param_samples_tmp += (np.float32(np.random.uniform(low = process_param_lower_bnd[i],
+                                          high = process_param_upper_bnd[i])), )
+            param_samples += (param_samples_tmp, )
+            print(param_samples_tmp)
+            
+            if n % 100 == 0:
+                print(n, ' parameter sets sampled')
+
+                
                 
 
     if len(boundary_param_names) > 0:

@@ -139,7 +139,7 @@ temp = {
     "boundary": bf.constant, 
     "boundary_multiplicative": True,
     "data_folder": "/users/afengler/data/kde/race_model/train_test_data/",
-    "data_folder_x7":'/media/data_cifs/afengler/data/kde/race_model/train_test_data/",
+    "data_folder_x7": "/media/data_cifs/afengler/data/kde/race_model/train_test_data/",
     "output_folder": "/users/afengler/data/kde/race_model/method_comparison/",
     "output_folder_x7":"/media/data_cifs/afengler/data_kde/race_model/train_test_data/",
     "param_names": ["v", "a", "w", "ndt"],
@@ -149,7 +149,7 @@ temp = {
     "param_bounds_sampler": [[0.1, 1.9], [1.1, 2.9], [0.21, 0.79], [0.1, 0.9]],
     "boundary_param_bounds_network": [],
     "boundary_param_bounds_sampler": []
-    }
+    },
 "ddm_fcn":{
     "dgp": cd.ddm_flexbound,
     "boundary": bf.constant,
