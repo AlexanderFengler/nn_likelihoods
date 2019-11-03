@@ -90,7 +90,7 @@ if __name__ == "__main__":
     method = 'race_model'
     analytic = False
     binned = True
-    n_choices = 4
+    n_choices = 6
     
     # out file name components
     file_id = sys.argv[1]
