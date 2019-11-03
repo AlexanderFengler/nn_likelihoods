@@ -23,8 +23,8 @@ machine = sys.argv[1] # 'ccv', 'x7'
 method = sys.argv[2]
 analytic = ('analytic' in method)
 data_type = sys.argv[3]
-n_data_samples = sys.argv[4]
-n_slice_samples = sys.argv[5]
+n_data_samples = int(sys.argv[4])
+n_slice_samples = int(sys.argv[5])
 file_id = sys.argv[6]
 n_cpus = 'all'
 
@@ -35,11 +35,11 @@ print('argument list: ', str(sys.argv))
 #out_file_signature 
 
 if data_type == 'perturbation_experiment':
-    file_ = 'base_data_perturbation_experiment_nexp_1_n_' + n_data_samples + '_' + file_id + '.pickle'
-    out_file_signature = 'post_samp_perturbation_experiment_nexp_1_n_' + n_data_samples + '_' + file_id
+    file_ = 'base_data_perturbation_experiment_nexp_1_n_' + str(n_data_samples) + '_' + file_id + '.pickle'
+    out_file_signature = 'post_samp_perturbation_experiment_nexp_1_n_' + str(n_data_samples) + '_' + file_id
 if data_type == 'uniform':
-    file_ = 'base_data_param_recov_unif_reps_1_n_' + n_data_samples + '_' + file_id + '.pickle'
-    out_file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + n_data_samples + '_' + file_id
+    file_ = 'base_data_param_recov_unif_reps_1_n_' + str(n_data_samples) + '_' + file_id + '.pickle'
+    out_file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + str(n_data_samples) + '_' + file_id
 
 # if machine == 'x7':
 #     method_comparison_folder = "/media/data_cifs/afengler/data/kde/ddm/method_comparison/"
