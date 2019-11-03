@@ -53,8 +53,8 @@ if machine == 'ccv':
 
 # -----------------------------------------------------------------------------
 # v, a, w, ndt. angle
-def param_grid_perturbation_experiment(n_experiments = n_experiments,
-                                       n_datasets_by_experiment = n_datasets_by_experiment,
+def param_grid_perturbation_experiment(n_experiments = 0, # n_experiments,
+                                       n_datasets_by_experiment =  1, # n_datasets_by_experiment,
                                        perturbation_sizes = [[0.05, 0.1, 0.2],
                                                              [0.05, 0.1, 0.2],
                                                              [0.05, 0.1, 0.2],
