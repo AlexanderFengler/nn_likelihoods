@@ -128,9 +128,12 @@ if __name__ == "__main__":
         s = np.array([1 for i in range(n_choices)], dtype = np.float32)
         
     delta_t = 0.01 # Choose
-    max_t = 20  # Choose
-    #max_t = 10
-    n_samples = 20000 # Choose
+    if binned:
+        max_t = 10
+    else:
+        max_t = 20
+        
+    n_samples = 5000 # Choose
     #n_samples = 100000 # Choose
     n_simulators = 100 # Choose
     print_info = False # Choose
