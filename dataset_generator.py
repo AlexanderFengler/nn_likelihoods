@@ -28,9 +28,10 @@ if type_of_experiment == 'uniform':
 
 if type_of_experiment == 'perturbation_experiment':
     n_experiments = int(sys.argv[4])
-    n_data_samples = int(sys.argv[5])
+    n_datasets_by_experiment = int(sys.argv[5])
     
-file_id = sys.argv[6]
+n_data_samples = int(sys.argv[6])    
+file_id = sys.argv[7]
 
 n_datasets_by_experiment = 1
 
