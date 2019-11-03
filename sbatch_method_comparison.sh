@@ -17,9 +17,9 @@
 #SBATCH -c 12
 #SBATCH -N 1
 ##SBATCH -p gpu --gres=gpu:1
-#SBATCH --array=1-10
+#SBATCH --array=1-100
 
 # Run a command
 #source /users/afengler/miniconda3/etc/profile.d/conda.sh
 #conda activate tony
-python -u /users/afengler/git_repos/nn_likelihoods/method_comparison_sim.py ccv weibull_cdf_ndt uniform 2500 100 $SLURM_ARRAY_TASK_ID
+python -u /users/afengler/git_repos/nn_likelihoods/method_comparison_sim.py ccv weibull_cdf_ndt uniform 2500 10000 $SLURM_ARRAY_TASK_ID
