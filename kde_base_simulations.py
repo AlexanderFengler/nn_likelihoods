@@ -86,23 +86,17 @@ if __name__ == "__main__":
     # Get cpu cnt
     n_cpus = psutil.cpu_count(logical = False)
 
-    
     # Choose simulator and datatype
     machine = sys.argv[1]
     method = sys.argv[2]
     n_choices = int(sys.argv[3])
     binned = bool(sys.argv[4])
-    file_id = sys.argv[5]
+    n_samples = int(sys.argv[5])
+    file_id = sys.argv[6]
     analytic = ('analytic' in method)
-    
-    #method = 'race_model'
-    #n_choices = 6
-    analytic = False
-    #binned = True
-
-    
+    n_simulators = 10000 # Choose
+        
     # out file name components
-    #file_id = sys.argv[1]
     file_signature =  method + '_base_simulations_'
     
     # Load meta data from kde_info.pickle file
@@ -141,10 +135,7 @@ if __name__ == "__main__":
         max_t = 10
     else:
         max_t = 20
-        
-    n_samples = 5000 # Choose
-    #n_samples = 100000 # Choose
-    n_simulators = 100 # Choose
+
     print_info = False # Choose
     bound = method_params['boundary']
     boundary_multiplicative = method_params['boundary_multiplicative']
@@ -152,8 +143,7 @@ if __name__ == "__main__":
     # Extra params
     bin_dt = 0.04
     n_bins = 256
-    
-    
+      
     if method != 'lba' and method != 'race_model':
         if binned:
             out_folder = method_folder + 'base_simulations_' + str(n_samples) + '_binned/'
@@ -190,7 +180,7 @@ if __name__ == "__main__":
                                                            high = process_param_upper_bnd,
                                                            size = (n_simulators, len(process_param_names)))))
         
-        print('passing')
+        #print('passing')
         
     else:
         param_samples = tuple()
@@ -205,9 +195,9 @@ if __name__ == "__main__":
                     param_samples_tmp += (np.float32(np.random.uniform(low = process_param_lower_bnd[i],
                                           high = process_param_upper_bnd[i])), )
             param_samples += (param_samples_tmp, )
-            print(param_samples_tmp)
+            #print(param_samples_tmp)
             if n % 100 == 0:
-                print(n, ' parameter sets sampled')
+                #print(n, ' parameter sets sampled')
             
         # Update process param names to account for n_choices
         process_param_tmp = []
@@ -219,7 +209,7 @@ if __name__ == "__main__":
             else:
                 process_param_tmp.append(process_param_names[i])
         param_names_full = process_param_tmp + boundary_param_names
-        print('param_names_full ', param_names_full)
+        #print('param_names_full ', param_names_full)
             
 
 
