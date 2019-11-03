@@ -89,8 +89,8 @@ if __name__ == "__main__":
     machine = sys.argv[1]
     method = sys.argv[2]
     n_choices = int(sys.argv[3])
-    binned = bool(sys.argv[4])
-    n_samples = int(sys.argv[5])
+    n_samples = int(sys.argv[4])
+    binned = bool(sys.argv[5])
     file_id = sys.argv[6]
     analytic = ('analytic' in method)
     n_simulators = 10000 # Choose
