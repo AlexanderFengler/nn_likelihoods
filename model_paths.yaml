@@ -13,5 +13,7 @@ lba_analytic: /media/data_cifs/afengler/data/analytic/lba/keras_models/dnnregres
 lba_ndt: /users/afengler/data/kde/lba/keras_models/dnnregressor_lba_ndt_09_28_19_12_35_56/
 linear_collapse: /users/afengler/data/kde/linear_collapse/keras_models/dnnregressor_ddm_08_08_19_19_05_39/
 ornstein: /users/afengler/data/kde/ornstein_uhlenbeck/keras_models/dnnregressor_ornstein_08_15_19_16_36_05/
-weibull_cdf_ndt: /media/data_cifs/afengler/data/kde/weibull_cdf/keras_models/dnnregressor_weibull_cdf_ndt_10_31_19_15_23_19/
-weibull_cdf_ndt_12: /media/data_cifs/afengler/data/kde/weibull_cdf/keras_models/dnnregressor_weibull_cdf_ndt_10_31_19_16_34_43/
+weibull_cdf_ndt: /users/afengler/data/kde/weibull_cdf/keras_models/dnnregressor_weibull_cdf_ndt_10_31_19_16_34_43/
+# weibull_cdf_ndt_12: /media/data_cifs/afengler/data/kde/weibull_cdf/keras_models/dnnregressor_weibull_cdf_ndt_10_31_19_16_34_43/
+# weibull_cdf_ndt: /media/data_cifs/afengler/data/kde/weibull_cdf/keras_models/dnnregressor_weibull_cdf_ndt_10_31_19_15_23_19/
+# weibull_cdf_ndt uncommented is actually weibull_cdf_ndt_12
