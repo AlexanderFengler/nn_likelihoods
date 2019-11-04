@@ -20,3 +20,7 @@
 
 # Run a command
 python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv race_model 4 100000 1 $SLURM_ARRAY_TASK_ID
+
+python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv race_model 5 100000 1 $SLURM_ARRAY_TASK_ID
+
+python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv race_model 6 100000 1 $SLURM_ARRAY_TASK_ID
