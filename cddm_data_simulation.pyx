@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 from time import time
 import inspect
+import pickle
 
 DTYPE = np.float32
 
@@ -67,6 +68,8 @@ cdef float[:] draw_gaussian(int n):
 
 # Simulate (rt, choice) tuples from: SIMPLE DDM -----------------------------------------------
 # Simplest algorithm
+# delete random comment
+# delete random comment 2
 @cython.boundscheck(False)
 @cython.wraparound(False) 
 def ddm(float v = 0, # drift by timestep 'delta_t'
