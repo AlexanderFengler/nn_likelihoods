@@ -106,7 +106,7 @@ if __name__ == "__main__":
         eps_correction = float(sys.argv[8]) 
         
     # out file name components
-    file_signature =  method + '_base_simulations_'
+    file_signature =  method + '_param_recovery_data_'
     
     # Load meta data from kde_info.pickle file
     if machine == 'x7':
