@@ -140,14 +140,14 @@ if __name__ == "__main__":
     
     if method != 'lba' and method != 'race_model':
         if binned:
-            out_folder = method_folder + data_type + str(n_samples) + '_binned/'
+            out_folder = method_folder + data_type + '_' + str(n_samples) + '_binned/'
         else:
-            out_folder = method_folder + data_type + str(n_samples) + '/'
+            out_folder = method_folder + data_type + '_' + str(n_samples) + '/'
     else:
         if binned:
-            out_folder = method_folder + data_type + str(n_samples) + '_' + str(n_choices) + '_binned/'
+            out_folder = method_folder + data_type + '_' + str(n_samples) + '_' + str(n_choices) + '_binned/'
         else:
-            out_folder = method_folder + data_type + str(n_samples) + '_' + str(n_choices) + '/'
+            out_folder = method_folder + data_type + '_' + str(n_samples) + '_' + str(n_choices) + '/'
 
     if not os.path.exists(out_folder):
         os.makedirs(out_folder)
