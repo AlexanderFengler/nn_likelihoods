@@ -112,14 +112,15 @@ if __name__ == "__main__":
     # out file name components
     if machine == 'x7':
         stats = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
-        method_folder = stats['method_folder_x7']
+        method_params = stats[method]
+        method_folder = method_params['method_folder_x7']
 
     if machine == 'ccv':
         stats = pickle.load(open("/users/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
-        method_folder = stats['method_folder']
+        method_params = stats[method]
+        method_folder = method_params['method_folder']
     
     # Simulator parameters
-    method_params = stats[method]
     dgp = method_params["dgp"]
     
     if n_choices <= 2 and method != 'lba':
