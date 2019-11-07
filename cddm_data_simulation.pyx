@@ -381,7 +381,7 @@ def ornstein_uhlenbeck(float v = 0, # drift parameter
 
         # Random walker
         while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
-            y += ((v * delta_t) - (delta_t * g * y)) + sqrt_st * gaussian_values[m]
+            y += ((v - (g * y)) * delta_t) + sqrt_st * gaussian_values[m]
             t += delta_t
             ix += 1
             m += 1
@@ -389,7 +389,7 @@ def ornstein_uhlenbeck(float v = 0, # drift parameter
                 gaussian_values = draw_gaussian(num_draws)
                 m = 0
 
-        rts_view[n, 0] = t
+        rts_view[n, 0] = ndt + t
         choices_view[n, 0] = sign(y)
 
         # if print_info == True:

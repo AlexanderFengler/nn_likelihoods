@@ -6708,7 +6708,7 @@ static PyObject *__pyx_pf_20cddm_data_simulation_6ornstein_uhlenbeck(CYTHON_UNUS
  * 
  *         # Random walker
  *         while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:             # <<<<<<<<<<<<<<
- *             y += ((v * delta_t) - (delta_t * g * y)) + sqrt_st * gaussian_values[m]
+ *             y += ((v - (g * y)) * delta_t) + sqrt_st * gaussian_values[m]
  *             t += delta_t
  */
     while (1) {
@@ -6734,16 +6734,16 @@ static PyObject *__pyx_pf_20cddm_data_simulation_6ornstein_uhlenbeck(CYTHON_UNUS
       /* "cddm_data_simulation.pyx":384
  *         # Random walker
  *         while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
- *             y += ((v * delta_t) - (delta_t * g * y)) + sqrt_st * gaussian_values[m]             # <<<<<<<<<<<<<<
+ *             y += ((v - (g * y)) * delta_t) + sqrt_st * gaussian_values[m]             # <<<<<<<<<<<<<<
  *             t += delta_t
  *             ix += 1
  */
       __pyx_t_21 = __pyx_v_m;
-      __pyx_v_y = (__pyx_v_y + (((__pyx_v_v * __pyx_v_delta_t) - ((__pyx_v_delta_t * __pyx_v_g) * __pyx_v_y)) + (__pyx_v_sqrt_st * (*((float *) ( /* dim=0 */ (__pyx_v_gaussian_values.data + __pyx_t_21 * __pyx_v_gaussian_values.strides[0]) ))))));
+      __pyx_v_y = (__pyx_v_y + (((__pyx_v_v - (__pyx_v_g * __pyx_v_y)) * __pyx_v_delta_t) + (__pyx_v_sqrt_st * (*((float *) ( /* dim=0 */ (__pyx_v_gaussian_values.data + __pyx_t_21 * __pyx_v_gaussian_values.strides[0]) ))))));
 
       /* "cddm_data_simulation.pyx":385
  *         while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
- *             y += ((v * delta_t) - (delta_t * g * y)) + sqrt_st * gaussian_values[m]
+ *             y += ((v - (g * y)) * delta_t) + sqrt_st * gaussian_values[m]
  *             t += delta_t             # <<<<<<<<<<<<<<
  *             ix += 1
  *             m += 1
@@ -6751,7 +6751,7 @@ static PyObject *__pyx_pf_20cddm_data_simulation_6ornstein_uhlenbeck(CYTHON_UNUS
       __pyx_v_t = (__pyx_v_t + __pyx_v_delta_t);
 
       /* "cddm_data_simulation.pyx":386
- *             y += ((v * delta_t) - (delta_t * g * y)) + sqrt_st * gaussian_values[m]
+ *             y += ((v - (g * y)) * delta_t) + sqrt_st * gaussian_values[m]
  *             t += delta_t
  *             ix += 1             # <<<<<<<<<<<<<<
  *             m += 1
@@ -6796,7 +6796,7 @@ static PyObject *__pyx_pf_20cddm_data_simulation_6ornstein_uhlenbeck(CYTHON_UNUS
  *                 gaussian_values = draw_gaussian(num_draws)
  *                 m = 0             # <<<<<<<<<<<<<<
  * 
- *         rts_view[n, 0] = t
+ *         rts_view[n, 0] = ndt + t
  */
         __pyx_v_m = 0;
 
@@ -6813,17 +6813,17 @@ static PyObject *__pyx_pf_20cddm_data_simulation_6ornstein_uhlenbeck(CYTHON_UNUS
     /* "cddm_data_simulation.pyx":392
  *                 m = 0
  * 
- *         rts_view[n, 0] = t             # <<<<<<<<<<<<<<
+ *         rts_view[n, 0] = ndt + t             # <<<<<<<<<<<<<<
  *         choices_view[n, 0] = sign(y)
  * 
  */
     __pyx_t_22 = __pyx_v_n;
     __pyx_t_23 = 0;
-    *((float *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_rts_view.data + __pyx_t_22 * __pyx_v_rts_view.strides[0]) ) + __pyx_t_23 * __pyx_v_rts_view.strides[1]) )) = __pyx_v_t;
+    *((float *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_rts_view.data + __pyx_t_22 * __pyx_v_rts_view.strides[0]) ) + __pyx_t_23 * __pyx_v_rts_view.strides[1]) )) = (__pyx_v_ndt + __pyx_v_t);
 
     /* "cddm_data_simulation.pyx":393
  * 
- *         rts_view[n, 0] = t
+ *         rts_view[n, 0] = ndt + t
  *         choices_view[n, 0] = sign(y)             # <<<<<<<<<<<<<<
  * 
  *         # if print_info == True:

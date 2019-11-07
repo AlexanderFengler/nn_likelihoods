@@ -1,4 +1,6 @@
-# RUN FORMAT: python pyhtonfile method n_choices binned(bool) file_id 
+# RUN FORMAT: python python_file machine method n_choices n_samples binned(bool) file_id type_of_data n_simulators(optional) eps_correction (optional)
+
+# type_of_data --> 'parameter_recovery' , 'base_simulations'
 
 # Basic python utilities
 import numpy as np
@@ -92,47 +94,34 @@ if __name__ == "__main__":
     n_samples = int(sys.argv[4])
     binned = bool(sys.argv[5])
     file_id = sys.argv[6]
+    data_type = sys.argv[7]
     analytic = ('analytic' in method)
+    file_signature =  method + '_' + data_type + '_'
     
     n_simulators = 10000 
-    if len(sys.argv) > 7:
-        n_simulators = int(sys.argv[7])
+    if len(sys.argv) > 8:
+        n_simulators = int(sys.argv[8])
     
     # Extra params for binned version
     bin_dt = 0.04
     n_bins = 256
-    eps_correction = 1e-7
-    if binned and len(sys.argv) > 8:
-        eps_correction = float(sys.argv[8]) 
+    eps_correction = 0
+    if binned and (len(sys.argv) > 9):
+        eps_correction = float(sys.argv[9]) 
         
     # out file name components
-    file_signature =  method + '_param_recovery_data_'
-    
-    # Load meta data from kde_info.pickle file
-    if machine == 'x7':
-        #method_folder = '/media/data_cifs/afengler/data/kde/weibull_cdf/'
-        if analytic:
-            method_folder = '/media/data_cifs/afengler/data/analytic/' + method + '/'
-        else:
-            method_folder = '/media/data_cifs/afengler/data/kde/' + method + '/'
-
-    if machine == 'ccv':
-        #method_folder = '/users/afengler/data/kde/weibull_cdf/'
-        if analytic:
-            method_folder = '/users/afengler/data/analytic/' + method + '/'
-        else:
-            method_folder = '/users/afengler/data/kde/' + method + '/'
-               
     if machine == 'x7':
         stats = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
-        method_params = stats[method]
-        dgp = method_params["dgp"]
+        method_folder = stats['method_folder_x7']
+
     if machine == 'ccv':
         stats = pickle.load(open("/users/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))
-        method_params = stats[method]
-        dgp = method_params['dgp']
-
+        method_folder = stats['method_folder']
+    
     # Simulator parameters
+    method_params = stats[method]
+    dgp = method_params["dgp"]
+    
     if n_choices <= 2 and method != 'lba':
         s = 1 # Choose
     else:
@@ -150,14 +139,14 @@ if __name__ == "__main__":
     
     if method != 'lba' and method != 'race_model':
         if binned:
-            out_folder = method_folder + 'base_simulations_' + str(n_samples) + '_binned/'
+            out_folder = method_folder + data_type + str(n_samples) + '_binned/'
         else:
-            out_folder = method_folder + 'base_simulations_' + str(n_samples) + '/'
+            out_folder = method_folder + data_type + str(n_samples) + '/'
     else:
         if binned:
-            out_folder = method_folder + 'base_simulations_' + str(n_samples) + '_' + str(n_choices) + '_binned/'
+            out_folder = method_folder + data_type + str(n_samples) + '_' + str(n_choices) + '_binned/'
         else:
-            out_folder = method_folder + 'base_simulations_' + str(n_samples) + '_' + str(n_choices) + '/'
+            out_folder = method_folder + data_type + str(n_samples) + '_' + str(n_choices) + '/'
 
     if not os.path.exists(out_folder):
         os.makedirs(out_folder)
@@ -212,12 +201,7 @@ if __name__ == "__main__":
             else:
                 process_param_tmp.append(process_param_names[i])
         param_names_full = process_param_tmp + boundary_param_names
-        #print('param_names_full ', param_names_full)
-            
-
-
-                
-                
+        #print('param_names_full ', param_names_full)           
 
     if len(boundary_param_names) > 0:
         boundary_param_lower_bnd = []
@@ -270,8 +254,8 @@ if __name__ == "__main__":
         meta = res[0][2]
         
         # Storing files
-        pickle.dump((features, labels), open(out_folder + file_signature + file_id + '.pickle', 'wb'))
-        pickle.dump(meta, open(out_folder + 'meta_' + file_signature + '.pickle', 'wb'))
+        pickle.dump((features, labels), open(out_folder + file_signature + 'n_' + str(n_samples) + '_' + file_id + '.pickle', 'wb'))
+        pickle.dump(meta, open(out_folder + 'meta_' + file_signature + 'n_' + str(n_samples) + '.pickle', 'wb'))
     
     # STANDARD OUTPUT
     else:
