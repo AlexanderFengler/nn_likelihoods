@@ -3,13 +3,13 @@
 # Default resources are 1 core with 2.8GB of memory per core.
 
 # job name:
-#SBATCH -J full_ddm_sim
+#SBATCH -J ornstein_sim
 
 # priority
 #SBATCH --account=bibs-frankmj-condo
 
 # output file
-#SBATCH --output /users/afengler/batch_job_out/full_ddm_sim_%A_%a.out
+#SBATCH --output /users/afengler/batch_job_out/ornstein_sim_%A_%a.out
 
 # Request runtime, memory, cores:
 #SBATCH --time=24:00:00
@@ -46,7 +46,7 @@
 # #done
 # # -------------------------------------------
 
-python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv ornstein 2 100 1 $SLURM_ARRAY_TASK_ID base_simulations 10000 0
+python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv ornstein 2 100000 1 $SLURM_ARRAY_TASK_ID base_simulations 10000 0
 
 #python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv race_model 3 100000 1 $SLURM_ARRAY_TASK_ID 1000 0
 
