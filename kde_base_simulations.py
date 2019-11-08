@@ -123,7 +123,7 @@ if __name__ == "__main__":
     # Simulator parameters
     dgp = method_params["dgp"]
     
-    if n_choices <= 2 and method != 'lba':
+    if method != 'race_model':
         s = 1 # Choose
     else:
         s = np.array([1 for i in range(n_choices)], dtype = np.float32)
@@ -230,7 +230,7 @@ if __name__ == "__main__":
         process_params = param_samples[i]
         print(param_samples[i])
         sampler_params = (s, delta_t, max_t, n_samples, print_info, bound, boundary_multiplicative)
-                          
+        
         if len(boundary_param_names) > 0:
             boundary_params = (dict(zip(boundary_param_names, boundary_param_samples[i])) ,)
             #print('passed thorugh')
