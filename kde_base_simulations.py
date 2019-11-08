@@ -146,7 +146,7 @@ if __name__ == "__main__":
                 out_folder = method_folder + data_type + '_' + str(n_samples) + '/'
         if data_type == 'parameter_recovery':
             if binned:
-                out_folder = method_folder + data_type + 'binned/'
+                out_folder = method_folder + data_type + '_binned/'
             else:
                 out_folder = method_folder + data_type + '/'
     else:
