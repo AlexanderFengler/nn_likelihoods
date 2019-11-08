@@ -16,7 +16,7 @@
 #SBATCH --mem=24G
 #SBATCH -c 14
 #SBATCH -N 1
-#SBATCH --array=1-100
+#SBATCH --array=1-1
 
 # # Run a command
 # n_data_points=( 100 200 400 800 1600 3200 6400 12800 25600 )
