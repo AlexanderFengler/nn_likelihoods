@@ -269,26 +269,7 @@ if __name__ == "__main__":
         # Parallel Loop
         with Pool(processes = n_cpus) as pool:
             res = pool.starmap(data_generator_ddm, args_list)
-            pickle.dump(res, open(out_folder + file_signature + file_id + '.pickle', 'wb'))
+            pickle.dump(res, open(out_folder + file_signature + 'n_' + str(n_samples) + '_' + file_id + '.pickle', 'wb'))
     # --------------------------------------------------------------------------------------------------------
     print('finished')
-    
-    
-# UNUSED -----
-
-    #for i in range(len(counts)):
-    #sum(counts[i] >= eps_correction)
-        
        
-#     for i in range(len(counts)):
-#         counts[i][counts[i] <= eps_correction] = eps_correction
-#         counts[i][counts[i] > eps_correction] = counts[i][counts[i] > eps_correction] - (eps_correction * (n_small / n_big))    
-
-#     for i in range(len(counts)):
-#         counts[i] =  np.asmatrix(counts[i]).T
-
-#     labels = np.concatenate(counts, axis = 1)
-    
-    #features = 
-    #labels = counts.T
-    

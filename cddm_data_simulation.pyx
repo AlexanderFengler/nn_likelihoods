@@ -445,7 +445,7 @@ def test_check():
 def race_model(v = np.array([0, 0, 0], dtype = DTYPE), # np.array expected, one column of floats
                float a = 1, # initial boundary separation
                w = np.array([0, 0, 0], dtype = DTYPE), # np.array expected, one column of floats
-               ndt = 1, # for now we we don't allow ndt by choice
+               float ndt = 1, # for now we we don't allow ndt by choice
                #ndt = np.array([0.0, 0.0, 0.0], dtype = DTYPE),
                s = np.array([1, 1, 1], dtype = DTYPE), # np.array expected, one column of floats
                float delta_t = 0.001, # time increment step
@@ -551,7 +551,7 @@ def lca(v = np.array([0, 0, 0], dtype = DTYPE), # drift parameters (np.array exp
         w = np.array([0, 0, 0], dtype = DTYPE), # initial bias parameters (np.array expect: one column of floats)
         float g = 0, # decay parameter
         float b = 1, # inhibition parameter
-        ndt = np.array([0.0, 0.0, 0.0], dtype = DTYPE),
+        float ndt = 1,
         float s = 1, # variance (can be one value or np.array of size as v and w)
         float delta_t = 0.001, # time-step size in simulator
         float max_t = 20, # maximal time
@@ -620,7 +620,7 @@ def lca(v = np.array([0, 0, 0], dtype = DTYPE), # drift parameters (np.array exp
             particles_sum = csum(particles_view)
             # update particle positions 
             for i in range(n_particles):
-                particles_reduced_sum_view[i] = (-1) * particles_view[i] + particles_sum
+                particles_reduced_sum_view[i] = (- 1) * particles_view[i] + particles_sum
                 particles_view[i] += ((v_view[i] - (g * particles_view[i]) - \
                         (b * particles_reduced_sum_view[i])) * delta_t) + (sqrt_st * gaussian_values[m])
                 particles_view[i] = fmax(0.0, particles_view[i])
@@ -634,24 +634,24 @@ def lca(v = np.array([0, 0, 0], dtype = DTYPE), # drift parameters (np.array exp
             ix += 1 # increment boundary index
             
         choices_view[n, 0] = particles.argmax() # store choices for sample n
-        rts_view[n, 0] = t + ndt[choices_view[n, 0]] # store reaction time for sample n
+        rts_view[n, 0] = t + ndt # ndt[choices_view[n, 0]] # store reaction time for sample n
         
     # Create some dics
     v_dict = {}
     w_dict = {}
-    ndt_dict = {}
+    #ndt_dict = {}
     
     for i in range(n_particles):
         v_dict['v_' + str(i)] = v[i]
         w_dict['w_' + str(i)] = w[i]
-        ndt_dict['ndt_' + str(i)] = ndt[i]
+        #ndt_dict['ndt_' + str(i)] = ndt[i]
 
     return (rts, choices, {**v_dict,
                            'a': a,
                            **w_dict,
                            'g': g,
                            'b': b,
-                           **ndt_dict,
+                           'ndt': ndt,
                            's': s,
                            **boundary_params,
                            'delta_t': delta_t,
