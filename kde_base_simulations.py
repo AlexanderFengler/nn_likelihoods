@@ -262,8 +262,8 @@ if __name__ == "__main__":
         meta = res[0][2]
         
         # Storing files
-        pickle.dump((features, labels), open(out_folder + file_signature + 'n_' + str(n_samples) + '_' + file_id + '.pickle', 'wb'))
-        pickle.dump(meta, open(out_folder + 'meta_' + file_signature + 'n_' + str(n_samples) + '.pickle', 'wb'))
+        pickle.dump((features, labels), open(out_folder + file_signature + str(n_choices) + '_n_' + str(n_samples) + '_' + file_id + '.pickle', 'wb'))
+        pickle.dump(meta, open(out_folder + 'meta_' + file_signature + str(n_choices) + '_n_' + str(n_samples) + '.pickle', 'wb'))
     
     # STANDARD OUTPUT
     else:
