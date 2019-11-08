@@ -16,15 +16,14 @@
 #SBATCH --mem=24G
 #SBATCH -c 14
 #SBATCH -N 1
-#SBATCH --array=1-100
+#SBATCH --array=1-1
 
 # Run a command
-
-# n_data_points=( 100 200 400 800 1600 3200 6400 12800 25600 )
-# # outer -------------------------------------
-# for n in "${n_data_points[@]}"
-# # inner -------------------------------------
-# do
+n_data_points=( 100 200 400 800 1600 3200 6400 12800 25600 )
+# outer -------------------------------------
+for n in "${n_data_points[@]}"
+# inner -------------------------------------
+do
 #     python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv race_model 3 $n 1 $SLURM_ARRAY_TASK_ID 1000 0
 #     python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv race_model 4 $n 1 $SLURM_ARRAY_TASK_ID 1000 0
 #     python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv race_model 5 $n 1 $SLURM_ARRAY_TASK_ID 1000 0
@@ -33,20 +32,16 @@
 #     python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv angle 2 $n 1 $SLURM_ARRAY_TASK_ID 1000 0
 #     python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv race_model 2 $n 1 $SLURM_ARRAY_TASK_ID 1000 0
 #     python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv weibull_cdf 2 $n 1 $SLURM_ARRAY_TASK_ID 1000 0
-#     python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv ornstein 2 $n 1 $SLURM_ARRAY_TASK_ID 1000 0
+    python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv ornstein 2 $n 1 $SLURM_ARRAY_TASK_ID parameter_recovery 1000 0
 #     python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv full_ddm 2 $n 1 $SLURM_ARRAY_TASK_ID 1000 0
+#         echo $n
+#         echo $id
+done
+# -------------------------------------------
+#done
+# -------------------------------------------
 
-
-
-
-# #         echo $n
-# #         echo $id
-# done
-# # -------------------------------------------
-# #done
-# # -------------------------------------------
-
-python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv ornstein 2 100000 1 $SLURM_ARRAY_TASK_ID base_simulations 10000 0
+# python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv ornstein 2 100000 1 $SLURM_ARRAY_TASK_ID base_simulations 10000 0
 
 #python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv race_model 3 100000 1 $SLURM_ARRAY_TASK_ID 1000 0
 
