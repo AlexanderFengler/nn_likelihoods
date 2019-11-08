@@ -208,7 +208,7 @@ if __name__ == "__main__":
             else:
                 process_param_tmp.append(process_param_names[i])
         param_names_full = process_param_tmp + boundary_param_names
-        #print('param_names_full ', param_names_full)           
+        print('param_names_full ', param_names_full)           
 
     if len(boundary_param_names) > 0:
         boundary_param_lower_bnd = []
