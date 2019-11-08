@@ -228,6 +228,7 @@ if __name__ == "__main__":
     for i in range(n_simulators):
         # Get current set of parameters
         process_params = param_samples[i]
+        print(param_samples[i])
         sampler_params = (s, delta_t, max_t, n_samples, print_info, bound, boundary_multiplicative)
                           
         if len(boundary_param_names) > 0:
