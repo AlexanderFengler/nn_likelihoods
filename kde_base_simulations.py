@@ -139,10 +139,16 @@ if __name__ == "__main__":
     boundary_multiplicative = method_params['boundary_multiplicative']
     
     if method != 'lba' and method != 'race_model':
-        if binned:
-            out_folder = method_folder + data_type + '_' + str(n_samples) + '_binned/'
-        else:
-            out_folder = method_folder + data_type + '_' + str(n_samples) + '/'
+        if data_type == 'base_simulations':
+            if binned:
+                out_folder = method_folder + data_type + '_' + str(n_samples) + '_binned/'
+            else:
+                out_folder = method_folder + data_type + '_' + str(n_samples) + '/'
+        if data_type == 'parameter_recovery':
+            if binned:
+                out_folder = method_folder + data_type + 'binned/'
+            else:
+                out_folder = method_folder + data_type + '/'
     else:
         if binned:
             out_folder = method_folder + data_type + '_' + str(n_samples) + '_' + str(n_choices) + '_binned/'
