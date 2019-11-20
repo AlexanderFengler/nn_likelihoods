@@ -9,7 +9,8 @@ class SliceSampler:
                  m = 50,
                  print_interval = 1): # max doubling allowed
         
-        self.dims = bounds.shape[0]
+        #self.dims = bounds.shape[0]
+        self.dims = len(bounds)
         self.bounds = bounds
         self.target = target
         self.w = w

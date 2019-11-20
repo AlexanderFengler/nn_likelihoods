@@ -7,7 +7,7 @@ import os
 
 temp = {
 "lba":{
-    "dgp":clba.rlba,
+    "dgp": clba.rlba,
     "method_folder": '/users/afengler/data/kde/lba/',
     "method_folder_x7": '/media/data_cifs/afengler/data/kde/lba/',
     "data_folder": "/users/afengler/data/kde/lba/train_test_data_ndt_20000/",
@@ -21,10 +21,14 @@ temp = {
     "boundary_param_names": [],
     "param_bounds_network": [[1.0, 2.0], [1.0, 2.0], [0.0, 1.0], [1.5, 3.0], [0.1, 0.2], [0.0, 1.0]],
     "param_bounds_sampler": [[1.25, 1.75], [1.25, 1.75], [0.2, 0.8], [1.75, 2.75], [0.11, 0.19], [0.1, 0.9]], 
-    "boundary_param_bounds": []
+    "boundary_param_bounds_network": [],
+    "boundary_param_bounds_sampler": [],
+    "dgp_hyperparameters": [['n_samples', 20000], 
+                            ['max_t', 20.0], 
+                            ['d_lower_lim', 0.01]],
        },
 "lba_analytic":{
-    "dgp":clba.rlba,
+    "dgp": clba.rlba,
     "method_folder": '/users/afengler/data/analytic/lba/',
     "method_folder_x7": '/media/data_cifs/afengler/data/analytic/lba/',
     "data_folder": "/users/afengler/data/analytic/lba/train_test_data_kde_imit/",
@@ -38,7 +42,11 @@ temp = {
     "boundary_param_names": [],
     "param_bounds_network": [[1.0, 2.0], [1.0, 2.0], [0.0, 1.0], [1.5, 3.0], [0.1, 0.2], [0.0, 1.0]],
     "param_bounds_sampler": [[1.25, 1.75], [1.25, 1.75], [0.2, 0.8], [1.75, 2.75], [0.11, 0.19], [0.1, 0.9]], 
-    "boundary_param_bounds": []
+    "boundary_param_bounds_network": [],
+    "boundary_param_bounds_sampler": [],
+    "dgp_hyperparameters": [['n_samples', 20000],
+                            ['max_t', 20.0], 
+                            ['d_lower_lim', 0.01]],
        },
 "ddm":{
     "dgp": cd.ddm_flexbound,
@@ -62,6 +70,13 @@ temp = {
     "param_bounds_sampler": [[-1.9, 1.9], [0.6, 1.4], [0.31, 0.69], [0.1, 0.9]],
     "boundary_param_bounds_network": [],
     "boundary_param_bounds_sampler": [],
+    "dgp_hyperparameters": [['s', 1], 
+                            ['delta_t', 0.01], 
+                            ['max_t', 20], 
+                            ['n_samples', 20000], 
+                            ['print_info', False],
+                            ['boundary', bf.constant],
+                            ['boundary_multiplicative', True]],
     },
 "ddm_analytic":{
     "dgp": cd.ddm_flexbound,
@@ -79,6 +94,13 @@ temp = {
     "boundary_param_bounds_network": [],
     "param_bounds_network": [[-2.0, 2.0], [0.5, 1.5], [0.3, 0.7], [0.0, 1.0]],
     "param_bounds_sampler": [[-2.0, 2.0], [0.6, 1.5], [0.30, 0.70], [0.0, 1.0]],
+    "dgp_hyperparameters": [['s', 1], 
+                            ['delta_t', 0.01], 
+                            ['max_t', 20], 
+                            ['n_samples', 20000], 
+                            ['print_info', False],
+                            ['boundary', bf.constant],
+                            ['boundary_multiplicative', True]],
     },
 "angle":{
     "dgp": cd.ddm_flexbound,
@@ -97,7 +119,14 @@ temp = {
     "param_bounds_network": [[-1.5, 1.5], [0.6, 1.5], [0.3, 0.7], [0.0, 1.0]],
     "param_bounds_sampler": [[-1.51, 1.49], [0.6, 1.4], [0.31, 0.69], [0.1, 0.9]],
     "boundary_param_bounds_network": [[0, (np.pi / 2 - .2)]],
-    "boundary_param_bounds_sampler": [[0.05, np.pi / 2 - .3]]
+    "boundary_param_bounds_sampler": [[0.05, np.pi / 2 - .3]],
+    "dgp_hyperparameters": [['s', 1], 
+                            ['delta_t', 0.01], 
+                            ['max_t', 20], 
+                            ['n_samples', 20000], 
+                            ['print_info', False],
+                            ['boundary', bf.angle],
+                            ['boundary_multiplicative', False]],
     },
 "weibull_cdf":{
     "dgp": cd.ddm_flexbound,
@@ -116,7 +145,14 @@ temp = {
     "param_bounds_network": [[-1.5, 1.5], [0.6, 1.5], [0.3, 0.7], [0.0, 1.0]],
     "param_bounds_sampler": [[-1.51, 1.49], [0.6, 1.4], [0.31, 0.69], [0.1, 0.9]],
     "boundary_param_bounds_network": [[0.5, 5.0], [0.5, 7.0]],
-    "boundary_param_bounds_sampler": [[0.55, 4.95], [0.55, 6.95]]
+    "boundary_param_bounds_sampler": [[0.55, 4.95], [0.55, 6.95]],
+    "dgp_hyperparameters": [['s', 1], 
+                            ['delta_t', 0.01], 
+                            ['max_t', 20], 
+                            ['n_samples', 20000], 
+                            ['print_info', False],
+                            ['boundary', bf.weibull_cdf],
+                            ['boundary_multiplicative', True]],
     },
 "ornstein":{
     "dgp": cd.ornstein_uhlenbeck,
@@ -133,7 +169,14 @@ temp = {
     "param_bounds_sampler": [[-1.9, 1.9], [0.6, 1.4], [0.31, 0.69], [-0.9, 0.9], [0.1, 0.9]],
     "boundary_param_names": [],
     "boundary_param_bounds_network": [],
-    "boundary_param_bounds_sampler": []
+    "boundary_param_bounds_sampler": [],
+    "dgp_hyperparameters": [['s', 1], 
+                            ['delta_t', 0.01], 
+                            ['max_t', 20], 
+                            ['n_samples', 20000], 
+                            ['print_info', False],
+                            ['boundary', bf.constant],
+                            ['boundary_multiplicative', True]],
     },
 "ornstein_angle":{},
 "ornstein_weibull":{},
@@ -152,7 +195,14 @@ temp = {
     "param_bounds_network": [[-2.0, 2.0], [0.6, 1.8], [0.3, 0.7], [0.25, 1.25], [0, 0.4], [0, 0.5], [0, 0.5]],
     "param_bounds_sampler": [[-1.9, 1.9], [0.65, 1.75], [0.31, 0.69], [0.3, 1.2], [0.05, 0.35], [0.05, 0.45], [0.05, 0.45]],
     "boundary_param_bounds_network": [],
-    "boundary_param_bounds_sampler": []
+    "boundary_param_bounds_sampler": [],
+    "dgp_hyperparameters": [['s', 1], 
+                            ['delta_t', 0.01],
+                            ['max_t', 20], 
+                            ['n_samples', 20000], 
+                            ['print_info', False],
+                            ['boundary', bf.constant],
+                            ['boundary_multiplicative', True]],
     },
 "race_model":{
     "dgp": cd.race_model,
@@ -170,7 +220,14 @@ temp = {
     "param_bounds_network":[[0, 2.0], [1.0, 3.0], [0.2, 0.8], [0.0, 1.0]],
     "param_bounds_sampler": [[0.1, 1.9], [1.1, 2.9], [0.21, 0.79], [0.1, 0.9]],
     "boundary_param_bounds_network": [],
-    "boundary_param_bounds_sampler": []
+    "boundary_param_bounds_sampler": [],
+    "dgp_hyperparameters": [['s', 1], 
+                            ['delta_t', 0.01], 
+                            ['max_t', 20], 
+                            ['n_samples', 20000], 
+                            ['print_info', False],
+                            ['boundary', bf.constant],
+                            ['boundary_multiplicative', True]]
     },
 "lca":{
     "dgp": cd.lca,
@@ -188,7 +245,14 @@ temp = {
     "param_bounds_network": [[0, 2.0], [1.0, 3.0], [0.2, 0.8], [-1.0, 1.0], [-1.0, 1.0], [0.0, 1.0]],
     "param_bounds_sampler": [[0, 2.0], [1.0, 3.0], [0.2, 0.8], [-1.0, 1.0], [-1.0, 1.0], [0.0, 1.0]],
     "boundary_param_bounds_network": [],
-    "boundary_param_bounds_sampler": []
+    "boundary_param_bounds_sampler": [],
+    "dgp_hyperparameters": [['s', 1], 
+                            ['delta_t', 0.01], 
+                            ['max_t', 20], 
+                            ['n_samples', 20000], 
+                            ['print_info', False],
+                            ['boundary', bf.constant],
+                            ['boundary_multiplicative', True]],
 },
 "ddm_fcn":{
     "dgp": cd.ddm_flexbound,

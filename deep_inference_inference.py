@@ -20,7 +20,7 @@ import clba
 # print(device_lib.list_local_devices())
 
 #machine = 'x7'
-method = 'ddm_ndt'
+method = 'ddm'
 fcn_custom_objects = {"heteroscedastic_loss": tf.losses.huber_loss}
 
 def load_data_perturbation_experiment(file_ = '..'):
@@ -29,7 +29,6 @@ def load_data_perturbation_experiment(file_ = '..'):
     param_grid = tmp[0]
     return (param_grid, data_grid)
     
-
 def run_inference(file_list = ['.', '.'],
                   machine = 'x7',
                   method = 'ddm_ndt'):
@@ -67,3 +66,13 @@ def run_inference(file_list = ['.', '.'],
         pickle.dump((param_grid, data_grid, fcn_results), 
                     open(tmp_file_name, "wb"))
         print(file_)
+        
+# TODO: REWRITE
+        
+# if __name__ == "__main__":
+#     # Make command line interface
+#     CLI = argparse.ArgumentParser()
+#     CLI.add_argument("--machine",
+#                      type = str, 
+#                      default = 'x7')
+#     CLI.add_argument
