@@ -1,8 +1,8 @@
+# IMPORTS --------------------------------------------------------------------
 # We are not importing tensorflow or keras here
 # import tensorflow as tf
 # from tensorflow import keras
 
-# 
 import numpy as np
 import yaml
 import pandas as pd
@@ -26,11 +26,13 @@ import clba
 
 # Network converter
 import keras_to_numpy as ktnp
+# -----------------------------------------------------------------------------
 
-
+# SUPPORT FUNCTIONS -----------------------------------------------------------
 # Get full parameter vector including bounds
 def make_parameter_bounds_for_sampler(mode = 'test',
                                       method_params = []):
+    
     if mode == 'test':
         param_bounds = method_params['param_bounds_sampler'] + method_params['boundary_param_bounds_sampler']
     if mode == 'train':
@@ -58,9 +60,9 @@ def make_parameter_bounds_for_sampler(mode = 'test',
         return np.array(param_bounds_tmp)
     else: 
         return np.array(param_bounds)
-
+# -----------------------------------------------------------------------------
+    
 # INITIALIZATIONS -------------------------------------------------------------
-# Python method_comparison.py machine method data_type n_data_samples n_slice_samples file_id
 if __name__ == "__main__":
     CLI = argparse.ArgumentParser()
     CLI.add_argument("--machine",
@@ -89,7 +91,7 @@ if __name__ == "__main__":
                      default = 'signature')
     CLI.add_argument("--boundmode",
                      type = str,
-                     default = 'test')
+                     default = 'train')
     CLI.add_argument("--nchoices",
                      type = int,
                      default = 2)
@@ -170,7 +172,7 @@ if __name__ == "__main__":
         param_grid = data[0]
         data_grid = data[1]
         
-        
+    # Parameter bounds to pass to sampler    
     sampler_param_bounds = make_parameter_bounds_for_sampler(mode = mode, 
                                                              method_params = method_params)
     sampler_param_bounds = [sampler_param_bounds for i in range(data_grid.shape[0])]
@@ -250,5 +252,7 @@ if __name__ == "__main__":
         posterior_samples = np.array(p.map(mlp_posterior, zip(data_grid, param_grid, sampler_param_bounds)))
 
     # Store files
+    print('saving to file')
+    print(output_folder + out_file_signature + '_' + out_file_id + ".pickle")
     pickle.dump((param_grid, data_grid, posterior_samples), 
                  open(output_folder + out_file_signature + '_' + out_file_id + ".pickle", "wb"))
