@@ -1,4 +1,4 @@
-angle_ndt: /media/data_cifs/afengler/data/kde/angle/keras_models/dnnregressor_angle_ndt_09_28_19_18_05_42/
+angle: /media/data_cifs/afengler/data/kde/angle/keras_models/dnnregressor_angle_ndt_09_28_19_18_05_42/
 #ddm: /media/data_cifs/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_08_08_19_23_37_48/
 ddm_analytic: /not/a/real/path
 ddm: /media/data_cifs/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_ndt_09_27_19_19_02_40/
