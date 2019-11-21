@@ -409,13 +409,7 @@ def make_dataset_r_dgp(dgp_list = ['ddm', 'ornstein', 'angle', 'weibull'],
         [3] dgp_list
         
     """
-
-    # Load base config file:
-#     if machine == 'x7':
-#         config = yaml.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/config_files/config_data_generator.yaml"))
-#     if machine == 'ccv':
-#         config = yaml.load(open("/users/afengler/git_repos/nn_likelihoods/config_files/config_data_generator.yaml"))
-    
+  
     if config['binned']:
         model_ids = np.random.choice(len(dgp_list), size = (config['n_parameter_sets'], 1))
         model_ids.sort()
@@ -453,7 +447,30 @@ def make_dataset_r_dgp(dgp_list = ['ddm', 'ornstein', 'angle', 'weibull'],
             return 'Dataset completed'
     
     else:
-        return (data_grid_out, param_grid_out, model_ids, dgp_list)              
+        return (data_grid_out, param_grid_out, model_ids, dgp_list)  
+
+def bin_arbitrary_fptd(out = [0, 0],
+                       bin_dt = 0.04,
+                       n_bins = 256,
+                       n_choices = 2,
+                       choice_codes = [-1.0, 1.0],
+                       max_t = 20.0,
+                       n_samples = 20000): # ['v', 'a', 'w', 'ndt', 'angle']
+
+    # Generate bins
+    if n_bins == 0:
+        n_bins = int(max_t / bin_dt)
+        bins = np.linspace(0, max_t, n_bins + 1)
+    else:    
+        bins = np.linspace(0, max_t, n_bins + 1)
+
+    cnt = 0
+    counts = np.zeros( (n_bins, n_choices) ) 
+
+    for choice in choice_codes:
+        counts[:, cnt] = np.histogram(out[:, 0][out[:, 1] == choice], bins = bins)[0] 
+        cnt += 1
+    return counts
 # -------------------------------------------------------------------------------------
 
 # RUN 

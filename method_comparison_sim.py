@@ -13,6 +13,7 @@ import uuid
 import os
 import sys
 import argparse
+import scipy as scp
 
 
 # Sampler
@@ -210,6 +211,7 @@ if __name__ == "__main__":
 
     # Define posterior samplers for respective likelihood functions
     def mlp_posterior(args): # args = (data, true_params)
+        scp.random.seed()
         model = SliceSampler(bounds = args[2], 
                              target = mlp_target, 
                              w = .4 / 1024, 
@@ -220,6 +222,7 @@ if __name__ == "__main__":
 
     # Test navarro-fuss
     def nf_posterior(args):
+        scp.random.seed()
         model = SliceSampler(bounds = args[2],
                              target = nf_target, 
                              w = .4 / 1024, 
@@ -229,6 +232,7 @@ if __name__ == "__main__":
         return model.samples
 
     def lba_posterior(args):
+        scp.random.seed()
         model = SliceSampler(bounds = args[2],
                              target = lba_target,
                              w = .4 / 1024,
