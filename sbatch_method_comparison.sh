@@ -3,13 +3,13 @@
 # Default resources are 1 core with 2.8GB of memory per core.
 
 # job name:
-#SBATCH -J weibull_bg
+#SBATCH -J angle_bg
 
 # priority
 #SBATCH --account=bibs-frankmj-condo
 
 # output file
-#SBATCH --output /users/afengler/batch_job_out/weibull_bg_%A_%a.out
+#SBATCH --output /users/afengler/batch_job_out/angle_bg_%A_%a.out
 
 # Request runtime, memory, cores:
 #SBATCH --time=36:00:00
@@ -22,4 +22,4 @@
 # Run a command
 #source /users/afengler/miniconda3/etc/profile.d/conda.sh
 #conda activate tony
-python -u /users/afengler/git_repos/nn_likelihoods/method_comparison_sim.py --machine ccv --method weibull_cdf --nmcmcsamples 10000 --datatype real --infileid bg_stn_sampling_ready.pickle --boundmode train --outfilesig bg_stn_posterior_samples --outfileid $SLURM_ARRAY_TASK_ID
+python -u /users/afengler/git_repos/nn_likelihoods/method_comparison_sim.py --machine ccv --method angle --nmcmcsamples 10000 --datatype real --infileid bg_stn_sampling_ready.pickle --boundmode train --outfilesig bg_stn_posterior_samples --outfileid $SLURM_ARRAY_TASK_ID
