@@ -25,7 +25,7 @@ n_choices=( 3 4 5 6) #4 5 6 )
 n_parameter_sets=100
 n_bins=( 256 512 )
 # outer -------------------------------------
-for bins in "$(n_bins[@])"
+for bins in "${n_bins[@]}"
     for n in "${n_samples[@]}"
     do
     # inner -------------------------------------
