@@ -388,15 +388,19 @@ class data_generator():
                                         '_nbins_' + str(self.config['n_bins']) + \
                                         '_n_' + str(self.config['n_samples']) + \
                                         '_' + self.file_id + '.pickle')
+            
+            meta = self.dgp_hyperparameters.copy()
+            if 'boundary' in meta.keys():
+                meta.pop('boundary')
 
-            pickle.dump((param_grid, data_grid, self.dgp_hyperparameters), open(training_data_folder + '/' + \
-                                                                               self.method + \
-                                                                               '_nchoices_' + str(self.config['n_choices']) + \
-                                                                               '_train_data_' + \
-                                                                               'binned_' + str(int(self.config['binned'])) + \
-                                                                               '_nbins_' + str(self.config['n_bins']) + \
-                                                                               '_n_' + str(self.config['n_samples']) + \
-                                                                               '_' + self.file_id + '.pickle', 'wb'), protocol = 2)
+            pickle.dump((param_grid, data_grid, meta), open(training_data_folder + '/' + \
+                                                            self.method + \
+                                                            '_nchoices_' + str(self.config['n_choices']) + \
+                                                            '_train_data_' + \
+                                                            'binned_' + str(int(self.config['binned'])) + \
+                                                            '_nbins_' + str(self.config['n_bins']) + \
+                                                            '_n_' + str(self.config['n_samples']) + \
+                                                            '_' + self.file_id + '.pickle', 'wb'), protocol = 2)
             return 'Dataset completed'
         else:
             return param_grid, data_grid
