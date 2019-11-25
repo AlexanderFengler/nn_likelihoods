@@ -377,6 +377,7 @@ class data_generator():
 
         if save:
             training_data_folder = self.method_folder + 'training_data_binned_' + str(int(self.config['binned'])) + \
+                                   '_nbins_' + str(self.conifg['n_bins']) + \
                                    '_n_' + str(self.config['n_samples'])
             if not os.path.exists(training_data_folder):
                 os.makedirs(training_data_folder)
