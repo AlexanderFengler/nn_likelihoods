@@ -383,13 +383,15 @@ class data_generator():
             
             print('saving dataset as ', training_data_folder + '/' + \
                                         self.method + '_train_data_' + \
-                                        str(int(self.config['binned'])) + \
+                                        'binned_' + str(int(self.config['binned'])) + \
+                                        '_nbins_' + str(self.conifg['n_bins']) + \
                                         '_n_' + str(self.config['n_samples']) + \
                                         '_' + self.file_id + '.pickle')
 
             pickle.dump((param_grid, data_grid), open(training_data_folder + '/' + \
                                                       self.method + '_train_data_' + \
-                                                      str(int(self.config['binned'])) + \
+                                                      'binned_' + str(int(self.config['binned'])) + \
+                                                      '_nbins_' + str(self.conifg['n_bins']) + \
                                                       '_n_' + str(self.config['n_samples']) + \
                                                       '_' + self.file_id + '.pickle', 'wb'), protocol = 2)
             return 'Dataset completed'

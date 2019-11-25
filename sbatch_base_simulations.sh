@@ -12,15 +12,15 @@
 #SBATCH --output /users/afengler/batch_job_out/ornstein_sim_%A_%a.out
 
 # Request runtime, memory, cores:
-#SBATCH --time=24:00:00
+#SBATCH --time=36:00:00
 #SBATCH --mem=24G
 #SBATCH -c 14
 #SBATCH -N 1
-#SBATCH --array=1-10
+#SBATCH --array=1-100
 
 # # Run a command
 declare -a dgps=("ddm" "angle" "weibull_cdf" "ornstein" "lca" "race_model")
-n_samples=( 50 120 ) #( 50000 100000 200000 400000 )
+n_samples=( 100 ) #( 50000 100000 200000 400000 )
 n_choices=( 3 4 5 6) #4 5 6 )
 n_parameter_sets=100
 # outer -------------------------------------
