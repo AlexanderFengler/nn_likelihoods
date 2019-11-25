@@ -33,12 +33,12 @@ do
         then
             for n_c in "${n_choices[@]}"
                 do
-                   python -u dataset_generator.py --machine x7 --dgplist $dgp --datatype 'cnn_train' --binned 1 --nbins 256 --maxt 10 --nchoices $n_c --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --fileid $SLURM_ARRAY_TASK_ID
+                   python -u dataset_generator.py --machine ccv --dgplist $dgp --datatype 'cnn_train' --binned 1 --nbins 256 --maxt 10 --nchoices $n_c --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --fileid $SLURM_ARRAY_TASK_ID
                    echo "$dgp"
                    echo $n_c
             done
         else
-             python -u dataset_generator.py --machine x7 --dgplist $dgp --datatype 'cnn_train' --binned 1 --nbins 256 --maxt 10 --nchoices 2 --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --fileid $SLURM_ARRAY_TASK_ID
+             python -u dataset_generator.py --machine ccv --dgplist $dgp --datatype 'cnn_train' --binned 1 --nbins 256 --maxt 10 --nchoices 2 --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --fileid $SLURM_ARRAY_TASK_ID
              echo "$dgp"
              echo $n_c
         fi
