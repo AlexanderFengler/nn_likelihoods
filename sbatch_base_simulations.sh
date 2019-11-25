@@ -20,7 +20,7 @@
 
 # # Run a command
 declare -a dgps=("ddm" "angle" "weibull_cdf" "ornstein" "lca" "race_model")
-n_samples=( 10 100 ) #( 50000 100000 200000 400000 )
+n_samples=( 50 120 ) #( 50000 100000 200000 400000 )
 n_choices=( 3 4 5 6) #4 5 6 )
 n_parameter_sets=100
 # outer -------------------------------------
