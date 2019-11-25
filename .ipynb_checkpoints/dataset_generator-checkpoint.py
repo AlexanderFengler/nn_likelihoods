@@ -391,7 +391,7 @@ class data_generator():
             
             meta = self.dgp_hyperparameters.copy()
             if 'boundary' in meta.keys():
-                del meta('boundary')
+                del meta['boundary']
 
             pickle.dump((param_grid, data_grid, meta), open(training_data_folder + '/' + \
                                                             self.method + \
