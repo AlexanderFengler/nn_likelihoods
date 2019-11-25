@@ -343,17 +343,17 @@ class data_generator():
         if save == True:
             print('saving dataset as ', self.method_comparison_folder + \
                                         'base_data_uniform_' + \
-                                        '_n_par_' + str(self.config['n_parameter_sets']) + \
-                                        '_n_reps_' + str(self.config['n_reps']) + \
+                                        '_npar_' + str(self.config['n_parameter_sets']) + \
+                                        '_nreps_' + str(self.config['n_reps']) + \
                                         '_n_' + str(self.config['n_samples']) + \
                                         '_' + self.file_id + '.pickle')
             
-            pickle.dump((param_grid, data_grid), open(self.method_comparison_folder + \
-                                                      'base_data_uniform' + \
-                                                      '_n_par_' + str(self.config['n_parameter_sets']) + \
-                                                      '_n_reps_' + str(self.config['nreps']) + \
-                                                      '_n_' + str(self.config['n_samples']) + \
-                                                      '_' + self.file_id + '.pickle', 'wb'))
+            pickle.dump((param_grid, data_grid, self.dgp_hyperparameters), open(self.method_comparison_folder + \
+                                                                              'base_data_uniform' + \
+                                                                              '_npar_' + str(self.config['n_parameter_sets']) + \
+                                                                              '_nreps_' + str(self.config['nreps']) + \
+                                                                              '_n_' + str(self.config['n_samples']) + \
+                                                                              '_' + self.file_id + '.pickle', 'wb'))
             return 'Dataset completed'
         else:
             return param_grid, data_grid
@@ -389,12 +389,14 @@ class data_generator():
                                         '_n_' + str(self.config['n_samples']) + \
                                         '_' + self.file_id + '.pickle')
 
-            pickle.dump((param_grid, data_grid), open(training_data_folder + '/' + \
-                                                      self.method + '_train_data_' + \
-                                                      'binned_' + str(int(self.config['binned'])) + \
-                                                      '_nbins_' + str(self.config['n_bins']) + \
-                                                      '_n_' + str(self.config['n_samples']) + \
-                                                      '_' + self.file_id + '.pickle', 'wb'), protocol = 2)
+            pickle.dump((param_grid, data_grid, self.dgp_hyperparameters), open(training_data_folder + '/' + \
+                                                                               self.method + \
+                                                                               'nchoices_' + self.config['n_choices'] + \
+                                                                               '_train_data_' + \
+                                                                               'binned_' + str(int(self.config['binned'])) + \
+                                                                               '_nbins_' + str(self.config['n_bins']) + \
+                                                                               '_n_' + str(self.config['n_samples']) + \
+                                                                               '_' + self.file_id + '.pickle', 'wb'), protocol = 2)
             return 'Dataset completed'
         else:
             return param_grid, data_grid
