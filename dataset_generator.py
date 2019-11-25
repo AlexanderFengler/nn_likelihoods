@@ -494,7 +494,7 @@ def make_dataset_r_dgp(dgp_list = ['ddm', 'ornstein', 'angle', 'weibull'],
                                                                 '_n_reps_' + str(self.config['nreps']) + \
                                                                 '_n_' + str(self.config['n_samples']) + \
                                                                 '_' + self.file_id + '.pickle', 'wb'))
-            return 'Dataset completed'
+        return 'Dataset completed'
     
     else:
         return (data_grid_out, param_grid_out, model_ids, dgp_list)  
