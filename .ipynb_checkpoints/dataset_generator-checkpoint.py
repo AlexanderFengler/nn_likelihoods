@@ -377,7 +377,7 @@ class data_generator():
 
         if save:
             training_data_folder = self.method_folder + 'training_data_binned_' + str(int(self.config['binned'])) + \
-                                   '_nbins_' + str(self.conifg['n_bins']) + \
+                                   '_nbins_' + str(self.config['n_bins']) + \
                                    '_n_' + str(self.config['n_samples'])
             if not os.path.exists(training_data_folder):
                 os.makedirs(training_data_folder)
@@ -385,14 +385,14 @@ class data_generator():
             print('saving dataset as ', training_data_folder + '/' + \
                                         self.method + '_train_data_' + \
                                         'binned_' + str(int(self.config['binned'])) + \
-                                        '_nbins_' + str(self.conifg['n_bins']) + \
+                                        '_nbins_' + str(self.config['n_bins']) + \
                                         '_n_' + str(self.config['n_samples']) + \
                                         '_' + self.file_id + '.pickle')
 
             pickle.dump((param_grid, data_grid), open(training_data_folder + '/' + \
                                                       self.method + '_train_data_' + \
                                                       'binned_' + str(int(self.config['binned'])) + \
-                                                      '_nbins_' + str(self.conifg['n_bins']) + \
+                                                      '_nbins_' + str(self.config['n_bins']) + \
                                                       '_n_' + str(self.config['n_samples']) + \
                                                       '_' + self.file_id + '.pickle', 'wb'), protocol = 2)
             return 'Dataset completed'
