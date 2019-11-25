@@ -391,7 +391,7 @@ class data_generator():
 
             pickle.dump((param_grid, data_grid, self.dgp_hyperparameters), open(training_data_folder + '/' + \
                                                                                self.method + \
-                                                                               'nchoices_' + str(self.config['n_choices']) + \
+                                                                               '_nchoices_' + str(self.config['n_choices']) + \
                                                                                '_train_data_' + \
                                                                                'binned_' + str(int(self.config['binned'])) + \
                                                                                '_nbins_' + str(self.config['n_bins']) + \

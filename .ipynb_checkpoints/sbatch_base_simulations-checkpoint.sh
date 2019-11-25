@@ -13,7 +13,7 @@
 
 # Request runtime, memory, cores:
 #SBATCH --time=36:00:00
-#SBATCH --mem=24G
+#SBATCH --mem=32G
 #SBATCH -c 14
 #SBATCH -N 1
 #SBATCH --array=1-100
@@ -23,27 +23,30 @@ declare -a dgps=("ddm" "angle" "weibull_cdf" "ornstein" "lca" "race_model")
 n_samples=( 100 ) #( 50000 100000 200000 400000 )
 n_choices=( 3 4 5 6) #4 5 6 )
 n_parameter_sets=100
+n_bins=( 256 512 )
 # outer -------------------------------------
-for n in "${n_samples[@]}"
-do
-# inner -------------------------------------
-    for dgp in "${dgps[@]}"
+for bins in "$(n_bins[@])"
+    for n in "${n_samples[@]}"
     do
-        if [[ "$dgp" = "lca" ]] || [[ "$dgp" = "race_model" ]];
-        then
-            for n_c in "${n_choices[@]}"
-                do
-                   python -u dataset_generator.py --machine ccv --dgplist $dgp --datatype 'cnn_train' --binned 1 --nbins 256 --maxt 10 --nchoices $n_c --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --fileid $SLURM_ARRAY_TASK_ID
-                   echo "$dgp"
-                   echo $n_c
-            done
-        else
-             python -u dataset_generator.py --machine ccv --dgplist $dgp --datatype 'cnn_train' --binned 1 --nbins 256 --maxt 10 --nchoices 2 --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --fileid $SLURM_ARRAY_TASK_ID
-             echo "$dgp"
-             echo $n_c
-        fi
+    # inner -------------------------------------
+        for dgp in "${dgps[@]}"
+        do
+            if [[ "$dgp" = "lca" ]] || [[ "$dgp" = "race_model" ]];
+            then
+                for n_c in "${n_choices[@]}"
+                    do
+                       python -u dataset_generator.py --machine ccv --dgplist $dgp --datatype 'cnn_train' --binned 1 --nbins 256 --maxt 10 --nchoices $n_c --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --fileid $SLURM_ARRAY_TASK_ID
+                       echo "$dgp"
+                       echo $n_c
+                done
+            else
+                 python -u dataset_generator.py --machine ccv --dgplist $dgp --datatype 'cnn_train' --binned 1 --nbins 256 --maxt 10 --nchoices 2 --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --fileid $SLURM_ARRAY_TASK_ID
+                 echo "$dgp"
+                 echo $n_c
+            fi
+        done
+                # normal call to function
     done
-            # normal call to function
 done
 # -------------------------------------------
 #done
