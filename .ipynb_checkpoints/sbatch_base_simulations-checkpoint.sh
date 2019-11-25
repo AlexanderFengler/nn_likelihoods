@@ -16,7 +16,7 @@
 # SBATCH --mem=24G
 # SBATCH -c 14
 # SBATCH -N 1
-# SBATCH --array=1-1
+# SBATCH --array=1-10
 
 # # Run a command
 declare -a dgps=("ddm" "angle" "weibull_cdf" "ornstein" "lca" "race_model")
@@ -33,12 +33,12 @@ do
         then
             for n_c in "${n_choices[@]}"
                 do
-                   python -u dataset_generator.py --machine x7 --dgplist $dgp --datatype 'cnn_train' --binned 1 --nbins 256 --maxt 10 --nchoices $n_c --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --fileid TEST
+                   python -u dataset_generator.py --machine x7 --dgplist $dgp --datatype 'cnn_train' --binned 1 --nbins 256 --maxt 10 --nchoices $n_c --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --fileid $SLURM_ARRAY_TASK_ID
                    echo "$dgp"
                    echo $n_c
             done
         else
-             python -u dataset_generator.py --machine x7 --dgplist $dgp --datatype 'cnn_train' --binned 1 --nbins 256 --maxt 10 --nchoices 2 --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --fileid TEST
+             python -u dataset_generator.py --machine x7 --dgplist $dgp --datatype 'cnn_train' --binned 1 --nbins 256 --maxt 10 --nchoices 2 --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --fileid $SLURM_ARRAY_TASK_ID
              echo "$dgp"
              echo $n_c
         fi
