@@ -151,7 +151,7 @@ class data_generator():
                 args_list.append(process_params + sampler_hyperparameters)
             else:
                 args_list.append(process_params + sampler_hyperparameters + boundary_params)
-                print(process_params + sampler_hyperparameters + boundary_params)
+                #print(process_params + sampler_hyperparameters + boundary_params)
         return args_list
     
     def clean_up_parameters(self):
@@ -186,7 +186,7 @@ class data_generator():
             param_bounds_tmp += param_bounds[n_process_params:]
             params_upper_bnd = [bnd[0] for bnd in param_bounds_tmp]
             params_lower_bnd = [bnd[1] for bnd in param_bounds_tmp]
-            print(params_lower_bnd)
+            #print(params_lower_bnd)
             
             
         # If our model is not lba, race, lca we use simple procedure 
@@ -372,10 +372,10 @@ class data_generator():
             data_grid = np.zeros((self.config['n_parameter_sets'],
                                   self.config['n_samples'],
                                   2))
-        print(param_grid)
+        #print(param_grid)
         data_grid = np.array(self.generate_data_grid_parallel(param_grid = param_grid))
 
-        if save == True:
+        if save:
             training_data_folder = self.method_folder + 'training_data_binned_' + str(int(self.config['binned'])) + \
                                    '_n_' + str(self.config['n_samples'])
             if not os.path.exists(training_data_folder):
@@ -487,13 +487,13 @@ def make_dataset_r_dgp(dgp_list = ['ddm', 'ornstein', 'angle', 'weibull'],
         data_grid_out.append(data_grid)
         param_grid_out.append(param_grid)
 
-    if save == True:
-            print('saving dataset')
-            pickle.dump((np.concatenate(out), model_ids, dgp_list), open(method_comparison_folder + \
-                                                                    'base_data_uniform_r_dgp' + \
-                                                                    '_n_reps_' + str(self.config['nreps']) + \
-                                                                    '_n_' + str(self.config['n_samples']) + \
-                                                                    '_' + self.file_id + '.pickle', 'wb'))
+    if save:
+        print('saving dataset')
+        pickle.dump((np.concatenate(out), model_ids, dgp_list), open(method_comparison_folder + \
+                                                                'base_data_uniform_r_dgp' + \
+                                                                '_n_reps_' + str(self.config['nreps']) + \
+                                                                '_n_' + str(self.config['n_samples']) + \
+                                                                '_' + self.file_id + '.pickle', 'wb'))
             return 'Dataset completed'
     
     else:
