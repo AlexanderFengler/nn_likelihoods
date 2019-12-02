@@ -21,7 +21,7 @@ temp = {
     "boundary_param_names": [],
     "param_bounds_network": [[1.0, 2.0], [1.0, 2.0], [0.0, 1.0], [1.5, 3.0], [0.1, 0.2], [0.0, 1.0]],
     "param_bounds_sampler": [[1.25, 1.75], [1.25, 1.75], [0.2, 0.8], [1.75, 2.75], [0.11, 0.19], [0.1, 0.9]], 
-    "param_bounds_cnn": [[1.0, 2.0], [1.0, 2.0], [0.0, 1.0], [1.5, 3.0], [0.1, 0.2], [0.0, 1.0]],
+    "param_bounds_cnn": [[1.0, 2.0], [1.0, 2.0], [0.0, 1.0], [1.5, 3.0], [0.1, 0.2], [0.0, 2.0]],
     "boundary_param_bounds_network": [],
     "boundary_param_bounds_sampler": [],
     "boundary_param_bounds_cnn": [],

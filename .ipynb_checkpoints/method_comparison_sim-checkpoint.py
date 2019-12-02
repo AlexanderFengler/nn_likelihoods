@@ -15,7 +15,6 @@ import sys
 import argparse
 import scipy as scp
 
-
 # Sampler
 from samplers import SliceSampler
 
@@ -107,7 +106,7 @@ if __name__ == "__main__":
     data_type = args.datatype
     n_samples = args.nsamples
     n_slice_samples = args.nmcmcsamples
-    infile_id = args.outfileid
+    infile_id = args.infileid
     out_file_id = args.outfileid
     out_file_signature = args.outfilesig
     n_cpus = 'all'
@@ -118,6 +117,7 @@ if __name__ == "__main__":
     if data_type == 'uniform':
         file_ = 'base_data_param_recov_unif_reps_1_n_' + str(n_samples) + '_' + infile_id + '.pickle'
         out_file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + str(n_samples) + '_' + infile_id
+    
     if data_type == 'real':                                                                        
         file_ = args.infileid
         if machine == 'x7':
@@ -215,9 +215,10 @@ if __name__ == "__main__":
         model = SliceSampler(bounds = args[2], 
                              target = mlp_target, 
                              w = .4 / 1024, 
-                             p = 8)
+                             p = 8,
+                             data = args[0])
 
-        model.sample(args[0], num_samples = n_slice_samples, init = args[1])
+        model.sample(num_samples = n_slice_samples, init = args[1])
         return model.samples
 
     # Test navarro-fuss
@@ -228,7 +229,9 @@ if __name__ == "__main__":
                              w = .4 / 1024, 
                              p = 8)
         
-        model.sample(args[0], num_samples = n_slice_samples, init = args[1])
+        model.sample(args[0], 
+                     num_samples = n_slice_samples, 
+                     init = args[1])
         return model.samples
 
     def lba_posterior(args):
