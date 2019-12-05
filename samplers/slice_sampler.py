@@ -31,7 +31,6 @@ class SliceSampler:
         right[dim] = left[dim] + self.w
         k = self.p
         
-        
         lp_l = self.target(left, self.data)
         lp_r = self.target(right, self.data)
 

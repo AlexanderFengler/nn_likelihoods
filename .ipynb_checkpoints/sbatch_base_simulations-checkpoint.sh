@@ -16,7 +16,7 @@
 #SBATCH --mem=32G
 #SBATCH -c 14
 #SBATCH -N 1
-#SBATCH --array=1-100
+#SBATCH --array=1-50
 
 # # Run a command
 declare -a dgps=( "ddm" ) #( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "lca" "race_model" )

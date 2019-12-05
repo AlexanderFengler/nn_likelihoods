@@ -31,7 +31,6 @@ class SliceSampler:
         right[dim] = left[dim] + self.w
         k = self.p
         
-        
         lp_l = self.target(left, self.data)
         lp_r = self.target(right, self.data)
 
@@ -103,9 +102,10 @@ class SliceSampler:
             left, right = self._find_interval_doubling(z, prev, dim)
             #print(dim)
             # Adaptively shrink the interval
-            while not np.isclose(left,right, 1e-3): # This condition might be unnecessary
+            while not np.isclose(left, right, 1e-3): # This condition might be unnecessary
             #while True:
                 u = np.random.uniform()
+                # TODO: CHECK IF THIS SHOULD BE  left[dim] ....
                 out[dim] = left + u * (right - left)
                 lp = self.target(out, self.data)
                 if z < lp and self._accept(prev, out, z, left, right, dim):
