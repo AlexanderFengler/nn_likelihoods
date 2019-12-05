@@ -32,6 +32,7 @@ class data_generator():
                  machine = 'x7',
                  file_id = 'id',
                  max_t = 20.0,
+                 delta_t = 0.01,
                  config = None):
     # INIT -----------------------------------------
         self.machine = machine
@@ -54,6 +55,7 @@ class data_generator():
         self.dgp_hyperparameters = dict(self.method_params['dgp_hyperparameters'])
         self.dgp_hyperparameters['max_t'] = max_t
         self.dgp_hyperparameters['n_samples'] = self.config['nsamples']
+        self.dgp_hyperparameters['delta_t'] = delta_t
    # ----------------------------------------------------
    
     def data_generator(self, *args):
@@ -74,13 +76,17 @@ class data_generator():
                              out = [0, 0],
                              bin_dt = 0.04,
                              nbins = 0): # ['v', 'a', 'w', 'ndt', 'angle']
-
+        
         # Generate bins
         if nbins == 0:
             nbins = int(out[2]['max_t'] / bin_dt)
-            bins = np.linspace(0, out[2]['max_t'], nbins + 1)
-        else:    
-            bins = np.linspace(0, out[2]['max_t'], nbins + 1)
+            bins = np.zeros(nbins + 1)
+            bins[:nbins] = np.linspace(0, out[2]['max_t'], nbins)
+            bins[nbins] = np.inf
+        else:  
+            bins = np.zeros(nbins + 1)
+            bins[:nbins] = np.linspace(0, out[2]['max_t'], nbins)
+            bins[nbins] = np.inf
 
         cnt = 0
         counts = np.zeros( (nbins, len(out[2]['possible_choices']) ) )
@@ -230,7 +236,7 @@ class data_generator():
             # Store as first row in experiment i
             param_grid[i, cnt, :] = param_grid_tmp
 
-            # Store meta data for experiment (only need to do once --> i ==0)
+            # Store meta data for experiment (only need to do once --> i == 0)
             if i == 0:
                 meta_dat.loc[cnt, :] = [-1, -1]
 
@@ -471,6 +477,7 @@ def make_dataset_r_dgp(dgp_list = ['ddm', 'ornstein', 'angle', 'weibull'],
                        machine = 'x7',
                        file_id = 'TEST',
                        max_rt = 20.0,
+                       delta_t = 0.01,
                        config = None,
                        save = False):
     """Generates datasets across kinds of simulators
@@ -515,7 +522,9 @@ def make_dataset_r_dgp(dgp_list = ['ddm', 'ornstein', 'angle', 'weibull'],
         # Initialize data_generator class with new properties
         dg_tmp = data_generator(machine = machine,
                                 config = config,
-                                max_rt = max_rt)
+                                max_rt = max_rt,
+                                delta_t = delta_t)
+        
         # Run the simulator
         data_grid, param_grid = dg_tmp.make_dataset_uniform(save = False)
         
@@ -545,15 +554,20 @@ def bin_arbitrary_fptd(out = [0, 0],
     # Generate bins
     if nbins == 0:
         nbins = int(max_t / bin_dt)
-        bins = np.linspace(0, max_t, nbins + 1)
+        bins = np.zeros(nbins + 1)
+        bins[:nbins] = np.linspace(0, max_t, nbins)
+        bins[nbins] = np.inf
     else:    
-        bins = np.linspace(0, max_t, nbins + 1)
+        bins = np.zeros(nbins + 1)
+        bins[:nbins] = np.linspace(0, max_t, nbins)
+        bins[nbins] = np.inf
 
     cnt = 0
     counts = np.zeros( (nbins, nchoices) ) 
 
     for choice in choice_codes:
         counts[:, cnt] = np.histogram(out[:, 0][out[:, 1] == choice], bins = bins)[0] 
+        print(np.histogram(out[:, 0][out[:, 1] == choice], bins = bins)[1])
         cnt += 1
     return counts
 # -------------------------------------------------------------------------------------
@@ -603,6 +617,9 @@ if __name__ == "__main__":
     CLI.add_argument("--maxt",
                      type = float,
                      default = 10.0)
+    CLI.add_argument("--deltat",
+                     type = float,
+                     default = 0.001)
     CLI.add_argument("--pickleprotocol",
                      type = int,
                      default = 2)
@@ -641,6 +658,7 @@ if __name__ == "__main__":
         dg = data_generator(machine = args.machine,
                             file_id = args.fileid,
                             max_t = args.maxt,
+                            delta_t = args.deltat
                             config = config)
         out = dg.make_dataset_train_network_unif(save = args.save)
         
@@ -648,6 +666,7 @@ if __name__ == "__main__":
         dg = data_generator(machine = args.machine,
                              file_id = args.fileid,
                              max_t = args.maxt,
+                             delta_t = args.deltat
                              config = config)
         out = dg.make_dataset_parameter_recovery(save = args.save)
     
@@ -655,6 +674,7 @@ if __name__ == "__main__":
         dg = data_generator(machine = args.machine,
                             file_id = args.fileid,
                             max_t = args.maxt,
+                            delta_t = args.deltat
                             config = config)
         out = dg_tmp.make_dataset_perturbation_experiment(save = args.save)
 
@@ -662,6 +682,7 @@ if __name__ == "__main__":
         dg = data_generator(machine = args.machine,
                             file_id = args.fileid,
                             max_t = args.maxt,
+                            delta_t = args.deltat
                             config = config)
         out = dg_tmp.make_dataset_r_sim(n_sim_bnds = [100, 200000],
                                         save = args.save)
@@ -671,6 +692,7 @@ if __name__ == "__main__":
                                  machine = args.machine,
                                  file_id = args.fileid,
                                  max_t = args.maxt,
+                                 delta_t = args.deltat
                                  config = config,
                                  save = args.save)
     print('Finished')

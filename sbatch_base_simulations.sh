@@ -3,26 +3,26 @@
 # Default resources are 1 core with 2.8GB of memory per core.
 
 # job name:
-#SBATCH -J ornstein_sim
+# SBATCH -J ornstein_sim
 
 # priority
-#SBATCH --account=bibs-frankmj-condo
+# SBATCH --account=bibs-frankmj-condo
 
 # output file
-#SBATCH --output /users/afengler/batch_job_out/ornstein_sim_%A_%a.out
+# SBATCH --output /users/afengler/batch_job_out/ornstein_sim_%A_%a.out
 
 # Request runtime, memory, cores:
-#SBATCH --time=36:00:00
-#SBATCH --mem=32G
-#SBATCH -c 14
-#SBATCH -N 1
-#SBATCH --array=1-100
+# SBATCH --time=36:00:00
+# SBATCH --mem=32G
+# SBATCH -c 14
+# SBATCH -N 1
+# SBATCH --array=1-100
 
 # # Run a command
-declare -a dgps=( "race_model" ) #( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "lca" "race_model" )
-n_samples=( 200000 ) #( 50000 100000 200000 400000 )
-n_choices=( 5 6 ) #( 4 5 6 )
-n_parameter_sets=20000   #20000
+declare -a dgps=( "ddm" ) #( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "lca" "race_model" )
+n_samples=( 100000 ) #( 50000 100000 200000 400000 )
+n_choices=( 2 ) #( 4 5 6 )
+n_parameter_sets=2   #20000
 n_bins=( 256 )
 # outer -------------------------------------
 for bins in "${n_bins[@]}"
@@ -36,12 +36,12 @@ do
             then
                 for n_c in "${n_choices[@]}"
                     do
-                       python -u dataset_generator.py --machine ccv --dgplist $dgp --datatype cnn_train --nreps 1 --binned 1 --nbins $bins --maxt 10 --nchoices $n_c --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --fileid $SLURM_ARRAY_TASK_ID
+                       python -u dataset_generator.py --machine ccv --dgplist $dgp --datatype cnn_train --nreps 1 --binned 1 --nbins $bins --maxt 10 --nchoices $n_c --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --fileid $SLURM_ARRAY_TASK_ID --deltat 0.001
                        echo "$dgp"
                        echo $n_c
                 done
             else
-                 python -u dataset_generator.py --machine ccv --dgplist $dgp --datatype cnn_train --nreps 1 --binned 1 --nbins $bins --maxt 10 --nchoices 2 --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --fileid $SLURM_ARRAY_TASK_ID
+                 python -u dataset_generator.py --machine ccv --dgplist $dgp --datatype cnn_train --nreps 1 --binned 1 --nbins $bins --maxt 10 --nchoices 2 --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --fileid $SLURM_ARRAY_TASK_ID --deltat 0.001
                  echo "$dgp"
                  echo $n_c
             fi
