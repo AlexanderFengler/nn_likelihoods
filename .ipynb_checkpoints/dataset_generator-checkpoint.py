@@ -658,7 +658,7 @@ if __name__ == "__main__":
         dg = data_generator(machine = args.machine,
                             file_id = args.fileid,
                             max_t = args.maxt,
-                            delta_t = args.deltat
+                            delta_t = args.deltat,
                             config = config)
         out = dg.make_dataset_train_network_unif(save = args.save)
         
@@ -666,7 +666,7 @@ if __name__ == "__main__":
         dg = data_generator(machine = args.machine,
                              file_id = args.fileid,
                              max_t = args.maxt,
-                             delta_t = args.deltat
+                             delta_t = args.deltat,
                              config = config)
         out = dg.make_dataset_parameter_recovery(save = args.save)
     
@@ -674,7 +674,7 @@ if __name__ == "__main__":
         dg = data_generator(machine = args.machine,
                             file_id = args.fileid,
                             max_t = args.maxt,
-                            delta_t = args.deltat
+                            delta_t = args.deltat,
                             config = config)
         out = dg_tmp.make_dataset_perturbation_experiment(save = args.save)
 
@@ -682,7 +682,7 @@ if __name__ == "__main__":
         dg = data_generator(machine = args.machine,
                             file_id = args.fileid,
                             max_t = args.maxt,
-                            delta_t = args.deltat
+                            delta_t = args.deltat,
                             config = config)
         out = dg_tmp.make_dataset_r_sim(n_sim_bnds = [100, 200000],
                                         save = args.save)
@@ -692,7 +692,7 @@ if __name__ == "__main__":
                                  machine = args.machine,
                                  file_id = args.fileid,
                                  max_t = args.maxt,
-                                 delta_t = args.deltat
+                                 delta_t = args.deltat,
                                  config = config,
                                  save = args.save)
     print('Finished')
