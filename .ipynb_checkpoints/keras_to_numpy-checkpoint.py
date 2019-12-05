@@ -18,9 +18,7 @@ def tanh(x):
     return (2 / (1 + np.exp(- 2 * x))) - 1
 
 # Function to extract network architecture 
-def extract_architecture(model, 
-                         save = False,
-                         save_path = ''):
+def extract_architecture(model, save = False, save_path = ''):
     
     biases = []
     activations = []
@@ -49,13 +47,7 @@ def predict(x, weights, biases, activations):
             np.dot(x, weights[i]) + biases[i])
     return x
 
-def log_p(params, 
-          weights, 
-          biases, 
-          activations, 
-          data, 
-          orig_output_log_l = True, 
-          ll_min = 1e-29):
+def log_p(params, weights, biases, activations, data, orig_output_log_l = True, ll_min = 1e-29):
     param_grid = np.tile(params, (data.shape[0], 1))
     inp = np.concatenate([param_grid, data], axis = 1)
     if orig_output_log_l:
