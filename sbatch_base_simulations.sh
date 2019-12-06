@@ -19,9 +19,9 @@
 #SBATCH --array=1-50
 
 # # Run a command
-declare -a dgps=( "ornstein" "angle" "weibull_cdf" ) #( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "lca" "race_model" )
+declare -a dgps=( "full_ddm" "lca" "race_model" ) #( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "lca" "race_model" )
 n_samples=( 100000 ) #( 50000 100000 200000 400000 )
-n_choices=( 2 ) #( 4 5 6 )
+n_choices=( 2 3 ) #( 4 5 6 )
 n_parameter_sets=20000   #20000
 n_bins=( 256 512 )
 # outer -------------------------------------

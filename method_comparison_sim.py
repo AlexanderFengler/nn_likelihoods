@@ -184,8 +184,9 @@ if __name__ == "__main__":
 
 # RUN POSTERIOR SIMULATIONS --------------------------------------------------------------------------
    # MLP TARGET
-    def mlp_target(params, data, likelihood_min = 1e-7): 
-        ll_min = np.log(likelihood_min)
+    def mlp_target(params, data, 
+                   ll_min= -16.11809 # corresponds to 1e-7
+                  ): 
         params_rep = np.tile(params, (data.shape[0], 1))
         input_batch = np.concatenate([params_rep, data], axis = 1)
         out = np.maximum(ktnp.predict(input_batch, weights, biases, activations), ll_min)
@@ -217,7 +218,7 @@ if __name__ == "__main__":
                              w = .4 / 1024, 
                              p = 8,
                              data = args[0])
-
+        
         model.sample(num_samples = n_slice_samples, init = args[1])
         return model.samples
 
