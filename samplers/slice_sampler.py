@@ -1,5 +1,7 @@
 import numpy as np
-from scipy.optimize import differential_evolution
+import scipy as scpy
+import scipy.optimize as scp_opt
+#from scipy.optimize import differential_evolution
 
 class SliceSampler:
     def __init__(self,
@@ -9,7 +11,7 @@ class SliceSampler:
                  p = 8,
                  m = 50,
                  print_interval = 1): # max doubling allowed
-        
+        self.optimizer = scp_opt.differential_evolution
         #self.dims = bounds.shape[0]
         self.dims = np.array([i for i in range(len(bounds))])
         self.bounds = bounds
@@ -184,13 +186,13 @@ class SliceSampler:
                     tmp[dim] = np.random.uniform(self.bounds[dim][0],
                                                  self.bounds[dim][1])
             elif init[:3] == 'mle':
-                out = differential_evolution(self.target, 
-                                             bounds = [tuple(b) for b in self.bounds], 
-                                             args = (self.data), 
-                                             popsize = mle_popsize,
-                                             polish = mle_polish,
-                                             disp = mle_disp,
-                                             maxiter = mle_maxiter)
+                out = self.optimizer(self.target, 
+                                     bounds = [tuple(b) for b in self.bounds], 
+                                     args = (self.data), 
+                                     popsize = mle_popsize,
+                                     polish = mle_polish,
+                                     disp = mle_disp,
+                                     maxiter = mle_maxiter)
                 tmp = out.x
             else:
                 tmp = init
