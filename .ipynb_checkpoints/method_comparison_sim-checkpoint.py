@@ -73,7 +73,7 @@ if __name__ == "__main__":
                      default = 'ddm')
     CLI.add_argument("--datatype",
                      type = str,
-                     default = 'uniform')
+                     default = 'uniform') # real, uniform, perturbation experiment
     CLI.add_argument("--nsamples",
                      type = int,
                      default = 1000)
@@ -95,6 +95,18 @@ if __name__ == "__main__":
     CLI.add_argument("--nchoices",
                      type = int,
                      default = 2)
+    CLI.add_argument("--activedims",
+                     nargs = "*",
+                     type = int.
+                     default = [0, 1, 2, 3])
+    CLI.add_argument("--frozendims",
+                     nargs = "*",
+                     type = int,
+                     default = [])
+    CLI.add_argument("--frozendimsinit",
+                     nargs = '*',
+                     type = float,
+                     default = [])
     
     args = CLI.parse_args()
     print(args)
@@ -110,6 +122,14 @@ if __name__ == "__main__":
     out_file_id = args.outfileid
     out_file_signature = args.outfilesig
     n_cpus = 'all'
+    
+    # Initialize the frozen dimensions
+    if len(args.frozendims) > 1:
+        frozen_dims = [[args.frozendims[i], args.frozendimsinit[i]] for i in range(len(args.frozendims))]
+        active_dims = args.activedims
+    else:
+        active_dims = 'all'
+        frozen_dims = 'none'
     
     if data_type == 'perturbation_experiment':
         file_ = 'base_data_perturbation_experiment_nexp_1_n_' + str(n_samples) + '_' + infile_id + '.pickle'
@@ -139,7 +159,6 @@ if __name__ == "__main__":
             network_path = yaml.load(tmp_file)[method]
     
     method_params['n_choices'] = args.nchoices
-    #print(stats)
     print(method_params)
 
     # Load weights, biases and activations of current network --------
@@ -168,24 +187,30 @@ if __name__ == "__main__":
         data = pickle.load(open(data_folder + file_, 'rb'))
         data_grid = data[0]
         param_grid = ['random' for i in range(data_grid.shape[0])]
-    else:
+    elif data_type == 'uniform':
         data = pickle.load(open(output_folder + file_, 'rb'))
         param_grid = data[0]
         data_grid = data[1]
+    elif data_type == 'perturbation_experiment':
+        pass # TODO fill in correct formatting for perturbation experiment
+    else:
+        print('Unknown Datatype, results will likely not make sense')   
         
     # Parameter bounds to pass to sampler    
     sampler_param_bounds = make_parameter_bounds_for_sampler(mode = mode, 
                                                              method_params = method_params)
     sampler_param_bounds = [sampler_param_bounds for i in range(data_grid.shape[0])]
-  
+    
+    # 
     print('param_grid: ', param_grid)
     print('shape of data_grid:', data_grid.shape)
 # ----------------------------------------------------------------------------------------------------
 
 # RUN POSTERIOR SIMULATIONS --------------------------------------------------------------------------
    # MLP TARGET
-    def mlp_target(params, data, likelihood_min = 1e-7): 
-        ll_min = np.log(likelihood_min)
+    def mlp_target(params, data, 
+                   ll_min= -16.11809 # corresponds to 1e-7
+                  ): 
         params_rep = np.tile(params, (data.shape[0], 1))
         input_batch = np.concatenate([params_rep, data], axis = 1)
         out = np.maximum(ktnp.predict(input_batch, weights, biases, activations), ll_min)
@@ -200,7 +225,7 @@ if __name__ == "__main__":
                                                    params[3])), np.log(likelihood_min)))
 
     # LBA ANALYTIC 
-    def lba_target(params, data):
+    def lba_target(params, data): # TODO add active and frozen dim vals
         return clba.batch_dlba2(rt = data[:, 0],
                                 choice = data[:, 1],
                                 v = params[:2],
@@ -217,17 +242,22 @@ if __name__ == "__main__":
                              w = .4 / 1024, 
                              p = 8,
                              data = args[0])
-
-        model.sample(num_samples = n_slice_samples, init = args[1])
+        
+        model.sample(num_samples = n_slice_samples,
+                     init = args[1],
+                     active_dims = active_dims,
+                     frozen_dim_vals = frozen_dims)
         return model.samples
 
     # Test navarro-fuss
-    def nf_posterior(args):
+    def nf_posterior(args): # TODO add active and frozen dim vals
         scp.random.seed()
         model = SliceSampler(bounds = args[2],
                              target = nf_target, 
                              w = .4 / 1024, 
-                             p = 8)
+                             p = 8,
+                             active_dims = active_dims,
+                             frozen_dim_vals = frozen_dims)
         
         model.sample(args[0], 
                      num_samples = n_slice_samples, 
