@@ -243,10 +243,11 @@ if __name__ == "__main__":
         model = SliceSampler(bounds = args[2], 
                              target = mlp_target, 
                              w = .4 / 1024, 
-                             p = 8,
-                             data = args[0])
+                             p = 8)
+                             
         
-        model.sample(num_samples = n_slice_samples,
+        model.sample(data = args[0],
+                     num_samples = n_slice_samples,
                      init = args[1],
                      active_dims = active_dims,
                      frozen_dim_vals = frozen_dims)
