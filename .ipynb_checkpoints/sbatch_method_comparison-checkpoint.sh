@@ -26,4 +26,4 @@
 # python -u /users/afengler/git_repos/nn_likelihoods/method_comparison_sim.py --machine ccv --method angle --nmcmcsamples 1000 --datatype real --infileid bg_stn_sampling_ready.pickle --boundmode train --outfilesig bg_stn_posterior_samples --outfileid $SLURM_ARRAY_TASK_ID
 
 
-python -u /users/afengler/git_repos/nn_likelihoods/method_comparison_sim.py --machine ccv --method ddm --nmcmcsamples 100 --datatype uniform --infileid base_data_perturbation_experiment_nexp_1_n_500_21.pickle --boundmode train --outfilesig test_new_slice_sampler --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 --frozendims 2 --frozendimsinit 0.6
+python -u /users/afengler/git_repos/nn_likelihoods/method_comparison_sim.py --machine ccv --method ddm --nmcmcsamples 100 --datatype uniform --infileid base_data_perturbation_experiment_nexp_1_n_500_21 --boundmode train --outfilesig test_new_slice_sampler --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 --frozendims 2 --frozendimsinit 0.6
