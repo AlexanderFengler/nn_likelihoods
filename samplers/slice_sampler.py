@@ -158,7 +158,7 @@ class SliceSampler:
         self.data = data
         
         if active_dims == 'all':
-            self.dims = np.array([i for i in range(len(bounds))])
+            self.dims = np.array([i for i in range(len(self.bounds))])
         else: 
             self.dims = np.array(active_dims)
         

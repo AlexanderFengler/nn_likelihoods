@@ -203,6 +203,7 @@ if __name__ == "__main__":
                                                              method_params = method_params)
     sampler_param_bounds = [sampler_param_bounds for i in range(data_grid.shape[0])]
     
+    print('sampler_params_bounds: ' ,sampler_param_bounds)
     # 
     print('param_grid: ', param_grid)
     print('shape of data_grid:', data_grid.shape)
