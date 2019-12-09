@@ -97,7 +97,7 @@ if __name__ == "__main__":
                      default = 2)
     CLI.add_argument("--activedims",
                      nargs = "*",
-                     type = int.
+                     type = int,
                      default = [0, 1, 2, 3])
     CLI.add_argument("--frozendims",
                      nargs = "*",
