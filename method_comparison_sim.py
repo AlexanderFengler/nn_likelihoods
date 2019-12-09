@@ -222,7 +222,8 @@ if __name__ == "__main__":
                                                    params[0],
                                                    params[1] * 2, 
                                                    params[2],
-                                                   params[3])), np.log(likelihood_min)))
+                                                   params[3])),
+                                                   np.log(likelihood_min)))
 
     # LBA ANALYTIC 
     def lba_target(params, data): # TODO add active and frozen dim vals
