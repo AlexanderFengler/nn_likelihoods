@@ -185,6 +185,10 @@ class SliceSampler:
             else:
                 tmp = init
                 
+                if not frozen_dims == 'none':
+                    for fdim in frozen_dims:
+                        tmp[fdim[0]] = fdim[1]
+                
             init_lp = self.target(tmp, self.data)
             
             # Make first sample

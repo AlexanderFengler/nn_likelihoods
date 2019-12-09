@@ -204,7 +204,8 @@ if __name__ == "__main__":
     sampler_param_bounds = [sampler_param_bounds for i in range(data_grid.shape[0])]
     
     print('sampler_params_bounds: ' ,sampler_param_bounds)
-    # 
+    print('active dims: ', active_dims)
+    print('frozen_dims: ', frozen_dims)
     print('param_grid: ', param_grid)
     print('shape of data_grid:', data_grid.shape)
 # ----------------------------------------------------------------------------------------------------
