@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.optimize import differential_evolution
 
 class SliceSampler:
     def __init__(self,
