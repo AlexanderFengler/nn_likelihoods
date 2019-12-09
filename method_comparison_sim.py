@@ -192,7 +192,9 @@ if __name__ == "__main__":
         param_grid = data[0]
         data_grid = data[1]
     elif data_type == 'perturbation_experiment':
-        pass # TODO fill in correct formatting for perturbation experiment
+        data = pickle.load(open(output_folder + file_, 'rb'))
+        param_grid = data[0]
+        data_grid = data[1]
     else:
         print('Unknown Datatype, results will likely not make sense')   
         
