@@ -186,8 +186,14 @@ class SliceSampler:
                     tmp[dim] = np.random.uniform(self.bounds[dim][0],
                                                  self.bounds[dim][1])
             elif init[:3] == 'mle':
+                # Make bounds for mle optimizer
+                bounds_tmp = [tuple(b) for b in self.bounds]
+                if not frozen_dim_vals == 'none':
+                    for fdim in frozen_dim_vals:
+                        bounds_tmp[fdim[0]] = (fdim[1], fdim[1])
+                        
                 out = self.optimizer(self.target, 
-                                     bounds = [tuple(b) for b in self.bounds], 
+                                     bounds = bounds_tmp, 
                                      args = (self.data,), 
                                      popsize = mle_popsize,
                                      polish = mle_polish,
