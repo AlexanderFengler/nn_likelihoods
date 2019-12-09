@@ -178,14 +178,14 @@ class SliceSampler:
                                                  self.bounds[dim][1])
                 
                 # Add in frozen dims
-                if not frozen_dims == 'none':
+                if not frozen_dim_vals == 'none':
                     for fdim in frozen_dims:
                         tmp[fdim[0]] = fdim[1]
                 
             else:
                 tmp = init
                 
-                if not frozen_dims == 'none':
+                if not frozen_dim_vals == 'none':
                     for fdim in frozen_dims:
                         tmp[fdim[0]] = fdim[1]
                 

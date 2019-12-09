@@ -124,7 +124,7 @@ if __name__ == "__main__":
     n_cpus = 'all'
     
     # Initialize the frozen dimensions
-    if len(args.frozendims) > 1:
+    if len(args.frozendims) >= 1:
         frozen_dims = [[args.frozendims[i], args.frozendimsinit[i]] for i in range(len(args.frozendims))]
         active_dims = args.activedims
     else:
