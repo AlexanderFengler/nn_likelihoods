@@ -199,6 +199,7 @@ class SliceSampler:
                                      polish = mle_polish,
                                      disp = mle_disp,
                                      maxiter = mle_maxiter)
+                print('MLE vector: ', out.x)
                 tmp = out.x
             else:
                 tmp = init
