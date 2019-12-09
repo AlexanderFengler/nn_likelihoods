@@ -14,6 +14,7 @@ import os
 import sys
 import argparse
 import scipy as scp
+from scipy.optimize import differential_evolution
 
 # Sampler
 from samplers import SliceSampler
@@ -107,6 +108,9 @@ if __name__ == "__main__":
                      nargs = '*',
                      type = float,
                      default = [])
+    CLI.add_argument("--samplerinit",
+                     type = str,
+                     default = 'mle') # 'mle', 'random', 'true'
     
     args = CLI.parse_args()
     print(args)
@@ -182,11 +186,11 @@ if __name__ == "__main__":
 
 # MAKE PARAMETER / DATA GRID -------------------------------------------------------------------------
     # REFORMULATE param bounds
+    print(data_folder + file_)
+    
     if data_type == 'real':
-        print(data_folder + file_)
         data = pickle.load(open(data_folder + file_, 'rb'))
         data_grid = data[0]
-        param_grid = ['random' for i in range(data_grid.shape[0])]
     elif data_type == 'uniform':
         data = pickle.load(open(output_folder + file_, 'rb'))
         param_grid = data[0]
@@ -197,7 +201,17 @@ if __name__ == "__main__":
         data_grid = data[1]
     else:
         print('Unknown Datatype, results will likely not make sense')   
-        
+    
+    # 
+    if args.samplerinit == 'random':
+        param_grid = ['random' for i in range(data_grid.shape[0])]
+    elif args.samplerinit == 'true':
+        if not (data_type == 'uniform' or data_type == 'perturbation_experiment'):
+            print('You cannot initialize true parameters if we are dealing with real data....')
+        param_grid = data[0]
+    elif args.samplerinit == 'mle':
+        param_grid = ['mle' for i in range(data_grid.shape[0])]
+    
     # Parameter bounds to pass to sampler    
     sampler_param_bounds = make_parameter_bounds_for_sampler(mode = mode, 
                                                              method_params = method_params)
@@ -246,7 +260,8 @@ if __name__ == "__main__":
                              target = mlp_target, 
                              w = .4 / 1024, 
                              p = 8)
-                             
+        
+        
         
         model.sample(data = args[0],
                      num_samples = n_slice_samples,

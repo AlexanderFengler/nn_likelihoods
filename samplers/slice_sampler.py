@@ -151,18 +151,24 @@ class SliceSampler:
                method = 'doubling', 
                init = 'random',
                active_dims = 'all', # str or list of dimensions
-               frozen_dim_vals = [[]] # list of lists where first elements in sublist is dimension and second is the assgined value or 'none' (only relevant when we consider random initialization, otherwise provided anyways)
+               frozen_dim_vals = [[]], # list of lists where first elements in sublist is dimension and second is the assgined value or 'none' (only relevant when we consider random initialization, otherwise provided anyways)
+               mle_popsize = 40,
+               mle_polish = False,
+               mle_disp = True,
+               mle_maxiter = 100
                ):
         
         # Initialize data
         self.data = data
         
+        # Subset active parameter dimensions
         if active_dims == 'all':
             self.dims = np.array([i for i in range(len(self.bounds))])
         else: 
             self.dims = np.array(active_dims)
         
-        # New sampler ? 
+        # Do we continue a chain or start a new one?
+        # If new one, 
         if add == False:
             id_start = 1
             
@@ -170,34 +176,40 @@ class SliceSampler:
             self.samples = np.zeros((num_samples, len(self.bounds))) # samples
             self.lp = np.zeros(num_samples) # sample log likelihoods
 
-            # Random initialization of starting points
+            # Taking care of initialization
             if init[0] == 'r':
                 tmp = np.zeros(len(self.bounds))
                 for dim in self.dims:
                     tmp[dim] = np.random.uniform(self.bounds[dim][0],
                                                  self.bounds[dim][1])
-                
-                # Add in frozen dims
-                if not frozen_dim_vals == 'none':
-                    for fdim in frozen_dim_vals:
-                        tmp[fdim[0]] = fdim[1]
-                
+            elif init[:3] == 'mle':
+                out = differential_evolution(self.target, 
+                                             bounds = [tuple(b) for b in self.bounds], 
+                                             args = (self.data), 
+                                             popsize = mle_popsize,
+                                             polish = mle_polish,
+                                             disp = mle_disp,
+                                             maxiter = mle_maxiter)
+                tmp = out.x
             else:
                 tmp = init
-                
-                if not frozen_dim_vals == 'none':
-                    for fdim in frozen_dim_vals:
-                        tmp[fdim[0]] = fdim[1]
+            
+            # Add in frozen dims
+            if not frozen_dim_vals == 'none':
+                for fdim in frozen_dim_vals:
+                    tmp[fdim[0]] = fdim[1]
                 
             init_lp = self.target(tmp, self.data)
-            print(tmp)
+            print('Init vector: ', tmp)
+            
             # Make first sample
             if method == 'doubling':
                 self.samples[0], self.lp[0] = self._slice_sample_doubling(tmp, init_lp)
             if method == 'step_out':
                 self.samples[0], self.lp[0] = self._slice_sample_step_out(tmp, init_lp)
         
-        # Or do we add samples to previous samples ?
+        # Or do we add samples to previous samples ? # TODO: Take care of frozen dimensions when we continue a chain (it is simpler, because we can freeze at whatever value the frozen dimension had up unitl now)
+        
         else: 
             # choose appropriate starting idx 
             id_start = self.samples.shape[0]
