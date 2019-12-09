@@ -190,7 +190,7 @@ class SliceSampler:
                         tmp[fdim[0]] = fdim[1]
                 
             init_lp = self.target(tmp, self.data)
-            print('tmp')
+            print(tmp)
             # Make first sample
             if method == 'doubling':
                 self.samples[0], self.lp[0] = self._slice_sample_doubling(tmp, init_lp)
