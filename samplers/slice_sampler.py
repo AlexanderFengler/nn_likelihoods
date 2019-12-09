@@ -188,7 +188,7 @@ class SliceSampler:
             elif init[:3] == 'mle':
                 out = self.optimizer(self.target, 
                                      bounds = [tuple(b) for b in self.bounds], 
-                                     args = (self.data), 
+                                     args = (self.data,), 
                                      popsize = mle_popsize,
                                      polish = mle_polish,
                                      disp = mle_disp,
