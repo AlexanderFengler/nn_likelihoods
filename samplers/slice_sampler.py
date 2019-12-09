@@ -167,12 +167,12 @@ class SliceSampler:
             id_start = 1
             
             # Initialize sample storage
-            self.samples = np.zeros((num_samples, self.dims.shape[0])) # samples
+            self.samples = np.zeros((num_samples, len(self.bounds))) # samples
             self.lp = np.zeros(num_samples) # sample log likelihoods
 
             # Random initialization of starting points
             if init[0] == 'r':
-                tmp = np.zeros(self.dims.shape[0])
+                tmp = np.zeros(len(self.bounds))
                 for dim in self.dims:
                     tmp[dim] = np.random.uniform(self.bounds[dim][0],
                                                  self.bounds[dim][1])
@@ -203,7 +203,7 @@ class SliceSampler:
             id_start = self.samples.shape[0]
             
             # Increase size so sample container
-            tmp_samples = np.zeros((self.samples.shape[0] + num_samples, self.dims.shape[0]))
+            tmp_samples = np.zeros((self.samples.shape[0] + num_samples, len(self.bounds)))
             tmp_samples[:self.samples.shape[0], :] = self.samples
             self.samples = tmp_samples
             
