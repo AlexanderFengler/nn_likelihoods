@@ -236,7 +236,7 @@ class SliceSampler:
         # Initialize data
         self.data = data
         # Initialize sample storage
-        self.samples = np.zeros((num_samples, self.dims)) # samples
+        self.samples = np.zeros((num_samples, len(self.bounds))) # samples
         self.lp = np.zeros(num_samples) # sample log likelihoods
 
         init = np.zeros(self.dims)
