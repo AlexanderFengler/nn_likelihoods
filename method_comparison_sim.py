@@ -186,9 +186,9 @@ if __name__ == "__main__":
 
 # MAKE PARAMETER / DATA GRID -------------------------------------------------------------------------
     # REFORMULATE param bounds
-    print(data_folder + file_)
     
     if data_type == 'real':
+        print(data_folder + file_)
         data = pickle.load(open(data_folder + file_, 'rb'))
         data_grid = data[0]
     elif data_type == 'uniform':
