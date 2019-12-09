@@ -17,7 +17,7 @@ class SliceSampler:
         self.p = p
         self.m = m
         self.print_interval = print_interval
-        self.active_dims = active_dims
+        #self.active_dims = active_dims
 
     # Doubling procedue for finding intervals
     def _find_interval_doubling(self, z, prev, dim):
