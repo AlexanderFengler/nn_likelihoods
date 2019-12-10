@@ -414,6 +414,7 @@ def kde_from_simulations(base_simulation_folder = '',
     # Make every string full directory
     files_ = [base_simulation_folder + '/' + file_ for file_ in files_]
 
+
     # Compute some derived quantities
     n_samples_by_kde_tmp = int(n_total / n_files)
 
@@ -449,8 +450,7 @@ def kde_from_simulations(base_simulation_folder = '',
         data.iloc[row_cnt:(row_cnt + n_kde), my_columns.index('rt')] = tmp_kde_samples[0].ravel()
         data.iloc[row_cnt:(row_cnt + n_kde), my_columns.index('choice')] = tmp_kde_samples[1].ravel()
         data.iloc[row_cnt:(row_cnt + n_kde), my_columns.index('log_l')] = tmp_kde.kde_eval(data = tmp_kde_samples).ravel()
-    
-    #--------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------
 
         # MIXTURE COMPONENT 2: Negative uniform part -------------------------------------
         choice_tmp = np.random.choice(tmp_sim_data[2]['possible_choices'],
