@@ -55,15 +55,13 @@
 
 # ---------------------------------------------------------------------------------------
 # Run rdgp
-n_parameter_sets=40000
+n_parameter_sets=20000
 bins=256
 n_c=2
 
 python -u dataset_generator.py --machine ccv --dgplist ddm full_ddm angle weibull_cdf ornstein --datatype r_dgp --nreps 1 --binned 1 --nbins $bins --maxt 10 --nchoices $n_c --nsimbnds 100 100000 --mode cnn --nparamsets $n_parameter_sets --save 1 --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID 
 
-
 # ---------------------------------------------------------------------------------------
-
 
 # python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv ornstein 2 100000 1 $SLURM_ARRAY_TASK_ID base_simulations 10000 0
 
