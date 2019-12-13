@@ -55,11 +55,11 @@
 
 # ---------------------------------------------------------------------------------------
 # Run rdgp
-n_parameter_sets=1000
+n_parameter_sets=40000
 bins=256
 n_c=2
 
-python -u dataset_generator.py --machine ccv --dgplist ddm full_ddm angle weibull_cdf ornstein --datatype r_dgp --nreps 1 --binned 1 --nbins $bins --maxt 10 --nchoices $n_c --nsimbnds 100 1000 --mode cnn --nparamsets $n_parameter_sets --save 1 --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID 
+python -u dataset_generator.py --machine ccv --dgplist ddm full_ddm angle weibull_cdf ornstein --datatype r_dgp --nreps 1 --binned 1 --nbins $bins --maxt 10 --nchoices $n_c --nsimbnds 100 100000 --mode cnn --nparamsets $n_parameter_sets --save 1 --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID 
 
 
 # ---------------------------------------------------------------------------------------
