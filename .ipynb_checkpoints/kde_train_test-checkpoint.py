@@ -68,7 +68,6 @@ if __name__ == "__main__":
                                        process_params = process_params,
                                        print_info = False)
     
-    
 # UNUSED --------------------------
     # LBA
 #     process_params = ['v_0', 'v_1', 'A', 'b', 's', 'ndt']

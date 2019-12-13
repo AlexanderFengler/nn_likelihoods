@@ -469,15 +469,17 @@ class data_generator():
                                                       '_' + self.file_id + '.pickle', 'wb'))
             return 'Dataset completed'
         else:
-            return param_grid, data_grid
+            return param_grid, data_grid, self.nsamples
 # ---------------------------------------------------------------------------------------
 
 # Functions outside the data generator class that use it --------------------------------
-def make_dataset_r_dgp(dgp_list = ['ddm', 'ornstein', 'angle', 'weibull'],
+def make_dataset_r_dgp(dgp_list = ['ddm', 'ornstein', 'angle', 'weibull', 'full_ddm'],
                        machine = 'x7',
+                       r_nsamples = True,
+                       n_sim_bnds = [100, 100000],
                        file_id = 'TEST',
-                       max_rt = 20.0,
-                       delta_t = 0.01,
+                       max_t = 10.0,
+                       delta_t = 0.001,
                        config = None,
                        save = False):
     """Generates datasets across kinds of simulators
@@ -508,6 +510,7 @@ def make_dataset_r_dgp(dgp_list = ['ddm', 'ornstein', 'angle', 'weibull'],
         model_ids.sort()
         data_grid_out = []
         param_grid_out = []
+        nsamples_out = []
     else:
         return 'Config should specify binned = True for simulations to start'
 
@@ -522,27 +525,49 @@ def make_dataset_r_dgp(dgp_list = ['ddm', 'ornstein', 'angle', 'weibull'],
         # Initialize data_generator class with new properties
         dg_tmp = data_generator(machine = machine,
                                 config = config,
-                                max_rt = max_rt,
+                                max_t = max_t,
                                 delta_t = delta_t)
         
         # Run the simulator
-        data_grid, param_grid = dg_tmp.make_dataset_uniform(save = False)
+        if r_nsamples:
+            param_grid, data_grid, nsamples = dg_tmp.make_dataset_r_sim(n_sim_bnds = n_sim_bnds,
+                                                                        save = False)
+        else:
+            param_grid, data_grid = dg_tmp.make_dataset_uniform(save = False)
+            
+        print(data_grid.shape)
+        print(param_grid.shape)
         
         # Append results
         data_grid_out.append(data_grid)
         param_grid_out.append(param_grid)
+        if r_nsamples:
+            nsamples_out.append(nsamples_out)
 
     if save:
         print('saving dataset')
-        pickle.dump((np.concatenate(out), model_ids, dgp_list), open(method_comparison_folder + \
-                                                                'base_data_uniform_r_dgp' + \
-                                                                '_nreps_' + str(self.config['nreps']) + \
-                                                                '_n_' + str(self.config['nsamples']) + \
-                                                                '_' + self.file_id + '.pickle', 'wb'))
+        if machine == 'x7':
+            out_folder = '/media/data_cifs/afengler/data/kde/rdgp/'
+        if machine == 'ccv':
+            out_folder = '/users/afengler/data/kde/rdgp/'
+            
+        out_folder = out_folder + 'training_data_' + str(int(config['binned'])) + \
+                     '_nbins_' + str(config['nbins']) + \
+                     '_nsimbnds_' + str(config['nsimbnds'][0]) + '_' + str(config['nsimbnds'][1]) +'/'
+            
+        if not os.path.exists(out_folder):
+                os.makedirs(out_folder)
+                
+        pickle.dump((np.concatenate(data_grid_out, axis = 1), model_ids, param_grid_out, dgp_list),
+                                                   open(out_folder + \
+                                                   'rdgp_nchoices_' + str(config['nchoices']) + \
+                                                   '_nreps_' + str(config['nreps']) + \
+                                                   '_nsimbnds_' + str(config['nsimbnds'][0]) + '_' + \
+                                                   str(config['nsimbnds'][1]) + \
+                                                   '_' + str(config['file_id']) + '.pickle', 'wb'))
         return 'Dataset completed'
-    
     else:
-        return (data_grid_out, param_grid_out, model_ids, dgp_list)  
+        return (np.concatenate(data_grid_out, axis = 1), model_ids, param_grid_out, dgp_list)  
 
 def bin_arbitrary_fptd(out = [0, 0],
                        bin_dt = 0.04,
@@ -583,7 +608,7 @@ if __name__ == "__main__":
     CLI.add_argument("--dgplist", 
                      nargs = "*",
                      type = str,
-                     default = ['ddm', 'ornstein', 'angle', 'weibull'])
+                     default = ['ddm', 'ornstein', 'angle', 'weibull', 'full_ddm'])
     CLI.add_argument("--datatype",
                      type = str,
                      default = 'uniform') # 'parameter_recovery, 'perturbation_experiment', 'r_sim', 'r_dgp', 'cnn_train'
@@ -605,12 +630,16 @@ if __name__ == "__main__":
     CLI.add_argument("--mode",
                      type = str,
                      default = 'mlp') # train, test, cnn
+    CLI.add_argument("--nsimbnds",
+                     nargs = '*',
+                     type = int,
+                     default = [100, 100000])
     CLI.add_argument("--nparamsets", 
                      type = int,
                      default = 10000)
     CLI.add_argument("--fileid",
                      type = str,
-                     default = '')
+                     default = 'TEST')
     CLI.add_argument("--save",
                      type = bool,
                      default = 0)
@@ -652,6 +681,7 @@ if __name__ == "__main__":
     config['nparamsets'] = args.nparamsets
     config['nreps'] = args.nreps
     config['pickleprotocol'] = args.pickleprotocol
+    config['nsimbnds'] = args.nsimbnds
     
     # Get data for the type of dataset we want
     if args.datatype == 'cnn_train':
@@ -691,6 +721,8 @@ if __name__ == "__main__":
         out = make_dataset_r_dgp(dgp_list = args.dgplist,
                                  machine = args.machine,
                                  file_id = args.fileid,
+                                 r_nsamples = True,
+                                 n_sim_bnds = args.nsimbnds,
                                  max_t = args.maxt,
                                  delta_t = args.deltat,
                                  config = config,
