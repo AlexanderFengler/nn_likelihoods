@@ -19,7 +19,7 @@
 #SBATCH --array=1-100
 
 # Run a command
-python -u kde_train_test.py --machine ccv --method weibull_cdf --simfolder training_data_binned_0_nbins_0_n_200 --fileprefix weibull_cdf_nchoices_2_train_data_binned_0_nbins_0_n_200 --outfolder training_data_binned_0_nbins_0_n_200 --nbyparam 1000 --mixture 0.8 0.1 0.1 --fileid $SLURM_ARRAY_TASK_ID
+python -u kde_train_test.py --machine ccv --method weibull_cdf --simfolder training_data_binned_0_nbins_0_n_20000 --fileprefix weibull_cdf_nchoices_2_train_data_binned_0_nbins_0_n_20000 --outfolder training_data_binned_0_nbins_0_n_20000 --nbyparam 1000 --mixture 0.8 0.1 0.1 --fileid $SLURM_ARRAY_TASK_ID
 
 #--fileid $SLURM_ARRAY_TASK_ID
 #python -u /users/afengler/git_repos/nn_likelihoods/navarro_fuss_train_test.py

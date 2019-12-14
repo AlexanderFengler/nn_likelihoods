@@ -19,7 +19,7 @@
 #SBATCH --array=1-100
 
 # Run a command
-python -u simulator_get_stats.py --machine ccv --method weibull_cdf --simfolder training_data_binned_0_nbins_0_n_200 --fileprefix weibull_cdf_nchoices_2_train_data_binned_0_nbins_0_n_200 --fileid $SLURM_ARRAY_TASK_ID
+python -u simulator_get_stats.py --machine ccv --method weibull_cdf --simfolder training_data_binned_0_nbins_0_n_20000 --fileprefix weibull_cdf_nchoices_2_train_data_binned_0_nbins_0_n_20000 --fileid $SLURM_ARRAY_TASK_ID
 
 #$SLURM_ARRAY_TASK_ID
 

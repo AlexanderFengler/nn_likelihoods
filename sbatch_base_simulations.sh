@@ -66,11 +66,10 @@
 
 # ---------------------------------------------------------------------------------------
 # Base data for mlp
-n_parameter_sets=100
-bins=256
+n_parameter_sets=10000
 n_c=2
 
-python -u dataset_generator.py --machine ccv --dgplist weibull_cdf --datatype cnn_train --nreps 1 --binned 0 --nbins 0 --maxt 20 --nchoices $n_c --nsamples 200 --mode mlp --nparamsets $n_parameter_sets --save 1 --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID 
+python -u dataset_generator.py --machine ccv --dgplist weibull_cdf --datatype cnn_train --nreps 1 --binned 0 --nbins 0 --maxt 20 --nchoices $n_c --nsamples 20000 --mode mlp --nparamsets $n_parameter_sets --save 1 --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID 
 
 #---------------------------------------------------------------------------------------
 
