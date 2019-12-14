@@ -403,7 +403,6 @@ class data_generator():
             data_grid = np.zeros((self.config['nparamsets'],
                                   self.config['nsamples'],
                                   2))
-        #print(param_grid)
         data_grid = np.array(self.generate_data_grid_parallel(param_grid = param_grid))
 
         if save:
@@ -506,8 +505,9 @@ def make_dataset_r_dgp(dgp_list = ['ddm', 'ornstein', 'angle', 'weibull', 'full_
     """
   
     if config['binned']:
-        model_ids = np.random.choice(len(dgp_list), size = (config['nparamsets'], 1))
-        model_ids.sort()
+        model_ids = np.random.choice(len(dgp_list),
+                                     size = (config['nparamsets'], 1))
+        model_ids.sort(axis = 0)
         data_grid_out = []
         param_grid_out = []
         nsamples_out = []
@@ -616,7 +616,7 @@ if __name__ == "__main__":
                      type = int,
                      default = 1)
     CLI.add_argument("--binned",
-                     type = bool,
+                     type = int,
                      default = 1)
     CLI.add_argument("--nbins",
                      type = int,

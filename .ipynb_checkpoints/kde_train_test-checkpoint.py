@@ -9,6 +9,7 @@ import psutil
 import pickle
 import os
 import sys
+import argparse
 
 import kde_training_utilities as kde_util
 import kde_class as kde
@@ -30,7 +31,7 @@ if __name__ == "__main__":
                      default = 'ddm_base_simulations')
     CLI.add_argument('--fileid',
                      type = str,
-                     default = '1')
+                     default = 'TEST')
     CLI.add_argument('--outfolder',
                      type = str,
                      default = 'train_test')
@@ -42,27 +43,32 @@ if __name__ == "__main__":
                      type = float,
                      default = [0.8, 0.1, 0.1])
     
+    args = CLI.parse_args()
+    print(args)
+    
     # Specify base simulation folder ------
-    if machine == 'x7':
+    if args.machine == 'x7':
         method_params = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle",
                                          "rb"))[args.method]
+        method_folder = method_params['method_folder_x7']
 
-    if machine == 'ccv':
+    if args.machine == 'ccv':
         method_params = pickle.load(open("/users/afengler/git_repos/nn_likelihoods/kde_stats.pickle", 
                                          "rb"))[args.method]
+        method_folder = method_params['method_folder']
     
     # Speficy names of process parameters
     process_params = method_params['param_names'] + method_params['boundary_param_names']
     
     # Make output folder if it doesn't exist
-    if not os.path.isdir(method_params['method_folder'] + target_folder):
-        os.mkdir(method_params['method_folder'] + target_folder)
+    if not os.path.isdir(method_folder + args.outfolder + '/'):
+        os.mkdir(method_folder + args.outfolder + '/')
 
     # Main function 
-    kde_util.kde_from_simulations_fast(base_simulation_folder = method_params['method_folder'] + args.simfolder,
+    kde_util.kde_from_simulations_fast(base_simulation_folder = method_folder + args.simfolder,
                                        file_name_prefix = args.fileprefix,
                                        file_id = args.fileid,
-                                       target_folder = method_parmas['method_folder'] + args.outfolder,
+                                       target_folder = method_folder + args.outfolder,
                                        n_by_param = args.nbyparam,
                                        mixture_p = args.mixture,
                                        process_params = process_params,

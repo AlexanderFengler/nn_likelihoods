@@ -13,6 +13,7 @@ import multiprocessing as mp
 from  multiprocessing import Process
 from  multiprocessing import Pool
 import psutil
+import argparse
 
 # System utilities
 from datetime import datetime
@@ -174,7 +175,9 @@ def filter_simulations(base_simulation_folder = '',
 def filter_simulations_fast(base_simulation_folder = '',
                             file_name_prefix = '',
                             file_id = 0,
+                            method_params = [],
                             param_ranges = 'none', # either 'none' or dict that specifies allowed ranges for parameters
+                            
                             filters = {'mode': 20, # != (checking if mode is max_rt)
                                        'choice_cnt': 10, # > (checking that each choice receive at least 10 samples in simulator)
                                        'mean_rt': 15, # < (checking that mean_rt is smaller than specified value
@@ -184,42 +187,46 @@ def filter_simulations_fast(base_simulation_folder = '',
                       ):
 
     file_ = pickle.load(open( base_simulation_folder + file_name_prefix + '_' + str(file_id) + '.pickle', 'rb' ))
-    init_cols = list(file_[0][2].keys())
-    n_datasets = len(file_)
+    init_cols = method_params['param_names'] + method_params['boundary_param_names']
+    n_datasets = file_[1].shape[0]
     
     # Initialize data frame
-    sim_stat_data = pd.DataFrame(np.zeros((n_datasets, len(init_cols))), columns = init_cols)
+    sim_stat_data = pd.DataFrame(file_[0], 
+                                 columns = init_cols)
     
-
     # MAX RT BY SIMULATION: TEST SHOULD BE CONSISTENT
-    n_simulations = file_[0][2]['n_samples']
-    n_choices = len(file_[0][2]['possible_choices'])
-    choices = file_[0][2]['possible_choices']
-    max_rts = np.zeros((n_datasets, 1))
-   
+    n_simulations = file_[1].shape[1] #['n_samples']
+    n_choices = len(np.unique(file_[1][0, :, 1])) # ['n_choices']
+    choices = np.unique(file_[1][0, :, 1])
+    #n_choices = len(file_[0][2]['possible_choices'])
+    #choices = file_[0][2]['possible_choices']
     
-    max_t = file_[0][2]['max_t']
-    max_ts = np.zeros((n_datasets, 1))
+    max_rts = np.zeros((n_datasets, 1))
+    
+    max_t = file_[2]['max_t']
+    sim_stat_data['max_t'] = max_t
+    
+    
     #max_ts[:] = max_t 
-
+    max_ts = np.zeros((n_datasets, 1))
     stds = np.zeros((n_datasets, n_choices))
     mean_rts = np.zeros((n_datasets, n_choices))
     choice_cnts = np.zeros((n_datasets, n_choices))
     modes = np.zeros((n_datasets, n_choices))
     mode_cnts = np.zeros((n_datasets, n_choices))
     
-
-    sim_stat_data = [None] * n_datasets
+    #sim_stat_data = [None] * n_datasets
 
     cnt = 0     
     for i in range(n_datasets):
-        max_rts[i] = (file_[i][0].max().round(2))
-        max_ts[i] = (file_[i][2]['max_t'])
+        max_rts[i] = (file_[1][i, :, 0].max().round(2))
+        max_ts[i] = max_t
+        #max_ts[i] = (file_[1][i][2]['max_t'])
         # Standard deviation of reaction times
         choice_cnt = 0
         for choice_tmp in choices:
 
-            tmp_rts = file_[i][0][file_[i][1] == choice_tmp]
+            tmp_rts = file_[1][i, :, 0][file_[1][i, :, 1] == choice_tmp]
             n_c = len(tmp_rts)
             choice_cnts[cnt, choice_cnt] = n_c
             mode_tmp = mode(tmp_rts)
@@ -230,22 +237,22 @@ def filter_simulations_fast(base_simulation_folder = '',
                 modes[cnt, choice_cnt] = float(mode_tmp[0])
                 mode_cnts[cnt, choice_cnt] = int(mode_tmp[1])
             else:
-                mean_rts[cnt, choice_cnt] = -1
-                stds[cnt, choice_cnt] = -1
-                modes[cnt, choice_cnt] = -1
+                mean_rts[cnt, choice_cnt] = - 1
+                stds[cnt, choice_cnt] = - 1
+                modes[cnt, choice_cnt] = - 1
                 mode_cnts[cnt, choice_cnt] = 0
 
             choice_cnt += 1
 
-        # Basic data column
-        sim_stat_data[cnt] = [file_[i][2][key] for key in list(file_[i][2].keys())]
+        # Basic data column 
+        # TODO: Put this back in respecting new input format
+        #sim_stat_data[cnt] = [file_[i][2][key] for key in list(file_[i][2].keys())]
 
         cnt += 1
         if cnt % 1000 == 0:
             print(cnt)
 
-    sim_stat_data = pd.DataFrame(sim_stat_data, columns = file_[0][2].keys())
-
+    #sim_stat_data = pd.DataFrame(sim_stat_data, columns = file_[0][2].keys())
     # Compute some more columns
     for i in range(0, n_choices, 1):
         sim_stat_data['mean_rt_' + str(i)] = mean_rts[:, i]
@@ -269,7 +276,7 @@ def filter_simulations_fast(base_simulation_folder = '',
 
     # FILTER 1: PARAMETER RANGES
     if param_ranges == 'none':
-            keep = sim_stat_data['a'] >= 0 # should return a vector of all true's
+            keep = sim_stat_data['max_t'] >= 0 # should return a vector of all true's
     else:
         cnt = 0
         for param in param_ranges.keys():
@@ -309,7 +316,7 @@ def kde_from_simulations_fast(base_simulation_folder = '',
                               print_info = False
                              ):
     
-    file_ = pickle.load(open( base_simulation_folder + file_name_prefix + '_' + str(file_id) + '.pickle', 'rb' ) )
+    file_ = pickle.load(open( base_simulation_folder + '/' + file_name_prefix + '_' + str(file_id) + '.pickle', 'rb' ) )
     stat_ = pickle.load(open( base_simulation_folder + '/simulator_statistics' + '_' + str(file_id) + '.pickle', 'rb' ) )
 
     # Initialize dataframe
@@ -322,21 +329,27 @@ def kde_from_simulations_fast(base_simulation_folder = '',
     n_unif_up = int(n_by_param * mixture_p[2])
     n_kde = n_kde + (n_by_param - n_kde - n_unif_up - n_unif_down) # correct n_kde if sum != n_by_param
     
+    # Add possible choices to file_[2] which is the meta data for the simulator (expected when loaded the kde class)
+    file_[2]['possible_choices'] = np.unique(file_[1][0, :, 1])
+    file_[2]['possible_choices'].sort()
     # CONTINUE HERE   
     # Main while loop --------------------------------------------------------------------
     row_cnt = 0
     cnt = 0
-    for i in range(len(file_)):
+    for i in range(file_[1].shape[0]):
         if stat_['keep_file'][i]:
             # Read in simulator file
-            tmp_sim_data = file_[i]
+            tmp_sim_data = file_[1][i]
             lb = cnt * n_by_param
+            
             # Make empty dataframe of appropriate size
+            p_cnt = 0
             for param in process_params:
-                data.iloc[(lb):(lb + n_by_param), my_columns.index(param)] = tmp_sim_data[2][param]
-
+                data.iloc[(lb):(lb + n_by_param), my_columns.index(param)] = file_[0][i, p_cnt] #tmp_sim_data[2][param]
+                p_cnt += 1
+            
             # MIXTURE COMPONENT 1: Get simulated data from kde -------------------------------
-            tmp_kde = kde_class.logkde(tmp_sim_data)
+            tmp_kde = kde_class.logkde((file_[1][i, :, 0], file_[1][i, :, 1], file_[2])) #[tmp_sim_data)
             tmp_kde_samples = tmp_kde.kde_sample(n_samples = n_kde)
 
             data.iloc[lb:(lb + n_kde), my_columns.index('rt')] = tmp_kde_samples[0].ravel()
@@ -345,9 +358,9 @@ def kde_from_simulations_fast(base_simulation_folder = '',
             # --------------------------------------------------------------------------------
 
             # MIXTURE COMPONENT 2: Negative uniform part -------------------------------------
-            choice_tmp = np.random.choice(tmp_sim_data[2]['possible_choices'],
+            choice_tmp = np.random.choice(file_[2]['possible_choices'], #['possible_choices'],
                                           size = n_unif_down)
-
+            
             rt_tmp = np.random.uniform(low = - 1,
                                        high = 0.0001,
                                        size = n_unif_down)
@@ -359,12 +372,12 @@ def kde_from_simulations_fast(base_simulation_folder = '',
 
 
             # MIXTURE COMPONENT 3: Positive uniform part --------------------------------------
-            choice_tmp = np.random.choice(tmp_sim_data[2]['possible_choices'],
+            choice_tmp = np.random.choice(file_[2]['possible_choices'],
                                           size = n_unif_up)
 
-            if tmp_sim_data[2]['max_t'] < 100:
+            if file_[2]['max_t'] < 100:
                 rt_tmp = np.random.uniform(low = 0.0001,
-                                           high = tmp_sim_data[2]['max_t'],
+                                           high = file_[2]['max_t'],
                                            size = n_unif_up)
             else:
                 rt_tmp = np.random.uniform(low = 0.0001, 
@@ -381,15 +394,16 @@ def kde_from_simulations_fast(base_simulation_folder = '',
     # -----------------------------------------------------------------------------------
 
     # Store data
-    print('writing data to file')
-    data.to_pickle(target_folder + '/data_' + uuid.uuid1().hex + '.pickle' , protocol = 4)
+    print('writing data to file: ', target_folder + '/data_' + str(file_id) + '.pickle')
+    pickle.dump(data.values, open(target_folder + '/data_' + str(file_id) + '.pickle', 'wb'), protocol = 4)
+    #data.to_pickle(target_folder + '/data_' + str(file_id) + '.pickle' , protocol = 4)
 
     # Write metafile if it doesn't exist already
     # Hack for now: Just copy one of the base simulations files over
     if os.path.isfile(target_folder + '/meta_data.pickle'):
         pass
     else:
-        pickle.dump(tmp_sim_data,  open(target_folder + '/meta_data.pickle', 'wb') )
+        pickle.dump(tmp_sim_data, open(target_folder + '/meta_data.pickle', 'wb') )
 
     return data
                                       

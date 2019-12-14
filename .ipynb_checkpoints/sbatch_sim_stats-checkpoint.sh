@@ -19,4 +19,7 @@
 #SBATCH --array=1-100
 
 # Run a command
-python -u /users/afengler/git_repos/nn_likelihoods/simulator_get_stats.py $SLURM_ARRAY_TASK_ID
+python -u simulator_get_stats.py --machine ccv --method weibull_cdf --simfolder training_data_binned_0_nbins_0_n_200 --fileprefix weibull_cdf_nchoices_2_train_data_binned_0_nbins_0_n_200 --fileid TEST
+
+#$SLURM_ARRAY_TASK_ID
+

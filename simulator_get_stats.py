@@ -16,6 +16,7 @@ import os
 import pickle 
 import uuid
 import sys
+import argparse
 
 # My own code
 import kde_class as kde
@@ -40,19 +41,21 @@ if __name__ == "__main__":
                      default = 'ddm_base_simulations')
     CLI.add_argument("--fileid",
                      type = str,
-                     default = 'test')
+                     default = 'TEST')
     args = CLI.parse_args()
     print(args)
     
     # Specify base simulation folder ------
-    if machine == 'x7':
+    if args.machine == 'x7':
         method_params = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle",
                                          "rb"))[args.method]
-
-    if machine == 'ccv':
+        base_simulation_folder = method_params['method_folder_x7'] + args.simfolder +'/'
+        
+    if args.machine == 'ccv':
         method_params = pickle.load(open("/users/afengler/git_repos/nn_likelihoods/kde_stats.pickle", 
                                          "rb"))[args.method]
-
+        base_simulation_folder = method_paras['method_folder'] + args.simfolder + '/'
+        
     # FILTERS: GENERAL
     filters = {'mode': 20, # != 
                'choice_cnt': 10, # > 
@@ -62,11 +65,12 @@ if __name__ == "__main__":
               }
     
     # Run filter new
-    kde_utils.filter_simulations_fast(base_simulation_folder = method_params['method_folder'] + args.simfolder,
-                                      file_name_prefix = args.fileprefix,
-                                      file_id = args.fileid,
-                                      param_ranges = 'none',
-                                      filters = filters)
+    kde_utils.filter_simulations_fast(base_simulation_folder = base_simulation_folder,
+                                       file_name_prefix = args.fileprefix,
+                                       file_id = args.fileid,
+                                       method_params = method_params,
+                                       param_ranges = 'none',
+                                       filters = filters)
 
 # unused ---------------------------------------------------------------
     # DDM ANGLE NDT
