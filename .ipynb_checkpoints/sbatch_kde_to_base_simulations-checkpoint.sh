@@ -14,12 +14,12 @@
 # Request runtime, memory, cores:
 #SBATCH --time=24:00:00
 #SBATCH --mem=24G
-#SBATCH -c 1
+#SBATCH -c 14
 #SBATCH -N 1
-#SBATCH --array=1-50
+#SBATCH --array=1-100
 
 # Run a command
-python -u kde_train_test.py --machine ccv --method weibull_cdf --simfolder training_data_binned_0_nbins_0_n_200 --fileprefix weibull_cdf_nchoices_2_train_data_binned_0_nbins_0_n_200 --outfolder train_test_TEST --nbyparam 1000 --mixture 0.8 0.1 0.1
+python -u kde_train_test.py --machine ccv --method weibull_cdf --simfolder training_data_binned_0_nbins_0_n_200 --fileprefix weibull_cdf_nchoices_2_train_data_binned_0_nbins_0_n_200 --outfolder training_data_binned_0_nbins_0_n_200 --nbyparam 1000 --mixture 0.8 0.1 0.1 --fileid $SLURM_ARRAY_TASK_ID
 
 #--fileid $SLURM_ARRAY_TASK_ID
 #python -u /users/afengler/git_repos/nn_likelihoods/navarro_fuss_train_test.py
