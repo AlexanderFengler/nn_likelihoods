@@ -54,7 +54,7 @@ if __name__ == "__main__":
     if args.machine == 'ccv':
         method_params = pickle.load(open("/users/afengler/git_repos/nn_likelihoods/kde_stats.pickle", 
                                          "rb"))[args.method]
-        base_simulation_folder = method_paras['method_folder'] + args.simfolder + '/'
+        base_simulation_folder = method_params['method_folder'] + args.simfolder + '/'
         
     # FILTERS: GENERAL
     filters = {'mode': 20, # != 
