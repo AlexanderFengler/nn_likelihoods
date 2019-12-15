@@ -3,7 +3,7 @@
 # Default resources are 1 core with 2.8GB of memory per core.
 
 # job name:
-#SBATCH -J angle_ndt_sim_stats
+#SBATCH -J tpl_2_weibull
 
 # priority
 #SBATCH --account=bibs-frankmj-condo
