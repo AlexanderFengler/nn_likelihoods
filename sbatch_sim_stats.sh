@@ -19,7 +19,8 @@
 #SBATCH --array=1-100
 
 # Run a command
-python -u simulator_get_stats.py --machine ccv --method angle --simfolder training_data_binned_0_nbins_0_n_20000 --fileprefix angle_nchoices_2_train_data_binned_0_nbins_0_n_20000 --fileid $SLURM_ARRAY_TASK_ID
+method='angle'
+python -u simulator_get_stats.py --machine ccv --method $method --simfolder training_data_binned_0_nbins_0_n_20000 --fileprefix ${method}_nchoices_2_train_data_binned_0_nbins_0_n_20000 --fileid $SLURM_ARRAY_TASK_ID
 
 #$SLURM_ARRAY_TASK_ID
 
