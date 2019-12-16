@@ -114,7 +114,9 @@ class logkde():
             n_by_choice[np.argmax(n_by_choice)] += 1
             print('rounding error catched')
             choices[n_samples - 1, 0] = np.random.choice(self.data['choices'])
-        
+            print('resolution: ', choices[n_samples - 1, 0])
+            print('choices allowed: ', self.data['choices'])
+            
         # Get samples
         cnt_low = 0
         for i in range(0, len(self.data['choices']), 1):

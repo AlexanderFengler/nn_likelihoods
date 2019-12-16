@@ -148,7 +148,7 @@ if __name__ == "__main__":
             model_paths = yaml.load(open("model_paths.yaml"))
 
         model_path = model_paths[method +  '_' + str(n_training_datasets_to_load)]
-        model = load_model(model_path + 'model_final.h5')
+        model = load_model(model_path + 'model_final.h5', custom_objects = {"huber_loss": tf.losses.huber_loss})
 
     # ---------------------------------------------------------------------------
 

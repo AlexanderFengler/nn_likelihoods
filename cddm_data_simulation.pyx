@@ -340,8 +340,8 @@ def ornstein_uhlenbeck(float v = 0, # drift parameter
                       ):
     
     # Initializations
-    rts = np.zeros((n_samples,1), dtype = DTYPE) # rt storage
-    choices = np.zeros((n_samples,1), dtype = np.intc) # choice storage
+    rts = np.zeros((n_samples, 1), dtype = DTYPE) # rt storage
+    choices = np.zeros((n_samples, 1), dtype = np.intc) # choice storage
 
     cdef float[:,:] rts_view = rts
     cdef int[:,:] choices_view = choices
