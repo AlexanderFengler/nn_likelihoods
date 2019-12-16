@@ -3,13 +3,13 @@
 # Default resources are 1 core with 2.8GB of memory per core.
 
 # job name:
-#SBATCH -J weibull_bg
+#SBATCH -J angle_bg
 
 # priority
 #SBATCH --account=bibs-frankmj-condo
 
 # output file
-#SBATCH --output /users/afengler/batch_job_out/weibull_bg_%A_%a.out
+#SBATCH --output /users/afengler/batch_job_out/angle_bg_%A_%a.out
 
 # Request runtime, memory, cores:
 #SBATCH --time=36:00:00
@@ -27,6 +27,6 @@
 
 # python -u /users/afengler/git_repos/nn_likelihoods/method_comparison_sim.py --machine ccv --method ddm --nmcmcsamples 100 --datatype perturbation_experiment --infileid 21 --boundmode train --outfilesig test_new_slice_sampler --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 3 --frozendims 2 --frozendimsinit 0.6 --samplerinit mle
 
-python -u /users/afengler/git_repos/nn_likelihoods/method_comparison_sim.py --machine ccv --method weibull_cdf --nmcmcsamples 10000 --datatype real --infileid bg_stn_sampling_ready.pickle --boundmode train --outfilesig _expanded_bounds_ --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 5 --samplerinit mle
+python -u /users/afengler/git_repos/nn_likelihoods/method_comparison_sim.py --machine ccv --method angle --nmcmcsamples 10000 --datatype real --infileid bg_stn_sampling_ready.pickle --boundmode train --outfilesig _expanded_bounds_ --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 --samplerinit mle
 
 #--frozendims 2 --frozendimsinit 0.5

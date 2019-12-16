@@ -1,4 +1,4 @@
-angle: /users/afengler/data/kde/angle/keras_models/dnnregressor_angle_ndt_09_28_19_18_05_42/
+
 #ddm: /users/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_08_08_19_23_37_48/
 ddm_analytic: /not/a/real/path
 ddm: /users/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_ndt_09_27_19_19_02_40/
@@ -21,5 +21,11 @@ ornstein: /users/afengler/data/kde/ornstein_uhlenbeck/keras_models/dnnregressor_
 # This weibull model is based on 100 files 1billion training samples
 weibull_cdf: /users/afengler/data/kde/weibull_cdf/keras_models/dnnregressor_weibull_cdf_12_15_19_21_41_21/
 
+# This weibull model is based on 100 files 1billion training samples
+angle:
+/users/afengler/data/kde/angle/keras_models/dnnregressor_angle_12_15_19_23_39_15/
+
+# This is an older angle mlp that used the more constrained parameter space
+#angle: /users/afengler/data/kde/angle/keras_models/dnnregressor_angle_ndt_09_28_19_18_05_42/
 # This is an older weibull mlp that used the more constrained parameter space
 # weibull_cdf: /users/afengler/data/kde/weibull_cdf/keras_models/dnnregressor_weibull_cdf_ndt_10_31_19_16_34_43/
