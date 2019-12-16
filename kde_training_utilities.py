@@ -196,7 +196,10 @@ def kde_from_simulations_fast(base_simulation_folder = '',
     n_kde = n_kde + (n_by_param - n_kde - n_unif_up - n_unif_down) # correct n_kde if sum != n_by_param
     
     # Add possible choices to file_[2] which is the meta data for the simulator (expected when loaded the kde class)
-    file_[2]['possible_choices'] = np.unique(file_[1][0, :, 1])
+    
+    # TODO: THIS INFORMATION SHOULD BE INCLUDED AS META-DATA INTO THE BASE SIMULATOIN FILES
+    file_[2]['possible_choices'] = np.unique([-1,1])
+    #file_[2]['possible_choices'] = np.unique(file_[1][0, :, 1])
     file_[2]['possible_choices'].sort()
     # CONTINUE HERE   
     # Main while loop --------------------------------------------------------------------
