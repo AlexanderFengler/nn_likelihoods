@@ -8,11 +8,11 @@ setup(
 #         ext_modules = cythonize("cddm_data_simulation.pyx", 
 #                                 annotate = True, 
 #                                 compiler_directives = {'language_level': "3"}),
-        ext_modules = cythonize("samplers/cslice_sampler.pyx",
-                              annotate = True, 
-                              compiler_directives = {'language_level': "3"}),
-        #ext_modules = cythonize("clba.pyx", annotate = True, compiler_directives = {'language_level': "3"}),
-        #ext_modules = cythonize("cdwiener.pyx", annotate = True, compiler_directives = {'language_level': "3"}),
+#         ext_modules = cythonize("samplers/cslice_sampler.pyx",
+#                               annotate = True, 
+#                               compiler_directives = {'language_level': "3"}),
+#         ext_modules = cythonize("clba.pyx", annotate = True, compiler_directives = {'language_level': "3"}),
+        ext_modules = cythonize("cdwiener.pyx", annotate = True, compiler_directives = {'language_level': "3"}),
         # ext_modules = cythonize("wfpt.pyx", language="c++"),
         include_dirs = [numpy.get_include()]
     )

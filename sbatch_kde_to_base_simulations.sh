@@ -9,14 +9,14 @@
 #SBATCH --account=bibs-frankmj-condo
 
 # output file
-#SBATCH --output /users/afengler/batch_job_out/weibull_cdf_ndt_train_test_%A_%a.out
+#SBATCH --output /users/afengler/batch_job_out/tpl3_%A_%a.out
 
 # Request runtime, memory, cores:
 #SBATCH --time=24:00:00
 #SBATCH --mem=32G
 #SBATCH -c 14
 #SBATCH -N 1
-#SBATCH --array=36-46
+#SBATCH --array=1-100
 
 # Run a command
 method='angle'
