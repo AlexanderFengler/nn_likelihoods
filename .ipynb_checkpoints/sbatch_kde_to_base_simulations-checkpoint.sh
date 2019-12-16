@@ -16,7 +16,7 @@
 #SBATCH --mem=32G
 #SBATCH -c 14
 #SBATCH -N 1
-#SBATCH --array=1-100
+#SBATCH --array=13,28,31,32,60
 
 # Run a command
 method='ornstein'
