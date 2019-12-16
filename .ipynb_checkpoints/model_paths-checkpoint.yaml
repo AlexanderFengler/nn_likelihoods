@@ -17,4 +17,9 @@ lba_analytic: /media/data_cifs/afengler/data/analytic/lba/keras_models/dnnregres
 lba_ndt: /users/afengler/data/kde/lba/keras_models/dnnregressor_lba_ndt_09_28_19_12_35_56/
 linear_collapse: /users/afengler/data/kde/linear_collapse/keras_models/dnnregressor_ddm_08_08_19_19_05_39/
 ornstein: /users/afengler/data/kde/ornstein_uhlenbeck/keras_models/dnnregressor_ornstein_08_15_19_16_36_05/
-weibull_cdf: /users/afengler/data/kde/weibull_cdf/keras_models/dnnregressor_weibull_cdf_ndt_10_31_19_16_34_43/
+
+# This weibull model is based on 100 files 1billion training samples
+weibull_cdf: /users/afengler/data/kde/weibull_cdf/keras_models/dnnregressor_weibull_cdf_12_15_19_21_41_21/
+
+# This is an older weibull mlp that used the more constrained parameter space
+# weibull_cdf: /users/afengler/data/kde/weibull_cdf/keras_models/dnnregressor_weibull_cdf_ndt_10_31_19_16_34_43/
