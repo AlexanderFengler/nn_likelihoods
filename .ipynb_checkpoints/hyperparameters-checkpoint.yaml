@@ -2,7 +2,7 @@ hidden_layers: [100, 100, 120, 1]
 hidden_activations: ["tanh", "tanh", "tanh", "linear"]
 filters: [128, 128, 128, 128]
 batch_size: 1000000
-n_epochs: 10
+n_epochs: 25
 learning_rate: .002 # I think was originally 0.0002
 momentum: .7
 model_type: "dnnregressor"
