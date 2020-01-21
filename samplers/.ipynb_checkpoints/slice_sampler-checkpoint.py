@@ -155,7 +155,7 @@ class SliceSampler:
                init = 'random',
                active_dims = 'all', # str or list of dimensions
                frozen_dim_vals = [[]], # list of lists where first elements in sublist is dimension and second is the assgined value or 'none' (only relevant when we consider random initialization, otherwise provided anyways)
-               mle_popsize = 40,
+               mle_popsize = 200,
                mle_polish = False,
                mle_disp = True,
                mle_maxiter = 100

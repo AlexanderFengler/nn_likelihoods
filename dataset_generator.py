@@ -595,6 +595,32 @@ def bin_arbitrary_fptd(out = [0, 0],
         print(np.histogram(out[:, 0][out[:, 1] == choice], bins = bins)[1])
         cnt += 1
     return counts
+
+
+def bin_simulator_output(self, 
+                             out = [0, 0],
+                             bin_dt = 0.04,
+                             nbins = 0): # ['v', 'a', 'w', 'ndt', 'angle']
+        
+        # Generate bins
+        if nbins == 0:
+            nbins = int(out[2]['max_t'] / bin_dt)
+            bins = np.zeros(nbins + 1)
+            bins[:nbins] = np.linspace(0, out[2]['max_t'], nbins)
+            bins[nbins] = np.inf
+        else:  
+            bins = np.zeros(nbins + 1)
+            bins[:nbins] = np.linspace(0, out[2]['max_t'], nbins)
+            bins[nbins] = np.inf
+
+        cnt = 0
+        counts = np.zeros( (nbins, len(out[2]['possible_choices']) ) )
+
+        for choice in out[2]['possible_choices']:
+            counts[:, cnt] = np.histogram(out[0][out[1] == choice], bins = bins)[0] / out[2]['n_samples']
+            cnt += 1
+        return counts
+    
 # -------------------------------------------------------------------------------------
 
 # RUN 
