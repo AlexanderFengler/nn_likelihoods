@@ -43,7 +43,7 @@ def extract_architecture(model,
 # Function to perform forward pass given architecture
 def predict(x, weights, biases, activations):
     # Activation dict
-    activation_fns = {"relu":relu, "linear":linear, 'sigmoid':sigmoid, "tanh":tanh}
+    activation_fns = {"relu":relu, "linear":linear, 'sigmoid':sigmoid, "tanh":np.tanh}
     for i in range(len(weights)):
         x = activation_fns[activations[i]](
             np.dot(x, weights[i]) + biases[i])
@@ -59,8 +59,7 @@ def log_p(params,
     param_grid = np.tile(params, (data.shape[0], 1))
     inp = np.concatenate([param_grid, data], axis = 1)
     if orig_output_log_l:
-        out = predict(inp, weights, biases, activations)
-        return - np.sum(out)
+        return - np.sum(predict(inp, weights, biases, activations))
     else:
         out = np.maximum(predict(inp, weights, biases, activations), ll_min)
         return - np.sum(np.log(out))

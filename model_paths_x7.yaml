@@ -18,7 +18,11 @@ fcn_weibull_cdf_3000: /media/data_cifs/afengler/data/kde/weibull_cdf/keras_model
 full: /media/data_cifs/afengler/data/kde/full_ddm/keras_models/dnnregressor_full_08_17_19_16_27_27/
 lba: /media/data_cifs/afengler/data/kde/lba/keras_models/dnnregressor_analytic_lba_08_21_19_12_01_09/
 linear_collapse: /media/data_cifs/afengler/data/kde/linear_collapse/keras_models/dnnregressor_ddm_08_08_19_19_05_39/
-ornstein: /media/data_cifs/afengler/data/kde/ornstein_uhlenbeck/keras_models/dnnregressor_ornstein_08_15_19_16_36_05/
+# ornstein: /media/data_cifs/afengler/data/kde/ornstein_uhlenbeck/keras_models/dnnregressor_ornstein_08_15_19_16_36_05/
+
+ornstein: /media/data_cifs/afengler/data/kde/ornstein/keras_models/dnnregressor_ornstein_12_16_19_17_44_25/
+
+
 ornstein_100: /media/data_cifs/afengler/data/kde/ornstein/keras_models/dnnregressor_ornstein_12_16_19_17_44_25/
 ornstein_2: /media/data_cifs/afengler/data/kde/ornstein/keras_models/dnnregressor_ornstein_12_16_19_17_37_30/
 weibull_cdf: /media/data_cifs/afengler/data/kde/weibull_cdf/keras_models/dnnregressor_weibull_cdf_ndt_10_31_19_16_34_43/

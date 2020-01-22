@@ -125,7 +125,7 @@ if __name__ == "__main__":
     infile_id = args.infileid
     out_file_id = args.outfileid
     out_file_signature = args.outfilesig
-    n_cpus = 'all'
+    n_cpus = 1  # 'all'
     
     # Initialize the frozen dimensions
     if len(args.frozendims) >= 1:
@@ -301,13 +301,20 @@ if __name__ == "__main__":
     else: 
         p = mp.Pool(n_cpus)
 
+    print(data_grid.shape)
+    print(param_grid)
+    print(sampler_param_bounds)
     # Run the sampler with correct target as specified above
-    if method == 'lba_analytic':
-        posterior_samples = np.array(p.map(lba_posterior, zip(data_grid, param_grid, sampler_param_bounds)))
-    elif method == 'ddm_analytic':
-        posterior_samples = np.array(p.map(nf_posterior, zip(data_grid, param_grid, sampler_param_bounds)))
+    if n_cpus == 'all':
+        if method == 'lba_analytic':
+            posterior_samples = np.array(p.map(lba_posterior, zip(data_grid, param_grid, sampler_param_bounds)))
+        elif method == 'ddm_analytic':
+            posterior_samples = np.array(p.map(nf_posterior, zip(data_grid, param_grid, sampler_param_bounds)))
+        else:
+            posterior_samples = np.array(p.map(mlp_posterior, zip(data_grid, param_grid, sampler_param_bounds)))
     else:
-        posterior_samples = np.array(p.map(mlp_posterior, zip(data_grid, param_grid, sampler_param_bounds)))
+        for i in range(1):
+            posterior_samples = mlp_posterior((data_grid[i], param_grid[i], sampler_param_bounds[i]))
 
     # Store files
     print('saving to file')
