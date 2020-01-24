@@ -1,6 +1,7 @@
 # Load packages
 #import tensorflow as tf
 #from tensorflow import keras
+import cython
 import numpy as np
 import pickle  
 
@@ -41,16 +42,14 @@ def extract_architecture(model,
     return weights, biases, activations
 
 # Function to perform forward pass given architecture
-# TD optimize this function as much as possible (need lakshmis advice for this....)
 def predict(x, weights, biases, activations, n_layers):
     # Activation dict
-    activation_fns = {"relu":relu, "linear":linear, 'sigmoid':sigmoid, "tanh":np.tanh}
+    activation_fns = {"relu":relu, "linear":linear, 'sigmoid':sigmoid, 'tanh':np.tanh}
 
     #for i in range(len(weights)):
     for i in range(n_layers):
         x = activation_fns[activations[i]](
             np.dot(x, weights[i]) + biases[i])
-        print('x shape', x.shape)
     return x
 
 def log_p(params, 
@@ -130,4 +129,4 @@ def get_tmp_params(params = [0, 1, 2, 3, 4],
 #         print('idx: ', idx)
 #         print('params out: ', params_tmp)
         return params_tmp
-# ------------------------------------      
+# ------------------------------------ 

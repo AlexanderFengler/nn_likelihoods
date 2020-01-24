@@ -2,7 +2,10 @@
 # We are not importing tensorflow or keras here
 # import tensorflow as tf
 # from tensorflow import keras
+import os
+#os.environ['NUMPY_EXPERIMENTAL_ARRAY_FUNCTION'] = '0'
 
+from numpy import ndarray
 import numpy as np
 import yaml
 import pandas as pd
@@ -10,14 +13,21 @@ from itertools import product
 import multiprocessing as mp
 import pickle
 import uuid
-import os
+
 import sys
 import argparse
 import scipy as scp
 from scipy.optimize import differential_evolution
 
+# import tensorflow as tf
+# from tensorflow import keras
+# from tensorflow.keras.models import load_model
+# os.environ["CUDA_DEVICE_ORDER"]= "PCI_BUS_ID"   # see issue #152
+# os.environ["CUDA_VISIBLE_DEVICES"] = '1'
+
 # Sampler
 from samplers import SliceSampler
+from samplers import DifferentialEvolutionSequential
 
 # Analytical Likelihood for ddm
 from cdwiener import batch_fptd
@@ -26,7 +36,10 @@ from cdwiener import batch_fptd
 import clba
 
 # Network converter
-import keras_to_numpy as ktnp
+#import keras_to_numpy as ktnp
+import ckeras_to_numpy as ktnp
+
+import keras_to_numpy_class as ktnpc
 # -----------------------------------------------------------------------------
 
 # SUPPORT FUNCTIONS -----------------------------------------------------------
@@ -155,6 +168,7 @@ if __name__ == "__main__":
         with open("model_paths_x7.yaml") as tmp_file:
             network_path = yaml.load(tmp_file)[method]
             print(network_path)
+            # model = load_model(network_path + 'model_final.h5', custom_objects = {"huber_loss": tf.losses.huber_loss})
 
     if machine == 'ccv':
         method_params = pickle.load(open("/users/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))[method]
@@ -172,12 +186,15 @@ if __name__ == "__main__":
         with open(network_path + "weights.pickle", "rb") as tmp_file:
             weights = pickle.load(tmp_file)
             print(weights)
+            for weight in weights:
+                print(weight.shape)
         with open(network_path + 'biases.pickle', 'rb') as tmp_file:
             biases = pickle.load(tmp_file)
             print(biases)
         with open(network_path + 'activations.pickle', 'rb') as tmp_file:
             activations = pickle.load(tmp_file)
             print(activations)
+        n_layers = int(len(weights))
 # ----------------------------------------------------------------
 
 # DEFINE TARGET LIKELIHOODS FOR CORRESPONDING MODELS -------------------------------------------------
@@ -218,22 +235,42 @@ if __name__ == "__main__":
     sampler_param_bounds = [sampler_param_bounds for i in range(data_grid.shape[0])]
     
     print('sampler_params_bounds: ' , sampler_param_bounds)
+    print('shape sampler param bounds: ', sampler_param_bounds[0].shape)
     print('active dims: ', active_dims)
     print('frozen_dims: ', frozen_dims)
     print('param_grid: ', param_grid)
+    print('shape of param_grid:', len(param_grid))
     print('shape of data_grid:', data_grid.shape)
 # ----------------------------------------------------------------------------------------------------
 
 # RUN POSTERIOR SIMULATIONS --------------------------------------------------------------------------
    # MLP TARGET
-    def mlp_target(params, data, 
-                   ll_min= -16.11809 # corresponds to 1e-7
-                  ): 
-        params_rep = np.tile(params, (data.shape[0], 1))
-        input_batch = np.concatenate([params_rep, data], axis = 1)
-        out = np.maximum(ktnp.predict(input_batch, weights, biases, activations), ll_min)
-        return np.sum(out)
+    n_params = sampler_param_bounds[0].shape[0]
+    mlpt = ktnpc.mlp_target(weights = weights, biases = biases, activations = activations, n_datapoints = data_grid.shape[1])
 
+    def mlp_target(params, 
+                   data, 
+                   ll_min= -16.11809 # corresponds to 1e-7
+                   ): 
+        
+        mlp_input_batch = np.zeros((data_grid.shape[1], sampler_param_bounds[0].shape[0] + 2), dtype = np.float32)
+        mlp_input_batch[:, :n_params] = params
+        mlp_input_batch[:, n_params:] = data
+
+        #print(mlpt.predict(x = mlp_input_batch))
+        # params_rep = np.tile(params, (data.shape[0], 1))
+        # input_batch = np.concatenate([params_rep, data], axis = 1)
+        #return np.sum(np.maximum(mlpt.predict(mlp_input_batch), ll_min))
+        return np.sum(np.core.umath.maximum(ktnp.predict(mlp_input_batch, weights, biases, activations, n_layers), ll_min))
+
+    # def mlp_target(params,
+    #                data,
+    #                ll_min = -16.11809):
+    #     mlp_input_batch[:, :n_params] = params
+    #     mlp_input_batch[:, n_params:] = data
+    #     #print(model.predict(mlp_input_batch).shape)
+    #     return np.sum(np.maximum(model.predict(mlp_input_batch)[:, 0], ll_min))
+    
     # NAVARRO FUSS (DDM)
     def nf_target(params, data, likelihood_min = 1e-48):
         return np.sum(np.maximum(np.log(batch_fptd(data[:, 0] * data[:, 1] * (- 1),
@@ -256,12 +293,14 @@ if __name__ == "__main__":
     # Define posterior samplers for respective likelihood functions
     def mlp_posterior(args): # args = (data, true_params)
         scp.random.seed()
-        model = SliceSampler(bounds = args[2], 
-                             target = mlp_target, 
-                             w = .4 / 1024, 
-                             p = 8)
-        
-        
+
+        model = DifferentialEvolutionSequential(bounds = args[2],
+                                                target = mlp_target)
+
+        # model = SliceSampler(bounds = args[2], 
+        #                      target = mlp_target, 
+        #                      w = .4 / 1024, 
+        #                      p = 8)
         
         model.sample(data = args[0],
                      num_samples = n_slice_samples,
@@ -304,6 +343,7 @@ if __name__ == "__main__":
     print(data_grid.shape)
     print(param_grid)
     print(sampler_param_bounds)
+    
     # Run the sampler with correct target as specified above
     if n_cpus == 'all':
         if method == 'lba_analytic':

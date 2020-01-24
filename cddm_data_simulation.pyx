@@ -4,7 +4,7 @@ from libc.stdlib cimport rand, RAND_MAX
 from libc.math cimport log, sqrt, fmax
 
 import numpy as np
-import pandas as pd
+#import pandas as pd
 from time import time
 import inspect
 import pickle

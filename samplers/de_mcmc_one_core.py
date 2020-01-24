@@ -1,9 +1,16 @@
 import numpy as np
 import scipy
+import scipy.optimize as scp_opt
 
 class DifferentialEvolutionSequential():
     
-    def __init__(self, bounds, target, NP_multiplier = 4, gamma = 0.4, proposal_var = 0.1, crp = 0.3):
+    def __init__(self, 
+                 bounds, 
+                 target, 
+                 NP_multiplier = 4, 
+                 gamma = 0.4, 
+                 proposal_var = 0.02, 
+                 crp = 0.3):
         """
         Params
         -----
@@ -20,15 +27,19 @@ class DifferentialEvolutionSequential():
         gamma: float
             gamma parameter to mediate the magnitude of the update
         """
-        self.dims = bounds.shape[0]
+        self.optimizer = scp_opt.differential_evolution
+        self.dims = len(bounds) #np.array([i for i in range(len(bounds))])
         self.bounds = bounds
         self.NP = int(np.floor(NP_multiplier * self.dims))
         self.target = target
         self.gamma = gamma
         self.proposal_var = proposal_var
         self.crp = crp
-        
-        
+    
+    def attach_sample(self, samples)
+        assert samples.shape[1] == self.NP, 'Population size of previous sample does not match NP parameter value')
+        self.samples = samples
+
     def anneal_logistic(self, x = 1, k = 1/100, L = 10):
         return 1 + (2 * L - (2 * L / (1 + np.exp(- k * (x)))))
     
@@ -52,6 +63,7 @@ class DifferentialEvolutionSequential():
             R1 = pop
             while R1 == pop:
                 R1 = np.random.choice(pop_seq)
+            
             R2 = pop
             while R2 == pop or R2 == R1:
                 R2 = np.random.choice(pop_seq)
@@ -76,7 +88,17 @@ class DifferentialEvolutionSequential():
                 self.samples[idx, pop, :] = proposals[pop, :]
                 self.lps[idx, pop] = proposals_lps[pop]
    
-    def sample(self, data, num_samples = 800, add = False, crossover = True, anneal_k = 1 / 80, anneal_L = 10): 
+    def sample(self, 
+               data, 
+               num_samples = 800, 
+               add = False, 
+               crossover = True, 
+               anneal_k = 1 / 80, 
+               anneal_L = 10,
+               init = 'random',
+               active_dims = None,
+               frozen_dim_vals = None): 
+        
         if add == False:
             self.data = data
             self.lps = np.zeros((num_samples, self.NP))
