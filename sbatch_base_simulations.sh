@@ -9,7 +9,7 @@
 #SBATCH --account=bibs-frankmj-condo
 
 # output file
-#SBATCH --output /users/afengler/batch_job_out/tpl1_%A_%a.out
+#SBATCH --output /users/afengler/batch_job_out/tpl_1_%A_%a.out
 
 # Request runtime, memory, cores:
 #SBATCH --time=48:00:00
@@ -21,7 +21,7 @@
 # --------------------------------------------------------------------------------------
 # Sequentially run different kind of models
 
-declare -a dgps=( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "lca" "race_model" ) 
+#declare -a dgps=( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "lca" "race_model" ) 
 declare -a dgps=( "full_ddm" "weibull_cdf" "ornstein" "race_model" ) 
 n_samples=( 110000 )   # ( 128 256 512 1024 2048 4096 8192 50000 100000 200000 400000 )
 n_choices=( 2 4 6 ) #( 4 5 6 )
@@ -40,12 +40,12 @@ do
             then
                 for n_c in "${n_choices[@]}"
                     do
-                       python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype ccn_train --nreps 1 --binned 1 --nbins $bins --maxt 10 --nchoices $n_c --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --deltat 0.001 #--fileid $SLURM_ARRAY_TASK_ID 
+                       python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype ccn_train --nreps 1 --binned 1 --nbins $bins --maxt 10 --nchoices $n_c --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID 
                        echo "$dgp"
                        echo $n_c
                 done
             else
-                 python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype ccn_train --nreps 1 --binned 1 --nbins $bins --maxt 10 --nchoices 2 --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1  --deltat 0.001 #--fileid $SLURM_ARRAY_TASK_ID
+                 python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype ccn_train --nreps 1 --binned 1 --nbins $bins --maxt 10 --nchoices 2 --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1  --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID
                  echo "$dgp"
                  echo $n_c
             fi
@@ -53,7 +53,7 @@ do
                 # normal call to function
     done
 done
----------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------------------
 # Run rdgp
