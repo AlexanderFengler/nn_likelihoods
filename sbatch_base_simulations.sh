@@ -6,8 +6,8 @@
 #SBATCH -J tpl_1_weibull
 
 # priority
-#SBATCH --account=bibs-frankmj-condo
-##SBATCH --account=carney-frankmj-condo
+##SBATCH --account=bibs-frankmj-condo
+#SBATCH --account=carney-frankmj-condo
 
 # output file
 #SBATCH --output /users/afengler/batch_job_out/tpl_1_%A_%a.out
