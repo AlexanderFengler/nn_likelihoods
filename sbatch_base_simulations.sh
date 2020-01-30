@@ -7,6 +7,7 @@
 
 # priority
 #SBATCH --account=bibs-frankmj-condo
+##SBATCH --account=carney-frankmj-condo
 
 # output file
 #SBATCH --output /users/afengler/batch_job_out/tpl_1_%A_%a.out
@@ -40,12 +41,12 @@ do
             then
                 for n_c in "${n_choices[@]}"
                     do
-                       python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype ccn_train --nreps 1 --binned 1 --nbins $bins --maxt 10 --nchoices $n_c --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID 
+                       python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype cnn_train --nreps 1 --binned 1 --nbins $bins --maxt 10 --nchoices $n_c --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID 
                        echo "$dgp"
                        echo $n_c
                 done
             else
-                 python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype ccn_train --nreps 1 --binned 1 --nbins $bins --maxt 10 --nchoices 2 --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1  --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID
+                 python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype cnn_train --nreps 1 --binned 1 --nbins $bins --maxt 10 --nchoices 2 --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1  --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID
                  echo "$dgp"
                  echo $n_c
             fi
