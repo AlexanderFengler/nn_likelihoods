@@ -16,42 +16,44 @@
 #SBATCH --mem=32G
 #SBATCH -c 14
 #SBATCH -N 1
-#SBATCH --array=1-100
+#SBATCH --array=51-100
 
 # --------------------------------------------------------------------------------------
 # Sequentially run different kind of models
 
-# declare -a dgps=( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "lca" "race_model" ) 
-# n_samples=( 128 256 512 1024 2048 4096 8192 ) #( 50000 100000 200000 400000 )
-# n_choices=( 2 3 4 ) #( 4 5 6 )
-# n_parameter_sets=100  #20000
-# n_bins=( 256 512 )
-# # outer -------------------------------------
-# for bins in "${n_bins[@]}"
-# do
-#     for n in "${n_samples[@]}"
-#     do
-#     # inner -------------------------------------
-#         for dgp in "${dgps[@]}"
-#         do
-#             if [[ "$dgp" = "lca" ]] || [[ "$dgp" = "race_model" ]];
-#             then
-#                 for n_c in "${n_choices[@]}"
-#                     do
-#                        python -u dataset_generator.py --machine x7 --dgplist $dgp --datatype parameter_recovery --nreps 10 --binned 1 --nbins $bins --maxt 10 --nchoices $n_c --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --deltat 0.001 #--fileid $SLURM_ARRAY_TASK_ID 
-#                        echo "$dgp"
-#                        echo $n_c
-#                 done
-#             else
-#                  python -u dataset_generator.py --machine x7 --dgplist $dgp --datatype parameter_recovery --nreps 10 --binned 1 --nbins $bins --maxt 10 --nchoices 2 --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1  --deltat 0.001 #--fileid $SLURM_ARRAY_TASK_ID
-#                  echo "$dgp"
-#                  echo $n_c
-#             fi
-#         done
-#                 # normal call to function
-#     done
-# done
-# ---------------------------------------------------------------------------------------
+declare -a dgps=( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "lca" "race_model" ) 
+declare -a dgps=( "full_ddm" "weibull_cdf" "ornstein" "race_model" ) 
+n_samples=( 110000 )   # ( 128 256 512 1024 2048 4096 8192 50000 100000 200000 400000 )
+n_choices=( 2 4 6 ) #( 4 5 6 )
+n_parameter_sets=100
+n_bins=( 256 )
+machine="ccv"
+# outer -------------------------------------
+for bins in "${n_bins[@]}"
+do
+    for n in "${n_samples[@]}"
+    do
+    # inner -------------------------------------
+        for dgp in "${dgps[@]}"
+        do
+            if [[ "$dgp" = "lca" ]] || [[ "$dgp" = "race_model" ]];
+            then
+                for n_c in "${n_choices[@]}"
+                    do
+                       python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype ccn_train --nreps 1 --binned 1 --nbins $bins --maxt 10 --nchoices $n_c --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --deltat 0.001 #--fileid $SLURM_ARRAY_TASK_ID 
+                       echo "$dgp"
+                       echo $n_c
+                done
+            else
+                 python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype ccn_train --nreps 1 --binned 1 --nbins $bins --maxt 10 --nchoices 2 --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1  --deltat 0.001 #--fileid $SLURM_ARRAY_TASK_ID
+                 echo "$dgp"
+                 echo $n_c
+            fi
+        done
+                # normal call to function
+    done
+done
+---------------------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------------------
 # Run rdgp
@@ -66,11 +68,11 @@
 
 # ---------------------------------------------------------------------------------------
 # Base data for mlp
-n_parameter_sets=10000
-n_c=2
-method='ornstein'
+# n_parameter_sets=10000
+# n_c=2
+# method='ornstein'
 
-python -u dataset_generator.py --machine ccv --dgplist $method --datatype cnn_train --nreps 1 --binned 0 --nbins 0 --maxt 20 --nchoices $n_c --nsamples 20000 --mode mlp --nparamsets $n_parameter_sets --save 1 --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID
+# python -u dataset_generator.py --machine ccv --dgplist $method --datatype cnn_train --nreps 1 --binned 0 --nbins 0 --maxt 20 --nchoices $n_c --nsamples 20000 --mode mlp --nparamsets $n_parameter_sets --save 1 --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID
 
 #---------------------------------------------------------------------------------------
 
