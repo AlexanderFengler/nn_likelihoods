@@ -9,6 +9,7 @@ import pickle
 import uuid
 import os
 import sys
+from datetime import datetime
 #from tqdm import tqdm
 
 import boundary_functions as bf
@@ -709,7 +710,11 @@ if __name__ == "__main__":
     config['pickleprotocol'] = args.pickleprotocol
     config['nsimbnds'] = args.nsimbnds
     
+
+
     # Get data for the type of dataset we want
+    start_t = datetime.now()
+
     if args.datatype == 'cnn_train':
         dg = data_generator(machine = args.machine,
                             file_id = args.fileid,
@@ -753,4 +758,7 @@ if __name__ == "__main__":
                                  delta_t = args.deltat,
                                  config = config,
                                  save = args.save)
+
+    finish_t = datetime.now()
+    print('Time elapsed: ', finish_t - start_t)
     print('Finished')
