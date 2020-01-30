@@ -36,8 +36,8 @@ class DifferentialEvolutionSequential():
         self.proposal_var = proposal_var
         self.crp = crp
     
-    def attach_sample(self, samples)
-        assert samples.shape[1] == self.NP, 'Population size of previous sample does not match NP parameter value')
+    def attach_sample(self, samples):
+        assert samples.shape[1] == self.NP, 'Population size of previous sample does not match NP parameter value'
         self.samples = samples
 
     def anneal_logistic(self, x = 1, k = 1/100, L = 10):
