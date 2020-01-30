@@ -3,11 +3,11 @@
 # Default resources are 1 core with 2.8GB of memory per core.
 
 # job name:
-#SBATCH -J tpl_1_weibull
+#SBATCH -J train_dat
 
 # priority
-##SBATCH --account=bibs-frankmj-condo
-#SBATCH --account=carney-frankmj-condo
+#SBATCH --account=bibs-frankmj-condo
+##SBATCH --account=carney-frankmj-condo
 
 # output file
 #SBATCH --output /users/afengler/batch_job_out/tpl_1_%A_%a.out
@@ -15,18 +15,18 @@
 # Request runtime, memory, cores:
 #SBATCH --time=48:00:00
 #SBATCH --mem=32G
-#SBATCH -c 32
+#SBATCH -c 14
 #SBATCH -N 1
-#SBATCH --array=51-100
+#SBATCH --array=51-150
 
 # --------------------------------------------------------------------------------------
 # Sequentially run different kind of models
 
 #declare -a dgps=( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "lca" "race_model" ) 
 declare -a dgps=( "full_ddm" "weibull_cdf" "ornstein" "race_model" ) 
-n_samples=( 110000 )   # ( 128 256 512 1024 2048 4096 8192 50000 100000 200000 400000 )
+n_samples=( 100000 )   # ( 128 256 512 1024 2048 4096 8192 50000 100000 200000 400000 )
 n_choices=( 4 6 ) #( 4 5 6 )
-n_parameter_sets=100
+n_parameter_sets=20000
 n_bins=( 256 )
 machine="ccv"
 # outer -------------------------------------
