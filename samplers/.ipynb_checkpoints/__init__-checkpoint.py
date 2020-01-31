@@ -8,3 +8,4 @@ from .mh_componentwise import MetropolisHastingsComponentwise
 #from .particle_filter_parallel import ParticleFilterParallel
 from .slice_sampler import SliceSampler
 #from .importance import ImportanceSampler
+#from .diagnostics import diagnostics
