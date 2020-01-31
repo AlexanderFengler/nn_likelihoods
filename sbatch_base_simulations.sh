@@ -17,15 +17,15 @@
 #SBATCH --mem=32G
 #SBATCH -c 14
 #SBATCH -N 1
-#SBATCH --array=51-150
+#SBATCH --array=1-50
 
 # --------------------------------------------------------------------------------------
 # Sequentially run different kind of models
 
 #declare -a dgps=( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "lca" "race_model" ) 
-declare -a dgps=( "full_ddm" "weibull_cdf" "ornstein" "race_model" ) 
+declare -a dgps=( "race_model" ) 
 n_samples=( 100000 )   # ( 128 256 512 1024 2048 4096 8192 50000 100000 200000 400000 )
-n_choices=( 4 6 ) #( 4 5 6 )
+n_choices=( 6 ) #( 4 5 6 )
 n_parameter_sets=20000
 n_bins=( 256 )
 machine="ccv"
