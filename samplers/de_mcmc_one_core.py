@@ -1,7 +1,7 @@
 import numpy as np
 import scipy
 import scipy.optimize as scp_opt
-import diagnostics as mcmcdiag
+import samplers.diagnostics as mcmcdiag
 
 class DifferentialEvolutionSequential():
     
@@ -153,11 +153,14 @@ class DifferentialEvolutionSequential():
                 print("Iteration {}".format(i))
                 
                 # Adaptive step
-                if (i > 1000 and self.n_adaptations < 10):
-                    if (self.accept_cnt / self.total_cnt) < 0.1:
+                if (i > 1000):
+                    acc_rat_tmp = self.accept_cnt / self.total_cnt
+                    print('Acceptance ratio: ', acc_rat_tmp)
+                    if (acc_rat_tmp) < 0.1:
                         self.proposal_var = self.proposal_var / 2
                         print('New proposal variance: ', self.proposal_var)
-                    if (self.accept_cnt / self.total_cnt) > 0.4:
+                    
+                    if (acc_rat_tmp) > 0.4:
                         self.proposal_var = self.proposal_var * 1.5
                         print('New proposal variance: ', self.proposal_var)
                     
@@ -166,8 +169,8 @@ class DifferentialEvolutionSequential():
                     
                 if ((i > 2000) and (i % 1000)):
                     continue_, r_hat = mcmcdiag.get_gelman_rubin_mv(chains = self.samples,
-                                                                burn_in = 1000,
-                                                                tresh = 1.005)
+                                                                    burn_in = 1000,
+                                                                    thresh = 1.005)
                     print('Gelman Rubin: ', r_hat)
                     print('Contineu: ', continue_)
                     if not continue_:

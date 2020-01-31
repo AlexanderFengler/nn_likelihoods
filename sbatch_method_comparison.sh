@@ -29,7 +29,8 @@
 
 # python -u /users/afengler/git_repos/nn_likelihoods/method_comparison_sim.py --machine ccv --method ornstein --nmcmcsamples 100 --datatype real --infileid bg_stn_sampling_ready.pickle --boundmode train --outfilesig _expanded_bounds_ --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 --samplerinit mle
 
-python -m cProfile -s tottime /media/data_cifs/afengler/git_repos/nn_likelihoods/method_comparison_sim.py --machine x7 --method ornstein --nmcmcsamples 4000 --datatype real --infileid bg_stn_sampling_ready.pickle --boundmode train --outfilesig _expanded_bounds_test_ --outfileid 999 --activedims 0 1 2 3 4 --samplerinit random > profile_out.txt
+# python -m cProfile -s tottime /media/data_cifs/afengler/git_repos/nn_likelihoods/method_comparison_sim.py --machine x7 --method ornstein --nmcmcsamples 4000 --datatype real --infileid bg_stn_sampling_ready.pickle --boundmode train --outfilesig _expanded_bounds_test_ --outfileid 999 --activedims 0 1 2 3 4 --samplerinit random > profile_out.txt
+python -u /media/data_cifs/afengler/git_repos/nn_likelihoods/method_comparison_sim.py --machine x7 --method ornstein --nmcmcsamples 5000 --datatype real --infileid bg_stn_sampling_ready.pickle --boundmode train --outfilesig _expanded_bounds_test_ --outfileid 999 --activedims 0 1 2 3 4 --samplerinit random
 
 #
 #--frozendims 2 --frozendimsinit 0.5
