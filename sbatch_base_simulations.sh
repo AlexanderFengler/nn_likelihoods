@@ -6,8 +6,8 @@
 #SBATCH -J train_dat
 
 # priority
-##SBATCH --account=bibs-frankmj-condo
-#SBATCH --account=carney-frankmj-condo
+#SBATCH --account=bibs-frankmj-condo
+##SBATCH --account=carney-frankmj-condo
 
 # output file
 #SBATCH --output /users/afengler/batch_job_out/tpl_1_%A_%a.out
@@ -17,18 +17,19 @@
 #SBATCH --mem=32G
 #SBATCH -c 14
 #SBATCH -N 1
-#SBATCH --array=1-50
+#SBATCH --array=51-150
 
 # --------------------------------------------------------------------------------------
 # Sequentially run different kind of models
 
 #declare -a dgps=( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "lca" "race_model" ) 
-declare -a dgps=( "race_model" ) 
+declare -a dgps=( "ddm" "angle" ) # "ornstein" "weibull_cdf" ) 
 n_samples=( 100000 )   # ( 128 256 512 1024 2048 4096 8192 50000 100000 200000 400000 )
-n_choices=( 6 ) #( 4 5 6 )
+n_choices=( 2 ) #( 4 5 6 )
 n_parameter_sets=20000
 n_bins=( 256 )
-machine="ccv"
+machine="x7"
+datatype="cnn_train" # "parameter_recovery"
 # outer -------------------------------------
 for bins in "${n_bins[@]}"
 do
@@ -41,12 +42,12 @@ do
             then
                 for n_c in "${n_choices[@]}"
                     do
-                       python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype cnn_train --nreps 1 --binned 1 --nbins $bins --maxt 10 --nchoices $n_c --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID 
+                       python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype $datatype --nreps 1 --binned 1 --nbins $bins --maxt 10 --nchoices $n_c --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID 
                        echo "$dgp"
                        echo $n_c
                 done
             else
-                 python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype cnn_train --nreps 1 --binned 1 --nbins $bins --maxt 10 --nchoices 2 --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1  --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID
+                 python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype $datatype --nreps 1 --binned 1 --nbins $bins --maxt 10 --nchoices 2 --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1  --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID
                  echo "$dgp"
                  echo $n_c
             fi
