@@ -28,7 +28,7 @@ n_samples=( 100000 )   # ( 128 256 512 1024 2048 4096 8192 50000 100000 200000 4
 n_choices=( 2 ) #( 4 5 6 )
 n_parameter_sets=20000
 n_bins=( 256 )
-machine="x7"
+machine="ccv"
 datatype="cnn_train" # "parameter_recovery"
 # outer -------------------------------------
 for bins in "${n_bins[@]}"
