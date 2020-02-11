@@ -173,7 +173,8 @@ class data_generator():
         # Epsilon correction of boundaries (to make sure for parameter recovery we don't generate straight at the bound)
         eps = 0
         if self.config['datatype'] == 'parameter_recovery':
-            eps = 0.05
+            # TD make eps parameter
+            eps = 0.2
 
         # If model is lba, lca, race we need to expand parameter boundaries to account for
         # parameters that depend on the number of choices
