@@ -523,11 +523,13 @@ def ddm_flexbound_seq2(float v1 = 0,
 # Simulate (rt, choice) tuples from: DDM WITH FLEXIBLE BOUNDARIES ------------------------------------
 @cython.boundscheck(False)
 @cython.wraparound(False)
-def ddm_flexbound_par2(float v1 = 0,
-                       float v2 = 0,
+def ddm_flexbound_par2(float v_h = 0, 
+                       float v_l_1 = 0,
+                       float v_l_2 = 0,
                        float a = 1,
-                       float w1 = 0.5,
-                       float w2 = 0.5,
+                       float w_h = 0.5,
+                       float w_l_1 = 0.5,
+                       float w_l_2 = 0.5,
                        float ndt = 0.5,
                        float s = 1,
                        float delta_t = 0.001,
@@ -542,8 +544,8 @@ def ddm_flexbound_par2(float v1 = 0,
     rts = np.zeros((n_samples, 1), dtype = DTYPE)
     choices = np.zeros((n_samples, 1), dtype = np.intc)
 
-    cdef float[:,:] rts_view = rts
-    cdef int[:,:] choices_view = choices
+    cdef float[:, :] rts_view = rts
+    cdef int[:, :] choices_view = choices
 
     cdef float delta_t_sqrt = sqrt(delta_t) # correct scalar so we can use standard normal samples for the brownian motion
     cdef float sqrt_st = delta_t_sqrt * s # scalar to ensure the correct variance for the gaussian step
@@ -567,57 +569,63 @@ def ddm_flexbound_par2(float v1 = 0,
             if tmp > 0:
                 boundary_view[i] = tmp
 
-    cdef float y, t
+    cdef float y_h, y_l, v_l, t_h, t_l
     cdef int n, ix
     cdef int m = 0
     cdef float[:] gaussian_values = draw_gaussian(num_draws)
 
     # Loop over samples
     for n in range(n_samples):
-        t = 0 # reset time
+        t_h = 0 # reset time high dimension
+        t_l = 0 # reset time low dimension
         ix = 0 # reset boundary index
 
-        # Random walker 1
-        y = (-1) * boundary_view[0] + (w1 * 2 * (boundary_view[0]))  # reset starting position 
-        while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
-            y += (v1 * delta_t) + (sqrt_st * gaussian_values[m])
-            t += delta_t
+        # Initialize walkers
+        y_h = (-1) * boundary_view[0] + (w_h * 2 * (boundary_view[0])) 
+
+        # Random walks until y_h hits bound
+        while y_h >= (-1) * boundary_view[ix] and y_h <= boundary_view[ix] and t <= max_t:
+            y_h += (v_h * delta_t) + (sqrt_st * gaussian_values[m])
+            t_h += delta_t
             ix += 1
             m += 1
             if m == num_draws:
                 gaussian_values = draw_gaussian(num_draws)
                 m = 0
 
-        if sign(y) < 0: # Store intermediate choice
+        if sign(y_h) < 0: # Store intermediate choice
             choices_view[n, 0] = 0 
+            y_l = (-1) * boundary_view[0] + (w_l_1 * 2 * (boundary_view[0])) 
+            v_l = v_l_1
+        
         else:
             choices_view[n, 0] = 2
-        
-        # If we are already at maximum t, to generate a choice we just sample from a bernoulli
-        if t >= max_t:
-            if random_uniform() > 0.5:
-                choices_view[n, 0] = choices_view[n, 0] + 1
-        
-        # Random walker 2
-        y = (-1) * boundary_view[ix] + (w2 * 2 * (boundary_view[ix]))  # reset starting position 
-        while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
-            y += (v2 * delta_t) + (sqrt_st * gaussian_values[m])
-            t += delta_t
+            y_l = (-1) * boundary_view[0] + (w_l_2 * 2 * (boundary_view[0])) 
+            v_l = v_l_2
+
+        # Random walks until the y_l corresponding to y_h hits bound
+        ix = 0
+        while y_l >= (-1) * boundary_view[ix] and y_l <= boundary_view[ix] and t_l <= max_t:
+            y_l += (v_l * delta_t) + (sqrt_st * gaussian_values[m])
+            t_l += delta_t
             ix += 1
             m += 1
             if m == num_draws:
                 gaussian_values = draw_gaussian(num_draws)
                 m = 0
 
-        rts_view[n, 0] = t + ndt
-        if sign(y) >= 0: # store choice update
+        rts_view[n, 0] = fmax(t_h, t_l) + ndt
+
+        if sign(y_l) >= 0: # store choice update
             choices_view[n, 0] = choices_view[n, 0] + 1
 
-    return (rts, choices,  {'v1': v1,
-                            'v2': v2,
+    return (rts, choices,  {'v_h': v_h,
+                            'v_l_1': v_l_1,
+                            'v_l_2': v_l_2,
                             'a': a,
-                            'w1': w1,
-                            'w2': w2,
+                            'w_h': w_h,
+                            'w_l_1': w_l_1,
+                            'w_l_2': w_l_2,
                             'ndt': ndt,
                             's': s,
                             **boundary_params,
@@ -632,11 +640,13 @@ def ddm_flexbound_par2(float v1 = 0,
 # Simulate (rt, choice) tuples from: DDM WITH FLEXIBLE BOUNDARIES ------------------------------------
 @cython.boundscheck(False)
 @cython.wraparound(False)
-def ddm_flexbound_mic2(float v1 = 0,
-                       float v2 = 0,
+def ddm_flexbound_mic2(float v_h = 0, 
+                       float v_l_1 = 0,
+                       float v_l_2 = 0,
                        float a = 1,
-                       float w1 = 0.5,
-                       float w2 = 0.5,
+                       float w_h = 0.5,
+                       float w_l_1 = 0.5,
+                       float w_l_2 = 0.5,
                        float ndt = 0.5,
                        float s = 1,
                        float delta_t = 0.001,
@@ -651,8 +661,8 @@ def ddm_flexbound_mic2(float v1 = 0,
     rts = np.zeros((n_samples, 1), dtype = DTYPE)
     choices = np.zeros((n_samples, 1), dtype = np.intc)
 
-    cdef float[:,:] rts_view = rts
-    cdef int[:,:] choices_view = choices
+    cdef float[:, :] rts_view = rts
+    cdef int[:, :] choices_view = choices
 
     cdef float delta_t_sqrt = sqrt(delta_t) # correct scalar so we can use standard normal samples for the brownian motion
     cdef float sqrt_st = delta_t_sqrt * s # scalar to ensure the correct variance for the gaussian step
@@ -676,57 +686,63 @@ def ddm_flexbound_mic2(float v1 = 0,
             if tmp > 0:
                 boundary_view[i] = tmp
 
-    cdef float y, t
+    cdef float y_h, y_l, v_l, t_h, t_l
     cdef int n, ix
     cdef int m = 0
     cdef float[:] gaussian_values = draw_gaussian(num_draws)
 
     # Loop over samples
     for n in range(n_samples):
-        t = 0 # reset time
+        t_h = 0 # reset time high dimension
+        t_l = 0 # reset time low dimension
         ix = 0 # reset boundary index
 
-        # Random walker 1
-        y = (-1) * boundary_view[0] + (w1 * 2 * (boundary_view[0]))  # reset starting position 
-        while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
-            y += (v1 * delta_t) + (sqrt_st * gaussian_values[m])
-            t += delta_t
+        # Initialize walkers
+        y_h = (-1) * boundary_view[0] + (w_h * 2 * (boundary_view[0])) 
+
+        # Random walks until y_h hits bound
+        while y_h >= (-1) * boundary_view[ix] and y_h <= boundary_view[ix] and t <= max_t:
+            y_h += (v_h * delta_t) + (sqrt_st * gaussian_values[m])
+            t_h += delta_t
             ix += 1
             m += 1
             if m == num_draws:
                 gaussian_values = draw_gaussian(num_draws)
                 m = 0
 
-        if sign(y) < 0: # Store intermediate choice
+        if sign(y_h) < 0: # Store intermediate choice
             choices_view[n, 0] = 0 
+            y_l = (-1) * boundary_view[0] + (w_l_1 * 2 * (boundary_view[0])) 
+            v_l = v_l_1
+        
         else:
             choices_view[n, 0] = 2
-        
-        # If we are already at maximum t, to generate a choice we just sample from a bernoulli
-        if t >= max_t:
-            if random_uniform() > 0.5:
-                choices_view[n, 0] = choices_view[n, 0] + 1
-        
-        # Random walker 2
-        y = (-1) * boundary_view[ix] + (w2 * 2 * (boundary_view[ix]))  # reset starting position 
-        while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
-            y += (v2 * delta_t) + (sqrt_st * gaussian_values[m])
-            t += delta_t
+            y_l = (-1) * boundary_view[0] + (w_l_2 * 2 * (boundary_view[0])) 
+            v_l = v_l_2
+
+        # Random walks until the y_l corresponding to y_h hits bound
+        ix = 0
+        while y_l >= (-1) * boundary_view[ix] and y_l <= boundary_view[ix] and t_l <= max_t:
+            y_l += (v_l * delta_t) + (sqrt_st * gaussian_values[m])
+            t_l += delta_t
             ix += 1
             m += 1
             if m == num_draws:
                 gaussian_values = draw_gaussian(num_draws)
                 m = 0
 
-        rts_view[n, 0] = t + ndt
-        if sign(y) >= 0: # store choice update
+        rts_view[n, 0] = fmax(t_h, t_l) + ndt
+
+        if sign(y_l) >= 0: # store choice update
             choices_view[n, 0] = choices_view[n, 0] + 1
 
-    return (rts, choices,  {'v1': v1,
-                            'v2': v2,
+    return (rts, choices,  {'v_h': v_h,
+                            'v_l_1': v_l_1,
+                            'v_l_2': v_l_2,
                             'a': a,
-                            'w1': w1,
-                            'w2': w2,
+                            'w_h': w_h,
+                            'w_l_1': w_l_1,
+                            'w_l_2': w_l_2,
                             'ndt': ndt,
                             's': s,
                             **boundary_params,
