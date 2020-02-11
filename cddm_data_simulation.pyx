@@ -674,6 +674,10 @@ def ddm_flexbound_mic2(float v_h = 0,
     cdef int i
     cdef float tmp
 
+    # Y particle trace
+    bias_trace = np.zeros(num_draws, dtype = DTYPE)
+    cdef float[:] bias_trace_view = bias_trace
+
     # Precompute boundary evaluations
     if boundary_multiplicative:
         for i in range(num_draws):
@@ -687,7 +691,7 @@ def ddm_flexbound_mic2(float v_h = 0,
                 boundary_view[i] = tmp
 
     cdef float y_h, y_l, v_l, t_h, t_l
-    cdef int n, ix
+    cdef int n, ix, ix_tmp
     cdef int m = 0
     cdef float[:] gaussian_values = draw_gaussian(num_draws)
 
@@ -699,10 +703,12 @@ def ddm_flexbound_mic2(float v_h = 0,
 
         # Initialize walkers
         y_h = (-1) * boundary_view[0] + (w_h * 2 * (boundary_view[0])) 
+        bias_trace_view[0] = (y_h - boundary_view[0]) / (2 * boundary_view[0])
 
         # Random walks until y_h hits bound
         while y_h >= (-1) * boundary_view[ix] and y_h <= boundary_view[ix] and t <= max_t:
             y_h += (v_h * delta_t) + (sqrt_st * gaussian_values[m])
+            bias_trace_view[ix] = (y_h - boundary_view[ix]) / (2 * boundary_view[ix])
             t_h += delta_t
             ix += 1
             m += 1
@@ -714,16 +720,31 @@ def ddm_flexbound_mic2(float v_h = 0,
             choices_view[n, 0] = 0 
             y_l = (-1) * boundary_view[0] + (w_l_1 * 2 * (boundary_view[0])) 
             v_l = v_l_1
-        
+            ix_tmp = ix + 1
+
+            while ix_tmp < num_draws:
+                bias_trace_view[ix_tmp] = 0.0
+                ix_tmp += 1
+
+            # We need to reverse the bias if we took the lower choice
+            ix_tmp = 0 
+            while ix_tmp < num_draws:
+                bias_trace_view[ix_tmp] = 1.0 - bias_trace_view[ix_tmp]
+                ix_tmp += 1
+
         else:
             choices_view[n, 0] = 2
             y_l = (-1) * boundary_view[0] + (w_l_2 * 2 * (boundary_view[0])) 
             v_l = v_l_2
+            ix_tmp = ix + 1
+            while ix_tmp < num_draws:
+                bias_trace_view[ix_tmp] = 1.0
+                ix_tmp += 1
 
         # Random walks until the y_l corresponding to y_h hits bound
         ix = 0
         while y_l >= (-1) * boundary_view[ix] and y_l <= boundary_view[ix] and t_l <= max_t:
-            y_l += (v_l * delta_t) + (sqrt_st * gaussian_values[m])
+            y_l += (bias_trace_view[ix] * v_l * delta_t) + (sqrt_st * gaussian_values[m])
             t_l += delta_t
             ix += 1
             m += 1
