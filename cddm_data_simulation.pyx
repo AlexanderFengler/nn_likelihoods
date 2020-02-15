@@ -414,11 +414,13 @@ def ornstein_uhlenbeck(float v = 0, # drift parameter
 # Simulate (rt, choice) tuples from: DDM WITH FLEXIBLE BOUNDARIES ------------------------------------
 @cython.boundscheck(False)
 @cython.wraparound(False)
-def ddm_flexbound_seq2(float v1 = 0,
-                       float v2 = 0,
+def ddm_flexbound_seq2(float v_h = 0,
+                       float v_l_1 = 0,
+                       float v_l_2 = 0,
                        float a = 1,
-                       float w1 = 0.5,
-                       float w2 = 0.5,
+                       float w_h = 0.5,
+                       float w_l_1 = 0,
+                       float w_l_2 = 0.5,
                        float ndt = 0.5,
                        float s = 1,
                        float delta_t = 0.001,
@@ -458,7 +460,7 @@ def ddm_flexbound_seq2(float v1 = 0,
             if tmp > 0:
                 boundary_view[i] = tmp
 
-    cdef float y, t
+    cdef float y_h, t, y_l
     cdef int n, ix
     cdef int m = 0
     cdef float[:] gaussian_values = draw_gaussian(num_draws)
@@ -469,30 +471,33 @@ def ddm_flexbound_seq2(float v1 = 0,
         ix = 0 # reset boundary index
 
         # Random walker 1
-        y = (-1) * boundary_view[0] + (w1 * 2 * (boundary_view[0]))  # reset starting position 
-        while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
-            y += (v1 * delta_t) + (sqrt_st * gaussian_values[m])
+        y_h = (-1) * boundary_view[0] + (w_h * 2 * (boundary_view[0]))  # reset starting position 
+        while y_h >= (-1) * boundary_view[ix] and y_h <= boundary_view[ix] and t <= max_t:
+            y_h += (v_h * delta_t) + (sqrt_st * gaussian_values[m])
             t += delta_t
             ix += 1
             m += 1
             if m == num_draws:
                 gaussian_values = draw_gaussian(num_draws)
                 m = 0
-
-        if sign(y) < 0: # Store intermediate choice
-            choices_view[n, 0] = 0 
-        else:
-            choices_view[n, 0] = 2
-        
+  
         # If we are already at maximum t, to generate a choice we just sample from a bernoulli
         if t >= max_t:
             if random_uniform() > 0.5:
                 choices_view[n, 0] = choices_view[n, 0] + 1
-        
+        else:
+            if sign(y_h) < 0: # Store intermediate choice
+                choices_view[n, 0] = 0 
+                y_l = (-1) * boundary_view[ix] + (w_l_1 * 2 * (boundary_view[ix])) 
+                v_l = v_l_1
+            else:
+                choices_view[n, 0] = 2
+                y_l = (-1) * boundary_view[ix] + (w_l_2 * 2 * (boundary_view[ix])) 
+                v_l = v_l_2
+
         # Random walker 2
-        y = (-1) * boundary_view[ix] + (w2 * 2 * (boundary_view[ix]))  # reset starting position 
-        while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
-            y += (v2 * delta_t) + (sqrt_st * gaussian_values[m])
+        while y_l >= (-1) * boundary_view[ix] and y_l <= boundary_view[ix] and t <= max_t:
+            y_l += (v_l * delta_t) + (sqrt_st * gaussian_values[m])
             t += delta_t
             ix += 1
             m += 1
@@ -501,14 +506,16 @@ def ddm_flexbound_seq2(float v1 = 0,
                 m = 0
 
         rts_view[n, 0] = t + ndt
-        if sign(y) >= 0: # store choice update
+        if sign(y_l) >= 0: # store choice update
             choices_view[n, 0] = choices_view[n, 0] + 1
 
-    return (rts, choices,  {'v1': v1,
-                            'v2': v2,
+    return (rts, choices,  {'v_h': v_h,
+                            'v_l_1': v_l_1,
+                            'v_l_2': v_l_2,
                             'a': a,
-                            'w1': w1,
-                            'w2': w2,
+                            'w_h': w_h,
+                            'w_l_1': w_l_1,
+                            'w_l_2': w_l_2,
                             'ndt': ndt,
                             's': s,
                             **boundary_params,
@@ -584,7 +591,7 @@ def ddm_flexbound_par2(float v_h = 0,
         y_h = (-1) * boundary_view[0] + (w_h * 2 * (boundary_view[0])) 
 
         # Random walks until y_h hits bound
-        while y_h >= (-1) * boundary_view[ix] and y_h <= boundary_view[ix] and t <= max_t:
+        while y_h >= (-1) * boundary_view[ix] and y_h <= boundary_view[ix] and t_h <= max_t:
             y_h += (v_h * delta_t) + (sqrt_st * gaussian_values[m])
             t_h += delta_t
             ix += 1
@@ -647,6 +654,7 @@ def ddm_flexbound_mic2(float v_h = 0,
                        float w_h = 0.5,
                        float w_l_1 = 0.5,
                        float w_l_2 = 0.5,
+                       float d = 0.5, # d for 'dampen' effect on drift parameter
                        float ndt = 0.5,
                        float s = 1,
                        float delta_t = 0.001,
@@ -703,12 +711,12 @@ def ddm_flexbound_mic2(float v_h = 0,
 
         # Initialize walkers
         y_h = (-1) * boundary_view[0] + (w_h * 2 * (boundary_view[0])) 
-        bias_trace_view[0] = (y_h - boundary_view[0]) / (2 * boundary_view[0])
+        bias_trace_view[0] = ((boundary_view[0] - y_h) / (2 * boundary_view[0]))
 
         # Random walks until y_h hits bound
-        while y_h >= (-1) * boundary_view[ix] and y_h <= boundary_view[ix] and t <= max_t:
+        while y_h >= (-1) * boundary_view[ix] and y_h <= boundary_view[ix] and t_h <= max_t:
             y_h += (v_h * delta_t) + (sqrt_st * gaussian_values[m])
-            bias_trace_view[ix] = (y_h - boundary_view[ix]) / (2 * boundary_view[ix])
+            bias_trace_view[ix] = ((boundary_view[ix] - y_h) / (2 * boundary_view[ix]))
             t_h += delta_t
             ix += 1
             m += 1
@@ -718,33 +726,34 @@ def ddm_flexbound_mic2(float v_h = 0,
 
         if sign(y_h) < 0: # Store intermediate choice
             choices_view[n, 0] = 0 
-            y_l = (-1) * boundary_view[0] + (w_l_1 * 2 * (boundary_view[0])) 
+            y_l = (- 1) * boundary_view[0] + (w_l_1 * 2 * (boundary_view[0])) 
             v_l = v_l_1
             ix_tmp = ix + 1
 
             while ix_tmp < num_draws:
-                bias_trace_view[ix_tmp] = 0.0
+                bias_trace_view[ix_tmp] = 1.0
                 ix_tmp += 1
 
             # We need to reverse the bias if we took the lower choice
             ix_tmp = 0 
             while ix_tmp < num_draws:
-                bias_trace_view[ix_tmp] = 1.0 - bias_trace_view[ix_tmp]
+                bias_trace_view[ix_tmp] = bias_trace_view[ix_tmp]
                 ix_tmp += 1
 
         else:
             choices_view[n, 0] = 2
-            y_l = (-1) * boundary_view[0] + (w_l_2 * 2 * (boundary_view[0])) 
+            y_l = (- 1) * boundary_view[0] + (w_l_2 * 2 * (boundary_view[0])) 
             v_l = v_l_2
             ix_tmp = ix + 1
             while ix_tmp < num_draws:
-                bias_trace_view[ix_tmp] = 1.0
+                bias_trace_view[ix_tmp] = 0.0
                 ix_tmp += 1
 
         # Random walks until the y_l corresponding to y_h hits bound
         ix = 0
         while y_l >= (-1) * boundary_view[ix] and y_l <= boundary_view[ix] and t_l <= max_t:
-            y_l += (bias_trace_view[ix] * v_l * delta_t) + (sqrt_st * gaussian_values[m])
+            #y_l += (bias_trace_view[ix] * v_l * delta_t) + (sqrt_st * gaussian_values[m])
+            y_l += (v_l * (1.0 - bias_trace_view[ix] * d) * delta_t) + (sqrt_st * gaussian_values[m])
             t_l += delta_t
             ix += 1
             m += 1
