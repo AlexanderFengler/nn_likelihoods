@@ -17,16 +17,16 @@
 #SBATCH --mem=32G
 #SBATCH -c 14
 #SBATCH -N 1
-#SBATCH --array=51-150
+#SBATCH --array=1-300
 
 # --------------------------------------------------------------------------------------
 # Sequentially run different kind of models
 
 #declare -a dgps=( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "lca" "race_model" "ddm_seq2" "ddm_par2" "ddm_mic2") 
-declare -a dgps=( "ddm_seq2" "ddm_par2" "ddm_mic2" ) 
+declare -a dgps=( "ddm_seq2" ) 
 n_samples=( 100000 )   # ( 128 256 512 1024 2048 4096 8192 50000 100000 200000 400000 )
 n_choices=( 2 ) #( 4 5 6 )
-n_parameter_sets=10   #20000
+n_parameter_sets=10000   #20000
 n_bins=( 512 )
 machine="ccv" #"ccv"
 datatype="cnn_train" #"cnn_train" # "parameter_recovery"
@@ -43,14 +43,15 @@ do
             then
                 for n_c in "${n_choices[@]}"
                     do
-                       python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype $datatype --nreps 1 --binned 1 --nbins $bins --maxt $maxt --nchoices $n_c --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --deltat 0.001 --fileid 999 #$SLURM_ARRAY_TASK_ID 
                        echo "$dgp"
                        echo $n_c
+                       python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype $datatype --nreps 1 --binned 1 --nbins $bins --maxt $maxt --nchoices $n_c --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --deltat 0.001 --fileid 999 #$SLURM_ARRAY_TASK_ID 
                 done
             else
-                 python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype $datatype --nreps 1 --binned 1 --nbins $bins --maxt $maxt --nchoices 2 --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1  --deltat 0.001 --fileid 999 #$SLURM_ARRAY_TASK_ID
                  echo "$dgp"
                  echo $n_c
+                 python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype $datatype --nreps 1 --binned 1 --nbins $bins --maxt $maxt --nchoices 2 --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1  --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID
+                
             fi
         done
                 # normal call to function
