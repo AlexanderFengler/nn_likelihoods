@@ -535,7 +535,7 @@ def make_dataset_r_dgp(dgp_list = ['ddm', 'ornstein', 'angle', 'weibull', 'full_
             param_grid, data_grid, nsamples = dg_tmp.make_dataset_r_sim(n_sim_bnds = n_sim_bnds,
                                                                         save = False)
         else:
-            param_grid, data_grid = dg_tmp.make_dataset_uniform(save = False)
+            param_grid, data_grid = dg_tmp.make_dataset_train_network_unif(save = False)
             
         print(data_grid.shape)
         print(param_grid.shape)
@@ -738,7 +738,7 @@ if __name__ == "__main__":
                             max_t = args.maxt,
                             delta_t = args.deltat,
                             config = config)
-        out = dg_tmp.make_dataset_perturbation_experiment(save = args.save)
+        out = dg.make_dataset_perturbation_experiment(save = args.save)
 
     if args.datatype == 'r_sim':
         dg = data_generator(machine = args.machine,
@@ -746,7 +746,7 @@ if __name__ == "__main__":
                             max_t = args.maxt,
                             delta_t = args.deltat,
                             config = config)
-        out = dg_tmp.make_dataset_r_sim(n_sim_bnds = [100, 200000],
+        out = dg.make_dataset_r_sim(n_sim_bnds = [100, 200000],
                                         save = args.save)
         
     if args.datatype == 'r_dgp':
