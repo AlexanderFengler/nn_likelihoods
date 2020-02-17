@@ -298,7 +298,7 @@ class data_generator():
     def make_dataset_perturbation_experiment(self,
                                              save = True):
         
-        param_grid, meta_dat = self.param_grid_perturbation_experiment()
+        param_grid, meta_dat = self.make_param_grid_perturbation_experiment()
              
         if self.config['binned']:           
             data_grid = np.zeros((self.config['nreps'],
@@ -597,7 +597,6 @@ def bin_arbitrary_fptd(out = [0, 0],
         print(np.histogram(out[:, 0][out[:, 1] == choice], bins = bins)[1])
         cnt += 1
     return counts
-
 
 def bin_simulator_output(self, 
                              out = [0, 0],
