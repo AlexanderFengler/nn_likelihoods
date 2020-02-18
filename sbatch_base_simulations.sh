@@ -36,7 +36,7 @@ for bins in "${n_bins[@]}"
 do
     for n in "${n_samples[@]}"
     do
-    # inner -------------------------------------
+    # inner ----------------------------tmux---------
         for dgp in "${dgps[@]}"
         do
             if [[ "$dgp" = "lca" ]] || [[ "$dgp" = "race_model" ]];
@@ -50,7 +50,7 @@ do
             else
                  echo "$dgp"
                  #echo $n_c
-                 python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype $datatype --nreps 1 --binned 1 --nbins $bins --maxt $maxt --nchoices ${n_choices[0]} --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1  --deltat 0.001 --fileid 1 #$SLURM_ARRAY_TASK_ID
+                 python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype $datatype --nreps 1 --binned 1 --nbins $bins --maxt $maxt --nchoices ${n_choices[0]} --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1  --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID
                 
             fi
         done
