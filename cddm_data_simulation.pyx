@@ -488,12 +488,24 @@ def ddm_flexbound_seq2(float v_h = 0,
         else:
             if sign(y_h) < 0: # Store intermediate choice
                 choices_view[n, 0] = 0 
-                y_l = (-1) * boundary_view[ix] + (w_l_1 * 2 * (boundary_view[ix])) 
-                v_l = v_l_1
+                
+                # In case boundary is negative already, we flip a coin with bias determined by w_l_ parameter
+                if boundary_view[ix] <= 0:
+                    if random_uniform() < w_l_1:
+                        choices_view[n, 0] += 1
+                else:
+                    y_l = (-1) * boundary_view[ix] + (w_l_1 * 2 * (boundary_view[ix])) 
+                    v_l = v_l_1
             else:
                 choices_view[n, 0] = 2
-                y_l = (-1) * boundary_view[ix] + (w_l_2 * 2 * (boundary_view[ix])) 
-                v_l = v_l_2
+                
+                # In case boundary is negative already, we flip a coin with bias determined by w_l_ parameter
+                if boundary_view[ix] <= 0:
+                    if random_uniform() < w_l_2:
+                        choices_view[n, 0] += 1
+                else:
+                    y_l = (-1) * boundary_view[ix] + (w_l_2 * 2 * (boundary_view[ix])) 
+                    v_l = v_l_2
 
         # Random walker 2
         while y_l >= (-1) * boundary_view[ix] and y_l <= boundary_view[ix] and t <= max_t:
@@ -507,7 +519,7 @@ def ddm_flexbound_seq2(float v_h = 0,
 
         rts_view[n, 0] = t + ndt
         if sign(y_l) >= 0: # store choice update
-            choices_view[n, 0] = choices_view[n, 0] + 1
+            choices_view[n, 0] += 1
 
     return (rts, choices,  {'v_h': v_h,
                             'v_l_1': v_l_1,
