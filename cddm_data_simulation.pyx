@@ -1,7 +1,7 @@
 # Functions for DDM data simulation
 import cython
 from libc.stdlib cimport rand, RAND_MAX
-from libc.math cimport log, sqrt, fmax
+from libc.math cimport log, sqrt, pow, fmax, atan, sin, cos, tan, M_PI, M_PI_2
 
 import numpy as np
 #import pandas as pd
@@ -15,6 +15,26 @@ DTYPE = np.float32
 cdef float random_uniform():
     cdef float r = rand()
     return r / RAND_MAX
+
+cdef float random_exponential():
+    return - log(random_uniform())
+
+cdef float random_stable(float alpha):
+    cdef float chi, eta, u, w. x
+    chi = - tan(M_PI_2 * alpha)
+
+    u = M_PI * (random_uniform() - 0.5)
+    w = random_exponential()
+
+    if alpha == 1.0:
+        eta = M_PI_2
+        x = (1.0 / eta) * ((M_PI_2 + u) * tan(u) - log((M_PI_2 * w * cos(u)) / (M_PI_2 + u)))
+    else:
+        eta = (1.0 / alpha) * atan(- chi)
+        x = pow((1.0 + chi * chi), 1.0 / (2.0 * alpha)) * \
+                (sin(alpha * (u + eta)) / pow(cos(u), 1.0 / alpha)) * \
+                pow(cos(u - (alpha * (u + eta))) / w, (1.0 - alpha / alpha))
+    return x
 
 cdef float random_gaussian():
     cdef float x1, x2, w
@@ -47,13 +67,13 @@ cdef void assign_random_gaussian_pair(float[:] out, int assign_ix):
     w = 2.0
 
     while(w >= 1.0):
-        x1 = 2.0 * random_uniform() - 1.0
-        x2 = 2.0 * random_uniform() - 1.0
-        w = x1 * x1 + x2 * x2
+        x1 = (2.0 * random_uniform()) - 1.0
+        x2 = (2.0 * random_uniform()) - 1.0
+        w = (x1 * x1) + (x2 * x2)
 
     w = ((-2.0 * log(w)) / w) ** 0.5
     out[assign_ix] = x1 * w
-    out[assign_ix + 1] = x2 * 2
+    out[assign_ix + 1] = x2 * w # this was x2 * 2 ..... :0 
 
 @cython.boundscheck(False)
 cdef float[:] draw_gaussian(int n):
