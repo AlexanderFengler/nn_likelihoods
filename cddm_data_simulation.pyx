@@ -24,31 +24,31 @@ cdef float random_uniform():
 cdef float random_exponential():
     return - log(random_uniform())
 
-cdef float random_stable(float alpha):
-    cdef float chi, eta, u, w. x
-    # chi = - tan(M_PI_2 * alpha)
+cdef float random_stable(float alpha_diff):
+    cdef float eta, u, w, x
+    # chi = - tan(M_PI_2 * alpha_diff)
 
     u = M_PI * (random_uniform() - 0.5)
     w = random_exponential()
 
-    if alpha == 1.0:
-        eta = M_PI_2
+    if alpha_diff == 1.0:
+        eta = M_PI_2 # useless but kept to remain faithful to wikipedia entry
         x = (1.0 / eta) * ((M_PI_2) * tan(u))
         # x = (1.0 / eta) * ((M_PI_2 + u) * tan(u) - log((M_PI_2 * w * cos(u)) / (M_PI_2 + u)))
     else:
-        # eta = (1.0 / alpha) * atan(- chi)
-        x = sin(alpha * u) / pow(cos(u), 1 / alpha) * pow(cos(u - (alpha * u) / w, (1.0 - alpha) / alpha))
-        # x = pow((1.0 + chi * chi), 1.0 / (2.0 * alpha)) * \
-        #        (sin(alpha * (u + eta)) / pow(cos(u), 1.0 / alpha)) * \
-        #        pow(cos(u - (alpha * (u + eta))) / w, (1.0 - alpha) / alpha)
+        # eta = (1.0 / alpha_diff) * atan(- chi)
+        x = (sin(alpha_diff * u) / (pow(cos(u), 1 / alpha_diff))) * pow(cos(u - (alpha_diff * u)) / w, (1.0 - alpha_diff) / alpha_diff)
+        # x = pow((1.0 + chi * chi), 1.0 / (2.0 * alpha_diff)) * \
+        #        (sin(alpha_diff * (u + eta)) / pow(cos(u), 1.0 / alpha_diff)) * \
+        #        pow(cos(u - (alpha_diff * (u + eta))) / w, (1.0 - alpha_diff) / alpha_diff)
     return x
 
-cdef float[:] draw_random_stable(int n, float alpha)
+cdef float[:] draw_random_stable(int n, float alpha_diff):
     cdef int i
     cdef float[:] result = np.zeros(n, dtype = DTYPE)
 
     for i in range(n):
-        result[i] = random_stable(alpha)
+        result[i] = random_stable(alpha_diff)
     return result
 
 cdef float random_gaussian():
@@ -255,8 +255,8 @@ def ddm_flexbound(float v = 0,
 def levy_flexbound(float v = 0,
                    float a = 1,
                    float w = 0.5,
+                   float alpha_diff = 1,
                    float ndt = 0.0,
-                   float alpha = 1,
                    float s = 1,
                    float delta_t = 0.001,
                    float max_t = 20,
@@ -298,7 +298,7 @@ def levy_flexbound(float v = 0,
     cdef float y, t
     cdef int n, ix
     cdef int m = 0
-    cdef float[:] gaussian_values = draw_gaussian(num_draws)
+    cdef float[:] gaussian_values = draw_random_stable(num_draws, alpha_diff)
 
     # Loop over samples
     for n in range(n_samples):
@@ -313,7 +313,7 @@ def levy_flexbound(float v = 0,
             ix += 1
             m += 1
             if m == num_draws:
-                gaussian_values = draw_gaussian(num_draws)
+                gaussian_values = draw_random_stable(num_draws, alpha_diff)
                 m = 0
 
         rts_view[n, 0] = t + ndt # Store rt
@@ -323,6 +323,7 @@ def levy_flexbound(float v = 0,
                             'a': a,
                             'w': w,
                             'ndt': ndt,
+                            'alpha_diff': alpha_diff,
                             's': s,
                             **boundary_params,
                             'delta_t': delta_t,
