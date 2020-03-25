@@ -273,8 +273,8 @@ def levy_flexbound(float v = 0,
     cdef float[:,:] rts_view = rts
     cdef int[:,:] choices_view = choices
 
-    cdef float delta_t_sqrt = sqrt(delta_t) # correct scalar so we can use standard normal samples for the brownian motion
-    cdef float sqrt_st = delta_t_sqrt * s # scalar to ensure the correct variance for the gaussian step
+    cdef float delta_t_alpha = pow(delta_t, 1.0 / alpha_diff) # correct scalar so we can use standard normal samples for the brownian motion
+    #cdef float sqrt_st = delta_t_sqrt * s # scalar to ensure the correct variance for the gaussian step
 
     # Boundary storage for the upper bound
     cdef int num_draws = int((max_t / delta_t) + 1)
@@ -308,7 +308,7 @@ def levy_flexbound(float v = 0,
 
         # Random walker
         while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
-            y += (v * delta_t) + (sqrt_st * gaussian_values[m])
+            y += (v * delta_t) + (delta_t_alpha * gaussian_values[m])
             t += delta_t
             ix += 1
             m += 1
@@ -329,7 +329,7 @@ def levy_flexbound(float v = 0,
                             'delta_t': delta_t,
                             'max_t': max_t,
                             'n_samples': n_samples,
-                            'simulator': 'ddm_flexbound',
+                            'simulator': 'levy_flexbound',
                             'boundary_fun_type': boundary_fun.__name__,
                             'possible_choices': [-1, 1]})
 # -------------------------------------------------------------------------------------------------

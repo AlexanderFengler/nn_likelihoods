@@ -1993,8 +1993,7 @@ static PyObject *__pyx_pf_20cddm_data_simulation_4levy_flexbound(CYTHON_UNUSED P
   PyObject *__pyx_v_choices = NULL;
   __Pyx_memviewslice __pyx_v_rts_view = { 0, 0, { 0 }, { 0 }, { 0 } };
   __Pyx_memviewslice __pyx_v_choices_view = { 0, 0, { 0 }, { 0 }, { 0 } };
-  float __pyx_v_delta_t_sqrt;
-  float __pyx_v_sqrt_st;
+  float __pyx_v_delta_t_alpha;
   int __pyx_v_num_draws;
   PyObject *__pyx_v_boundary = NULL;
   __Pyx_memviewslice __pyx_v_boundary_view = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -2035,7 +2034,7 @@ static PyObject *__pyx_pf_20cddm_data_simulation_4levy_flexbound(CYTHON_UNUSED P
   return __pyx_r;
 }
 /* … */
-  __pyx_tuple__38 = <span class='py_c_api'>PyTuple_Pack</span>(30, __pyx_n_s_v, __pyx_n_s_a, __pyx_n_s_w, __pyx_n_s_alpha_diff, __pyx_n_s_ndt, __pyx_n_s_s, __pyx_n_s_delta_t, __pyx_n_s_max_t, __pyx_n_s_n_samples, __pyx_n_s_print_info, __pyx_n_s_boundary_fun, __pyx_n_s_boundary_multiplicative, __pyx_n_s_boundary_params, __pyx_n_s_rts, __pyx_n_s_choices, __pyx_n_s_rts_view, __pyx_n_s_choices_view, __pyx_n_s_delta_t_sqrt, __pyx_n_s_sqrt_st, __pyx_n_s_num_draws, __pyx_n_s_boundary, __pyx_n_s_boundary_view, __pyx_n_s_i, __pyx_n_s_tmp, __pyx_n_s_y, __pyx_n_s_t, __pyx_n_s_n, __pyx_n_s_ix, __pyx_n_s_m, __pyx_n_s_gaussian_values);<span class='error_goto'> if (unlikely(!__pyx_tuple__38)) __PYX_ERR(0, 255, __pyx_L1_error)</span>
+  __pyx_tuple__38 = <span class='py_c_api'>PyTuple_Pack</span>(29, __pyx_n_s_v, __pyx_n_s_a, __pyx_n_s_w, __pyx_n_s_alpha_diff, __pyx_n_s_ndt, __pyx_n_s_s, __pyx_n_s_delta_t, __pyx_n_s_max_t, __pyx_n_s_n_samples, __pyx_n_s_print_info, __pyx_n_s_boundary_fun, __pyx_n_s_boundary_multiplicative, __pyx_n_s_boundary_params, __pyx_n_s_rts, __pyx_n_s_choices, __pyx_n_s_rts_view, __pyx_n_s_choices_view, __pyx_n_s_delta_t_alpha, __pyx_n_s_num_draws, __pyx_n_s_boundary, __pyx_n_s_boundary_view, __pyx_n_s_i, __pyx_n_s_tmp, __pyx_n_s_y, __pyx_n_s_t, __pyx_n_s_n, __pyx_n_s_ix, __pyx_n_s_m, __pyx_n_s_gaussian_values);<span class='error_goto'> if (unlikely(!__pyx_tuple__38)) __PYX_ERR(0, 255, __pyx_L1_error)</span>
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_tuple__38);
   <span class='refnanny'>__Pyx_GIVEREF</span>(__pyx_tuple__38);
 /* … */
@@ -2043,7 +2042,7 @@ static PyObject *__pyx_pf_20cddm_data_simulation_4levy_flexbound(CYTHON_UNUSED P
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
   if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_d, __pyx_n_s_levy_flexbound, __pyx_t_1) &lt; 0) <span class='error_goto'>__PYX_ERR(0, 255, __pyx_L1_error)</span>
   <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_codeobj__39 = (PyObject*)<span class='pyx_c_api'>__Pyx_PyCode_New</span>(13, 0, 30, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__38, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cddm_data_simulation_pyx, __pyx_n_s_levy_flexbound, 255, __pyx_empty_bytes);<span class='error_goto'> if (unlikely(!__pyx_codeobj__39)) __PYX_ERR(0, 255, __pyx_L1_error)</span>
+  __pyx_codeobj__39 = (PyObject*)<span class='pyx_c_api'>__Pyx_PyCode_New</span>(13, 0, 29, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__38, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cddm_data_simulation_pyx, __pyx_n_s_levy_flexbound, 255, __pyx_empty_bytes);<span class='error_goto'> if (unlikely(!__pyx_codeobj__39)) __PYX_ERR(0, 255, __pyx_L1_error)</span>
 </pre><pre class="cython line score-0">&#xA0;<span class="">0256</span>:                    <span class="nb">float</span> <span class="n">a</span> <span class="o">=</span> <span class="mf">1</span><span class="p">,</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">0257</span>:                    <span class="nb">float</span> <span class="n">w</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">0258</span>:                    <span class="nb">float</span> <span class="n">alpha_diff</span> <span class="o">=</span> <span class="mf">1</span><span class="p">,</span></pre>
@@ -2357,11 +2356,10 @@ static PyObject *__pyx_pf_20cddm_data_simulation_4levy_flexbound(CYTHON_UNUSED P
   __pyx_t_7.memview = NULL;
   __pyx_t_7.data = NULL;
 </pre><pre class="cython line score-0">&#xA0;<span class="">0275</span>: </pre>
-<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">0276</span>:     <span class="k">cdef</span> <span class="kt">float</span> <span class="nf">delta_t_sqrt</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">delta_t</span><span class="p">)</span> <span class="c"># correct scalar so we can use standard normal samples for the brownian motion</span></pre>
-<pre class='cython code score-0 '>  __pyx_v_delta_t_sqrt = sqrt(__pyx_v_delta_t);
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">0277</span>:     <span class="k">cdef</span> <span class="kt">float</span> <span class="nf">sqrt_st</span> <span class="o">=</span> <span class="n">delta_t_sqrt</span> <span class="o">*</span> <span class="n">s</span> <span class="c"># scalar to ensure the correct variance for the gaussian step</span></pre>
-<pre class='cython code score-0 '>  __pyx_v_sqrt_st = (__pyx_v_delta_t_sqrt * __pyx_v_s);
-</pre><pre class="cython line score-0">&#xA0;<span class="">0278</span>: </pre>
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">0276</span>:     <span class="k">cdef</span> <span class="kt">float</span> <span class="nf">delta_t_alpha</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">delta_t</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">alpha_diff</span><span class="p">)</span> <span class="c"># correct scalar so we can use standard normal samples for the brownian motion</span></pre>
+<pre class='cython code score-0 '>  __pyx_v_delta_t_alpha = pow(__pyx_v_delta_t, (1.0 / ((double)__pyx_v_alpha_diff)));
+</pre><pre class="cython line score-0">&#xA0;<span class="">0277</span>:     <span class="c">#cdef float sqrt_st = delta_t_sqrt * s # scalar to ensure the correct variance for the gaussian step</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">0278</span>: </pre>
 <pre class="cython line score-0">&#xA0;<span class="">0279</span>:     <span class="c"># Boundary storage for the upper bound</span></pre>
 <pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">0280</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">num_draws</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">max_t</span> <span class="o">/</span> <span class="n">delta_t</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1</span><span class="p">)</span></pre>
 <pre class='cython code score-0 '>  __pyx_v_num_draws = ((int)((__pyx_v_max_t / __pyx_v_delta_t) + 1.0));
@@ -2537,9 +2535,9 @@ static PyObject *__pyx_pf_20cddm_data_simulation_4levy_flexbound(CYTHON_UNUSED P
       __pyx_t_9 = __pyx_t_19;
       __pyx_L14_bool_binop_done:;
       if (!__pyx_t_9) break;
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">0311</span>:             <span class="n">y</span> <span class="o">+=</span> <span class="p">(</span><span class="n">v</span> <span class="o">*</span> <span class="n">delta_t</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">sqrt_st</span> <span class="o">*</span> <span class="n">gaussian_values</span><span class="p">[</span><span class="n">m</span><span class="p">])</span></pre>
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">0311</span>:             <span class="n">y</span> <span class="o">+=</span> <span class="p">(</span><span class="n">v</span> <span class="o">*</span> <span class="n">delta_t</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">delta_t_alpha</span> <span class="o">*</span> <span class="n">gaussian_values</span><span class="p">[</span><span class="n">m</span><span class="p">])</span></pre>
 <pre class='cython code score-0 '>      __pyx_t_21 = __pyx_v_m;
-      __pyx_v_y = (__pyx_v_y + ((__pyx_v_v * __pyx_v_delta_t) + (__pyx_v_sqrt_st * (*((float *) ( /* dim=0 */ (__pyx_v_gaussian_values.data + __pyx_t_21 * __pyx_v_gaussian_values.strides[0]) ))))));
+      __pyx_v_y = (__pyx_v_y + ((__pyx_v_v * __pyx_v_delta_t) + (__pyx_v_delta_t_alpha * (*((float *) ( /* dim=0 */ (__pyx_v_gaussian_values.data + __pyx_t_21 * __pyx_v_gaussian_values.strides[0]) ))))));
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">0312</span>:             <span class="n">t</span> <span class="o">+=</span> <span class="n">delta_t</span></pre>
 <pre class='cython code score-0 '>      __pyx_v_t = (__pyx_v_t + __pyx_v_delta_t);
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">0313</span>:             <span class="n">ix</span> <span class="o">+=</span> <span class="mf">1</span></pre>
@@ -2645,8 +2643,8 @@ static PyObject *__pyx_pf_20cddm_data_simulation_4levy_flexbound(CYTHON_UNUSED P
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_3);
   if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_t_4, __pyx_n_u_n_samples, __pyx_t_3) &lt; 0) <span class='error_goto'>__PYX_ERR(0, 331, __pyx_L1_error)</span>
   <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_3); __pyx_t_3 = 0;
-  if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_t_4, __pyx_n_u_simulator, __pyx_n_u_ddm_flexbound) &lt; 0) <span class='error_goto'>__PYX_ERR(0, 332, __pyx_L1_error)</span>
-</pre><pre class="cython line score-0">&#xA0;<span class="">0332</span>:                             <span class="s">&#39;simulator&#39;</span><span class="p">:</span> <span class="s">&#39;ddm_flexbound&#39;</span><span class="p">,</span></pre>
+  if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_t_4, __pyx_n_u_simulator, __pyx_n_u_levy_flexbound) &lt; 0) <span class='error_goto'>__PYX_ERR(0, 332, __pyx_L1_error)</span>
+</pre><pre class="cython line score-0">&#xA0;<span class="">0332</span>:                             <span class="s">&#39;simulator&#39;</span><span class="p">:</span> <span class="s">&#39;levy_flexbound&#39;</span><span class="p">,</span></pre>
 <pre class="cython line score-8" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">0333</span>:                             <span class="s">&#39;boundary_fun_type&#39;</span><span class="p">:</span> <span class="n">boundary_fun</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span></pre>
 <pre class='cython code score-8 '>  __pyx_t_3 = <span class='pyx_c_api'>__Pyx_PyObject_GetAttrStr</span>(__pyx_v_boundary_fun, __pyx_n_s_name);<span class='error_goto'> if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 333, __pyx_L1_error)</span>
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_3);

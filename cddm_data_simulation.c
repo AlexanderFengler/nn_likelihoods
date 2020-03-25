@@ -1957,6 +1957,7 @@ static const char __pyx_k_sqrt_st_view[] = "sqrt_st_view";
 static const char __pyx_k_stringsource[] = "stringsource";
 static const char __pyx_k_boundary_view[] = "boundary_view";
 static const char __pyx_k_ddm_flexbound[] = "ddm_flexbound";
+static const char __pyx_k_delta_t_alpha[] = "delta_t_alpha";
 static const char __pyx_k_particles_sum[] = "particles_sum";
 static const char __pyx_k_pyx_getbuffer[] = "__pyx_getbuffer";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
@@ -2076,6 +2077,7 @@ static PyObject *__pyx_n_s_ddm_flexbound_par2;
 static PyObject *__pyx_n_s_ddm_flexbound_seq2;
 static PyObject *__pyx_n_s_delta_t;
 static PyObject *__pyx_n_u_delta_t;
+static PyObject *__pyx_n_s_delta_t_alpha;
 static PyObject *__pyx_n_s_delta_t_sqrt;
 static PyObject *__pyx_n_s_dict;
 static PyObject *__pyx_n_s_dndt;
@@ -2115,6 +2117,7 @@ static PyObject *__pyx_n_s_j;
 static PyObject *__pyx_n_s_lca;
 static PyObject *__pyx_n_u_lca;
 static PyObject *__pyx_n_s_levy_flexbound;
+static PyObject *__pyx_n_u_levy_flexbound;
 static PyObject *__pyx_n_s_m;
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_n_s_max_t;
@@ -5219,8 +5222,7 @@ static PyObject *__pyx_pf_20cddm_data_simulation_4levy_flexbound(CYTHON_UNUSED P
   PyObject *__pyx_v_choices = NULL;
   __Pyx_memviewslice __pyx_v_rts_view = { 0, 0, { 0 }, { 0 }, { 0 } };
   __Pyx_memviewslice __pyx_v_choices_view = { 0, 0, { 0 }, { 0 }, { 0 } };
-  float __pyx_v_delta_t_sqrt;
-  float __pyx_v_sqrt_st;
+  float __pyx_v_delta_t_alpha;
   int __pyx_v_num_draws;
   PyObject *__pyx_v_boundary = NULL;
   __Pyx_memviewslice __pyx_v_boundary_view = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -5363,7 +5365,7 @@ static PyObject *__pyx_pf_20cddm_data_simulation_4levy_flexbound(CYTHON_UNUSED P
  *     cdef float[:,:] rts_view = rts
  *     cdef int[:,:] choices_view = choices             # <<<<<<<<<<<<<<
  * 
- *     cdef float delta_t_sqrt = sqrt(delta_t) # correct scalar so we can use standard normal samples for the brownian motion
+ *     cdef float delta_t_alpha = pow(delta_t, 1.0 / alpha_diff) # correct scalar so we can use standard normal samples for the brownian motion
  */
   __pyx_t_7 = __Pyx_PyObject_to_MemoryviewSlice_dsds_int(__pyx_v_choices, PyBUF_WRITABLE); if (unlikely(!__pyx_t_7.memview)) __PYX_ERR(0, 274, __pyx_L1_error)
   __pyx_v_choices_view = __pyx_t_7;
@@ -5373,20 +5375,11 @@ static PyObject *__pyx_pf_20cddm_data_simulation_4levy_flexbound(CYTHON_UNUSED P
   /* "cddm_data_simulation.pyx":276
  *     cdef int[:,:] choices_view = choices
  * 
- *     cdef float delta_t_sqrt = sqrt(delta_t) # correct scalar so we can use standard normal samples for the brownian motion             # <<<<<<<<<<<<<<
- *     cdef float sqrt_st = delta_t_sqrt * s # scalar to ensure the correct variance for the gaussian step
+ *     cdef float delta_t_alpha = pow(delta_t, 1.0 / alpha_diff) # correct scalar so we can use standard normal samples for the brownian motion             # <<<<<<<<<<<<<<
+ *     #cdef float sqrt_st = delta_t_sqrt * s # scalar to ensure the correct variance for the gaussian step
  * 
  */
-  __pyx_v_delta_t_sqrt = sqrt(__pyx_v_delta_t);
-
-  /* "cddm_data_simulation.pyx":277
- * 
- *     cdef float delta_t_sqrt = sqrt(delta_t) # correct scalar so we can use standard normal samples for the brownian motion
- *     cdef float sqrt_st = delta_t_sqrt * s # scalar to ensure the correct variance for the gaussian step             # <<<<<<<<<<<<<<
- * 
- *     # Boundary storage for the upper bound
- */
-  __pyx_v_sqrt_st = (__pyx_v_delta_t_sqrt * __pyx_v_s);
+  __pyx_v_delta_t_alpha = pow(__pyx_v_delta_t, (1.0 / ((double)__pyx_v_alpha_diff)));
 
   /* "cddm_data_simulation.pyx":280
  * 
@@ -5681,7 +5674,7 @@ static PyObject *__pyx_pf_20cddm_data_simulation_4levy_flexbound(CYTHON_UNUSED P
  * 
  *         # Random walker
  *         while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:             # <<<<<<<<<<<<<<
- *             y += (v * delta_t) + (sqrt_st * gaussian_values[m])
+ *             y += (v * delta_t) + (delta_t_alpha * gaussian_values[m])
  *             t += delta_t
  */
     while (1) {
@@ -5707,16 +5700,16 @@ static PyObject *__pyx_pf_20cddm_data_simulation_4levy_flexbound(CYTHON_UNUSED P
       /* "cddm_data_simulation.pyx":311
  *         # Random walker
  *         while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
- *             y += (v * delta_t) + (sqrt_st * gaussian_values[m])             # <<<<<<<<<<<<<<
+ *             y += (v * delta_t) + (delta_t_alpha * gaussian_values[m])             # <<<<<<<<<<<<<<
  *             t += delta_t
  *             ix += 1
  */
       __pyx_t_21 = __pyx_v_m;
-      __pyx_v_y = (__pyx_v_y + ((__pyx_v_v * __pyx_v_delta_t) + (__pyx_v_sqrt_st * (*((float *) ( /* dim=0 */ (__pyx_v_gaussian_values.data + __pyx_t_21 * __pyx_v_gaussian_values.strides[0]) ))))));
+      __pyx_v_y = (__pyx_v_y + ((__pyx_v_v * __pyx_v_delta_t) + (__pyx_v_delta_t_alpha * (*((float *) ( /* dim=0 */ (__pyx_v_gaussian_values.data + __pyx_t_21 * __pyx_v_gaussian_values.strides[0]) ))))));
 
       /* "cddm_data_simulation.pyx":312
  *         while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
- *             y += (v * delta_t) + (sqrt_st * gaussian_values[m])
+ *             y += (v * delta_t) + (delta_t_alpha * gaussian_values[m])
  *             t += delta_t             # <<<<<<<<<<<<<<
  *             ix += 1
  *             m += 1
@@ -5724,7 +5717,7 @@ static PyObject *__pyx_pf_20cddm_data_simulation_4levy_flexbound(CYTHON_UNUSED P
       __pyx_v_t = (__pyx_v_t + __pyx_v_delta_t);
 
       /* "cddm_data_simulation.pyx":313
- *             y += (v * delta_t) + (sqrt_st * gaussian_values[m])
+ *             y += (v * delta_t) + (delta_t_alpha * gaussian_values[m])
  *             t += delta_t
  *             ix += 1             # <<<<<<<<<<<<<<
  *             m += 1
@@ -5916,7 +5909,7 @@ static PyObject *__pyx_pf_20cddm_data_simulation_4levy_flexbound(CYTHON_UNUSED P
  *                             'delta_t': delta_t,
  *                             'max_t': max_t,             # <<<<<<<<<<<<<<
  *                             'n_samples': n_samples,
- *                             'simulator': 'ddm_flexbound',
+ *                             'simulator': 'levy_flexbound',
  */
   __pyx_t_3 = PyFloat_FromDouble(__pyx_v_max_t); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 330, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
@@ -5927,18 +5920,18 @@ static PyObject *__pyx_pf_20cddm_data_simulation_4levy_flexbound(CYTHON_UNUSED P
  *                             'delta_t': delta_t,
  *                             'max_t': max_t,
  *                             'n_samples': n_samples,             # <<<<<<<<<<<<<<
- *                             'simulator': 'ddm_flexbound',
+ *                             'simulator': 'levy_flexbound',
  *                             'boundary_fun_type': boundary_fun.__name__,
  */
   __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_n_samples); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 331, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   if (PyDict_SetItem(__pyx_t_4, __pyx_n_u_n_samples, __pyx_t_3) < 0) __PYX_ERR(0, 331, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_u_simulator, __pyx_n_u_ddm_flexbound) < 0) __PYX_ERR(0, 332, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_u_simulator, __pyx_n_u_levy_flexbound) < 0) __PYX_ERR(0, 332, __pyx_L1_error)
 
   /* "cddm_data_simulation.pyx":333
  *                             'n_samples': n_samples,
- *                             'simulator': 'ddm_flexbound',
+ *                             'simulator': 'levy_flexbound',
  *                             'boundary_fun_type': boundary_fun.__name__,             # <<<<<<<<<<<<<<
  *                             'possible_choices': [-1, 1]})
  * # -------------------------------------------------------------------------------------------------
@@ -5949,7 +5942,7 @@ static PyObject *__pyx_pf_20cddm_data_simulation_4levy_flexbound(CYTHON_UNUSED P
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "cddm_data_simulation.pyx":334
- *                             'simulator': 'ddm_flexbound',
+ *                             'simulator': 'levy_flexbound',
  *                             'boundary_fun_type': boundary_fun.__name__,
  *                             'possible_choices': [-1, 1]})             # <<<<<<<<<<<<<<
  * # -------------------------------------------------------------------------------------------------
@@ -29866,6 +29859,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_ddm_flexbound_seq2, __pyx_k_ddm_flexbound_seq2, sizeof(__pyx_k_ddm_flexbound_seq2), 0, 0, 1, 1},
   {&__pyx_n_s_delta_t, __pyx_k_delta_t, sizeof(__pyx_k_delta_t), 0, 0, 1, 1},
   {&__pyx_n_u_delta_t, __pyx_k_delta_t, sizeof(__pyx_k_delta_t), 0, 1, 0, 1},
+  {&__pyx_n_s_delta_t_alpha, __pyx_k_delta_t_alpha, sizeof(__pyx_k_delta_t_alpha), 0, 0, 1, 1},
   {&__pyx_n_s_delta_t_sqrt, __pyx_k_delta_t_sqrt, sizeof(__pyx_k_delta_t_sqrt), 0, 0, 1, 1},
   {&__pyx_n_s_dict, __pyx_k_dict, sizeof(__pyx_k_dict), 0, 0, 1, 1},
   {&__pyx_n_s_dndt, __pyx_k_dndt, sizeof(__pyx_k_dndt), 0, 0, 1, 1},
@@ -29905,6 +29899,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_lca, __pyx_k_lca, sizeof(__pyx_k_lca), 0, 0, 1, 1},
   {&__pyx_n_u_lca, __pyx_k_lca, sizeof(__pyx_k_lca), 0, 1, 0, 1},
   {&__pyx_n_s_levy_flexbound, __pyx_k_levy_flexbound, sizeof(__pyx_k_levy_flexbound), 0, 0, 1, 1},
+  {&__pyx_n_u_levy_flexbound, __pyx_k_levy_flexbound, sizeof(__pyx_k_levy_flexbound), 0, 1, 0, 1},
   {&__pyx_n_s_m, __pyx_k_m, sizeof(__pyx_k_m), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
   {&__pyx_n_s_max_t, __pyx_k_max_t, sizeof(__pyx_k_max_t), 0, 0, 1, 1},
@@ -30275,10 +30270,10 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *                    float a = 1,
  *                    float w = 0.5,
  */
-  __pyx_tuple__38 = PyTuple_Pack(30, __pyx_n_s_v, __pyx_n_s_a, __pyx_n_s_w, __pyx_n_s_alpha_diff, __pyx_n_s_ndt, __pyx_n_s_s, __pyx_n_s_delta_t, __pyx_n_s_max_t, __pyx_n_s_n_samples, __pyx_n_s_print_info, __pyx_n_s_boundary_fun, __pyx_n_s_boundary_multiplicative, __pyx_n_s_boundary_params, __pyx_n_s_rts, __pyx_n_s_choices, __pyx_n_s_rts_view, __pyx_n_s_choices_view, __pyx_n_s_delta_t_sqrt, __pyx_n_s_sqrt_st, __pyx_n_s_num_draws, __pyx_n_s_boundary, __pyx_n_s_boundary_view, __pyx_n_s_i, __pyx_n_s_tmp, __pyx_n_s_y, __pyx_n_s_t, __pyx_n_s_n, __pyx_n_s_ix, __pyx_n_s_m, __pyx_n_s_gaussian_values); if (unlikely(!__pyx_tuple__38)) __PYX_ERR(0, 255, __pyx_L1_error)
+  __pyx_tuple__38 = PyTuple_Pack(29, __pyx_n_s_v, __pyx_n_s_a, __pyx_n_s_w, __pyx_n_s_alpha_diff, __pyx_n_s_ndt, __pyx_n_s_s, __pyx_n_s_delta_t, __pyx_n_s_max_t, __pyx_n_s_n_samples, __pyx_n_s_print_info, __pyx_n_s_boundary_fun, __pyx_n_s_boundary_multiplicative, __pyx_n_s_boundary_params, __pyx_n_s_rts, __pyx_n_s_choices, __pyx_n_s_rts_view, __pyx_n_s_choices_view, __pyx_n_s_delta_t_alpha, __pyx_n_s_num_draws, __pyx_n_s_boundary, __pyx_n_s_boundary_view, __pyx_n_s_i, __pyx_n_s_tmp, __pyx_n_s_y, __pyx_n_s_t, __pyx_n_s_n, __pyx_n_s_ix, __pyx_n_s_m, __pyx_n_s_gaussian_values); if (unlikely(!__pyx_tuple__38)) __PYX_ERR(0, 255, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__38);
   __Pyx_GIVEREF(__pyx_tuple__38);
-  __pyx_codeobj__39 = (PyObject*)__Pyx_PyCode_New(13, 0, 30, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__38, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cddm_data_simulation_pyx, __pyx_n_s_levy_flexbound, 255, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__39)) __PYX_ERR(0, 255, __pyx_L1_error)
+  __pyx_codeobj__39 = (PyObject*)__Pyx_PyCode_New(13, 0, 29, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__38, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cddm_data_simulation_pyx, __pyx_n_s_levy_flexbound, 255, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__39)) __PYX_ERR(0, 255, __pyx_L1_error)
 
   /* "cddm_data_simulation.pyx":340
  * # @cythonboundscheck(False)
