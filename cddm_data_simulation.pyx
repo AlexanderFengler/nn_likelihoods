@@ -1,3 +1,8 @@
+# Globaly settings for cython
+# cython: cdivision=True
+# cython: wraparound=False
+# cython: boundscheck=False
+
 # Functions for DDM data simulation
 import cython
 from libc.stdlib cimport rand, RAND_MAX
@@ -21,20 +26,30 @@ cdef float random_exponential():
 
 cdef float random_stable(float alpha):
     cdef float chi, eta, u, w. x
-    chi = - tan(M_PI_2 * alpha)
+    # chi = - tan(M_PI_2 * alpha)
 
     u = M_PI * (random_uniform() - 0.5)
     w = random_exponential()
 
     if alpha == 1.0:
         eta = M_PI_2
-        x = (1.0 / eta) * ((M_PI_2 + u) * tan(u) - log((M_PI_2 * w * cos(u)) / (M_PI_2 + u)))
+        x = (1.0 / eta) * ((M_PI_2) * tan(u))
+        # x = (1.0 / eta) * ((M_PI_2 + u) * tan(u) - log((M_PI_2 * w * cos(u)) / (M_PI_2 + u)))
     else:
-        eta = (1.0 / alpha) * atan(- chi)
-        x = pow((1.0 + chi * chi), 1.0 / (2.0 * alpha)) * \
-                (sin(alpha * (u + eta)) / pow(cos(u), 1.0 / alpha)) * \
-                pow(cos(u - (alpha * (u + eta))) / w, (1.0 - alpha / alpha))
+        # eta = (1.0 / alpha) * atan(- chi)
+        x = sin(alpha * u) / pow(cos(u), 1 / alpha) * pow(cos(u - (alpha * u) / w, (1.0 - alpha) / alpha))
+        # x = pow((1.0 + chi * chi), 1.0 / (2.0 * alpha)) * \
+        #        (sin(alpha * (u + eta)) / pow(cos(u), 1.0 / alpha)) * \
+        #        pow(cos(u - (alpha * (u + eta))) / w, (1.0 - alpha) / alpha)
     return x
+
+cdef float[:] draw_random_stable(int n, float alpha)
+    cdef int i
+    cdef float[:] result = np.zeros(n, dtype = DTYPE)
+
+    for i in range(n):
+        result[i] = random_stable(alpha)
+    return result
 
 cdef float random_gaussian():
     cdef float x1, x2, w
@@ -61,7 +76,7 @@ cdef float csum(float[:] x):
     
     return total
 
-@cython.boundscheck(False)
+## @cythonboundscheck(False)
 cdef void assign_random_gaussian_pair(float[:] out, int assign_ix):
     cdef float x1, x2, w
     w = 2.0
@@ -75,7 +90,7 @@ cdef void assign_random_gaussian_pair(float[:] out, int assign_ix):
     out[assign_ix] = x1 * w
     out[assign_ix + 1] = x2 * w # this was x2 * 2 ..... :0 
 
-@cython.boundscheck(False)
+# @cythonboundscheck(False)
 cdef float[:] draw_gaussian(int n):
     # Draws standard normal variables - need to have the variance rescaled
     cdef int i
@@ -90,8 +105,9 @@ cdef float[:] draw_gaussian(int n):
 # Simplest algorithm
 # delete random comment
 # delete random comment 2
-@cython.boundscheck(False)
-@cython.wraparound(False) 
+#@cython.boundscheck(False)
+#@cython.wraparound(False)
+
 def ddm(float v = 0, # drift by timestep 'delta_t'
         float a = 1, # boundary separation
         float w = 0.5,  # between 0 and 1
@@ -149,9 +165,10 @@ def ddm(float v = 0, # drift by timestep 'delta_t'
                            'boundary_fun_type': 'constant',
                            'possible_choices': [-1, 1]})
 
+
 # Simulate (rt, choice) tuples from: DDM WITH FLEXIBLE BOUNDARIES ------------------------------------
-@cython.boundscheck(False)
-@cython.wraparound(False)
+# @cythonboundscheck(False)
+# @cythonwraparound(False)
 def ddm_flexbound(float v = 0,
                   float a = 1,
                   float w = 0.5,
@@ -230,11 +247,95 @@ def ddm_flexbound(float v = 0,
                             'simulator': 'ddm_flexbound',
                             'boundary_fun_type': boundary_fun.__name__,
                             'possible_choices': [-1, 1]})
-# -----------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------
+
+# Simulate (rt, choice) tuples from: Levy Flight with Flex Bound -------------------------------------
+# @cythonboundscheck(False)
+# @cythonwraparound(False)
+def levy_flexbound(float v = 0,
+                   float a = 1,
+                   float w = 0.5,
+                   float ndt = 0.0,
+                   float alpha = 1,
+                   float s = 1,
+                   float delta_t = 0.001,
+                   float max_t = 20,
+                   int n_samples = 20000,
+                   print_info = True,
+                   boundary_fun = None, # function of t (and potentially other parameters) that takes in (t, *args)
+                   boundary_multiplicative = True,
+                   boundary_params = {}
+                   ):
+
+    rts = np.zeros((n_samples, 1), dtype = DTYPE)
+    choices = np.zeros((n_samples, 1), dtype = np.intc)
+
+    cdef float[:,:] rts_view = rts
+    cdef int[:,:] choices_view = choices
+
+    cdef float delta_t_sqrt = sqrt(delta_t) # correct scalar so we can use standard normal samples for the brownian motion
+    cdef float sqrt_st = delta_t_sqrt * s # scalar to ensure the correct variance for the gaussian step
+
+    # Boundary storage for the upper bound
+    cdef int num_draws = int((max_t / delta_t) + 1)
+    boundary = np.zeros(num_draws, dtype = DTYPE)
+    cdef float[:] boundary_view = boundary
+    cdef int i
+    cdef float tmp
+
+    # Precompute boundary evaluations
+    if boundary_multiplicative:
+        for i in range(num_draws):
+            tmp = a * boundary_fun(t = i * delta_t, **boundary_params)
+            if tmp > 0:
+                boundary_view[i] = tmp
+    else:
+        for i in range(num_draws):
+            tmp = a + boundary_fun(t = i * delta_t, **boundary_params)
+            if tmp > 0:
+                boundary_view[i] = tmp
+
+    cdef float y, t
+    cdef int n, ix
+    cdef int m = 0
+    cdef float[:] gaussian_values = draw_gaussian(num_draws)
+
+    # Loop over samples
+    for n in range(n_samples):
+        y = (-1) * boundary_view[0] + (w * 2 * (boundary_view[0]))  # reset starting position 
+        t = 0 # reset time
+        ix = 0 # reset boundary index
+
+        # Random walker
+        while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
+            y += (v * delta_t) + (sqrt_st * gaussian_values[m])
+            t += delta_t
+            ix += 1
+            m += 1
+            if m == num_draws:
+                gaussian_values = draw_gaussian(num_draws)
+                m = 0
+
+        rts_view[n, 0] = t + ndt # Store rt
+        choices_view[n, 0] = sign(y) # Store choice
+
+    return (rts, choices,  {'v': v,
+                            'a': a,
+                            'w': w,
+                            'ndt': ndt,
+                            's': s,
+                            **boundary_params,
+                            'delta_t': delta_t,
+                            'max_t': max_t,
+                            'n_samples': n_samples,
+                            'simulator': 'ddm_flexbound',
+                            'boundary_fun_type': boundary_fun.__name__,
+                            'possible_choices': [-1, 1]})
+# -------------------------------------------------------------------------------------------------
 
 # Simulate (rt, choice) tuples from: Full DDM with flexible bounds --------------------------------
-@cython.boundscheck(False)
-@cython.wraparound(False)
+# @cythonboundscheck(False)
+# @cythonwraparound(False)
 def full_ddm(float v = 0,
              float a = 1,
              float w = 0.5,
@@ -342,8 +443,8 @@ def full_ddm(float v = 0,
 # -------------------------------------------------------------------------------------------------
 
 # Simulate (rt, choice) tuples from: Onstein-Uhlenbeck with flexible bounds -----------------------
-@cython.boundscheck(False)
-@cython.wraparound(False)
+# @cythonboundscheck(False)
+# @cythonwraparound(False)
 def ornstein_uhlenbeck(float v = 0, # drift parameter
                        float a = 1, # initial boundary separation
                        float w = 0.5, # starting point bias
@@ -432,8 +533,8 @@ def ornstein_uhlenbeck(float v = 0, # drift parameter
 # --------------------------------------------------------------------------------------------------
 
 # Simulate (rt, choice) tuples from: DDM WITH FLEXIBLE BOUNDARIES ------------------------------------
-@cython.boundscheck(False)
-@cython.wraparound(False)
+# @cythonboundscheck(False)
+# @cythonwraparound(False)
 def ddm_flexbound_seq2(float v_h = 0,
                        float v_l_1 = 0,
                        float v_l_2 = 0,
@@ -560,8 +661,8 @@ def ddm_flexbound_seq2(float v_h = 0,
 # -----------------------------------------------------------------------------------------------
 
 # Simulate (rt, choice) tuples from: DDM WITH FLEXIBLE BOUNDARIES ------------------------------------
-@cython.boundscheck(False)
-@cython.wraparound(False)
+# @cythonboundscheck(False)
+# @cythonwraparound(False)
 def ddm_flexbound_par2(float v_h = 0, 
                        float v_l_1 = 0,
                        float v_l_2 = 0,
@@ -677,8 +778,8 @@ def ddm_flexbound_par2(float v_h = 0,
 # -----------------------------------------------------------------------------------------------
 
 # Simulate (rt, choice) tuples from: DDM WITH FLEXIBLE BOUNDARIES ------------------------------------
-@cython.boundscheck(False)
-@cython.wraparound(False)
+# @cythonboundscheck(False)
+# @cythonwraparound(False)
 def ddm_flexbound_mic2(float v_h = 0, 
                        float v_l_1 = 0,
                        float v_l_2 = 0,
@@ -819,8 +920,8 @@ def ddm_flexbound_mic2(float v_h = 0,
 # Simulate (rt, choice) tuples from: RACE MODEL WITH N SAMPLES ----------------------------------
 
 # Check if any of the particles in the race model have crossed
-@cython.boundscheck(False)
-@cython.wraparound(False)
+# @cythonboundscheck(False)
+# @cythonwraparound(False)
 
 # Function that checks boundary crossing of particles
 cdef bint check_finished(float[:] particles, float boundary):
@@ -845,8 +946,8 @@ def test_check():
     end = time()
     print("numpy check: {}".format(start - end))
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
+# @cythonboundscheck(False)
+# @cythonwraparound(False)
 def race_model(v = np.array([0, 0, 0], dtype = DTYPE), # np.array expected, one column of floats
                float a = 1, # initial boundary separation
                w = np.array([0, 0, 0], dtype = DTYPE), # np.array expected, one column of floats
@@ -947,8 +1048,8 @@ def race_model(v = np.array([0, 0, 0], dtype = DTYPE), # np.array expected, one 
                            'boundary_fun_type': boundary_fun.__name__,
                            'possible_choices': list(np.arange(0, n_particles, 1))})
 # -------------------------------------------------------------------------------------------------
-@cython.boundscheck(False)
-@cython.wraparound(False)
+# @cythonboundscheck(False)
+# @cythonwraparound(False)
 
 # Simulate (rt, choice) tuples from: Leaky Competing Accumulator Model -----------------------------
 def lca(v = np.array([0, 0, 0], dtype = DTYPE), # drift parameters (np.array expect: one column of floats)
