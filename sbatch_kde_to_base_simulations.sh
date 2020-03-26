@@ -16,11 +16,11 @@
 #SBATCH --mem=32G
 #SBATCH -c 14
 #SBATCH -N 1
-#SBATCH --array=28,60
+#SBATCH --array=1-300
 
 # Run a command
-method='ornstein'
-python -u kde_train_test.py --machine ccv --method $method --simfolder training_data_binned_0_nbins_0_n_20000 --fileprefix ${method}_nchoices_2_train_data_binned_0_nbins_0_n_20000 --outfolder training_data_binned_0_nbins_0_n_20000 --nbyparam 1000 --mixture 0.8 0.1 0.1 --fileid $SLURM_ARRAY_TASK_ID
+method='levy'
+python -u kde_train_test.py --machine ccv --method $method --simfolder training_data_binned_0_nbins_0_n_20000 --fileprefix ${method}_nchoices_2_train_data_binned_0_nbins_512_n_20000 --outfolder training_data_binned_0_nbins_0_n_20000 --nbyparam 1000 --mixture 0.8 0.1 0.1 --fileid $SLURM_ARRAY_TASK_ID
 
 #--fileid $SLURM_ARRAY_TASK_ID
 #python -u /users/afengler/git_repos/nn_likelihoods/navarro_fuss_train_test.py
