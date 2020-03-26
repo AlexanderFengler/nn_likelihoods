@@ -1,4 +1,4 @@
-import ddm_data_simulation as ddm_sim
+#import ddm_data_simulation as ddm_sim
 import scipy as scp
 import numpy as np
 import pandas as pd
