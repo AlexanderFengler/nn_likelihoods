@@ -16,11 +16,11 @@
 #SBATCH --mem=32G
 #SBATCH -c 14
 #SBATCH -N 1
-#SBATCH --array=28,60
+#SBATCH --array=1-300
 
 # Run a command
 method='ornstein'
-python -u simulator_get_stats.py --machine ccv --method $method --simfolder training_data_binned_0_nbins_0_n_20000 --fileprefix ${method}_nchoices_2_train_data_binned_0_nbins_0_n_20000 --fileid $SLURM_ARRAY_TASK_ID
+python -u simulator_get_stats.py --machine ccv --method $method --simfolder training_data_binned_0_nbins_0_n_20000 --fileprefix ${method}_nchoices_2_train_data_binned_0_nbins_512_n_20000 --fileid $SLURM_ARRAY_TASK_ID
 
 #$SLURM_ARRAY_TASK_ID
 
