@@ -20,7 +20,7 @@ import argparse
 
 # My own code
 import kde_class as kde
-import ddm_data_simulation as ddm_simulator 
+#import cddm_data_simulation as ddm_simulator 
 import boundary_functions as bf
 import kde_training_utilities as kde_utils
 
