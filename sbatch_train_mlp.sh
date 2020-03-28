@@ -17,7 +17,7 @@
 #SBATCH --output /users/afengler/batch_job_out/gpu_test.out
 
 # Request runtime, memory, cores
-#SBATCH --time=2:00:00
+#SBATCH --time=24:00:00
 #SBATCH --mem=256G
 #SBATCH -c 14
 #SBATCH -N 1
