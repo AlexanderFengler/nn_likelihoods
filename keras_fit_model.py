@@ -136,10 +136,19 @@ if __name__ == "__main__":
         print('STRUCTURE OF GENERATED MODEL: ....')
         print(model.summary())
 
-        if dnn_params['loss'] == 'huber':
-            model.compile(loss = tf.losses.huber_loss, 
-                          optimizer = "adam", 
-                          metrics = ["mse"])
+        if machine == 'x7':
+
+            if dnn_params['loss'] == 'huber':
+                model.compile(loss = tf.losses.huber_loss, 
+                              optimizer = "adam", 
+                              metrics = ["mse"])
+        
+        if machine == 'ccv':
+
+            if dnn_params['loss'] == 'huber':
+                model.compile(loss = tf.keras.losses.Huber(),
+                              optimizer = "adam",
+                              metric = ["mse"])
 
         if dnn_params['loss'] == 'mse':
             model.compile(loss = 'mse', 
@@ -186,7 +195,7 @@ if __name__ == "__main__":
                         batch_size = dnn_params["batch_size"], 
                         shuffle = True,
                         callbacks = [checkpoint, reduce_lr, earlystopping], 
-                        verbose = 1,
+                        verbose = 2,
                         #validation_data = (X_val, y_val)
                        )
     # ---------------------------------------------------------------------------
