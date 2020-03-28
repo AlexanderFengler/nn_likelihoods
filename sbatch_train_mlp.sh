@@ -26,6 +26,7 @@
 #SBATCH -p gpu --gres=gpu:1
 ##SBATCH --array=1-1
 
+source /users/afengler/.bashrc
 conda deactivate
 conda activate tf-gpu-py37
 # module load python/3.7.4 cuda/10.0.130 cudnn/7.4 tensorflow/2.0.0_gpu_py37
