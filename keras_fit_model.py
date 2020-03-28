@@ -56,8 +56,13 @@ if __name__ == "__main__":
     # ----------------
 
     # INITIALIZATIONS ----------------------------------------------------------------
-    stats = pickle.load(open("kde_stats.pickle", "rb"))[method]
-    dnn_params = yaml.load(open("hyperparameters.yaml"))
+    if machine == 'x7':
+        stats = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))[method]
+        dnn_params = yaml.load(open("/meia/data_cifs/afengler/git_repos/nn_likelihoods/hyperparameters.yaml"))
+    else:
+        stats = pickle.load(open("/users/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))[method]
+        dnn_params = yaml.load(open("/users/afengler/git_repos/nn_likelihoods/hyperparameters.yaml"))
+
 
     if machine == 'x7':
         #data_folder = stats["data_folder_x7"]
