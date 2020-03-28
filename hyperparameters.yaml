@@ -1,4 +1,4 @@
-hidden_layers: [100, 100, 120, 1]
+hidden_layers: [100, 100, 100, 100, 1]   #[100, 100, 120, 1]
 hidden_activations: ["tanh", "tanh", "tanh", "linear"]
 filters: [128, 128, 128, 128]
 batch_size: 1000000

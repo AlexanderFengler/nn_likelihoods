@@ -157,9 +157,9 @@ if __name__ == "__main__":
     if warm_start:
         # Returns a compiled model identical to the previous one
         if machine == 'x7':
-            model_paths = yaml.load(open("model_paths_x7.yaml"))
+            model_paths = yaml.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/model_paths_x7.yaml"))
         if machine == 'ccv':
-            model_paths = yaml.load(open("model_paths.yaml"))
+            model_paths = yaml.load(open("/users/afengler/git_repos/nn_likelihoods/model_paths.yaml"))
 
         model_path = model_paths[method +  '_' + str(n_training_datasets_to_load)]
         model = load_model(model_path + 'model_final.h5', custom_objects = {"huber_loss": tf.losses.huber_loss})
