@@ -148,7 +148,7 @@ if __name__ == "__main__":
             if dnn_params['loss'] == 'huber':
                 model.compile(loss = tf.keras.losses.Huber(),
                               optimizer = "adam",
-                              metric = ["mse"])
+                              metrics = ["mse"])
 
         if dnn_params['loss'] == 'mse':
             model.compile(loss = 'mse', 
