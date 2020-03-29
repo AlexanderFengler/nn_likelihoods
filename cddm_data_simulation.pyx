@@ -101,6 +101,73 @@ cdef float[:] draw_gaussian(int n):
         result[n - 1] = random_gaussian()
     return result
 
+
+# DUMMY TEST SIMULATOR ------------------------------------------------------------------------
+# Simulate (rt, choice) tuples from: SIMPLE DDM -----------------------------------------------
+# Simplest algorithm
+# delete random comment
+# delete random comment 2
+#@cython.boundscheck(False)
+#@cython.wraparound(False)
+
+def test(float v = 0, # drift by timestep 'delta_t'
+         float a = 1, # boundary separation
+         float w = 0.5,  # between 0 and 1
+         float ndt = 0.0, # non-decision time
+         float s = 1, # noise sigma
+         float delta_t = 0.001, # timesteps fraction of seconds
+         float max_t = 20, # maximum rt allowed
+         int n_samples = 20000, # number of samples considered
+         print_info = True # timesteps fraction of seconds
+         ):
+
+    rts = np.zeros((n_samples, 1), dtype = DTYPE)
+    choices = np.zeros((n_samples, 1), dtype = np.intc)
+    cdef float[:, :] rts_view = rts
+    cdef int[:, :] choices_view = choices
+
+    cdef float delta_t_sqrt = sqrt(delta_t)
+    cdef float sqrt_st = delta_t_sqrt * s
+
+    cdef float y, t
+
+    cdef int n
+    cdef int m = 0
+    cdef int num_draws = int(max_t / delta_t + 1)
+    cdef float[:] gaussian_values = draw_gaussian(num_draws)
+
+    # Loop over samples
+    for n in range(n_samples):
+        y = w * a # reset starting point
+        t = 0.0 # reset time
+
+        # Random walker
+        while y <= a and y >= 0 and t <= max_t:
+            y += v * delta_t + sqrt_st * gaussian_values[m] # update particle position
+            t += delta_t
+            m += 1
+            if m == num_draws:
+                gaussian_values = draw_gaussian(num_draws)
+                m = 0
+
+        # Note that for purposes of consistency with Navarro and Fuss, 
+        # the choice corresponding the lower barrier is +1, higher barrier is -1
+        rts_view[n, 0] = t + ndt # store rt
+        choices_view[n, 0] = (-1) * sign(y) # store choice
+        
+    return (rts, choices, {'v': v,
+                           'a': a,
+                           'w': w,
+                           'ndt': ndt,
+                           's': s,
+                           'delta_t': delta_t,
+                           'max_t': max_t,
+                           'n_samples': n_samples,
+                           'simulator': 'ddm',
+                           'boundary_fun_type': 'constant',
+                           'possible_choices': [-1, 1]})
+# ---------------------------------------------------------------------------------------------
+
 # Simulate (rt, choice) tuples from: SIMPLE DDM -----------------------------------------------
 # Simplest algorithm
 # delete random comment

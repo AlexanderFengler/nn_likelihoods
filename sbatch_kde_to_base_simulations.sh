@@ -19,7 +19,7 @@
 #SBATCH --array=1-300
 
 # Run a command
-method='ornstein'
+method='ddm'
 python -u kde_train_test.py --machine ccv --method $method --simfolder training_data_binned_0_nbins_0_n_20000 --fileprefix ${method}_nchoices_2_train_data_binned_0_nbins_0_n_20000 --outfolder training_data_binned_0_nbins_0_n_20000 --nbyparam 1000 --mixture 0.8 0.1 0.1 --fileid $SLURM_ARRAY_TASK_ID
 
 #--fileid $SLURM_ARRAY_TASK_ID
