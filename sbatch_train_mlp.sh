@@ -33,7 +33,7 @@ conda activate tf-gpu-py37
 
 
 nfiles=150
-method='ddm'
+method='ornstein'
 machine='ccv'
 #data_folder='/users/afengler/data/kde/levy/'
 python -u /users/afengler/git_repos/nn_likelihoods/keras_fit_model.py --machine $machine --method $method --nfiles $nfiles --datafolder /users/afengler/data/kde/${method}/training_data_binned_0_nbins_0_n_20000/ --nbydataset 10000000 --warmstart 0
