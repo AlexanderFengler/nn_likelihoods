@@ -19,7 +19,7 @@
 #SBATCH --array=1-300
 
 # Run a command
-method='ornstein'
+method='full_ddm'
 python -u simulator_get_stats.py --machine ccv --method $method --simfolder training_data_binned_0_nbins_0_n_20000 --fileprefix ${method}_nchoices_2_train_data_binned_0_nbins_0_n_20000 --fileid $SLURM_ARRAY_TASK_ID
 
 #$SLURM_ARRAY_TASK_ID
