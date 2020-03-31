@@ -446,7 +446,7 @@ temp = {
     "data_folder_x7": "/media/data_cifs/afengler/data/kde/ornstein/train_test_data_20000/",
     "output_folder": "/users/afengler/data/kde/ornstein/method_comparison/",
     "output_folder_x7": "/media/data_cifs/afengler/data/kde/ornstein/method_comparison/",
-    "model_folder": "/users/afengler/data/kde/orstein/keras_models/",
+    "model_folder": "/users/afengler/data/kde/ornstein/keras_models/",
     "model_folder_x7": "/media/data_cifs/afengler/data/kde/ornstein/keras_models/",
     "param_names": ["v", "a", "w", "g", "ndt"],
     # "param_bounds_network": [[- 1.5, 1.5], [0.5, 1.5], [0.3, 0.7], [- 1.0, 1.0], [0.0, 1.0]],
