@@ -477,6 +477,8 @@ temp = {
     "data_folder_x7": "/media/data_cifs/afengler/data/kde/full_ddm/train_test_data_20000",
     "output_folder": "/users/afengler/data/kde/full_ddm/method_comparison/",
     "output_folder_x7": "/media/data_cifs/afengler/data/kde/full_ddm/method_comparison/",
+    "model_folder": "/users/afengler/data/kde/full_ddm/keras_models/",
+    "model_folder_x7": "/media/data_cifs/afengler/data/kde/full_ddm/keras_models/",
     "param_names": ["v", "a", "w", "ndt", "dw", "sdv", "dndt"],
     "boundary_param_names": [],
     # "param_bounds_network": [[-2.0, 2.0], [0.6, 1.8], [0.3, 0.7], [0.25, 1.25], [0, 0.4], [0, 0.5], [0.0, 0.5]],
