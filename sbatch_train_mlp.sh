@@ -18,7 +18,7 @@
 
 # Request runtime, memory, cores
 #SBATCH --time=24:00:00
-#SBATCH --mem=256G
+#SBATCH --mem=384G
 #SBATCH -c 14
 #SBATCH -N 1
 #SBATCH --constraint='quadrortx'
@@ -32,7 +32,7 @@ conda activate tf-gpu-py37
 # module load python/3.7.4 cuda/10.0.130 cudnn/7.4 tensorflow/2.0.0_gpu_py37
 
 
-nfiles=130
+nfiles=150
 method='full_ddm'
 machine='ccv'
 #data_folder='/users/afengler/data/kde/levy/'
