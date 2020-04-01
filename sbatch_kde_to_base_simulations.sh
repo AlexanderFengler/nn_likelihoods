@@ -6,10 +6,10 @@
 #SBATCH -J tpl_3_weibull
 
 # priority
-##SBATCH --account=bibs-frankmj-condo
+#SBATCH --account=bibs-frankmj-condo
 ##SBATCH --account=afengler
-#SBATCH --account=carney-frankmj-condo
-#SBATCH -p smp
+##SBATCH --account=carney-frankmj-condo
+##SBATCH -p smp
 
 # output file
 #SBATCH --output /users/afengler/batch_job_out/tpl3_%A_%a.out
