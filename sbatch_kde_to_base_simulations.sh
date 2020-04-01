@@ -7,7 +7,7 @@
 
 # priority
 #SBATCH --account=bibs-frankmj-condo
-#SBATCH -p smp
+##SBATCH -p smp
 
 # output file
 #SBATCH --output /users/afengler/batch_job_out/tpl3_%A_%a.out
