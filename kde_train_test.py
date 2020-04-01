@@ -65,14 +65,14 @@ if __name__ == "__main__":
         os.mkdir(method_folder + args.outfolder + '/')
 
     # Main function 
-    kde_util.kde_from_simulations_fast(base_simulation_folder = method_folder + args.simfolder,
-                                       file_name_prefix = args.fileprefix,
-                                       file_id = args.fileid,
-                                       target_folder = method_folder + args.outfolder,
-                                       n_by_param = args.nbyparam,
-                                       mixture_p = args.mixture,
-                                       process_params = process_params,
-                                       print_info = False)
+    kde_util.kde_from_simulations_fast_parallel(base_simulation_folder = method_folder + args.simfolder,
+                                                file_name_prefix = args.fileprefix,
+                                                file_id = args.fileid,
+                                                target_folder = method_folder + args.outfolder,
+                                                n_by_param = args.nbyparam,
+                                                mixture_p = args.mixture,
+                                                process_params = process_params,
+                                                print_info = False)
     
 # UNUSED --------------------------
     # LBA

@@ -31,6 +31,9 @@ import boundary_functions as bf
 # Plotting
 import matplotlib.pyplot as plt
 
+# /users/afengler/data/kde/full_ddm/training_data_binned_0_nbins_0_n_20000/full_ddm_nchoices_2_train_data_binned_0_nbins_0_n_20000_213.pickle
+# /users/afengler/data/kde/full_ddm/training_data_binned_0_nbins_0_n_20000/simulator_statistics_213.pickle
+
 def filter_simulations_fast(base_simulation_folder = '',
                             file_name_prefix = '',
                             file_id = 0,
@@ -172,6 +175,139 @@ def filter_simulations_fast(base_simulation_folder = '',
                      
     return sim_stat_data                     
 
+def make_kde_data(data = [], metadata  = [], keep_file = 0, n_kde = 100, n_unif_up = 100, n_unif_down = 100, idx = 0):
+    out = np.zeros((n_kde + n_unif_up + n_unif_down, 3))
+    tmp_kde = kde_class.logkde((data[:, 0], data[:, 1], metadata))
+    
+    # Get kde part
+    samples_kde = tmp_kde.kde_sample(n_samples = n_kde)
+    likelihoods_kde = tmp_kde.kde_eval(data = samples_kde).ravel()
+    
+    out[:n_kde, 0] = samples_kde[0].ravel()
+    out[:n_kde, 1] = samples_kde[1].ravel()
+    out[:n_kde, 2] = likelihoods_kde
+
+    # Get positive uniform part:
+    choice_tmp = np.random.choice(metadata['possible_choices'], size = n_unif_up)
+
+    if metadata['max_t'] < 100:
+        rt_tmp = np.random.uniform(low = 0.0001,
+                                   high = metadata['max_t'],
+                                   size = n_unif_up) 
+    else: 
+        rt_tmp = np.random.uniform(low = 0.0001, 
+                                   high = 100,
+                                   size = n_unif_up)
+
+    likelihoods_unif = tmp_kde.kde_eval(data = (rt_tmp, choice_tmp)).ravel()
+
+
+    out[n_kde:(n_kde + n_unif_up), 0] = rt_tmp
+    out[n_kde:(n_kde + n_unif_up), 1] = choice_tmp
+    out[n_kde:(n_kde + n_unif_up), 2] = likelihoods_unif
+
+
+    # Get negative uniform part:
+    choice_tmp = np.random.choice(metadata['possible_choices'], #['possible_choices'],
+                                    size = n_unif_down)
+    
+    rt_tmp = np.random.uniform(low = - 1,
+                                high = 0.0001,
+                                size = n_unif_down)
+
+    out[(n_kde + n_unif_up):, 0] = rt_tmp
+    out[(n_kde + n_unif_up):, 1] = choice_tmp
+    out[(n_kde + n_unif_up):, 2] = -66.77497
+    if idx % 10 == 0:
+        print(idx)
+    return out
+
+# We should be able to parallelize this !
+def kde_from_simulations_fast_parallel(base_simulation_folder = '',
+                                       file_name_prefix = '',
+                                       file_id = 1,
+                                       target_folder = '', 
+                                       n_by_param = 3000,
+                                       mixture_p = [0.8, 0.1, 0.1],
+                                       process_params = ['v', 'a', 'w', 'c1', 'c2'],
+                                       print_info = False
+                                       ):
+
+    file_ = pickle.load(open( base_simulation_folder + '/' + file_name_prefix + '_' + str(file_id) + '.pickle', 'rb' ) )
+    stat_ = pickle.load(open( base_simulation_folder + '/simulator_statistics' + '_' + str(file_id) + '.pickle', 'rb' ) )
+
+    # Initialize dataframe
+    my_columns = process_params + ['rt', 'choice', 'log_l']
+    data = pd.DataFrame(np.zeros((np.sum(stat_['keep_file']) * n_by_param, len(my_columns))),
+                        columns = my_columns)             
+     
+    n_kde = int(n_by_param * mixture_p[0])
+    n_unif_down = int(n_by_param * mixture_p[1])
+    n_unif_up = int(n_by_param * mixture_p[2])
+    n_kde = n_kde + (n_by_param - n_kde - n_unif_up - n_unif_down) # correct n_kde if sum != n_by_param
+    
+    # Add possible choices to file_[2] which is the meta data for the simulator (expected when loaded the kde class)
+    
+    # TODO: THIS INFORMATION SHOULD BE INCLUDED AS META-DATA INTO THE BASE SIMULATOIN FILES
+    file_[2]['possible_choices'] = np.unique([-1,1])
+    #file_[2]['possible_choices'] = np.unique(file_[1][0, :, 1])
+    file_[2]['possible_choices'].sort()
+
+    # CONTINUE HERE   
+    # Main while loop --------------------------------------------------------------------
+    #row_cnt = 0
+    s_id_kde = np.sum(stat_['keep_file']) * (n_unif_down + n_unif_up)
+    cnt = 0
+    starmap_iterator = ()
+    for i in range(file_[1].shape[0]):
+        if stat_['keep_file'][i]:
+            tmp_sim_data = file_[1][i]
+            lb = cnt * (n_unif_down + n_unif_up + n_kde)
+            lb_kde = s_id_kde + (cnt * (n_kde))
+            
+            # Make empty dataframe of appropriate size
+            p_cnt = 0
+            
+            for param in process_params:
+                data.iloc[(lb):(lb + n_unif_down + n_unif_up + n_kde), my_columns.index(param)] = file_[0][i, p_cnt] #tmp_sim_data[2][param]
+                #data.iloc[(lb_kde):(lb_kde + n_kde), my_columns.index(param)] = file_[0][i, p_cnt]
+                p_cnt += 1
+            
+            # Allocate to starmap tuple for mixture component 3
+            starmap_iterator += ((file_[1][i, :, :], file_[2], stat_['keep_file'][i], n_kde, n_unif_up, n_unif_down, cnt), )
+            
+            cnt += 1
+            if i % 100 == 0:
+                print(i, 'unif part generated')
+    
+    # MIXTURE COMPONENT 3: KDE DATA ----------------------------------------------------
+    # Parallel
+    n_cpus = psutil.cpu_count(logical = True)
+    with Pool(processes = n_cpus) as pool:
+        # data.iloc[s_id_kde: , ['rt', 'choice', 'log_l']]
+        data.iloc[: , -3:] = np.array(pool.starmap(make_kde_data, starmap_iterator)).reshape((-1, 3))
+        print(data)
+        #print(type(out_))
+        #print(out_)
+        #print(out_.shape)
+    # ----------------------------------------------------------------------------------
+
+    # Store data
+    
+    print('writing data to file: ', target_folder + '/data_' + str(file_id) + '.pickle')
+    pickle.dump(data.values, open(target_folder + '/data_' + str(file_id) + '.pickle', 'wb'), protocol = 4)
+    
+    #data.to_pickle(target_folder + '/data_' + str(file_id) + '.pickle' , protocol = 4)
+
+    # Write metafile if it doesn't exist already
+    # Hack for now: Just copy one of the base simulations files over
+    if os.path.isfile(target_folder + '/meta_data.pickle'):
+        pass
+    else:
+        pickle.dump(tmp_sim_data, open(target_folder + '/meta_data.pickle', 'wb') )
+
+    return data
+
 def kde_from_simulations_fast(base_simulation_folder = '',
                               file_name_prefix = '',
                               file_id = 1,
@@ -203,7 +339,7 @@ def kde_from_simulations_fast(base_simulation_folder = '',
     file_[2]['possible_choices'].sort()
     # CONTINUE HERE   
     # Main while loop --------------------------------------------------------------------
-    row_cnt = 0
+    #row_cnt = 0
     cnt = 0
     for i in range(file_[1].shape[0]):
         if stat_['keep_file'][i]:
