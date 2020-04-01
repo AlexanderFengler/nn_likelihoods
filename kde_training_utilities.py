@@ -230,8 +230,8 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
                                        n_by_param = 3000,
                                        mixture_p = [0.8, 0.1, 0.1],
                                        process_params = ['v', 'a', 'w', 'c1', 'c2'],
-                                       print_info = False
-                                       ):
+                                       print_info = False,
+                                       n_processes = 2):
 
     file_ = pickle.load(open( base_simulation_folder + '/' + file_name_prefix + '_' + str(file_id) + '.pickle', 'rb' ) )
     stat_ = pickle.load(open( base_simulation_folder + '/simulator_statistics' + '_' + str(file_id) + '.pickle', 'rb' ) )
@@ -259,7 +259,7 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
     s_id_kde = np.sum(stat_['keep_file']) * (n_unif_down + n_unif_up)
     cnt = 0
     starmap_iterator = ()
-    for i in range(file_[1].shape[0]):
+    for i in range(300): #range(file_[1].shape[0]):
         if stat_['keep_file'][i]:
             tmp_sim_data = file_[1][i]
             lb = cnt * (n_unif_down + n_unif_up + n_kde)
@@ -282,10 +282,15 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
     
     # MIXTURE COMPONENT 3: KDE DATA ----------------------------------------------------
     # Parallel
-    n_cpus = psutil.cpu_count(logical = False)
+    if n_processes == 'all':
+        n_cpus = psutil.cpu_count(logical = False)
+    else:
+        n_cpus = n_processes
+
     print('Number of cpus: ')
     print(n_cpus)
-    with Pool(processes = 2, maxtasksperchild=1000) as pool:
+   
+    with Pool(processes = n_cpus, maxtasksperchild=1000) as pool:
         # data.iloc[s_id_kde: , ['rt', 'choice', 'log_l']]
         data.iloc[: , -3:] = np.array(pool.starmap(make_kde_data, starmap_iterator)).reshape((-1, 3))
         print(data)

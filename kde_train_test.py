@@ -42,6 +42,9 @@ if __name__ == "__main__":
                      nargs = '*',
                      type = float,
                      default = [0.8, 0.1, 0.1])
+    CLI.add_argument('--nproc',
+                    type = int,
+                    default = 8)
     
     args = CLI.parse_args()
     print(args)
@@ -72,7 +75,8 @@ if __name__ == "__main__":
                                                 n_by_param = args.nbyparam,
                                                 mixture_p = args.mixture,
                                                 process_params = process_params,
-                                                print_info = False)
+                                                print_info = False,
+                                                n_processes= args.nproc)
     
 # UNUSED --------------------------
     # LBA
