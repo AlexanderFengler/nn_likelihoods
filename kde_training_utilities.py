@@ -233,14 +233,18 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
                                        print_info = False,
                                        n_processes = 2):
 
+    # Load in files
+    # 4gb
     file_ = pickle.load(open( base_simulation_folder + '/' + file_name_prefix + '_' + str(file_id) + '.pickle', 'rb' ) )
+    # 1.5mb
     stat_ = pickle.load(open( base_simulation_folder + '/simulator_statistics' + '_' + str(file_id) + '.pickle', 'rb' ) )
 
     # Initialize dataframe
     my_columns = process_params + ['rt', 'choice', 'log_l']
     data = pd.DataFrame(np.zeros((np.sum(stat_['keep_file']) * n_by_param, len(my_columns))),
                         columns = my_columns)             
-     
+    
+    # Initializations
     n_kde = int(n_by_param * mixture_p[0])
     n_unif_down = int(n_by_param * mixture_p[1])
     n_unif_up = int(n_by_param * mixture_p[2])
@@ -254,8 +258,7 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
     file_[2]['possible_choices'].sort()
 
     # CONTINUE HERE   
-    # Main while loop --------------------------------------------------------------------
-    #row_cnt = 0
+    # Preparation loop --------------------------------------------------------------------
     s_id_kde = np.sum(stat_['keep_file']) * (n_unif_down + n_unif_up)
     cnt = 0
     starmap_iterator = ()
@@ -269,8 +272,7 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
             p_cnt = 0
             
             for param in process_params:
-                data.iloc[(lb):(lb + n_unif_down + n_unif_up + n_kde), my_columns.index(param)] = file_[0][i, p_cnt] #tmp_sim_data[2][param]
-                #data.iloc[(lb_kde):(lb_kde + n_kde), my_columns.index(param)] = file_[0][i, p_cnt]
+                data.iloc[(lb):(lb + n_unif_down + n_unif_up + n_kde), my_columns.index(param)] = file_[0][i, p_cnt]
                 p_cnt += 1
             
             # Allocate to starmap tuple for mixture component 3
@@ -280,7 +282,6 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
             if i % 100 == 0:
                 print(i, 'unif part generated')
     
-    # MIXTURE COMPONENT 3: KDE DATA ----------------------------------------------------
     # Parallel
     if n_processes == 'all':
         n_cpus = psutil.cpu_count(logical = False)
@@ -294,16 +295,11 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
         # data.iloc[s_id_kde: , ['rt', 'choice', 'log_l']]
         data.iloc[: , -3:] = np.array(pool.starmap(make_kde_data, starmap_iterator)).reshape((-1, 3))
         print(data)
-        #print(type(out_))
-        #print(out_)
-        #print(out_.shape)
     # ----------------------------------------------------------------------------------
 
     # Store data
-    
     print('writing data to file: ', target_folder + '/data_' + str(file_id) + '.pickle')
     pickle.dump(data.values, open(target_folder + '/data_' + str(file_id) + '.pickle', 'wb'), protocol = 4)
-    
     #data.to_pickle(target_folder + '/data_' + str(file_id) + '.pickle' , protocol = 4)
 
     # Write metafile if it doesn't exist already
