@@ -7,7 +7,8 @@
 
 # priority
 ##SBATCH --account=bibs-frankmj-condo
-#SBATCH --account=afengler
+##SBATCH --account=afengler
+#SBATCH --account=carney-frankmj-condo
 #SBATCH -p smp
 
 # output file
