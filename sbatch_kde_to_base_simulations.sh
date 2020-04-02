@@ -19,7 +19,7 @@
 #SBATCH --mem=64G
 #SBATCH -c 14
 #SBATCH -N 1
-#SBATCH --array=2-2
+#SBATCH --array=1-300
 
 # Run a command
 method='full_ddm'
