@@ -365,7 +365,8 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
         #print(result.shape)
         #print(result)
     
-    data.iloc[: , ['rt', 'choice', 'log_l']] = result.reshape((-1, 3))
+    data.values[: , -3:] = result.reshape((-1, 3))
+    # [['rt', 'choice', 'log_l']] 
     pickle.dump(data, open('/users/afengler/batch_job_out/test_out.pickle', 'wb'), protocol = 4)
     #result.reshape((-1, 3)).shape
     #pickle.dump(result.reshape((-1, 3)), open('/users/afengler/batch_job_out/test_out_2.pickle', 'wb'), protocol = 4)
