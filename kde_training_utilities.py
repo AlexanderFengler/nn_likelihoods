@@ -220,7 +220,60 @@ def make_kde_data(data = [], metadata  = [], keep_file = 0, n_kde = 100, n_unif_
     out[(n_kde + n_unif_up):, 2] = -66.77497
     if idx % 10 == 0:
         print(idx)
+    
     return out
+
+# def make_kde_data(idx = 0):
+
+#     data = file_[1][idx, :, :]
+#     metadata = file_[2]
+
+#     out = np.zeros((n_kde + n_unif_up + n_unif_down, 3))
+#     tmp_kde = kde_class.logkde((data[:, 0], data[:, 1], metadata))
+    
+#     # Get kde part
+#     samples_kde = tmp_kde.kde_sample(n_samples = n_kde)
+#     likelihoods_kde = tmp_kde.kde_eval(data = samples_kde).ravel()
+    
+#     out[:n_kde, 0] = samples_kde[0].ravel()
+#     out[:n_kde, 1] = samples_kde[1].ravel()
+#     out[:n_kde, 2] = likelihoods_kde
+
+#     # Get positive uniform part:
+#     choice_tmp = np.random.choice(metadata['possible_choices'], size = n_unif_up)
+
+#     if metadata['max_t'] < 100:
+#         rt_tmp = np.random.uniform(low = 0.0001,
+#                                 high = metadata['max_t'],
+#                                 size = n_unif_up) 
+#     else: 
+#         rt_tmp = np.random.uniform(low = 0.0001, 
+#                                 high = 100,
+#                                 size = n_unif_up)
+
+#     likelihoods_unif = tmp_kde.kde_eval(data = (rt_tmp, choice_tmp)).ravel()
+
+
+#     out[n_kde:(n_kde + n_unif_up), 0] = rt_tmp
+#     out[n_kde:(n_kde + n_unif_up), 1] = choice_tmp
+#     out[n_kde:(n_kde + n_unif_up), 2] = likelihoods_unif
+
+
+#     # Get negative uniform part:
+#     choice_tmp = np.random.choice(metadata['possible_choices'], #['possible_choices'],
+#                                     size = n_unif_down)
+    
+#     rt_tmp = np.random.uniform(low = - 1,
+#                                 high = 0.0001,
+#                                 size = n_unif_down)
+
+#     out[(n_kde + n_unif_up):, 0] = rt_tmp
+#     out[(n_kde + n_unif_up):, 1] = choice_tmp
+#     out[(n_kde + n_unif_up):, 2] = -66.77497
+#     if idx % 10 == 0:
+#         print(idx)
+
+#     return out                                  
 
 # We should be able to parallelize this !
 def kde_from_simulations_fast_parallel(base_simulation_folder = '',
@@ -232,9 +285,12 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
                                        process_params = ['v', 'a', 'w', 'c1', 'c2'],
                                        print_info = False,
                                        n_processes = 2):
-
     # Load in files
     # 4gb
+    # global file_
+    # global n_kde
+    # global n_unif_up
+    # global n_unif_down
     file_ = pickle.load(open( base_simulation_folder + '/' + file_name_prefix + '_' + str(file_id) + '.pickle', 'rb' ) )
     # 1.5mb
     stat_ = pickle.load(open( base_simulation_folder + '/simulator_statistics' + '_' + str(file_id) + '.pickle', 'rb' ) )
@@ -262,9 +318,15 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
     s_id_kde = np.sum(stat_['keep_file']) * (n_unif_down + n_unif_up)
     cnt = 0
     starmap_iterator = ()
+    tmp_sim_data_ok = 0
     for i in range(file_[1].shape[0]):
         if stat_['keep_file'][i]:
-            tmp_sim_data = file_[1][i]
+
+            if tmp_sim_data_ok:
+                pass
+            else:
+                tmp_sim_data = file_[1][i]
+                tmp_sim_data_ok = 1
             lb = cnt * (n_unif_down + n_unif_up + n_kde)
             lb_kde = s_id_kde + (cnt * (n_kde))
             
@@ -277,6 +339,9 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
             
             # Allocate to starmap tuple for mixture component 3
             starmap_iterator += ((file_[1][i, :, :].copy(), file_[2].copy(), stat_['keep_file'][i].copy(), n_kde, n_unif_up, n_unif_down, cnt), )
+            # alternative
+            # tmp = i
+            # starmap_iterator += ((tmp), )
             
             cnt += 1
             if i % 100 == 0:
@@ -290,11 +355,19 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
 
     print('Number of cpus: ')
     print(n_cpus)
+    #file_
+    #stat_
    
     with Pool(processes = n_cpus, maxtasksperchild=1000) as pool:
-        # data.iloc[s_id_kde: , ['rt', 'choice', 'log_l']]
-        data.iloc[: , -3:] = np.array(pool.starmap(make_kde_data, starmap_iterator, chunksize = 10)).reshape((-1, 3))
-        print(data)
+        data.iloc[s_id_kde: , ['rt', 'choice', 'log_l']] = np.array(pool.starmap(make_kde_data, starmap_iterator)).reshape((-1, 3))
+        #print(data)
+        # for result in pool.imap(make_kde_data, starmap_iterator, chunksize = 20):
+        #     print(result)
+
+        #np.array(pool.imap(make_kde_data, starmap_iterator, chunksize = 20)).reshape((-1, 3))
+        #print(result)
+        #data.iloc[: , -3:] = 
+        #print(data)
     # ----------------------------------------------------------------------------------
 
     # Store data

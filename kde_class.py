@@ -32,7 +32,7 @@ class logkde():
                     if bandwidth_tmp > 0:
                         self.bandwidths.append(bandwidth_tmp)
                     else:
-                        print(self.data['rts'][i])
+                        #print(self.data['rts'][i])
                         self.bandwidths.append('no_base_data')
 
     # Function to generate basic kdes
@@ -51,7 +51,7 @@ class logkde():
         for i in range(0, len(self.data['choices']), 1):
             if self.bandwidths[i] == 'no_base_data':
                 self.base_kdes.append('no_base_data')
-                print('no_base_data reported')
+                #print('no_base_data reported')
             else: 
                 self.base_kdes.append(KernelDensity(kernel = 'gaussian',
                                                     bandwidth = self.bandwidths[i]).fit(np.log(self.data['rts'][i])))
@@ -112,10 +112,10 @@ class logkde():
             n_by_choice[np.argmax(n_by_choice)] -= 1
         elif sum(n_by_choice) < n_samples:
             n_by_choice[np.argmax(n_by_choice)] += 1
-            print('rounding error catched')
+            #print('rounding error catched')
             choices[n_samples - 1, 0] = np.random.choice(self.data['choices'])
-            print('resolution: ', choices[n_samples - 1, 0])
-            print('choices allowed: ', self.data['choices'])
+            #print('resolution: ', choices[n_samples - 1, 0])
+            #print('choices allowed: ', self.data['choices'])
             
         # Get samples
         cnt_low = 0
