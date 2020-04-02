@@ -367,7 +367,7 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
     
     pickle.dump(result, open('/users/afengler/batch_job_out/test_out.pickle', 'wb'), protocol = 4)
     result.reshape((-1, 3)).shape
-    pickle.dump(rresult.reshape((-1, 3), open('/users/afengler/batch_job_out/test_out_2.pickle', 'wb'), protocol = 4)
+    pickle.dump(rresult.reshape((-1, 3), open('/users/afengler/batch_job_out/test_out_2.pickle', 'wb'), protocol = 4))
         #print(data)
         # for result in pool.imap(make_kde_data, starmap_iterator, chunksize = 20):
         #     print(result)
