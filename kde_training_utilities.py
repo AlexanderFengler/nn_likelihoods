@@ -393,7 +393,7 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
     #else:
     #    pickle.dump(tmp_sim_data, open(target_folder + '/meta_data.pickle', 'wb') )
 
-    #return data
+    return 0 #data
 
 def kde_from_simulations_fast(base_simulation_folder = '',
                               file_name_prefix = '',
