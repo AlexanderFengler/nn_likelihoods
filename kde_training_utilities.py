@@ -360,14 +360,15 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
     #stat_
    
     with Pool(processes = n_cpus, maxtasksperchild=1000) as pool:
-        #data.iloc[: , ['rt', 'choice', 'log_l']] = 
+        #
         result = np.array(pool.starmap(make_kde_data, starmap_iterator))   #.reshape((-1, 3))
-        print(result.shape)
-        print(result)
+        #print(result.shape)
+        #print(result)
     
-    pickle.dump(result, open('/users/afengler/batch_job_out/test_out.pickle', 'wb'), protocol = 4)
-    result.reshape((-1, 3)).shape
-    pickle.dump(result.reshape((-1, 3), open('/users/afengler/batch_job_out/test_out_2.pickle', 'wb'), protocol = 4))
+    data.iloc[: , ['rt', 'choice', 'log_l']] = result.reshape((-1, 3))
+    pickle.dump(data, open('/users/afengler/batch_job_out/test_out.pickle', 'wb'), protocol = 4)
+    #result.reshape((-1, 3)).shape
+    #pickle.dump(result.reshape((-1, 3)), open('/users/afengler/batch_job_out/test_out_2.pickle', 'wb'), protocol = 4)
         #print(data)
         # for result in pool.imap(make_kde_data, starmap_iterator, chunksize = 20):
         #     print(result)
