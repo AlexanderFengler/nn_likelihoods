@@ -362,7 +362,12 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
     #stat_
    
     with Pool(processes = n_cpus, maxtasksperchild=1000) as pool:
-        data.iloc[: , ['rt', 'choice', 'log_l']] = np.array(pool.starmap(make_kde_data, starmap_iterator)).reshape((-1, 3))
+        #data.iloc[: , ['rt', 'choice', 'log_l']] = 
+        result = np.array(pool.starmap(make_kde_data, starmap_iterator))   #.reshape((-1, 3))
+        print(result.shape)
+        print(result)
+    
+    pickle.dump(result, open('/users/batch_job_out/test_out.pickle', 'wb'), protocol = 4)
         #print(data)
         # for result in pool.imap(make_kde_data, starmap_iterator, chunksize = 20):
         #     print(result)
@@ -374,18 +379,21 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
     # ----------------------------------------------------------------------------------
 
     # Store data
-    print('writing data to file: ', target_folder + '/data_' + str(file_id) + '.pickle')
-    pickle.dump(data.values, open(target_folder + '/data_' + str(file_id) + '.pickle', 'wb'), protocol = 4)
+    
+    #print('writing data to file: ', target_folder + '/data_' + str(file_id) + '.pickle')
+    #pickle.dump(data.values, open(target_folder + '/data_' + str(file_id) + '.pickle', 'wb'), protocol = 4)
+    
     #data.to_pickle(target_folder + '/data_' + str(file_id) + '.pickle' , protocol = 4)
 
     # Write metafile if it doesn't exist already
     # Hack for now: Just copy one of the base simulations files over
-    if os.path.isfile(target_folder + '/meta_data.pickle'):
-        pass
-    else:
-        pickle.dump(tmp_sim_data, open(target_folder + '/meta_data.pickle', 'wb') )
+    
+    #if os.path.isfile(target_folder + '/meta_data.pickle'):
+    #    pass
+    #else:
+    #    pickle.dump(tmp_sim_data, open(target_folder + '/meta_data.pickle', 'wb') )
 
-    return data
+    #return data
 
 def kde_from_simulations_fast(base_simulation_folder = '',
                               file_name_prefix = '',
