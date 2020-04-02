@@ -188,7 +188,7 @@ def make_kde_data(data = [], metadata  = [], keep_file = 0, n_kde = 100, n_unif_
     out[:n_kde, 2] = likelihoods_kde
 
     # Get positive uniform part:
-    choice_tmp = np.float(np.random.choice(metadata['possible_choices'], size = n_unif_up))
+    choice_tmp = np.random.choice(metadata['possible_choices'], size = n_unif_up)
 
     if metadata['max_t'] < 100:
         rt_tmp = np.random.uniform(low = 0.0001,
@@ -208,8 +208,8 @@ def make_kde_data(data = [], metadata  = [], keep_file = 0, n_kde = 100, n_unif_
 
 
     # Get negative uniform part:
-    choice_tmp = np.float(np.random.choice(metadata['possible_choices'], #['possible_choices'],
-                                    size = n_unif_down))
+    choice_tmp = np.random.choice(metadata['possible_choices'], #['possible_choices'],
+                                    size = n_unif_down)
     
     rt_tmp = np.random.uniform(low = - 1.0,
                                 high = 0.0001,
@@ -218,8 +218,6 @@ def make_kde_data(data = [], metadata  = [], keep_file = 0, n_kde = 100, n_unif_
     out[(n_kde + n_unif_up):, 0] = rt_tmp
     out[(n_kde + n_unif_up):, 1] = choice_tmp
     out[(n_kde + n_unif_up):, 2] = -66.77497
-    
-
     
     if idx % 10 == 0:
         print(idx)
