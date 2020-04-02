@@ -293,7 +293,7 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
    
     with Pool(processes = n_cpus, maxtasksperchild=1000) as pool:
         # data.iloc[s_id_kde: , ['rt', 'choice', 'log_l']]
-        data.iloc[: , -3:] = np.array(pool.starmap(make_kde_data, starmap_iterator)).reshape((-1, 3))
+        data.iloc[: , -3:] = np.array(pool.starmap(make_kde_data, starmap_iterator, chunksize = 10)).reshape((-1, 3))
         print(data)
     # ----------------------------------------------------------------------------------
 
