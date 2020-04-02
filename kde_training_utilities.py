@@ -262,7 +262,7 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
     s_id_kde = np.sum(stat_['keep_file']) * (n_unif_down + n_unif_up)
     cnt = 0
     starmap_iterator = ()
-    for i in range(300): #range(file_[1].shape[0]):
+    for i in range(file_[1].shape[0]):
         if stat_['keep_file'][i]:
             tmp_sim_data = file_[1][i]
             lb = cnt * (n_unif_down + n_unif_up + n_kde)
@@ -276,7 +276,7 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
                 p_cnt += 1
             
             # Allocate to starmap tuple for mixture component 3
-            starmap_iterator += ((file_[1][i, :, :], file_[2], stat_['keep_file'][i], n_kde, n_unif_up, n_unif_down, cnt), )
+            starmap_iterator += ((file_[1][i, :, :].copy(), file_[2].copy(), stat_['keep_file'][i].copy(), n_kde, n_unif_up, n_unif_down, cnt), )
             
             cnt += 1
             if i % 100 == 0:
