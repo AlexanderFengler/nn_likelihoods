@@ -188,7 +188,7 @@ def make_kde_data(data = [], metadata  = [], keep_file = 0, n_kde = 100, n_unif_
     out[:n_kde, 2] = likelihoods_kde
 
     # Get positive uniform part:
-    choice_tmp = np.random.choice(metadata['possible_choices'], size = n_unif_up)
+    choice_tmp = np.float(np.random.choice(metadata['possible_choices'], size = n_unif_up))
 
     if metadata['max_t'] < 100:
         rt_tmp = np.random.uniform(low = 0.0001,
@@ -208,20 +208,23 @@ def make_kde_data(data = [], metadata  = [], keep_file = 0, n_kde = 100, n_unif_
 
 
     # Get negative uniform part:
-    choice_tmp = np.random.choice(metadata['possible_choices'], #['possible_choices'],
-                                    size = n_unif_down)
+    choice_tmp = np.float(np.random.choice(metadata['possible_choices'], #['possible_choices'],
+                                    size = n_unif_down))
     
-    rt_tmp = np.random.uniform(low = - 1,
+    rt_tmp = np.random.uniform(low = - 1.0,
                                 high = 0.0001,
                                 size = n_unif_down)
 
     out[(n_kde + n_unif_up):, 0] = rt_tmp
     out[(n_kde + n_unif_up):, 1] = choice_tmp
     out[(n_kde + n_unif_up):, 2] = -66.77497
+    
+
+    
     if idx % 10 == 0:
         print(idx)
     
-    return out
+    return out.astype(np.float)
 
 # def make_kde_data(idx = 0):
 
@@ -359,7 +362,7 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
     #stat_
    
     with Pool(processes = n_cpus, maxtasksperchild=1000) as pool:
-        data.iloc[s_id_kde: , ['rt', 'choice', 'log_l']] = np.array(pool.starmap(make_kde_data, starmap_iterator)).reshape((-1, 3))
+        data.iloc[: , ['rt', 'choice', 'log_l']] = np.array(pool.starmap(make_kde_data, starmap_iterator)).reshape((-1, 3))
         #print(data)
         # for result in pool.imap(make_kde_data, starmap_iterator, chunksize = 20):
         #     print(result)
