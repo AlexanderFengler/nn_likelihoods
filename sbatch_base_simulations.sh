@@ -31,7 +31,7 @@ n_bins=( 512 )
 binned=1
 machine="ccv" #"ccv"
 datatype="cnn_train" #"cnn_train" # "parameter_recovery"
-mode="ccn"
+mode="cnn"
 maxt=20
 # outer -------------------------------------
 for bins in "${n_bins[@]}"
