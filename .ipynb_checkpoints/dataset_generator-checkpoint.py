@@ -9,6 +9,7 @@ import pickle
 import uuid
 import os
 import sys
+from datetime import datetime
 #from tqdm import tqdm
 
 import boundary_functions as bf
@@ -170,9 +171,13 @@ class data_generator():
             param_bounds = self.method_params['param_bounds_cnn'] + self.method_params['boundary_param_bounds_cnn']
         
         # Epsilon correction of boundaries (to make sure for parameter recovery we don't generate straight at the bound)
+        
         eps = 0
-        if self.config['datatype'] == 'parameter_recovery':
-            eps = 0.05
+        if self.config['datatype'] == 'parameter_recovery' and self.config['mode'] != 'test':
+            # TD make eps parameter
+            eps = 0.2
+            
+        print('epsilon correction', eps)
 
         # If model is lba, lca, race we need to expand parameter boundaries to account for
         # parameters that depend on the number of choices
@@ -296,7 +301,7 @@ class data_generator():
     def make_dataset_perturbation_experiment(self,
                                              save = True):
         
-        param_grid, meta_dat = self.param_grid_perturbation_experiment()
+        param_grid, meta_dat = self.make_param_grid_perturbation_experiment()
              
         if self.config['binned']:           
             data_grid = np.zeros((self.config['nreps'],
@@ -533,7 +538,7 @@ def make_dataset_r_dgp(dgp_list = ['ddm', 'ornstein', 'angle', 'weibull', 'full_
             param_grid, data_grid, nsamples = dg_tmp.make_dataset_r_sim(n_sim_bnds = n_sim_bnds,
                                                                         save = False)
         else:
-            param_grid, data_grid = dg_tmp.make_dataset_uniform(save = False)
+            param_grid, data_grid = dg_tmp.make_dataset_train_network_unif(save = False)
             
         print(data_grid.shape)
         print(param_grid.shape)
@@ -595,6 +600,31 @@ def bin_arbitrary_fptd(out = [0, 0],
         print(np.histogram(out[:, 0][out[:, 1] == choice], bins = bins)[1])
         cnt += 1
     return counts
+
+def bin_simulator_output(self, 
+                             out = [0, 0],
+                             bin_dt = 0.04,
+                             nbins = 0): # ['v', 'a', 'w', 'ndt', 'angle']
+        
+        # Generate bins
+        if nbins == 0:
+            nbins = int(out[2]['max_t'] / bin_dt)
+            bins = np.zeros(nbins + 1)
+            bins[:nbins] = np.linspace(0, out[2]['max_t'], nbins)
+            bins[nbins] = np.inf
+        else:  
+            bins = np.zeros(nbins + 1)
+            bins[:nbins] = np.linspace(0, out[2]['max_t'], nbins)
+            bins[nbins] = np.inf
+
+        cnt = 0
+        counts = np.zeros( (nbins, len(out[2]['possible_choices']) ) )
+
+        for choice in out[2]['possible_choices']:
+            counts[:, cnt] = np.histogram(out[0][out[1] == choice], bins = bins)[0] / out[2]['n_samples']
+            cnt += 1
+        return counts
+    
 # -------------------------------------------------------------------------------------
 
 # RUN 
@@ -683,7 +713,11 @@ if __name__ == "__main__":
     config['pickleprotocol'] = args.pickleprotocol
     config['nsimbnds'] = args.nsimbnds
     
+
+
     # Get data for the type of dataset we want
+    start_t = datetime.now()
+
     if args.datatype == 'cnn_train':
         dg = data_generator(machine = args.machine,
                             file_id = args.fileid,
@@ -706,7 +740,7 @@ if __name__ == "__main__":
                             max_t = args.maxt,
                             delta_t = args.deltat,
                             config = config)
-        out = dg_tmp.make_dataset_perturbation_experiment(save = args.save)
+        out = dg.make_dataset_perturbation_experiment(save = args.save)
 
     if args.datatype == 'r_sim':
         dg = data_generator(machine = args.machine,
@@ -714,7 +748,7 @@ if __name__ == "__main__":
                             max_t = args.maxt,
                             delta_t = args.deltat,
                             config = config)
-        out = dg_tmp.make_dataset_r_sim(n_sim_bnds = [100, 200000],
+        out = dg.make_dataset_r_sim(n_sim_bnds = [100, 200000],
                                         save = args.save)
         
     if args.datatype == 'r_dgp':
@@ -727,4 +761,7 @@ if __name__ == "__main__":
                                  delta_t = args.deltat,
                                  config = config,
                                  save = args.save)
+
+    finish_t = datetime.now()
+    print('Time elapsed: ', finish_t - start_t)
     print('Finished')

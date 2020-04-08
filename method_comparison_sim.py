@@ -30,7 +30,7 @@ from samplers import SliceSampler
 from samplers import DifferentialEvolutionSequential
 
 # Analytical Likelihood for ddm
-from cdwiener import batch_fptd
+#from cdwiener import batch_fptd
 
 # Analytical Likelihood for lba
 import clba
@@ -87,13 +87,16 @@ if __name__ == "__main__":
                      default = 'ddm')
     CLI.add_argument("--datatype",
                      type = str,
-                     default = 'uniform') # real, uniform, perturbation experiment
+                     default = 'parameter_recovery') # real, parameter_recovery, perturbation experiment
     CLI.add_argument("--nsamples",
                      type = int,
                      default = 1000)
     CLI.add_argument("--nmcmcsamples",
                      type = int,
                      default = 10000)
+    CLI.add_argument("--sampler",
+                    type = str,
+                    default = 'slice')
     CLI.add_argument("--outfileid",
                      type = str,
                      default = 'TEST')
@@ -132,6 +135,7 @@ if __name__ == "__main__":
     machine = args.machine
     method = args.method
     analytic = ('analytic' in method)
+    sampler = args.sampler
     data_type = args.datatype
     n_samples = args.nsamples
     n_slice_samples = args.nmcmcsamples
@@ -151,8 +155,9 @@ if __name__ == "__main__":
     if data_type == 'perturbation_experiment':
         file_ = 'base_data_perturbation_experiment_nexp_1_n_' + str(n_samples) + '_' + infile_id + '.pickle'
         out_file_signature = 'post_samp_perturbation_experiment_nexp_1_n_' + str(n_samples) + '_' + infile_id                                                                      
-    if data_type == 'uniform':
-        file_ = 'base_data_param_recov_unif_reps_1_n_' + str(n_samples) + '_' + infile_id + '.pickle'
+    if data_type == 'parameter_recovery':
+        file_ = 'parameter_recovery_data_binned_0_nbins_0_n_' + str(n_samples) + '/' + method + '_nchoices_2_parameter_recovery_binned_0_nbins_0_nreps_1_n_' + str(n_samples) + '.pickle'
+        #file_ = 'base_data_param_recov_unif_reps_1_n_' + str(n_samples) + '_' + infile_id + '.pickle'
         out_file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + str(n_samples) + '_' + infile_id
     
     if data_type == 'real':                                                                        
@@ -165,6 +170,7 @@ if __name__ == "__main__":
     if machine == 'x7':
         method_params = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))[method]
         output_folder = method_params['output_folder_x7']
+        method_folder = method_params['method_folder_x7']
         with open("model_paths_x7.yaml") as tmp_file:
             network_path = yaml.load(tmp_file)[method]
             print(network_path)
@@ -173,8 +179,10 @@ if __name__ == "__main__":
     if machine == 'ccv':
         method_params = pickle.load(open("/users/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))[method]
         output_folder = method_params['output_folder']
+        method_folder = method_params['method_folder']
         with open("model_paths.yaml") as tmp_file:
             network_path = yaml.load(tmp_file)[method]
+            print(network_path)
     
     method_params['n_choices'] = args.nchoices
     print(method_params)
@@ -206,14 +214,14 @@ if __name__ == "__main__":
     
     if data_type == 'real':
         print(data_folder + file_)
-        data = pickle.load(open(data_folder + file_, 'rb'))
+        data = pickle.load(open(data_folder + file_ , 'rb'))
         data_grid = data[0]
-    elif data_type == 'uniform':
-        data = pickle.load(open(output_folder + file_, 'rb'))
+    elif data_type == 'parameter_recovery':
+        data = pickle.load(open(method_folder + file_ , 'rb'))
         param_grid = data[0]
-        data_grid = data[1]
+        data_grid = np.squeeze(data[1], axis = 0)
     elif data_type == 'perturbation_experiment':
-        data = pickle.load(open(output_folder + file_, 'rb'))
+        data = pickle.load(open(output_folder + file_ , 'rb'))
         param_grid = data[0]
         data_grid = data[1]
     else:
@@ -221,13 +229,13 @@ if __name__ == "__main__":
     
     # 
     if args.samplerinit == 'random':
-        param_grid = ['random' for i in range(data_grid.shape[0])]
+        init_grid = ['random' for i in range(data_grid.shape[0])]
     elif args.samplerinit == 'true':
-        if not (data_type == 'uniform' or data_type == 'perturbation_experiment'):
+        if not (data_type == 'parameter_recovery' or data_type == 'perturbation_experiment'):
             print('You cannot initialize true parameters if we are dealing with real data....')
-        param_grid = data[0]
+        init_grid = data[0]
     elif args.samplerinit == 'mle':
-        param_grid = ['mle' for i in range(data_grid.shape[0])]
+        init_grid = ['mle' for i in range(data_grid.shape[0])]
     
     # Parameter bounds to pass to sampler    
     sampler_param_bounds = make_parameter_bounds_for_sampler(mode = mode, 
@@ -250,7 +258,7 @@ if __name__ == "__main__":
 
     def mlp_target(params, 
                    data, 
-                   ll_min= -16.11809 # corresponds to 1e-7
+                   ll_min = -16.11809 # corresponds to 1e-7
                    ): 
         
         mlp_input_batch = np.zeros((data_grid.shape[1], sampler_param_bounds[0].shape[0] + 2), dtype = np.float32)
@@ -293,14 +301,15 @@ if __name__ == "__main__":
     # Define posterior samplers for respective likelihood functions
     def mlp_posterior(args): # args = (data, true_params)
         scp.random.seed()
+        if sampler == 'slice':
+            model = SliceSampler(bounds = args[2], 
+                                 target = mlp_target, 
+                                 w = .4 / 1024, 
+                                 p = 8)
 
-        model = DifferentialEvolutionSequential(bounds = args[2],
-                                                target = mlp_target)
-
-        # model = SliceSampler(bounds = args[2], 
-        #                      target = mlp_target, 
-        #                      w = .4 / 1024, 
-        #                      p = 8)
+        if sampler == 'diffevo':
+            model = DifferentialEvolutionSequential(bounds = args[2],
+                                                    target = mlp_target)
         
         model.sample(data = args[0],
                      num_samples = n_slice_samples,
@@ -347,14 +356,14 @@ if __name__ == "__main__":
     # Run the sampler with correct target as specified above
     if n_cpus == 'all':
         if method == 'lba_analytic':
-            posterior_samples = np.array(p.map(lba_posterior, zip(data_grid, param_grid, sampler_param_bounds)))
+            posterior_samples = np.array(p.map(lba_posterior, zip(data_grid, init_grid, sampler_param_bounds)))
         elif method == 'ddm_analytic':
-            posterior_samples = np.array(p.map(nf_posterior, zip(data_grid, param_grid, sampler_param_bounds)))
+            posterior_samples = np.array(p.map(nf_posterior, zip(data_grid, init_grid, sampler_param_bounds)))
         else:
-            posterior_samples = np.array(p.map(mlp_posterior, zip(data_grid, param_grid, sampler_param_bounds)))
+            posterior_samples = np.array(p.map(mlp_posterior, zip(data_grid, init_grid, sampler_param_bounds)))
     else:
-        for i in range(1):
-            posterior_samples = mlp_posterior((data_grid[i], param_grid[i], sampler_param_bounds[i]))
+        for i in range((out_file_id - 1) * 10, (out_file_id) * 10, 1):
+            posterior_samples = mlp_posterior((data_grid[i], init_grid[i], sampler_param_bounds[i]))
 
     # Store files
     print('saving to file')

@@ -147,7 +147,8 @@ class DifferentialEvolutionSequential():
         print("Beginning sampling:")
         n_samples_final = self.samples.shape[1]
         i = id_start
-        
+        continue_ = 1
+
         while i < n_samples_final:
             if (i % 200 == 0):
                 print("Iteration {}".format(i))
