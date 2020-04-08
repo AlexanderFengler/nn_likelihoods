@@ -47,12 +47,12 @@ do
                     do
                        echo "$dgp"
                        echo $n_c
-                       python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype $datatype --nreps 1 --binned $binned --nbins $bins --maxt $maxt --nchoices $n_c --nsamples $n --mode $mode --nparamsets $n_parameter_sets --save 1 --deltat 0.001 --fileid 1 #$SLURM_ARRAY_TASK_ID 
+                       python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype $datatype --nreps 1 --binned $binned --nbins $bins --maxt $maxt --nchoices $n_c --nsamples $n --mode $mode --nparamsets $n_parameter_sets --save 1 --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID 
                 done
             else
                  echo "$dgp"
                  #echo $n_c
-                 python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype $datatype --nreps 1 --binned $binned --nbins $bins --maxt $maxt --nchoices ${n_choices[0]} --nsamples $n --mode $mode --nparamsets $n_parameter_sets --save 1  --deltat 0.001 --fileid 1 #$SLURM_ARRAY_TASK_ID
+                 python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype $datatype --nreps 1 --binned $binned --nbins $bins --maxt $maxt --nchoices ${n_choices[0]} --nsamples $n --mode $mode --nparamsets $n_parameter_sets --save 1  --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID
                 
             fi
         done
