@@ -49,7 +49,6 @@ class DifferentialEvolutionSequential():
         self.accept_cnt = 0
         self.total_cnt = 0
         self.gelman_rubin = 10
-        self.gelman_rubin_i_stop = 10000000
         self.gelman_rubin_r_hat = []
         np.random.seed()
         self.random_seed = np.random.get_state()
@@ -123,7 +122,8 @@ class DifferentialEvolutionSequential():
                anneal_L = 10,
                init = 'random',
                active_dims = None,
-               frozen_dim_vals = None): 
+               frozen_dim_vals = None,
+               gelman_rubin_force_stop = False): 
         
         if add == False:
             self.data = data
@@ -167,7 +167,6 @@ class DifferentialEvolutionSequential():
         n_samples_final = self.samples.shape[1]
         i = id_start
         continue_ = 1
-
         while i < n_samples_final:
             if (i % 200 == 0):
                 print("Iteration {}".format(i))
@@ -190,13 +189,13 @@ class DifferentialEvolutionSequential():
                 if ((i > 2000) and (i % 1000)):
                     continue_, r_hat = mcmcdiag.get_gelman_rubin_mv(chains = self.samples,
                                                                     burn_in = 1000,
-                                                                    thresh = 1.005)
+                                                                    thresh = 1.01)
                     self.gelman_rubin_r_hat.append(r_hat)
                     print('Gelman Rubin: ', r_hat)
                     print('Continue: ', continue_)
                     if not continue_:
-                        self.gelman_rubin_i_stop = i
-                        break
+                        if gelman_rubin_force_stop:
+                            break
                     
             self.propose(i, anneal_k, anneal_L, crossover)
             i += 1
@@ -205,4 +204,4 @@ class DifferentialEvolutionSequential():
             # Here I need to adjust samples so that the final datastructure doesn't have 0 elements
             pass
         
-        return (self.samples, self.lps, self.gelman_rubin_i_stop, self.gelman_rubin_r_hat, self.random_seed)
+        return (self.samples, self.lps, self.gelman_rubin_r_hat, self.random_seed)

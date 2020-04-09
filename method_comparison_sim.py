@@ -330,7 +330,7 @@ if __name__ == "__main__":
                                                     gamma = 'auto',
                                                     crp = 0.3)
         
-        (samples, lps, gelman_rubin_i_stop, gelman_rubin_r_hat, random_seed) = model.sample(data = args[0],
+        (samples, lps, gelman_rubin_r_hat, random_seed) = model.sample(data = args[0],
                                                                                num_samples = n_slice_samples,
                                                                                init = args[1],
                                                                                active_dims = active_dims,
