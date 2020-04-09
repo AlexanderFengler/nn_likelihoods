@@ -127,6 +127,12 @@ if __name__ == "__main__":
     CLI.add_argument("--samplerinit",
                      type = str,
                      default = 'mle') # 'mle', 'random', 'true'
+    CLI.add_argument("--nbyarrayjob",
+                     type = int,
+                     default = 10)
+    CLI.add_argument("--ncpus",
+                     type = int,
+                     default = 10)
     
     args = CLI.parse_args()
     print(args)
@@ -142,9 +148,10 @@ if __name__ == "__main__":
     infile_id = args.infileid
     out_file_id = args.outfileid
     out_file_signature = args.outfilesig
-    n_cpus = 6  # 'all'
-    n_by_arrayjob = 6
+    n_cpus = args.ncpus
+    n_by_arrayjob = args.nbyarrayjob
     
+
     # Initialize the frozen dimensions
     if len(args.frozendims) >= 1:
         frozen_dims = [[args.frozendims[i], args.frozendimsinit[i]] for i in range(len(args.frozendims))]
@@ -174,6 +181,7 @@ if __name__ == "__main__":
         method_folder = method_params['method_folder_x7']
         with open("model_paths_x7.yaml") as tmp_file:
             network_path = yaml.load(tmp_file)[method]
+            print('Loading network from: ')
             print(network_path)
             # model = load_model(network_path + 'model_final.h5', custom_objects = {"huber_loss": tf.losses.huber_loss})
 
@@ -183,9 +191,11 @@ if __name__ == "__main__":
         method_folder = method_params['method_folder']
         with open("model_paths.yaml") as tmp_file:
             network_path = yaml.load(tmp_file)[method]
+            print('Loading network from: ')
             print(network_path)
     
     method_params['n_choices'] = args.nchoices
+    print('METHOD PARAMETERS: \n')
     print(method_params)
 
     # Load weights, biases and activations of current network --------
@@ -194,15 +204,15 @@ if __name__ == "__main__":
     else:
         with open(network_path + "weights.pickle", "rb") as tmp_file:
             weights = pickle.load(tmp_file)
-            print(weights)
+            #print(weights)
             for weight in weights:
                 print(weight.shape)
         with open(network_path + 'biases.pickle', 'rb') as tmp_file:
             biases = pickle.load(tmp_file)
-            print(biases)
+            #print(biases)
         with open(network_path + 'activations.pickle', 'rb') as tmp_file:
             activations = pickle.load(tmp_file)
-            print(activations)
+            #print(activations)
         n_layers = int(len(weights))
 # ----------------------------------------------------------------
 
@@ -316,15 +326,16 @@ if __name__ == "__main__":
         if sampler == 'diffevo':
             model = DifferentialEvolutionSequential(bounds = args[2],
                                                     target = mlp_target,
-                                                    gamma = 0.6,
-                                                    crp = 0.5)
+                                                    mode_switch_p = 0.1,
+                                                    gamma = 'auto',
+                                                    crp = 0.3)
         
-        (samples, lps, gelman_rubin_i_stop, gelman_rubin_r_hat) = model.sample(data = args[0],
+        (samples, lps, gelman_rubin_i_stop, gelman_rubin_r_hat, random_seed) = model.sample(data = args[0],
                                                                                num_samples = n_slice_samples,
                                                                                init = args[1],
                                                                                active_dims = active_dims,
                                                                                frozen_dim_vals = frozen_dims)
-        return (samples, lps, gelman_rubin_i_stop, gelman_rubin_r_hat)
+        return (samples, lps, gelman_rubin_i_stop, gelman_rubin_r_hat, random_seed)
 
     # Test navarro-fuss
     def nf_posterior(args): # TODO add active and frozen dim vals
@@ -357,9 +368,9 @@ if __name__ == "__main__":
     else: 
         p = mp.Pool(n_cpus)
 
-    print(data_grid.shape)
-    print(param_grid)
-    print(sampler_param_bounds)
+    #print(data_grid.shape)
+    #print(param_grid)
+    #print(sampler_param_bounds)
 
     # Subset parameter and data grid
     

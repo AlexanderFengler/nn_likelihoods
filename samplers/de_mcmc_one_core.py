@@ -9,8 +9,9 @@ class DifferentialEvolutionSequential():
                  bounds, 
                  target, 
                  NP_multiplier = 5, 
-                 gamma = 0.4, 
-                 proposal_std = 0.1, 
+                 gamma = 'auto', # 'auto' or float 
+                 mode_switch_p = 0.1,
+                 proposal_std = 0.01, 
                  crp = 0.3):
         
         """
@@ -29,12 +30,20 @@ class DifferentialEvolutionSequential():
         gamma: float
             gamma parameter to mediate the magnitude of the update
         """
+        
         self.optimizer = scp_opt.differential_evolution
         self.dims = len(bounds) #np.array([i for i in range(len(bounds))])
         self.bounds = bounds
         self.NP = int(np.floor(NP_multiplier * self.dims))
         self.target = target
-        self.gamma = gamma
+        
+        if gamma == 'auto':
+            self.gamma = 2.38 / np.sqrt(2 * self.dims)
+        else: 
+            self.gamma = gamma
+
+        #self.gamma = gamma 
+        self.mode_switch_p = mode_switch_p
         self.proposal_std = proposal_std
         self.crp = crp
         self.accept_cnt = 0
@@ -42,6 +51,11 @@ class DifferentialEvolutionSequential():
         self.gelman_rubin = 10
         self.gelman_rubin_i_stop = 10000000
         self.gelman_rubin_r_hat = []
+        np.random.seed()
+        self.random_seed = np.random.get_state()
+
+        #print(self.random_seed)
+        print(np.random.normal(size = 10))
     
     def attach_sample(self, samples):
         assert samples.shape[0] == self.NP, 'Population size of previous sample does not match NP parameter value'
@@ -75,11 +89,12 @@ class DifferentialEvolutionSequential():
             while R2 == pop or R2 == R1:
                 R2 = np.random.choice(pop_seq)
              
-            proposals[pop, :] += self.gamma * (proposals[R1, :] - proposals[R2, :]) +  \
-                                                        self.proposal_std * np.random.standard_t(df = 2, size = self.dims)
-                                                        #np.random.normal(loc = 0, scale = self.proposal_std, size = self.dims)
+            proposals[pop, :] += np.random.choice([self.gamma, 1], p = [1 - self.mode_switch_p, self.mode_switch_p]) * (proposals[R1, :] - proposals[R2, :]) +  \
+                                                        np.random.normal(loc = 0, scale = self.proposal_std, size = self.dims)
+                                                        #self.proposal_std * np.random.standard_t(df = 2, size = self.dims)
+                                                        
             
-            # Clip proposal at bounds:
+            # Clip proposal at bounds: TD REFLECT AT BOUND?
             for dim in range(self.dims):
                 proposals[pop, dim] = np.clip(proposals[pop, dim], self.bounds[dim][0], self.bounds[dim][1])
             
@@ -165,7 +180,7 @@ class DifferentialEvolutionSequential():
                         self.proposal_std = self.proposal_std / 2
                         print('New proposal std: ', self.proposal_std)
                     
-                    if (acc_rat_tmp) > 0.2:
+                    if (acc_rat_tmp) > 0.5:
                         self.proposal_std = self.proposal_std * 1.5
                         print('New proposal std: ', self.proposal_std)
                     
@@ -183,7 +198,6 @@ class DifferentialEvolutionSequential():
                         self.gelman_rubin_i_stop = i
                         break
                     
-            
             self.propose(i, anneal_k, anneal_L, crossover)
             i += 1
         
@@ -191,4 +205,4 @@ class DifferentialEvolutionSequential():
             # Here I need to adjust samples so that the final datastructure doesn't have 0 elements
             pass
         
-        return (self.samples, self.lps, self.gelman_rubin_i_stop, self.gelman_rubin_r_hat)
+        return (self.samples, self.lps, self.gelman_rubin_i_stop, self.gelman_rubin_r_hat, self.random_seed)
