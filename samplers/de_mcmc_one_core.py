@@ -8,9 +8,9 @@ class DifferentialEvolutionSequential():
     def __init__(self, 
                  bounds, 
                  target, 
-                 NP_multiplier = 4, 
+                 NP_multiplier = 5, 
                  gamma = 0.4, 
-                 proposal_var = 0.01, 
+                 proposal_std = 0.1, 
                  crp = 0.3):
         
         """
@@ -35,10 +35,13 @@ class DifferentialEvolutionSequential():
         self.NP = int(np.floor(NP_multiplier * self.dims))
         self.target = target
         self.gamma = gamma
-        self.proposal_var = proposal_var
+        self.proposal_std = proposal_std
         self.crp = crp
         self.accept_cnt = 0
         self.total_cnt = 0
+        self.gelman_rubin = 10
+        self.gelman_rubin_i_stop = 10000000
+        self.gelman_rubin_r_hat = []
     
     def attach_sample(self, samples):
         assert samples.shape[0] == self.NP, 'Population size of previous sample does not match NP parameter value'
@@ -73,7 +76,8 @@ class DifferentialEvolutionSequential():
                 R2 = np.random.choice(pop_seq)
              
             proposals[pop, :] += self.gamma * (proposals[R1, :] - proposals[R2, :]) +  \
-                                                        np.random.normal(loc = 0, scale = self.proposal_var, size = self.dims)
+                                                        self.proposal_std * np.random.standard_t(df = 2, size = self.dims)
+                                                        #np.random.normal(loc = 0, scale = self.proposal_std, size = self.dims)
             
             # Clip proposal at bounds:
             for dim in range(self.dims):
@@ -157,13 +161,13 @@ class DifferentialEvolutionSequential():
                 if (i > 1000):
                     acc_rat_tmp = self.accept_cnt / self.total_cnt
                     print('Acceptance ratio: ', acc_rat_tmp)
-                    if (acc_rat_tmp) < 0.1:
-                        self.proposal_var = self.proposal_var / 2
-                        print('New proposal variance: ', self.proposal_var)
+                    if (acc_rat_tmp) < 0.05:
+                        self.proposal_std = self.proposal_std / 2
+                        print('New proposal std: ', self.proposal_std)
                     
-                    if (acc_rat_tmp) > 0.4:
-                        self.proposal_var = self.proposal_var * 1.5
-                        print('New proposal variance: ', self.proposal_var)
+                    if (acc_rat_tmp) > 0.2:
+                        self.proposal_std = self.proposal_std * 1.5
+                        print('New proposal std: ', self.proposal_std)
                     
                     self.accept_cnt = 0
                     self.total_cnt = 0
@@ -172,9 +176,11 @@ class DifferentialEvolutionSequential():
                     continue_, r_hat = mcmcdiag.get_gelman_rubin_mv(chains = self.samples,
                                                                     burn_in = 1000,
                                                                     thresh = 1.005)
+                    self.gelman_rubin_r_hat.append(r_hat)
                     print('Gelman Rubin: ', r_hat)
-                    print('Contineu: ', continue_)
+                    print('Continue: ', continue_)
                     if not continue_:
+                        self.gelman_rubin_i_stop = i
                         break
                     
             
@@ -185,4 +191,4 @@ class DifferentialEvolutionSequential():
             # Here I need to adjust samples so that the final datastructure doesn't have 0 elements
             pass
         
-        return (self.samples, self.lps)
+        return (self.samples, self.lps, self.gelman_rubin_i_stop, self.gelman_rubin_r_hat)

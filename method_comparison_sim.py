@@ -142,7 +142,8 @@ if __name__ == "__main__":
     infile_id = args.infileid
     out_file_id = args.outfileid
     out_file_signature = args.outfilesig
-    n_cpus = 1  # 'all'
+    n_cpus = 6  # 'all'
+    n_by_arrayjob = 6
     
     # Initialize the frozen dimensions
     if len(args.frozendims) >= 1:
@@ -220,6 +221,11 @@ if __name__ == "__main__":
         data = pickle.load(open(method_folder + file_ , 'rb'))
         param_grid = data[0]
         data_grid = np.squeeze(data[1], axis = 0)
+
+        # subset data according to array id so that we  
+        data_grid = data_grid[((int(out_file_id) - 1) * n_by_arrayjob) : (int(out_file_id) * n_by_arrayjob), :, :]
+        param_grid = param_grid[((int(out_file_id) - 1) * n_by_arrayjob) : (int(out_file_id) * n_by_arrayjob), :]
+
     elif data_type == 'perturbation_experiment':
         data = pickle.load(open(output_folder + file_ , 'rb'))
         param_grid = data[0]
@@ -309,14 +315,16 @@ if __name__ == "__main__":
 
         if sampler == 'diffevo':
             model = DifferentialEvolutionSequential(bounds = args[2],
-                                                    target = mlp_target)
+                                                    target = mlp_target,
+                                                    gamma = 0.6,
+                                                    crp = 0.5)
         
-        model.sample(data = args[0],
-                     num_samples = n_slice_samples,
-                     init = args[1],
-                     active_dims = active_dims,
-                     frozen_dim_vals = frozen_dims)
-        return model.samples
+        (samples, lps, gelman_rubin_i_stop, gelman_rubin_r_hat) = model.sample(data = args[0],
+                                                                               num_samples = n_slice_samples,
+                                                                               init = args[1],
+                                                                               active_dims = active_dims,
+                                                                               frozen_dim_vals = frozen_dims)
+        return (samples, lps, gelman_rubin_i_stop, gelman_rubin_r_hat)
 
     # Test navarro-fuss
     def nf_posterior(args): # TODO add active and frozen dim vals
@@ -352,17 +360,19 @@ if __name__ == "__main__":
     print(data_grid.shape)
     print(param_grid)
     print(sampler_param_bounds)
+
+    # Subset parameter and data grid
     
     # Run the sampler with correct target as specified above
-    if n_cpus == 'all':
+    if n_cpus != 1:
         if method == 'lba_analytic':
             posterior_samples = np.array(p.map(lba_posterior, zip(data_grid, init_grid, sampler_param_bounds)))
         elif method == 'ddm_analytic':
             posterior_samples = np.array(p.map(nf_posterior, zip(data_grid, init_grid, sampler_param_bounds)))
         else:
-            posterior_samples = np.array(p.map(mlp_posterior, zip(data_grid, init_grid, sampler_param_bounds)))
+            posterior_samples = p.map(mlp_posterior, zip(data_grid, init_grid, sampler_param_bounds))
     else:
-        for i in range((out_file_id - 1) * 10, (out_file_id) * 10, 1):
+        for i in range((out_file_id - 1) * 6, (out_file_id) * 6, 1):
             posterior_samples = mlp_posterior((data_grid[i], init_grid[i], sampler_param_bounds[i]))
 
     # Store files
