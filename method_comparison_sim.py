@@ -335,7 +335,7 @@ if __name__ == "__main__":
                                                                                init = args[1],
                                                                                active_dims = active_dims,
                                                                                frozen_dim_vals = frozen_dims)
-        return (samples, lps, gelman_rubin_i_stop, gelman_rubin_r_hat, random_seed)
+        return (samples, lps, gelman_rubin_r_hat, random_seed)
 
     # Test navarro-fuss
     def nf_posterior(args): # TODO add active and frozen dim vals
