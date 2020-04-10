@@ -32,17 +32,16 @@
 # python -m cProfile -s tottime /media/data_cifs/afengler/git_repos/nn_likelihoods/method_comparison_sim.py --machine x7 --method ornstein --nmcmcsamples 4000 --datatype real --infileid bg_stn_sampling_ready.pickle --boundmode train --outfilesig _expanded_bounds_test_ --outfileid 999 --activedims 0 1 2 3 4 --samplerinit random > profile_out.txt
 #python -u /media/data_cifs/afengler/git_repos/nn_likelihoods/method_comparison_sim.py --machine x7 --method ornstein --nmcmcsamples 5000 --datatype real --infileid bg_stn_sampling_ready.pickle --boundmode train --outfilesig _expanded_bounds_test_ --outfileid 999 --activedims 0 1 2 3 4 --samplerinit random
 
-python -u method_comparison_sim.py --machine ccv --method ddm --nsamples 1024 --nmcmcsamples 100 --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid 1 --activedims 0 1 2 3 4 --samplerinit mle --ncpus 10 --nbyarrayjob 10 #$SLURM_ARRAY_TASK_ID 
+python -u method_comparison_sim.py --machine ccv --method ddm --nsamples 1024 --nmcmcsamples 100 --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 --samplerinit mle --ncpus 10 --nbyarrayjob 10 #$SLURM_ARRAY_TASK_ID 
 
-python -u method_comparison_sim.py --machine ccv --method full_ddm --nsamples 1024 --nmcmcsamples 100 --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid 1 --activedims 0 1 2 3 4 --samplerinit mle --ncpus 10 --nbyarrayjob 10 #$SLURM_ARRAY_TASK_ID 
+python -u method_comparison_sim.py --machine ccv --method full_ddm --nsamples 1024 --nmcmcsamples 100 --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 --samplerinit mle --ncpus 10 --nbyarrayjob 10 #$SLURM_ARRAY_TASK_ID 
 
-python -u method_comparison_sim.py --machine ccv --method angle --nsamples 1024 --nmcmcsamples 100 --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid 1 --activedims 0 1 2 3 4 --samplerinit mle --ncpus 10 --nbyarrayjob 10 #$SLURM_ARRAY_TASK_ID 
+python -u method_comparison_sim.py --machine ccv --method angle --nsamples 1024 --nmcmcsamples 100 --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 --samplerinit mle --ncpus 10 --nbyarrayjob 10 #$SLURM_ARRAY_TASK_ID 
 
-python -u method_comparison_sim.py --machine ccv --method ornstein --nsamples 1024 --nmcmcsamples 100 --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid 1 --activedims 0 1 2 3 4 --samplerinit mle --ncpus 10 --nbyarrayjob 10 #$SLURM_ARRAY_TASK_ID 
+python -u method_comparison_sim.py --machine ccv --method ornstein --nsamples 1024 --nmcmcsamples 100 --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 --samplerinit mle --ncpus 10 --nbyarrayjob 10 #$SLURM_ARRAY_TASK_ID 
 
-python -u method_comparison_sim.py --machine ccv --method weibull_cdf --nsamples 1024 --nmcmcsamples 100 --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid 1 --activedims 0 1 2 3 4 --samplerinit mle --ncpus 10 --nbyarrayjob 10 #$SLURM_ARRAY_TASK_ID 
+python -u method_comparison_sim.py --machine ccv --method weibull_cdf --nsamples 1024 --nmcmcsamples 100 --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 --samplerinit mle --ncpus 10 --nbyarrayjob 10 #$SLURM_ARRAY_TASK_ID 
 
-python -u method_comparison_sim.py --machine ccv --method levy --nsamples 1024 --nmcmcsamples 100 --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid 1 --activedims 0 1 2 3 4 --samplerinit mle --ncpus 10 --nbyarrayjob 10 #$SLURM_ARRAY_TASK_ID 
+python -u method_comparison_sim.py --machine ccv --method levy --nsamples 1024 --nmcmcsamples 100 --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 --samplerinit mle --ncpus 10 --nbyarrayjob 10 #$SLURM_ARRAY_TASK_ID 
 
-#
 #--frozendims 2 --frozendimsinit 0.5

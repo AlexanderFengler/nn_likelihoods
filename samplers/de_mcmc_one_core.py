@@ -121,7 +121,7 @@ class DifferentialEvolutionSequential():
                anneal_k = 1 / 80, 
                anneal_L = 10,
                init = 'random',
-               active_dims = None,
+               active_dims = None, # ADD ACTIVE DIMS PROPERLY HERE
                frozen_dim_vals = None,
                gelman_rubin_force_stop = False): 
         
