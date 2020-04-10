@@ -34,13 +34,13 @@
 
 python -u method_comparison_sim.py --machine ccv --method ddm --nsamples 1024 --nmcmcsamples 100 --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 --samplerinit mle --ncpus 10 --nbyarrayjob 10 #$SLURM_ARRAY_TASK_ID 
 
-python -u method_comparison_sim.py --machine ccv --method full_ddm --nsamples 1024 --nmcmcsamples 100 --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 --samplerinit mle --ncpus 10 --nbyarrayjob 10 #$SLURM_ARRAY_TASK_ID 
+python -u method_comparison_sim.py --machine ccv --method full_ddm --nsamples 1024 --nmcmcsamples 100 --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 5 6 --samplerinit mle --ncpus 10 --nbyarrayjob 10 #$SLURM_ARRAY_TASK_ID 
 
 python -u method_comparison_sim.py --machine ccv --method angle --nsamples 1024 --nmcmcsamples 100 --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 --samplerinit mle --ncpus 10 --nbyarrayjob 10 #$SLURM_ARRAY_TASK_ID 
 
 python -u method_comparison_sim.py --machine ccv --method ornstein --nsamples 1024 --nmcmcsamples 100 --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 --samplerinit mle --ncpus 10 --nbyarrayjob 10 #$SLURM_ARRAY_TASK_ID 
 
-python -u method_comparison_sim.py --machine ccv --method weibull_cdf --nsamples 1024 --nmcmcsamples 100 --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 --samplerinit mle --ncpus 10 --nbyarrayjob 10 #$SLURM_ARRAY_TASK_ID 
+python -u method_comparison_sim.py --machine ccv --method weibull_cdf --nsamples 1024 --nmcmcsamples 100 --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 5 --samplerinit mle --ncpus 10 --nbyarrayjob 10 #$SLURM_ARRAY_TASK_ID 
 
 python -u method_comparison_sim.py --machine ccv --method levy --nsamples 1024 --nmcmcsamples 100 --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 --samplerinit mle --ncpus 10 --nbyarrayjob 10 #$SLURM_ARRAY_TASK_ID 
 
