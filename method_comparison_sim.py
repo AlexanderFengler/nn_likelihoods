@@ -52,6 +52,7 @@ def make_parameter_bounds_for_sampler(mode = 'test',
     if mode == 'train':
         param_bounds = method_params['param_bounds_network'] + method_params['boundary_param_bounds_network']
 
+
     # If model is lba, lca, race we need to expand parameter boundaries to account for
     # parameters that depend on the number of choices
     if method == 'lba' or method == 'lca' or method == 'race':
@@ -256,6 +257,13 @@ if __name__ == "__main__":
     # Parameter bounds to pass to sampler    
     sampler_param_bounds = make_parameter_bounds_for_sampler(mode = mode, 
                                                              method_params = method_params)
+
+
+    # Apply epsilon correction
+    epsilon_bound_correction = 0.02
+    sampler_param_bounds[:, 0] = sampler_param_bounds[:, 0] + epsilon_bound_correction
+    sampler_param_bounds[:, 1] = sampler_param_bounds[:, 1] - epsilon_bound_correction
+
     sampler_param_bounds = [sampler_param_bounds for i in range(data_grid.shape[0])]
     
     print('sampler_params_bounds: ' , sampler_param_bounds)
