@@ -3,6 +3,7 @@
 # import tensorflow as tf
 # from tensorflow import keras
 import os
+import time
 #os.environ['NUMPY_EXPERIMENTAL_ARRAY_FUNCTION'] = '0'
 
 from numpy import ndarray
@@ -322,6 +323,7 @@ if __name__ == "__main__":
                                 s = params[4],
                                 ndt = params[5])
 
+
     # Define posterior samplers for respective likelihood functions
     def mlp_posterior(args): # args = (data, true_params)
         scp.random.seed()
@@ -383,6 +385,7 @@ if __name__ == "__main__":
     # Subset parameter and data grid
     
     # Run the sampler with correct target as specified above
+    start_time = time.time()
     if n_cpus != 1:
         if method == 'lba_analytic':
             posterior_samples = np.array(p.map(lba_posterior, zip(data_grid, init_grid, sampler_param_bounds)))
@@ -393,9 +396,11 @@ if __name__ == "__main__":
     else:
         for i in range((out_file_id - 1) * 6, (out_file_id) * 6, 1):
             posterior_samples = mlp_posterior((data_grid[i], init_grid[i], sampler_param_bounds[i]))
-
+    end_time = time.time()
+    exec_time = end_time - start_time
+    
     # Store files
     print('saving to file')
     print(output_folder + out_file_signature + '_' + out_file_id + ".pickle")
-    pickle.dump((param_grid, data_grid, posterior_samples), 
+    pickle.dump((param_grid, data_grid, posterior_samples, exec_time), 
                  open(output_folder + out_file_signature + '_' + out_file_id + ".pickle", "wb"))
