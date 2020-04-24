@@ -17,7 +17,7 @@ import boundary_functions as bf
 import multiprocessing as mp
 import cddm_data_simulation as cd
 from cdwiener import batch_fptd
-import clba
+#import clba
 
 # Parallelization
 import multiprocessing as mp
