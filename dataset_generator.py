@@ -559,7 +559,7 @@ class data_generator():
             
             return 'Dataset completed'
         else:
-            return [param_grid, global_stds, global_means], data_grid, meta
+            return ([param_grid, global_stds, global_means], data_grid, meta)
 
     def make_dataset_r_sim(self,
                            n_sim_bnds = [10000, 100000],
