@@ -475,14 +475,13 @@ class data_generator():
         for n in range(self.config['nparamsets']):
             for i in range(self.config['nsubjects']):
                 a, b = (np.array(params_lower_bnd) - global_means[n]) / global_stds[n], (np.array(params_upper_bnd) - global_means[n]) / global_stds[n]
-                subject_param_grid[n, i, :] = np.float32(global_means[n] + truncnorm.rvs(a, b, size = global_stds.shape[1]) / global_stds[n])
+                subject_param_grid[n, i, :] = np.float32(global_means[n] + truncnorm.rvs(a, b, size = global_stds.shape[1]) * global_stds[n])
                 print('random variates')
                 print(truncnorm.rvs(a, b, size = global_stds.shape[1]))
                 print('samples')
                 print(subject_param_grid[n, i, :])
 
         return subject_param_grid, global_stds, global_means
-
 
     def generate_data_grid_hierarchical_parallel(self, 
                                                  param_grid = []):
@@ -503,7 +502,6 @@ class data_generator():
     
         return data_grid
 
-    
     def make_dataset_parameter_recovery_hierarchical(self,
                                                      save = True):
 
