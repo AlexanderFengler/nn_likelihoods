@@ -454,13 +454,10 @@ class data_generator():
     #
     def make_param_grid_hierarchical(self,
                                      ):
-        
-        if nparamsets == None:
-            nparamsets = self.config['nparamsets']
-        
+
         # Initializations
         params_upper_bnd, params_lower_bnd = self.clean_up_parameters()
-
+        nparams = len(params_upper_bnd)
         # Initialize global parameters
         param_ranges_half = (params_upper_bnd - params_lower_bnd) / 2
         global_stds = np.random.uniform(low = 0.001,
@@ -468,7 +465,7 @@ class data_generator():
                                         size = (nparamssets, n_params))
         global_means = np.random.uniform(low = params_lower_bnd + (params_ranges_half / 5),
                                          high = params_upper_bnd - (params_ranges_half / 5),
-                                         size = (nparamsets, n_params))
+                                         size = (self.config['nparamsets'], nparams))
 
         # Initialize local parameters (by condition)
         subject_param_grid = np.zeros((n_paramsets, n_subject, n_params))
@@ -483,9 +480,9 @@ class data_generator():
 
     def generate_data_grid_hierarchical_parallel(self, 
                                                  param_grid = []):
-
-        param_grid = np.reshape(param_grid, (-1, self.config['nparams']))
-        args_list = self.make_args_starmap_ready(param_grid = np.reshape(param_grid, (-1, self.config['nparams'])))
+        
+        nparams = param_grid.shape[2]
+        args_list = self.make_args_starmap_ready(param_grid = np.reshape(param_grid, (-1, nparams)))
 
         if self.config['n_cpus'] == 'all':
             n_cpus = psutil.cpu_count(logical = False)
