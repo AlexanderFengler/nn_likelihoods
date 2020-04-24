@@ -460,7 +460,7 @@ class data_generator():
         nparams = len(params_upper_bnd)
         
         # Initialize global parameters
-        paramq_ranges_half = (np.array(params_upper_bnd) - np.array(params_lower_bnd)) / 2
+        params_ranges_half = (np.array(params_upper_bnd) - np.array(params_lower_bnd)) / 2
         global_stds = np.random.uniform(low = 0.001,
                                         high = paramq_ranges_half / 10,
                                         size = (self.config['nparamsets'], nparams))
