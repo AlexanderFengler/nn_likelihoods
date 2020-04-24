@@ -485,7 +485,7 @@ class data_generator():
                                                  param_grid = []):
 
         param_grid = np.reshape(param_grid, (-1, self.config['nparams']))
-        args_list = self.make_args_starmap_ready(param_grid = np.reshape(param_grid, (-1, self.config['nparams']))
+        args_list = self.make_args_starmap_ready(param_grid = np.reshape(param_grid, (-1, self.config['nparams'])))
 
         if self.config['n_cpus'] == 'all':
             n_cpus = psutil.cpu_count(logical = False)
