@@ -477,7 +477,7 @@ class data_generator():
                 a, b = (np.array(params_lower_bnd) - global_means[n]) / global_stds[n], (np.array(params_upper_bnd) - global_means[n]) / global_stds[n]
                 subject_param_grid[n, i, :] = np.float32(global_means[n] + truncnorm.rvs(a, b, size = global_stds.shape[1]) / global_stds[n])
                 print('random variates')
-                print(truncnorm.rvs(a, b, size = global_stds.shape[1])
+                print(truncnorm.rvs(a, b, size = global_stds.shape[1]))s
                 print('samples')
                 print(subject_param_grid[n, i, :])
 
