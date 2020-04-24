@@ -474,7 +474,7 @@ class data_generator():
         for n in range(self.config['nparamsets']):
             for i in range(self.config['nsubjects']):
                 a, b = (np.array(params_lower_bnd) - global_means[n]) / global_stds[n], (np.array(params_upper_bnd) - global_means[n]) / global_stds[n]
-                param_dict[n, i, :] = np.float32(global_means[n] + truncnorm.rvs(a, b) / global_stds[n])
+                subject_param_grid[n, i, :] = np.float32(global_means[n] + truncnorm.rvs(a, b) / global_stds[n])
         
         return subject_param_grid, global_stds, global_means
 
