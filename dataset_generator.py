@@ -460,20 +460,20 @@ class data_generator():
         nparams = len(params_upper_bnd)
         
         # Initialize global parameters
-        param_ranges_half = (np.array(params_upper_bnd) - np.array(params_lower_bnd)) / 2
+        paramq_ranges_half = (np.array(params_upper_bnd) - np.array(params_lower_bnd)) / 2
         global_stds = np.random.uniform(low = 0.001,
-                                        high = param_ranges_half / 10,
+                                        high = paramq_ranges_half / 10,
                                         size = (self.config['nparamsets'], nparams))
         global_means = np.random.uniform(low = np.array(params_lower_bnd) + (params_ranges_half / 5),
                                          high = np.array(params_upper_bnd) - (params_ranges_half / 5),
                                          size = (self.config['nparamsets'], nparams))
 
         # Initialize local parameters (by condition)
-        subject_param_grid = np.zeros((n_paramsets, n_subject, n_params))
+        subject_param_grid = np.zeros((self.config['nparamsets'], self.config['nsubject'], nparams))
         
-        for n in range(n_paramsets):
-            for i in range(n_subjects):
-                a, b = (params_lower_bnd - global_means[n]) / global_stds[n], (params_upper_bnd - global_means[n]) / global_stds[n]
+        for n in range(self.config['nparamsets']):
+            for i in range(self.config['nsubjects']):
+                a, b = (np.array(params_lower_bnd) - global_means[n]) / global_stds[n], (np.array(params_upper_bnd) - global_means[n]) / global_stds[n]
                 param_dict[n, i, :] = np.float32(global_means[n] + truncnorm.rvs(a, b) / global_stds[n])
         
         return subject_param_grid, global_stds, global_means
@@ -502,7 +502,7 @@ class data_generator():
     def make_dataset_parameter_recovery_hierarchical(self,
                                                      save = True):
 
-        param_grid_dict = self.make_param_grid_hierarchical()
+        param_grid, global_stds, global_means = self.make_param_grid_hierarchical()
         
         self.nsamples = [self.config['nsamples'] for i in range(self.config['nparamsets'])]
         
@@ -545,7 +545,7 @@ class data_generator():
             if 'boundary' in meta.keys():
                 del meta['boundary']
 
-            pickle.dump((param_grid, data_grid, meta), 
+            pickle.dump(([param_grid, global_stds, global_means], data_grid, meta), 
                         open(training_data_folder + '/' + \
                             self.method + \
                             '_nchoices_' + str(self.config['nchoices']) + \
@@ -559,7 +559,7 @@ class data_generator():
             
             return 'Dataset completed'
         else:
-            return param_dict_list, data_grid
+            return [param_grid, global_stds, global_means], data_grid, meta
 
     def make_dataset_r_sim(self,
                            n_sim_bnds = [10000, 100000],
@@ -895,7 +895,7 @@ if __name__ == "__main__":
                             delta_t = args.deltat,
                             config = config)
 
-        out = dg.make_dataset_parameter_recovery_hierarchical()
+        out1, out2, out3 = dg.make_dataset_parameter_recovery_hierarchical()
 
     finish_t = datetime.now()
     print('Time elapsed: ', finish_t - start_t)
