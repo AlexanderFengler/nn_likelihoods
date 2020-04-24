@@ -462,7 +462,7 @@ class data_generator():
         # Initialize global parameters
         params_ranges_half = (np.array(params_upper_bnd) - np.array(params_lower_bnd)) / 2
         global_stds = np.random.uniform(low = 0.001,
-                                        high = paramq_ranges_half / 10,
+                                        high = params_ranges_half / 10,
                                         size = (self.config['nparamsets'], nparams))
         global_means = np.random.uniform(low = np.array(params_lower_bnd) + (params_ranges_half / 5),
                                          high = np.array(params_upper_bnd) - (params_ranges_half / 5),
