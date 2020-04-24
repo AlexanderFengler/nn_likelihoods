@@ -469,7 +469,7 @@ class data_generator():
                                          size = (self.config['nparamsets'], nparams))
 
         # Initialize local parameters (by condition)
-        subject_param_grid = np.zeros((self.config['nparamsets'], self.config['nsubject'], nparams))
+        subject_param_grid = np.zeros((self.config['nparamsets'], self.config['nsubjects'], nparams))
         
         for n in range(self.config['nparamsets']):
             for i in range(self.config['nsubjects']):
