@@ -895,7 +895,7 @@ if __name__ == "__main__":
                             delta_t = args.deltat,
                             config = config)
 
-        out1, out2, out3 = dg.make_dataset_parameter_recovery_hierarchical()
+        out = dg.make_dataset_parameter_recovery_hierarchical()
 
     finish_t = datetime.now()
     print('Time elapsed: ', finish_t - start_t)
