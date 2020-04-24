@@ -458,13 +458,14 @@ class data_generator():
         # Initializations
         params_upper_bnd, params_lower_bnd = self.clean_up_parameters()
         nparams = len(params_upper_bnd)
+        
         # Initialize global parameters
-        param_ranges_half = (params_upper_bnd - params_lower_bnd) / 2
+        param_ranges_half = (np.array(params_upper_bnd) - np.array(params_lower_bnd)) / 2
         global_stds = np.random.uniform(low = 0.001,
                                         high = param_ranges_half / 10,
                                         size = (nparamssets, n_params))
-        global_means = np.random.uniform(low = params_lower_bnd + (params_ranges_half / 5),
-                                         high = params_upper_bnd - (params_ranges_half / 5),
+        global_means = np.random.uniform(low = np.array(params_lower_bnd) + (params_ranges_half / 5),
+                                         high = np.array(params_upper_bnd) - (params_ranges_half / 5),
                                          size = (self.config['nparamsets'], nparams))
 
         # Initialize local parameters (by condition)
