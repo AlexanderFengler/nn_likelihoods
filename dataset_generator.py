@@ -504,7 +504,7 @@ class data_generator():
 
         param_grid, global_stds, global_means = self.make_param_grid_hierarchical()
         
-        self.nsamples = [self.config['nsamples'] for i in range(self.config['nparamsets'])]
+        self.nsamples = [self.config['nsamples'] for i in range(self.config['nparamsets'] * self.config['nsubjects'])]
         
         if self.config['binned']:
             data_grid = np.zeros((self.config['nreps'],
