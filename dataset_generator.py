@@ -461,6 +461,7 @@ class data_generator():
         
         # Initialize global parameters
         params_ranges_half = (np.array(params_upper_bnd) - np.array(params_lower_bnd)) / 2
+        
         global_stds = np.random.uniform(low = 0.001,
                                         high = params_ranges_half / 10,
                                         size = (self.config['nparamsets'], nparams))
@@ -474,8 +475,9 @@ class data_generator():
         for n in range(self.config['nparamsets']):
             for i in range(self.config['nsubjects']):
                 a, b = (np.array(params_lower_bnd) - global_means[n]) / global_stds[n], (np.array(params_upper_bnd) - global_means[n]) / global_stds[n]
-                subject_param_grid[n, i, :] = np.float32(global_means[n] + truncnorm.rvs(a, b) / global_stds[n])
-        
+                subject_param_grid[n, i, :] = np.float32(global_means[n] + truncnorm.rvs(a, b, size = global_std.shape[1]) / global_stds[n])
+                print(subject_param_grid[n, i, :])
+                
         return subject_param_grid, global_stds, global_means
 
 
