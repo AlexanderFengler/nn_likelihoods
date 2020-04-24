@@ -31,3 +31,7 @@ setup(
         include_dirs = [numpy.get_include()]
     )
 
+setup(
+        ext_modules = cythonize("clba.pyx", annotate = True, compiler_directives = {'language_level': "3"}),
+        include_dirs = [numpy.get_include()]
+)
