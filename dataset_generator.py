@@ -765,7 +765,7 @@ if __name__ == "__main__":
     CLI.add_argument("--datatype",
                      type = str,
                      default = 'uniform') # 'parameter_recovery, 'perturbation_experiment', 'r_sim', 'r_dgp', 'cnn_train', 'parameter_recovery_hierarchical'
-    CLI.add_arguent("--nsubjects",
+    CLI.add_argument("--nsubjects",
                     type = int,
                     default = 5)
     CLI.add_argument("--nreps",
