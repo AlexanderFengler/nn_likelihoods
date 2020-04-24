@@ -57,8 +57,8 @@ class data_generator():
         if self.machine == 'home':
             self.method_params = pickle.load(open("/Users/afengler/OneDrive/git_repos/" + \
                                                   "nn_likelihoods/kde_stats.pickle", "rb"))[self.method]
-            self.method_comparison_folder = self.method_params['output_folder']
-            self.method_folder = self.method_params['method_folder']
+            self.method_comparison_folder = self.method_params['output_folder_home']
+            self.method_folder = self.method_params['method_folder_home']
         
 
         self.dgp_hyperparameters = dict(self.method_params['dgp_hyperparameters'])
