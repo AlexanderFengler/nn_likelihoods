@@ -494,7 +494,7 @@ class data_generator():
 
         # Run Data generation
         with Pool(processes = n_cpus) as pool:
-            data_grid = np.array(pool.starmap(self.data_generator, args_list))]
+            data_grid = np.array(pool.starmap(self.data_generator, args_list))
 
         data_grid = np.reshape(data_grid, (self.config['nparamsets'], self.config['nsubjects'], self.config['nsamples'], self.config['nchoices']))
     
