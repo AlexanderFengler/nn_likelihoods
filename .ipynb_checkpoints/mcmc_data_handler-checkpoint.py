@@ -1,16 +1,10 @@
 import os
 import pickle
 import numpy as np
-import matplotlib.pyplot as plt
 import re
-import seaborn as sns
 from string import ascii_letters
-import pandas as pd
-from pandas.plotting import scatter_matrix
-from sklearn.linear_model import LinearRegression
-import cddm_data_simulation as cds
-import boundary_functions as bf
 from datetime import datetime
+import argparse
 
 def collect_datasets_diff_evo(in_files = [],
                               out_file = [],
