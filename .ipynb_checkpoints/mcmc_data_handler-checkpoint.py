@@ -74,7 +74,7 @@ if __name__ == "__main__":
                     default = 5000)
     CLI.add_argument("--ndata",
                      type = int,
-                    default = 1024)
+                     default = 1024)
     
     args = CLI.parse_args()
     print(args)
@@ -82,6 +82,7 @@ if __name__ == "__main__":
     machine = args.machine
     method = args.method
     nburnin = args.nburnin    
+    ndata = args.ndata
 
     if machine == 'home':
         method_comparison_folder = '/Users/afengler/OneDrive/project_nn_likelihoods/data/kde/' + method + '/method_comparison/'
