@@ -19,5 +19,5 @@
 #SBATCH --array=1-1
 
 
-python -m mcmc_data_handler.py --machine ccv --method ddm --nburnin 5000 --ndata 2048 
-python -m mcmc_data_handler.py --machine ccv --method ddm --nburnin 5000 --ndata 4096
+python -m /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method ddm --nburnin 5000 --ndata 2048 
+python -m /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method ddm --nburnin 5000 --ndata 4096
