@@ -75,6 +75,9 @@ if __name__ == "__main__":
     CLI.add_argument("--ndata",
                      type = int,
                      default = 1024)
+    CLI.add_argument("--nsubsample",
+                     type = int,
+                     default = 10000)
     
     args = CLI.parse_args()
     print(args)
@@ -83,6 +86,7 @@ if __name__ == "__main__":
     method = args.method
     nburnin = args.nburnin    
     ndata = args.ndata
+    nsubsample = args.nsubsample
 
     if machine == 'home':
         method_comparison_folder = '/Users/afengler/OneDrive/project_nn_likelihoods/data/kde/' + method + '/method_comparison/'
@@ -100,5 +104,6 @@ if __name__ == "__main__":
     _ = collect_datasets_diff_evo(in_files = files_,
                                   out_file = summary_file,
                                   burn_in = nburnin,
+                                  n_post_samples_by_param = nsubsample,
                                   sort_ = True,
                                   save = True)
