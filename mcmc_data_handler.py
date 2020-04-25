@@ -91,9 +91,9 @@ if __name__ == "__main__":
     nburnin = args.nburnin    
 
     if machine == 'home':
-        method_comparison_folder = 'Users/afengler/OneDrive/project_nn_likelihoods/data/kde/' + method + '/method_comparison/'
+        method_comparison_folder = '/Users/afengler/OneDrive/project_nn_likelihoods/data/kde/' + method + '/method_comparison/'
     if machine == 'ccv':
-        method_comparison_folder = 'users/afengler/data/kde/' + method + '/method_comparison/'
+        method_comparison_folder = '/users/afengler/data/kde/' + method + '/method_comparison/'
     if machine == 'x7':
         method_comparison_folder = '/media/data_cifs/afengler/data/kde/' + model + '/method_comparison/'
         
