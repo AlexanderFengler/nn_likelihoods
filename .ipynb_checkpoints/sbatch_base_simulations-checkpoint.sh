@@ -3,55 +3,64 @@
 # Default resources are 1 core with 2.8GB of memory per core.
 
 # job name:
-#SBATCH -J tpl_1_weibull
+#SBATCH -J train_dat
 
 # priority
 #SBATCH --account=bibs-frankmj-condo
+##SBATCH --account=carney-frankmj-condo
 
 # output file
-#SBATCH --output /users/afengler/batch_job_out/tpl1_%A_%a.out
+#SBATCH --output /users/afengler/batch_job_out/tpl_1_%A_%a.out
 
-# Request runtime, memory, cores:
+# Request runtime, memory, cores
 #SBATCH --time=48:00:00
 #SBATCH --mem=32G
 #SBATCH -c 14
 #SBATCH -N 1
-#SBATCH --array=1-100
+#SBATCH --array=1-1
 
 # --------------------------------------------------------------------------------------
 # Sequentially run different kind of models
 
-# declare -a dgps=( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "lca" "race_model" ) 
-# n_samples=( 128 256 512 1024 2048 4096 8192 ) #( 50000 100000 200000 400000 )
-# n_choices=( 2 3 4 ) #( 4 5 6 )
-# n_parameter_sets=100  #20000
-# n_bins=( 256 512 )
-# # outer -------------------------------------
-# for bins in "${n_bins[@]}"
-# do
-#     for n in "${n_samples[@]}"
-#     do
-#     # inner -------------------------------------
-#         for dgp in "${dgps[@]}"
-#         do
-#             if [[ "$dgp" = "lca" ]] || [[ "$dgp" = "race_model" ]];
-#             then
-#                 for n_c in "${n_choices[@]}"
-#                     do
-#                        python -u dataset_generator.py --machine x7 --dgplist $dgp --datatype parameter_recovery --nreps 10 --binned 1 --nbins $bins --maxt 10 --nchoices $n_c --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 --deltat 0.001 #--fileid $SLURM_ARRAY_TASK_ID 
-#                        echo "$dgp"
-#                        echo $n_c
-#                 done
-#             else
-#                  python -u dataset_generator.py --machine x7 --dgplist $dgp --datatype parameter_recovery --nreps 10 --binned 1 --nbins $bins --maxt 10 --nchoices 2 --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1  --deltat 0.001 #--fileid $SLURM_ARRAY_TASK_ID
-#                  echo "$dgp"
-#                  echo $n_c
-#             fi
-#         done
-#                 # normal call to function
-#     done
-# done
-# ---------------------------------------------------------------------------------------
+# declare -a dgps=( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "levy" ) # "lca" "race_model" "ddm_seq2" "ddm_par2" "ddm_mic2" "ddm_seq2_angle" "ddm_par2_angle" "ddm_mic2_angle")
+declare -a dgps=( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "levy" )  #( "ddm_mic2_angle" "ddm_par2_angle" ) # ( "ddm_seq2_angle" )
+n_samples=( 2048 )   # ( 128 256 512 1024 2048 4096 8192 50000 100000 200000 400000 )
+n_choices=( 2 ) #( 4 5 6 )
+n_parameter_sets=1000   #20000
+n_bins=( 0 )
+binned=0
+machine="ccv" #"ccv" "home" "x7"
+datatype="parameter_recovery"#"parameter_recovery_hierarchical" #"parameter_recovery" #"cnn_train" # "parameter_recovery"
+nsubjects=1 #10
+mode="mlp"  #'mlp' 'cnn'
+maxt=20
+# outer -------------------------------------
+for bins in "${n_bins[@]}"
+do
+    for n in "${n_samples[@]}"
+    do
+    # inner ----------------------------tmux---------
+        for dgp in "${dgps[@]}"
+        do
+            if [[ "$dgp" = "lca" ]] || [[ "$dgp" = "race_model" ]];
+            then
+                for n_c in "${n_choices[@]}"
+                    do
+                       echo "$dgp"
+                       echo $n_c
+                       python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype $datatype --nsubjects $nsubjects--nreps 1 --binned $binned --nbins $bins --maxt $maxt --nchoices $n_c --nsamples $n --mode $mode --nparamsets $n_parameter_sets --save 1 --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID 
+                done
+            else
+                 echo "$dgp"
+                 #echo $n_c
+                 python -u dataset_generator.py --machine $machine --dgplist $dgp --nsubjects $nsubjects --datatype $datatype --nreps 1 --binned $binned --nbins $bins --maxt $maxt --nchoices ${n_choices[0]} --nsamples $n --mode $mode --nparamsets $n_parameter_sets --save 1  --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID
+                
+            fi
+        done
+                # normal call to function
+    done
+done
+#---------------------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------------------
 # Run rdgp
@@ -66,11 +75,11 @@
 
 # ---------------------------------------------------------------------------------------
 # Base data for mlp
-n_parameter_sets=10000
-n_c=2
-method='ornstein'
+# n_parameter_sets=10000
+# n_c=2
+# method='ornstein'
 
-python -u dataset_generator.py --machine ccv --dgplist $method --datatype cnn_train --nreps 1 --binned 0 --nbins 0 --maxt 20 --nchoices $n_c --nsamples 20000 --mode mlp --nparamsets $n_parameter_sets --save 1 --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID
+# python -u dataset_generator.py --machine ccv --dgplist $method --datatype cnn_train --nreps 1 --binned 0 --nbins 0 --maxt 20 --nchoices $n_c --nsamples 20000 --mode mlp --nparamsets $n_parameter_sets --save 1 --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID
 
 #---------------------------------------------------------------------------------------
 
