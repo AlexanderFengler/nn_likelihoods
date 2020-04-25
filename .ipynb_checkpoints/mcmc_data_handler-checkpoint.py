@@ -98,7 +98,7 @@ if __name__ == "__main__":
     file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + str(ndata) + '_1_'
     summary_file = method_comparison_folder + 'summary_' + file_signature[:-1] + '.pickle'
     file_singature_len = len(file_signature)
-    files = os.istdir(method_comparison_folder)
+    files = os.listdir(method_comparison_folder)
     files_ = [method_comparison_folder + file_ for file_ in files if file_[:file_signature_len] == file_signature]
     
     _ = collect_datasets_diff_evo(in_files = files_,
