@@ -80,7 +80,6 @@ if __name__ == "__main__":
     print(args)
 
     machine = args.machine
-    tomachine = args.tomachine
     method = args.method
     nburnin = args.nburnin    
 
