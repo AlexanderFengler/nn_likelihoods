@@ -1,4 +1,4 @@
-#scp afengler@transfer.ccv.brown.edu:/users/afengler/data/kde/ddm/method_comparison/summary* /Users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm/method_comparison/
+scp afengler@transfer.ccv.brown.edu:/users/afengler/data/kde/ddm/method_comparison/summary* /Users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm/method_comparison/
 scp afengler@transfer.ccv.brown.edu:/users/afengler/data/kde/levy/method_comparison/summary* /Users/afengler/OneDrive/project_nn_likelihoods/data/kde/levy/method_comparison/
 scp afengler@transfer.ccv.brown.edu:/users/afengler/data/kde/full_ddm/method_comparison/summary* /Users/afengler/OneDrive/project_nn_likelihoods/data/kde/full_ddm/method_comparison/
 scp afengler@transfer.ccv.brown.edu:/users/afengler/data/kde/ornstein/method_comparison/summary* /Users/afengler/OneDrive/project_nn_likelihoods/data/kde/ornstein/method_comparison/
