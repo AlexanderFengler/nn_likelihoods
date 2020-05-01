@@ -3,7 +3,7 @@
 # Default resources are 1 core with 2.8GB of memory per core.
 
 # job name:
-#SBATCH -J gpu_test
+#SBATCH -J mlp_train
 
 # priority
 ##SBATCH --account=bibs-frankmj-condo
@@ -14,7 +14,7 @@
 #SBATCH --mail-type=ALL
 
 # output file
-#SBATCH --output /users/afengler/batch_job_out/gpu_test.out
+#SBATCH --output /users/afengler/batch_job_out/mlp_train_full_ddm2_widenet.out
 
 # Request runtime, memory, cores
 #SBATCH --time=24:00:00
