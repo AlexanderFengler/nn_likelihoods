@@ -14,7 +14,7 @@
 #SBATCH --mail-type=ALL
 
 # output file
-#SBATCH --output /users/afengler/batch_job_out/mlp_train_full_ddm2_widenet.out
+#SBATCH --output /users/afengler/batch_job_out/mlp_train_angle2_widenet.out
 
 # Request runtime, memory, cores
 #SBATCH --time=24:00:00
