@@ -38,7 +38,7 @@ nsamples=( 1024 2048 4096 )
 
 # python -u method_comparison_sim.py --machine ccv --method ddm --nsamples $nsamples --nmcmcsamples $nmcmcsamples --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 --samplerinit mle --ncpus 10 --nbyarrayjob $nbyarrayjob #$SLURM_ARRAY_TASK_ID 
 
-for n in "${n_samples[@]}"
+for n in "${nsamples[@]}"
 do
     python -u method_comparison_sim.py --machine ccv --method full_ddm2 --nsamples $n --nmcmcsamples $nmcmcsamples --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 5 6 --samplerinit mle --ncpus 10 --nbyarrayjob $nbyarrayjob #$SLURM_ARRAY_TASK_ID 
 
