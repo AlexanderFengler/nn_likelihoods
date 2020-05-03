@@ -24,7 +24,7 @@
 #SBATCH --constraint='quadrortx'
 ##SBATCH --constraint='cascade'
 #SBATCH -p gpu --gres=gpu:1
-##SBATCH --array=1-2
+#SBATCH --array=1-2
 
 source /users/afengler/.bashrc
 conda deactivate
