@@ -103,7 +103,7 @@ if __name__ == "__main__":
     #                                   )
     
     X, y = kde_load_data_new(path = data_folder,
-                             file_id_list = list(np.random.choice(maxidfiles + 1, replace = False, size = n_training_datasets_to_load)),
+                             file_id_list = list(1 + np.random.choice(maxidfiles, replace = False, size = n_training_datasets_to_load)),
                              # file_id_list = [i for i in range(1, n_training_datasets_to_load + 1, 1)],
                              return_log = True,
                              prelog_cutoff_low = 1e-7,
