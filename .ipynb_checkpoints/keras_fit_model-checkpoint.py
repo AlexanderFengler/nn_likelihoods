@@ -51,13 +51,19 @@ if __name__ == "__main__":
     # method = "weibull_cdf" # ddm, linear_collapse, ornstein, full, lba
     warm_start = args.warmstart
     n_training_datasets_to_load = args.nfiles
+    maxidfiles = args.maxidfiles
     machine = args.machine
     data_folder = args.datafolder
     # ----------------
 
     # INITIALIZATIONS ----------------------------------------------------------------
-    stats = pickle.load(open("kde_stats.pickle", "rb"))[method]
-    dnn_params = yaml.load(open("hyperparameters.yaml"))
+    if machine == 'x7':
+        stats = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))[method]
+        dnn_params = yaml.load(open("/meia/data_cifs/afengler/git_repos/nn_likelihoods/hyperparameters.yaml"))
+    else:
+        stats = pickle.load(open("/users/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))[method]
+        dnn_params = yaml.load(open("/users/afengler/git_repos/nn_likelihoods/hyperparameters.yaml"))
+
 
     if machine == 'x7':
         #data_folder = stats["data_folder_x7"]
@@ -95,9 +101,10 @@ if __name__ == "__main__":
     #                                    return_log = True, # Dont take log if you want to train on actual likelihoods
     #                                    prelog_cutoff = 1e-7 # cut out data with likelihood lower than 1e-7
     #                                   )
-
+    
     X, y = kde_load_data_new(path = data_folder,
-                             file_id_list = [i for i in range(1, n_training_datasets_to_load + 1, 1)],
+                             file_id_list = list(np.random.choice(maxidfiles + 1, replace = False, size = n_training_datasets_to_load)),
+                             # file_id_list = [i for i in range(1, n_training_datasets_to_load + 1, 1)],
                              return_log = True,
                              prelog_cutoff_low = 1e-7,
                              prelog_cutoff_high = 100)
@@ -131,10 +138,19 @@ if __name__ == "__main__":
         print('STRUCTURE OF GENERATED MODEL: ....')
         print(model.summary())
 
-        if dnn_params['loss'] == 'huber':
-            model.compile(loss = tf.losses.huber_loss, 
-                          optimizer = "adam", 
-                          metrics = ["mse"])
+        if machine == 'x7':
+
+            if dnn_params['loss'] == 'huber':
+                model.compile(loss = tf.losses.huber_loss, 
+                              optimizer = "adam", 
+                              metrics = ["mse"])
+        
+        if machine == 'ccv':
+
+            if dnn_params['loss'] == 'huber':
+                model.compile(loss = tf.keras.losses.Huber(),
+                              optimizer = "adam",
+                              metrics = ["mse"])
 
         if dnn_params['loss'] == 'mse':
             model.compile(loss = 'mse', 
@@ -143,9 +159,9 @@ if __name__ == "__main__":
     if warm_start:
         # Returns a compiled model identical to the previous one
         if machine == 'x7':
-            model_paths = yaml.load(open("model_paths_x7.yaml"))
+            model_paths = yaml.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/model_paths_x7.yaml"))
         if machine == 'ccv':
-            model_paths = yaml.load(open("model_paths.yaml"))
+            model_paths = yaml.load(open("/users/afengler/git_repos/nn_likelihoods/model_paths.yaml"))
 
         model_path = model_paths[method +  '_' + str(n_training_datasets_to_load)]
         model = load_model(model_path + 'model_final.h5', custom_objects = {"huber_loss": tf.losses.huber_loss})
@@ -181,7 +197,7 @@ if __name__ == "__main__":
                         batch_size = dnn_params["batch_size"], 
                         shuffle = True,
                         callbacks = [checkpoint, reduce_lr, earlystopping], 
-                        verbose = 1,
+                        verbose = 2,
                         #validation_data = (X_val, y_val)
                        )
     # ---------------------------------------------------------------------------
