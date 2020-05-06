@@ -135,6 +135,9 @@ if __name__ == "__main__":
     CLI.add_argument("--ncpus",
                      type = int,
                      default = 10)
+    CLI.add_argument("--nnbatchid",  # nnbatchid is used if we use the '_batch' parts of the model_path files (essentially to for pposterior sample runs that check if for the same model across networks we observe similar behavior)
+                     type = int,
+                     default = -1)
     
     args = CLI.parse_args()
     print(args)
@@ -152,7 +155,7 @@ if __name__ == "__main__":
     out_file_signature = args.outfilesig
     n_cpus = args.ncpus
     n_by_arrayjob = args.nbyarrayjob
-    
+    nnbatchid = args.nnbatchid
 
     # Initialize the frozen dimensions
     if len(args.frozendims) >= 1:
@@ -161,28 +164,19 @@ if __name__ == "__main__":
     else:
         active_dims = 'all'
         frozen_dims = 'none'
-    
-    if data_type == 'perturbation_experiment':
-        file_ = 'base_data_perturbation_experiment_nexp_1_n_' + str(n_samples) + '_' + infile_id + '.pickle'
-        out_file_signature = 'post_samp_perturbation_experiment_nexp_1_n_' + str(n_samples) + '_' + infile_id                                                                      
-    if data_type == 'parameter_recovery':
-        file_ = 'parameter_recovery_data_binned_0_nbins_0_n_' + str(n_samples) + '/' + method + '_nchoices_2_parameter_recovery_binned_0_nbins_0_nreps_1_n_' + str(n_samples) + '.pickle'
-        #file_ = 'base_data_param_recov_unif_reps_1_n_' + str(n_samples) + '_' + infile_id + '.pickle'
-        out_file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + str(n_samples) + '_' + infile_id
-    
-    if data_type == 'real':                                                                        
-        file_ = args.infileid
-        if machine == 'x7':
-            data_folder = '/media/data_cifs/afengler/data/real/'
-        if machine == 'ccv':
-            data_folder = '/users/afengler/data/real/'
-        
+   
     if machine == 'x7':
         method_params = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))[method]
         output_folder = method_params['output_folder_x7']
         method_folder = method_params['method_folder_x7']
         with open("model_paths_x7.yaml") as tmp_file:
-            network_path = yaml.load(tmp_file)[method]
+            if nnbatchid == -1:
+                network_path = yaml.load(tmp_file)[method]
+                network_id = network_path[list(re.finditer('/', network_path)[-2].start():]
+            else:
+                network_path = yaml.load(tmp_file)[method + '_batch'][nnbatchid]
+                network_id = network_path[list(re.finditer('/', network_path)[-2].start():]
+
             print('Loading network from: ')
             print(network_path)
             # model = load_model(network_path + 'model_final.h5', custom_objects = {"huber_loss": tf.losses.huber_loss})
@@ -192,10 +186,37 @@ if __name__ == "__main__":
         output_folder = method_params['output_folder']
         method_folder = method_params['method_folder']
         with open("model_paths.yaml") as tmp_file:
-            network_path = yaml.load(tmp_file)[method]
+            if nnbatchid == -1:
+                network_path = yaml.load(tmp_file)[method]
+                network_id = network_path[list(re.finditer('/', network_path)[-2]).start():]
+
+            else:
+                network_path = yaml.load(tmp_file)[method + '_batch'][nnbatchid]
+                network_id = network_path[list(re.finditer('/', network_path)[-2]).start():]
+                
             print('Loading network from: ')
             print(network_path)
+            
+    if data_type == 'perturbation_experiment':
+        file_ = 'base_data_perturbation_experiment_nexp_1_n_' + str(n_samples) + '_' + infile_id + '.pickle'
+        out_file_signature = 'post_samp_perturbation_experiment_nexp_1_n_' + str(n_samples) + '_' + infile_id                                                                      
     
+    if data_type == 'parameter_recovery':
+        file_ = 'parameter_recovery_data_binned_0_nbins_0_n_' + str(n_samples) + '/' + method + '_nchoices_2_parameter_recovery_binned_0_nbins_0_nreps_1_n_' + str(n_samples) + '.pickle'
+        #file_ = 'base_data_param_recov_unif_reps_1_n_' + str(n_samples) + '_' + infile_id + '.pickle'
+        
+        if not os.path.exists(output_folder + network_id):
+            os.makedirs(output_folder + network_id)
+        
+        out_file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + str(n_samples) + '_' + infile_id
+    
+    if data_type == 'real':                                                                        
+        file_ = args.infileid
+        if machine == 'x7':
+            data_folder = '/media/data_cifs/afengler/data/real/'
+        if machine == 'ccv':
+            data_folder = '/users/afengler/data/real/'
+     
     method_params['n_choices'] = args.nchoices
     print('METHOD PARAMETERS: \n')
     print(method_params)
@@ -401,6 +422,6 @@ if __name__ == "__main__":
     
     # Store files
     print('saving to file')
-    print(output_folder + out_file_signature + '_' + out_file_id + ".pickle")
+    print(output_folder + network_id + out_file_signature + '_' + out_file_id + ".pickle")
     pickle.dump((param_grid, data_grid, posterior_samples, exec_time), 
                  open(output_folder + out_file_signature + '_' + out_file_id + ".pickle", "wb"))
