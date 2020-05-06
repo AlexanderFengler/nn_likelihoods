@@ -172,10 +172,10 @@ if __name__ == "__main__":
         with open("model_paths_x7.yaml") as tmp_file:
             if nnbatchid == -1:
                 network_path = yaml.load(tmp_file)[method]
-                network_id = network_path[list(re.finditer('/', network_path)[-2].start():]
+                network_id = network_path[list(re.finditer('/', network_path))[-2].start():]
             else:
                 network_path = yaml.load(tmp_file)[method + '_batch'][nnbatchid]
-                network_id = network_path[list(re.finditer('/', network_path)[-2].start():]
+                network_id = network_path[list(re.finditer('/', network_path))[-2].start():]
 
             print('Loading network from: ')
             print(network_path)
