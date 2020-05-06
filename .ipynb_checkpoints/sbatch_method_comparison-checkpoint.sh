@@ -59,13 +59,16 @@
 
 # NNBATCH RUNS
 
-nmcmcsamples=20000
+nmcmcsamples=100
 nbyarrayjob=10
 nsamples=( 1024 )
 method=ddm
 
-for idx in {1..10}
-do 
-    python -u method_comparison_sim.py --machine ccv --method $method --nsamples $n --nmcmcsamples $nmcmcsamples --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 --samplerinit mle --ncpus 10 --nbyarrayjob $nbyarrayjob --nnbatchid $idx 
+for n in "${nsamples[@]}"
+do
+    for idx in {0..9}
+    do 
+        python -u method_comparison_sim.py --machine ccv --method $method --nsamples $n --nmcmcsamples $nmcmcsamples --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 --samplerinit mle --ncpus 10 --nbyarrayjob $nbyarrayjob --nnbatchid $idx 
+    done
 done
 
