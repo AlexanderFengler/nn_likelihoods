@@ -425,4 +425,4 @@ if __name__ == "__main__":
     print('saving to file')
     print(output_folder + network_id + out_file_signature + '_' + out_file_id + ".pickle")
     pickle.dump((param_grid, data_grid, posterior_samples, exec_time), 
-                 open(output_folder + out_file_signature + '_' + out_file_id + ".pickle", "wb"))
+                 open(output_folder + network_id + out_file_signature + '_' + out_file_id + ".pickle", "wb"))

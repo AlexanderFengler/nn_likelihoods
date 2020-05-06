@@ -59,7 +59,7 @@
 
 # NNBATCH RUNS
 
-nmcmcsamples=100
+nmcmcsamples=200
 nbyarrayjob=10
 nsamples=( 1024 )
 method=ddm
