@@ -5,6 +5,7 @@ import re
 from string import ascii_letters
 from datetime import datetime
 import argparse
+import yaml
 
 def collect_datasets_diff_evo(in_files = [],
                               out_file = [],
@@ -78,6 +79,12 @@ if __name__ == "__main__":
     CLI.add_argument("--nsubsample",
                      type = int,
                      default = 10000)
+    CLI.add_argument("--nnbatchid",
+                     type= int,
+                     default = -1)
+    
+    
+
     
     args = CLI.parse_args()
     print(args)
@@ -87,19 +94,42 @@ if __name__ == "__main__":
     nburnin = args.nburnin    
     ndata = args.ndata
     nsubsample = args.nsubsample
+    nnbatchid = args.nnbatchid
 
     if machine == 'home':
         method_comparison_folder = '/Users/afengler/OneDrive/project_nn_likelihoods/data/kde/' + method + '/method_comparison/'
+    
     if machine == 'ccv':
         method_comparison_folder = '/users/afengler/data/kde/' + method + '/method_comparison/'
+        
+        with open("/users/afengler/git_repos/nn_likelihoods/model_paths.yaml") as tmp_file:
+            if nnbatchid == -1:
+                network_path = yaml.load(tmp_file)[method]
+                network_id = network_path[list(re.finditer('/', network_path))[-2].end():]
+
+            else:
+                network_path = yaml.load(tmp_file)[method + '_batch'][nnbatchid]
+                network_id = network_path[list(re.finditer('/', network_path))[-2].end():]
+                
     if machine == 'x7':
         method_comparison_folder = '/media/data_cifs/afengler/data/kde/' + model + '/method_comparison/'
         
+        with open("/media/data_cifs/afengler/git_repos/nn_likelihoods/model_paths_x7.yaml") as tmp_file:
+            if nnbatchid == -1:
+                network_path = yaml.load(tmp_file)[method]
+                network_id = network_path[list(re.finditer('/', network_path))[-2].end():]
+            else:
+                network_path = yaml.load(tmp_file)[method + '_batch'][nnbatchid]
+                network_id = network_path[list(re.finditer('/', network_path))[-2].end():]
+                
+    print('Loading network from: ')
+    print(network_path)
+    
     file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + str(ndata) + '_1_'
     summary_file = method_comparison_folder + 'summary_' + file_signature[:-1] + '.pickle'
     file_signature_len = len(file_signature)
     files = os.listdir(method_comparison_folder)
-    files_ = [method_comparison_folder + file_ for file_ in files if file_[:file_signature_len] == file_signature]
+    files_ = [method_comparison_folder + network_id + file_ for file_ in files if file_[:file_signature_len] == file_signature]
     
     _ = collect_datasets_diff_evo(in_files = files_,
                                   out_file = summary_file,
@@ -107,3 +137,5 @@ if __name__ == "__main__":
                                   n_post_samples_by_param = nsubsample,
                                   sort_ = True,
                                   save = True)
+    
+            
