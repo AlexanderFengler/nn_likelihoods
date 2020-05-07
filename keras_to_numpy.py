@@ -50,7 +50,7 @@ def predict(x, weights, biases, activations, n_layers):
     for i in range(n_layers):
         x = activation_fns[activations[i]](
             np.dot(x, weights[i]) + biases[i])
-        print('x shape', x.shape)
+        # print('x shape', x.shape)
     return x
 
 def log_p(params, 

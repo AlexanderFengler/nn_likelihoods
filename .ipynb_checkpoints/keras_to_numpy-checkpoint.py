@@ -2,7 +2,7 @@
 #import tensorflow as tf
 #from tensorflow import keras
 import numpy as np
-import pickle
+import pickle  
 
 # Activations
 def relu(x):
@@ -14,11 +14,13 @@ def linear(x):
 def sigmoid(x):
     return 1 / (1 + np.exp(- x))
 
-def tanh(x):
-    return (2 / (1 + np.exp(- 2 * x))) - 1
+# def tanh(x):
+#     return (2 / (1 + np.exp(- 2 * x))) - 1
 
 # Function to extract network architecture 
-def extract_architecture(model, save = False, save_path = ''):
+def extract_architecture(model, 
+                         save = False,
+                         save_path = ''):
     
     biases = []
     activations = []
@@ -39,23 +41,40 @@ def extract_architecture(model, save = False, save_path = ''):
     return weights, biases, activations
 
 # Function to perform forward pass given architecture
-def predict(x, weights, biases, activations):
+# TD optimize this function as much as possible (need lakshmis advice for this....)
+def predict(x, weights, biases, activations, n_layers):
     # Activation dict
-    activation_fns = {"relu":relu, "linear":linear, 'sigmoid':sigmoid, "tanh":tanh}
-    for i in range(len(weights)):
+    activation_fns = {"relu":relu, "linear":linear, 'sigmoid':sigmoid, "tanh":np.tanh}
+
+    #for i in range(len(weights)):
+    for i in range(n_layers):
         x = activation_fns[activations[i]](
             np.dot(x, weights[i]) + biases[i])
+        # print('x shape', x.shape)
     return x
 
-def log_p(params, weights, biases, activations, data, orig_output_log_l = True, ll_min = 1e-29):
+def log_p(params, 
+          weights, 
+          biases, 
+          activations, 
+          data, 
+          orig_output_log_l = True, 
+          ll_min = 1e-29):
+    
     param_grid = np.tile(params, (data.shape[0], 1))
     inp = np.concatenate([param_grid, data], axis = 1)
-    if orig_output_log_l:
-        out = predict(inp, weights, biases, activations)
-        return - np.sum(out)
-    else:
-        out = np.maximum(predict(inp, weights, biases, activations), ll_min)
-        return - np.sum(np.log(out))
+    
+    # TD add ll_min back in ?
+    return - np.sum(predict(inp, 
+                            weights, 
+                            biases, 
+                            activations))
+    # else:
+    #     out = np.maximum(predict(inp, 
+    #                              weights, 
+    #                              biases, 
+    #                              activations), ll_min)
+    #     return - np.sum(np.log(out))
 
 def group_log_p(params, 
                 weights, 
