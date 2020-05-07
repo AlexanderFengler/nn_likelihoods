@@ -87,12 +87,6 @@ if __name__ == "__main__":
     # Load keras model
     keras_model = keras.models.load_model(network_path + 'model_final.h5')
 
-    # Load numpy model
-    numpy_model = mlp_target_class(data = out,
-                       weights = weights,
-                       biases = biases,
-                       activations = activations)
-
     info = {}
     info['numpy_timings'] = []
     info['keras_var_batch_timings'] = []
@@ -117,6 +111,12 @@ if __name__ == "__main__":
 
         # Numpy timings
         for i in range(nreps):
+            # Load numpy model
+            numpy_model = mlp_target_class(data = out,
+                                        weights = weights,
+                                        biases = biases,
+                                        activations = activations)
+
             start = datetime.now()
             numpy_model.target(params_rep)
             info['numpy_timings'].append((datetime.now() - start).total_seconds())
