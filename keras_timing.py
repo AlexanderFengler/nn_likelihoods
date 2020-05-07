@@ -97,7 +97,7 @@ if __name__ == "__main__":
     # Run timingss
     for n in [1024, 2048, 4096, 8192, 16384, 32768]:
         # Generate toy dataset
-        out = cds.ddm_flexbound(nsamples = n,
+        out = cds.ddm_flexbound(n_samples = n,
                                 boundary_fun = bf.constant,
                                 boundary_multiplicative = True)
         out = np.concatenate([out[0], out[1]], axis = 1)
@@ -113,9 +113,9 @@ if __name__ == "__main__":
         for i in range(nreps):
             # Load numpy model
             numpy_model = mlp_target_class(data = out,
-                                        weights = weights,
-                                        biases = biases,
-                                        activations = activations)
+                                           weights = weights,
+                                           biases = biases,
+                                           activations = activations)
 
             start = datetime.now()
             numpy_model.target(params_rep)
