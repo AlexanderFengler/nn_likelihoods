@@ -97,6 +97,7 @@ if __name__ == "__main__":
 
     # Run timingss
     for n in [1024, 2048, 4096, 8192, 16384, 32768]:
+        print('nsamples: ', n)
         # Generate toy dataset
         out = cds.ddm_flexbound(n_samples = n,
                                 boundary_fun = bf.constant,
@@ -111,6 +112,7 @@ if __name__ == "__main__":
         keras_input_batch[:, 4:] = out
 
         # Numpy timings
+        print('Running numpy')
         for i in range(nreps):
             # Load numpy model
             numpy_model = mlp_target_class(data = out,
@@ -124,26 +126,27 @@ if __name__ == "__main__":
             info['nsamples'].append(n)
         
         # Keras timings variable batch size
+        print('Running keras var batch')
         for i in range(nreps):
             start = datetime.now()
             keras_input_batch[:, :4] = params_rep
-            keras_input_batch[:, 4:] = out
             keras_model.predict(keras_input_batch, batch_size = nsamples)
             info['keras_var_batch_timings'].append((datetime.now() - start).total_seconds())
 
         # Keras timings fixed batch size
+        print('Running keras fix batch')
         for i in range(nreps):
             start = datetime.now()
             keras_input_batch[:, :4] = params_rep
-            keras_input_batch[:, 4:] = out
             keras_model.predict(keras_input_batch, batch_size = 1024)
             info['keras_fix_batch_timings'].append((datetime.now() - start).total_seconds())
 
         # Keras timings unspecified batch size
+        print('Running keras no batch')
         for i in range(nreps):
             start = datetime.now()
             keras_input_batch[:, :4] = params_rep
             keras_model.predict(keras_input_batch)
             info['keras_no_batch_timings'].append((datetime.now() - start).total_seconds())
 
-    pickle.dump(info, open('/users/afengler/git_repos/nn_likelihoods/', wb), protocol = 4)
+    pickle.dump(info, open('/users/afengler/data/timings/timings.pickle','wb'), protocol = 4)
