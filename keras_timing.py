@@ -85,7 +85,7 @@ if __name__ == "__main__":
     activations = pickle.load(open(network_path + 'activations.pickle', 'rb'))
     
     # Load keras model
-    keras_model = keras.models.load_model(my_dir + 'model_final.h5')
+    keras_model = keras.models.load_model(network_path + 'model_final.h5')
 
     # Load numpy model
     numpy_model = mlp_target_class(data = out,
