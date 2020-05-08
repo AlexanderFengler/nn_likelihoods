@@ -18,15 +18,28 @@
 #SBATCH -N 1
 #SBATCH --array=1-1
 
-# python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method ddm --nburnin 5000 --ndata 2048 --nsubsample 10000 --nnbatchid -1
-python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method ddm --nburnin 5000 --ndata 4096 --nsubsample 10000 --nnbatchid -1
-#python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method ornstein --nburnin 5000 --ndata 2048 --nsubsample 10000 --nnbatchid -1
-python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method ornstein --nburnin 5000 --ndata 4096 --nsubsample 10000 --nnbatchid -1
-#python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method full_ddm --nburnin 5000 --ndata 2048 --nsubsample 10000 --nnbatchid -1
-python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method full_ddm --nburnin 5000 --ndata 4096 --nsubsample 10000 --nnbatchid -1
-#python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method levy --nburnin 5000 --ndata 2048 --nsubsample 10000 --nnbatchid -1
-python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method levy --nburnin 5000 --ndata 4096 --nsubsample 10000 --nnbatchid -1
-#python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method weibull_cdf --nburnin 5000 --ndata 2048 --nsubsample 10000 --nnbatchid -1
-python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method weibull_cdf --nburnin 5000 --ndata 4096 --nsubsample 10000 --nnbatchid -1
-#python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method angle --nburnin 5000 --ndata 2048 --nsubsample 10000 --nnbatchid -1
-python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method angle --nburnin 5000 --ndata 4096 --nsubsample 10000 --nnbatchid -1
+machine="ccv"
+ids=( 0 1 2 3 4 5 6 7 8 9)
+ndata= ( 1024 2048 4096 )
+method="ddm"
+
+for n in "${ndata[@]}"
+do
+    for id in "${ids[@]}"
+    do 
+       python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --nburnin 5000 --ndata $n --nsubsample 10000 --nnbatchid $id
+    done
+done
+
+# # python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method ddm --nburnin 5000 --ndata 2048 --nsubsample 10000 --nnbatchid -1
+# python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method ddm --nburnin 5000 --ndata 4096 --nsubsample 10000 --nnbatchid -1
+# #python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method ornstein --nburnin 5000 --ndata 2048 --nsubsample 10000 --nnbatchid -1
+# python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method ornstein --nburnin 5000 --ndata 4096 --nsubsample 10000 --nnbatchid -1
+# #python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method full_ddm --nburnin 5000 --ndata 2048 --nsubsample 10000 --nnbatchid -1
+# python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method full_ddm --nburnin 5000 --ndata 4096 --nsubsample 10000 --nnbatchid -1
+# #python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method levy --nburnin 5000 --ndata 2048 --nsubsample 10000 --nnbatchid -1
+# python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method levy --nburnin 5000 --ndata 4096 --nsubsample 10000 --nnbatchid -1
+# #python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method weibull_cdf --nburnin 5000 --ndata 2048 --nsubsample 10000 --nnbatchid -1
+# python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method weibull_cdf --nburnin 5000 --ndata 4096 --nsubsample 10000 --nnbatchid -1
+# #python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method angle --nburnin 5000 --ndata 2048 --nsubsample 10000 --nnbatchid -1
+# python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method angle --nburnin 5000 --ndata 4096 --nsubsample 10000 --nnbatchid -1

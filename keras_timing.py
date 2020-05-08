@@ -149,4 +149,4 @@ if __name__ == "__main__":
             keras_model.predict(keras_input_batch)
             info['keras_no_batch_timings'].append((datetime.now() - start).total_seconds())
 
-    pickle.dump(info, open('/users/afengler/data/timings/timings.pickle','wb'), protocol = 4)
+    pickle.dump(info, open('/users/afengler/data/timings/timings.pickle', 'wb'), protocol = 4)
