@@ -24,5 +24,7 @@ if __name__ == "__main__":
                shadow = True, 
                ncol = 1)
 
-    plt.savefig('./figures/timings_mlp.png', dpi = 150)
+    plt.savefig('./figures/timings_mlp.png', 
+                dpi = 150,
+                bbox_inches = 'tight')
     plt.show()

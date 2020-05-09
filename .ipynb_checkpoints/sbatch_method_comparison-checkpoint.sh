@@ -62,13 +62,14 @@
 nmcmcsamples=20000
 nbyarrayjob=10
 nsamples=( 1024 2048 4096 )
-method=ddm
+method="full_ddm2"
+ids=( -1 )
 
 for n in "${nsamples[@]}"
 do
-    for idx in {0..9}
+    for id in "${ids[@]}"
     do 
-        python -u method_comparison_sim.py --machine ccv --method $method --nsamples $n --nmcmcsamples $nmcmcsamples --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 --samplerinit mle --ncpus 10 --nbyarrayjob $nbyarrayjob --nnbatchid $idx 
+        python -u method_comparison_sim.py --machine ccv --method $method --nsamples $n --nmcmcsamples $nmcmcsamples --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 5 6 --samplerinit mle --ncpus 10 --nbyarrayjob $nbyarrayjob --nnbatchid $id
     done
 done
 
