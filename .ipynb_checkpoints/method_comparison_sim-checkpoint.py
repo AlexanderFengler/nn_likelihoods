@@ -30,9 +30,8 @@ from scipy.optimize import differential_evolution
 # Sampler
 from samplers import SliceSampler
 from samplers import DifferentialEvolutionSequential
-
 # Analytical Likelihood for ddm
-#from cdwiener import batch_fptd
+from cdwiener import batch_fptd
 
 # Analytical Likelihood for lba
 import clba
@@ -198,12 +197,31 @@ if __name__ == "__main__":
             print('Loading network from: ')
             print(network_path)
             
+    if machine == 'home':
+        method_params = pickle.load(open("/users/afengler/OneDrive/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))[method]
+        output_folder = method_params['output_folder_home']
+        method_folder = method_params['method_folder_home']
+        with open("model_paths.yaml") as tmp_file:
+            if nnbatchid == -1:
+                network_path = yaml.load(tmp_file)[method]
+                network_id = network_path[list(re.finditer('/', network_path))[-2].end():]
+
+            else:
+                network_path = yaml.load(tmp_file)[method + '_batch'][nnbatchid]
+                network_id = network_path[list(re.finditer('/', network_path))[-2].end():]
+                
+            print('Loading network from: ')
+            print(network_path)
+            
     if data_type == 'perturbation_experiment':
         file_ = 'base_data_perturbation_experiment_nexp_1_n_' + str(n_samples) + '_' + infile_id + '.pickle'
         out_file_signature = 'post_samp_perturbation_experiment_nexp_1_n_' + str(n_samples) + '_' + infile_id                                                                      
     
     if data_type == 'parameter_recovery':
-        file_ = 'parameter_recovery_data_binned_0_nbins_0_n_' + str(n_samples) + '/' + method + '_nchoices_2_parameter_recovery_binned_0_nbins_0_nreps_1_n_' + str(n_samples) + '.pickle'
+        if method == 'ddm_analytic':
+            file_ = 'parameter_recovery_data_binned_0_nbins_0_n_' + str(n_samples) + '/' + 'ddm' + '_nchoices_2_parameter_recovery_binned_0_nbins_0_nreps_1_n_' + str(n_samples) + '.pickle'
+        else:
+            file_ = 'parameter_recovery_data_binned_0_nbins_0_n_' + str(n_samples) + '/' + method + '_nchoices_2_parameter_recovery_binned_0_nbins_0_nreps_1_n_' + str(n_samples) + '.pickle'
         #file_ = 'base_data_param_recov_unif_reps_1_n_' + str(n_samples) + '_' + infile_id + '.pickle'
         
         if not os.path.exists(output_folder + network_id):
@@ -301,7 +319,9 @@ if __name__ == "__main__":
 # RUN POSTERIOR SIMULATIONS --------------------------------------------------------------------------
    # MLP TARGET
     n_params = sampler_param_bounds[0].shape[0]
-    mlpt = ktnpc.mlp_target(weights = weights, biases = biases, activations = activations, n_datapoints = data_grid.shape[1])
+    
+    if not analytic:
+        mlpt = ktnpc.mlp_target(weights = weights, biases = biases, activations = activations, n_datapoints = data_grid.shape[1])
 
     def mlp_target(params, 
                    data, 
@@ -372,17 +392,26 @@ if __name__ == "__main__":
     # Test navarro-fuss
     def nf_posterior(args): # TODO add active and frozen dim vals
         scp.random.seed()
-        model = SliceSampler(bounds = args[2],
-                             target = nf_target, 
-                             w = .4 / 1024, 
-                             p = 8,
-                             active_dims = active_dims,
-                             frozen_dim_vals = frozen_dims)
+        if sampler == 'slice':
+            model = SliceSampler(bounds = args[2], 
+                                 target = nf_target, 
+                                 w = .4 / 1024, 
+                                 p = 8)
+
+        if sampler == 'diffevo':
+            model = DifferentialEvolutionSequential(bounds = args[2],
+                                                    target = nf_target,
+                                                    mode_switch_p = 0.1,
+                                                    gamma = 'auto',
+                                                    crp = 0.3)
         
-        model.sample(args[0], 
-                     num_samples = n_slice_samples, 
-                     init = args[1])
-        return model.samples
+        (samples, lps, gelman_rubin_r_hat, random_seed) = model.sample(data = args[0],
+                                                                       num_samples = n_slice_samples,
+                                                                       init = args[1],
+                                                                       active_dims = active_dims,
+                                                                       frozen_dim_vals = frozen_dims)
+       
+        return (samples, lps, gelman_rubin_r_hat, random_seed)
 
     def lba_posterior(args):
         scp.random.seed()
@@ -412,17 +441,27 @@ if __name__ == "__main__":
         if method == 'lba_analytic':
             posterior_samples = np.array(p.map(lba_posterior, zip(data_grid, init_grid, sampler_param_bounds)))
         elif method == 'ddm_analytic':
-            posterior_samples = np.array(p.map(nf_posterior, zip(data_grid, init_grid, sampler_param_bounds)))
+            posterior_samples = p.map(nf_posterior, zip(data_grid, 
+                                                        init_grid,
+                                                        sampler_param_bounds))
         else:
             posterior_samples = p.map(mlp_posterior, zip(data_grid, init_grid, sampler_param_bounds))
     else:
         for i in range((out_file_id - 1) * 6, (out_file_id) * 6, 1):
-            posterior_samples = mlp_posterior((data_grid[i], init_grid[i], sampler_param_bounds[i]))
+            posterior_samples = mlp_posterior((data_grid[i],
+                                               init_grid[i],
+                                               sampler_param_bounds[i]))
     end_time = time.time()
     exec_time = end_time - start_time
     
     # Store files
     print('saving to file')
-    print(output_folder + network_id + out_file_signature + '_' + out_file_id + ".pickle")
-    pickle.dump((param_grid, data_grid, posterior_samples, exec_time), 
-                 open(output_folder + network_id + out_file_signature + '_' + out_file_id + ".pickle", "wb"))
+    if method == 'ddm_analytic':
+        pickle.dump((param_grid, data_grid, posterior_samples, exec_time),
+                    open(output_folder + out_file_signature + '_' + out_file_id + '.pickle', 'wb'))
+        print(output_folder +  out_file_signature + '_' + out_file_id + ".pickle")
+
+    else:
+        print(output_folder + network_id + out_file_signature + '_' + out_file_id + ".pickle")
+        pickle.dump((param_grid, data_grid, posterior_samples, exec_time), 
+                    open(output_folder + network_id + out_file_signature + '_' + out_file_id + ".pickle", "wb"))

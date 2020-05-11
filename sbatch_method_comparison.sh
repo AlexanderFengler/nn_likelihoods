@@ -55,21 +55,21 @@
 #     python -u method_comparison_sim.py --machine ccv --method angle2 --nsamples $n --nmcmcsamples $nmcmcsamples --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 --samplerinit mle --ncpus 10 --nbyarrayjob $nbyarrayjob #$SLURM_ARRAY_TASK_ID 
 # done
 
-
-
 # NNBATCH RUNS
 
-nmcmcsamples=20000
+nmcmcsamples=200
 nbyarrayjob=10
-nsamples=( 1024 2048 4096 )
-method="full_ddm2"
+nsamples=( 1024 2048 4096 ) #( 1024 2048 4096 )
+method='ddm_analytic'  #"full_ddm2"
 ids=( -1 )
+machine='ccv'
+#SLURM_ARRAY_TASK_ID=1
 
 for n in "${nsamples[@]}"
 do
     for id in "${ids[@]}"
     do 
-        python -u method_comparison_sim.py --machine ccv --method $method --nsamples $n --nmcmcsamples $nmcmcsamples --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 5 6 --samplerinit mle --ncpus 10 --nbyarrayjob $nbyarrayjob --nnbatchid $id
+        python -u method_comparison_sim.py --machine $machine --method $method --nsamples $n --nmcmcsamples $nmcmcsamples --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 --samplerinit mle --ncpus 10 --nbyarrayjob $nbyarrayjob --nnbatchid $id
     done
 done
 
