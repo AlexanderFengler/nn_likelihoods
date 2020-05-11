@@ -57,7 +57,7 @@
 
 # NNBATCH RUNS
 
-nmcmcsamples=200
+nmcmcsamples=20000
 nbyarrayjob=10
 nsamples=( 1024 2048 4096 ) #( 1024 2048 4096 )
 method='ddm_analytic'  #"full_ddm2"
