@@ -224,8 +224,8 @@ if __name__ == "__main__":
             file_ = 'parameter_recovery_data_binned_0_nbins_0_n_' + str(n_samples) + '/' + method + '_nchoices_2_parameter_recovery_binned_0_nbins_0_nreps_1_n_' + str(n_samples) + '.pickle'
         #file_ = 'base_data_param_recov_unif_reps_1_n_' + str(n_samples) + '_' + infile_id + '.pickle'
         
-        if not os.path.exists(output_folder + network_id):
-            os.makedirs(output_folder + network_id)
+            if not os.path.exists(output_folder + network_id):
+                os.makedirs(output_folder + network_id)
         
         out_file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + str(n_samples) + '_' + infile_id
     
@@ -347,7 +347,7 @@ if __name__ == "__main__":
     #     return np.sum(np.maximum(model.predict(mlp_input_batch)[:, 0], ll_min))
     
     # NAVARRO FUSS (DDM)
-    def nf_target(params, data, likelihood_min = 1e-48):
+    def nf_target(params, data, likelihood_min = 1e-10):
         return np.sum(np.maximum(np.log(batch_fptd(data[:, 0] * data[:, 1] * (- 1),
                                                    params[0],
                                                    params[1] * 2, 
@@ -383,10 +383,10 @@ if __name__ == "__main__":
                                                     crp = 0.3)
         
         (samples, lps, gelman_rubin_r_hat, random_seed) = model.sample(data = args[0],
-                                                                               num_samples = n_slice_samples,
-                                                                               init = args[1],
-                                                                               active_dims = active_dims,
-                                                                               frozen_dim_vals = frozen_dims)
+                                                                       num_samples = n_slice_samples,
+                                                                       init = args[1],
+                                                                       active_dims = active_dims,
+                                                                       frozen_dim_vals = frozen_dims)
         return (samples, lps, gelman_rubin_r_hat, random_seed)
 
     # Test navarro-fuss

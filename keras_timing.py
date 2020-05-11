@@ -7,34 +7,44 @@ import argparse
 import keras_to_numpy as ktnp
 import pickle
 import cddm_data_simulation as cds
+from cdwiener import batch_fptd
 import boundary_functions as bf
 import numpy as np
 import yaml
 
 # Define mlp class for numpy forward pass
 class mlp_target_class:
-        def __init__(self,
-                    data = [],
-                    weights = [],
-                    biases = [],
-                    activations = [],
-                    ll_min = -16.11809,
-                    n_params = 4):
-            
-            self.n_params = n_params
-            self.data = data
-            self.ll_min = ll_min
-            self.batch = np.zeros((self.data.shape[0], n_params + 2))
-            self.batch[:, self.n_params:] = data
-            self.weights = weights
-            self.biases = biases
-            self.activations = activations
-            
-        def target(self, 
-                params):
-                
-            self.batch[:, :self.n_params] = np.tile(params, (self.data.shape[0], 1))
-            return np.sum(np.maximum(ktnp.predict(self.batch, self.weights, self.biases, self.activations, n_layers = 4), self.ll_min))
+    def __init__(self,
+                data = [],
+                weights = [],
+                biases = [],
+                activations = [],
+                ll_min = -16.11809,
+                n_params = 4):
+
+        self.n_params = n_params
+        self.data = data
+        self.ll_min = ll_min
+        self.batch = np.zeros((self.data.shape[0], n_params + 2))
+        self.batch[:, self.n_params:] = data
+        self.weights = weights
+        self.biases = biases
+        self.activations = activations
+
+    def target(self, 
+            params):
+
+        self.batch[:, :self.n_params] = np.tile(params, (self.data.shape[0], 1))
+        return np.sum(np.maximum(ktnp.predict(self.batch, self.weights, self.biases, self.activations, n_layers = 4), self.ll_min))
+        
+
+def nf_target(params, data, likelihood_min = 1e-10):
+    return np.sum(np.maximum(np.log(batch_fptd(data[:, 0] * data[:, 1] * (- 1),
+                                               params[0],
+                                               params[1] * 2, 
+                                               params[2],
+                                               params[3])),
+                                               np.log(likelihood_min)))
     
 
 # INITIALIZATIONS -------------------------------------------------------------
@@ -93,10 +103,12 @@ if __name__ == "__main__":
     info['keras_var_batch_timings'] = []
     info['keras_fix_batch_timings'] = []
     info['keras_no_batch_timings'] = []
+    info['navarro_timings'] = []
     info['nsamples'] = []
 
     # Run timingss
-    for n in [1024, 2048, 4096, 8192, 16384, 32768]:
+    for n in [1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072]:
+        
         print('nsamples: ', n)
         # Generate toy dataset
         out = cds.ddm_flexbound(n_samples = n,
@@ -111,6 +123,15 @@ if __name__ == "__main__":
         keras_input_batch = np.zeros((out.shape[0], 6))
         keras_input_batch[:, 4:] = out
 
+        
+        # Navarro Fuss timings
+        print('Running Navarro')
+        for i in range(nreps):
+            start = datetime.now()
+            nf_target(params_rep, data, likelihood_min = 1e-10)
+            info['navarro_timings'].append((datetime.now() - start).total_seconds())
+            info['nsamples'].append(n)
+            
         # Numpy timings
         print('Running numpy')
         for i in range(nreps):
@@ -119,11 +140,10 @@ if __name__ == "__main__":
                                            weights = weights,
                                            biases = biases,
                                            activations = activations)
-
             start = datetime.now()
             numpy_model.target(params_rep)
             info['numpy_timings'].append((datetime.now() - start).total_seconds())
-            info['nsamples'].append(n)
+
         
         # Keras timings variable batch size
         print('Running keras var batch')
