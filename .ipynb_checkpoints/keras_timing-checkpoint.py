@@ -128,7 +128,7 @@ if __name__ == "__main__":
         print('Running Navarro')
         for i in range(nreps):
             start = datetime.now()
-            nf_target(params_rep, data, likelihood_min = 1e-10)
+            nf_target(params = params_rep, data = out, likelihood_min = 1e-10)
             info['navarro_timings'].append((datetime.now() - start).total_seconds())
             info['nsamples'].append(n)
             
