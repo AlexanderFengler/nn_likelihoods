@@ -227,7 +227,7 @@ def make_kde_data(data = [], metadata  = [], keep_file = 0, n_kde = 100, n_unif_
     return out.astype(np.float)
 
 
-def make_fpdt_data(data = [], metadata  = [], keep_file = 0, n_kde = 100, n_unif_up = 100, n_unif_down = 100, idx = 0):
+def make_fptd_data(data = [], metadata  = [], keep_file = 0, n_kde = 100, n_unif_up = 100, n_unif_down = 100, idx = 0):
     out = np.zeros((n_kde + n_unif_up + n_unif_down, 3))
     tmp_kde = kde_class.logkde((data[:, 0], data[:, 1], metadata))
     
