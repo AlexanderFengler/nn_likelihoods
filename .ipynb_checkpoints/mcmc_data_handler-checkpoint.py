@@ -126,7 +126,7 @@ if __name__ == "__main__":
     print(network_path)
     
     file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + str(ndata) + '_1_'
-    summary_file = method_comparison_folder + network_id +'/summary_' + file_signature[:-1] + '.pickle'
+    summary_file = method_comparison_folder + network_id + '/summary_' + file_signature[:-1] + '.pickle'
     file_signature_len = len(file_signature)
     files = os.listdir(method_comparison_folder + network_id + '/')
     files_ = [method_comparison_folder + network_id + '/' + file_ for file_ in files if file_[:file_signature_len] == file_signature]
