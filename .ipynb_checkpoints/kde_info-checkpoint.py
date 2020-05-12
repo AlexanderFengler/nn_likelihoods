@@ -567,7 +567,7 @@ temp = {
     "method_folder_home": "/Users/afengler/OneDrive/project_nn_likelihoods/data/kde/full_ddm2/",
     "data_folder": "/users/afengler/data/kde/full_ddm2/train_test_data_20000",
     "data_folder_x7": "/media/data_cifs/afengler/data/kde/full_ddm2/train_test_data_20000",
-    "output_folder": "/users/afengler/data/kde/full_ddm/method_comparison2/",
+    "output_folder": "/users/afengler/data/kde/full_ddm2/method_comparison/",
     "output_folder_x7": "/media/data_cifs/afengler/data/kde/full_ddm2/method_comparison/",
     "output_folder_home": "/Users/afengler/OneDrive/project_nn_likelihoods/data/kde/full_ddm2/method_comparison/",
     "model_folder": "/users/afengler/data/kde/full_ddm2/keras_models/",
