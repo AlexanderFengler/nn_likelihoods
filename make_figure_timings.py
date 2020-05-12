@@ -9,17 +9,28 @@ if __name__ == "__main__":
     pdt = pd.DataFrame(pickle.load(open('./timings/timings.pickle', 'rb')))
     pdt_group_mean = pdt.groupby('nsamples').mean()
 
-    p1 = plt.scatter(np.log2(pdt_group_mean.index), 1000 * pdt_group_mean['numpy_timings'], label = 'Numpy')
-    p2 = plt.scatter(np.log2(pdt_group_mean.index), 1000 * pdt_group_mean['keras_no_batch_timings'], label = 'Keras batch 1')
-    p3 = plt.scatter(np.log2(pdt_group_mean.index), 1000 * pdt_group_mean['keras_var_batch_timings'], label = 'Keras batch 1000')
-    p4 = plt.scatter(np.log2(pdt_group_mean.index), 1000 * pdt_group_mean['keras_fix_batch_timings'], label = 'Keras batch all')
+    p1 = plt.scatter(np.log2(pdt_group_mean.index), 1000 * pdt_group_mean['numpy_timings'], 
+                     label = 'Numpy')
+    p2 = plt.scatter(np.log2(pdt_group_mean.index), 1000 * pdt_group_mean['keras_no_batch_timings'], 
+                     label = 'Keras batch 1')
+    p3 = plt.scatter(np.log2(pdt_group_mean.index), 1000 * pdt_group_mean['keras_var_batch_timings'], 
+                     label = 'Keras batch 1000')
+    p4 = plt.scatter(np.log2(pdt_group_mean.index), 1000 * pdt_group_mean['keras_fix_batch_timings'], 
+                     label = 'Keras batch all')
+    p5 = plt.scatter(np.log2(pdt_group_mean.index), 1000 * pdt_group_mean['navarro_timings'], 
+                     label = 'Navarro Fuss')
     
-    plt.xlabel('log2 sample size', size = 20)
-    plt.ylabel('ms', size = 20)
-    plt.title('Time / Forward Pass', size = 24)
+    plt.xlabel('log2 sample size',
+               size = 20)
     
-    plt.legend(loc='lower left', 
-               bbox_to_anchor=(0, 0.65),
+    plt.ylabel('ms', 
+               size = 20)
+    
+    plt.title('Time / Forward Pass', 
+              size = 24)
+    
+    plt.legend(loc = 'lower left', 
+               bbox_to_anchor = (0, 0.65),
                fancybox = True, 
                shadow = True, 
                ncol = 1)

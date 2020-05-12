@@ -23,7 +23,7 @@
 # Sequentially run different kind of models
 
 #declare -a dgps=( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "lca" "race_model" "ddm_seq2" "ddm_par2" "ddm_mic2" "ddm_seq2_angle" "ddm_par2_angle" "ddm_mic2_angle") 
-declare -a dgps=( "angle2" )  #( "weibull_cdf" ) # ( "ddm_seq2_angle" "ddm_mic2_angle" "ddm_par2_angle" )
+declare -a dgps=( "ddm_analytic" )     # ( "angle2" )  #( "weibull_cdf" ) # ( "ddm_seq2_angle" "ddm_mic2_angle" "ddm_par2_angle" )
 n_samples=( 20000 )   # ( 128 256 512 1024 2048 4096 8192 50000 100000 200000 400000 )
 n_choices=( 2 ) #( 4 5 6 )
 n_parameter_sets=10000   #20000
@@ -32,6 +32,7 @@ binned=0
 machine="ccv" #"ccv"
 datatype="cnn_train" #"cnn_train" # "parameter_recovery"
 mode="mlp"
+analytic=1
 maxt=20
 nproc=8
 
@@ -61,7 +62,7 @@ do
                  echo ${n_choices[0]}
                  python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype $datatype --nreps 1 --binned $binned --nbins $bins --maxt $maxt --nchoices ${n_choices[0]} --nsamples $n --mode $mode --nparamsets $n_parameter_sets --save 1  --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID
                  python -u simulator_get_stats.py --machine $machine --method $dgp --simfolder training_data_binned_${binned}_nbins_${bins}_n_${n} --fileprefix ${dgp}_nchoices_${n_choices[0]}_train_data_binned_${binned}_nbins_${bins}_n_${n} --fileid $SLURM_ARRAY_TASK_ID
-                 python -u kde_train_test.py --machine $machine --method $dgp --simfolder training_data_binned_${binned}_nbins_${bins}_n_${n} --fileprefix ${dgp}_nchoices_${n_choices[0]}_train_data_binned_${binned}_nbins_${bins}_n_${n} --outfolder training_data_binned_${binned}_nbins_${bins}_n_${n} --nbyparam $nbyparam --mixture 0.8 0.1 0.1 --fileid $SLURM_ARRAY_TASK_ID --nproc $nproc
+                 python -u kde_train_test.py --machine $machine --method $dgp --simfolder training_data_binned_${binned}_nbins_${bins}_n_${n} --fileprefix ${dgp}_nchoices_${n_choices[0]}_train_data_binned_${binned}_nbins_${bins}_n_${n} --outfolder training_data_binned_${binned}_nbins_${bins}_n_${n} --nbyparam $nbyparam --mixture 0.8 0.1 0.1 --fileid $SLURM_ARRAY_TASK_ID --nproc $nproc --analytic $analytic
             fi
         done
                 # normal call to function

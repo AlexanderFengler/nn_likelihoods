@@ -27,9 +27,14 @@ import glob
 import kde_class
 #import ddm_data_simulation as ddm_simulator
 import boundary_functions as bf
+from cdwiener import batch_fptd
+
 
 # Plotting
 import matplotlib.pyplot as plt
+
+# /users/afengler/data/kde/full_ddm/training_data_binned_0_nbins_0_n_20000/full_ddm_nchoices_2_train_data_binned_0_nbins_0_n_20000_213.pickle
+# /users/afengler/data/kde/full_ddm/training_data_binned_0_nbins_0_n_20000/simulator_statistics_213.pickle
 
 def filter_simulations_fast(base_simulation_folder = '',
                             file_name_prefix = '',
@@ -172,6 +177,281 @@ def filter_simulations_fast(base_simulation_folder = '',
                      
     return sim_stat_data                     
 
+def make_kde_data(data = [], metadata  = [], keep_file = 0, n_kde = 100, n_unif_up = 100, n_unif_down = 100, idx = 0):
+    out = np.zeros((n_kde + n_unif_up + n_unif_down, 3))
+    tmp_kde = kde_class.logkde((data[:, 0], data[:, 1], metadata))
+    
+    # Get kde part
+    samples_kde = tmp_kde.kde_sample(n_samples = n_kde)
+    likelihoods_kde = tmp_kde.kde_eval(data = samples_kde).ravel()
+    
+    out[:n_kde, 0] = samples_kde[0].ravel()
+    out[:n_kde, 1] = samples_kde[1].ravel()
+    out[:n_kde, 2] = likelihoods_kde
+
+    # Get positive uniform part:
+    choice_tmp = np.random.choice(metadata['possible_choices'], size = n_unif_up)
+
+    if metadata['max_t'] < 100:
+        rt_tmp = np.random.uniform(low = 0.0001,
+                                   high = metadata['max_t'],
+                                   size = n_unif_up) 
+    else: 
+        rt_tmp = np.random.uniform(low = 0.0001, 
+                                   high = 100,
+                                   size = n_unif_up)
+
+    likelihoods_unif = tmp_kde.kde_eval(data = (rt_tmp, choice_tmp)).ravel()
+
+
+    out[n_kde:(n_kde + n_unif_up), 0] = rt_tmp
+    out[n_kde:(n_kde + n_unif_up), 1] = choice_tmp
+    out[n_kde:(n_kde + n_unif_up), 2] = likelihoods_unif
+
+
+    # Get negative uniform part:
+    choice_tmp = np.random.choice(metadata['possible_choices'], #['possible_choices'],
+                                    size = n_unif_down)
+    
+    rt_tmp = np.random.uniform(low = - 1.0,
+                                high = 0.0001,
+                                size = n_unif_down)
+
+    out[(n_kde + n_unif_up):, 0] = rt_tmp
+    out[(n_kde + n_unif_up):, 1] = choice_tmp
+    out[(n_kde + n_unif_up):, 2] = -66.77497
+    
+    if idx % 10 == 0:
+        print(idx)
+    
+    return out.astype(np.float)
+
+
+def make_fpdt_data(data = [], metadata  = [], keep_file = 0, n_kde = 100, n_unif_up = 100, n_unif_down = 100, idx = 0):
+    out = np.zeros((n_kde + n_unif_up + n_unif_down, 3))
+    tmp_kde = kde_class.logkde((data[:, 0], data[:, 1], metadata))
+    
+    # Get kde part
+    samples_kde = tmp_kde.kde_sample(n_samples = n_kde)
+    out[:n_kde, 0] = samples_kde[0].ravel()
+    out[:n_kde, 1] = samples_kde[1].ravel()
+    out[:n_kde, 2] = np.log(batch_fptd(out[:n_kde, 0] * out[:n_kde, 1] * (- 1),
+                                       metadata['v'],
+                                       metadata['a'] * 2,
+                                       metadata['w'],
+                                       metadata['ndt']))
+    
+    # Get positive uniform part:
+    choice_tmp = np.random.choice(metadata['possible_choices'], size = n_unif_up)
+
+    if metadata['max_t'] < 100:
+        rt_tmp = np.random.uniform(low = 0.0001,
+                                   high = metadata['max_t'],
+                                   size = n_unif_up)
+    else: 
+        rt_tmp = np.random.uniform(low = 0.0001, 
+                                   high = 100,
+                                   size = n_unif_up)
+
+    likelihoods_unif = tmp_kde.kde_eval(data = (rt_tmp, choice_tmp)).ravel()
+
+
+    out[n_kde:(n_kde + n_unif_up), 0] = rt_tmp
+    out[n_kde:(n_kde + n_unif_up), 1] = choice_tmp
+    out[n_kde:(n_kde + n_unif_up), 2] = np.log(batch_fptd(out[n_kde:(n_kde + n_unif_up), 0] * out[n_kde:(n_kde + n_unif_up), 1] * (- 1),
+                                               metadata['v'],
+                                               metadata['a'] * 2,
+                                               metadata['w'],
+                                               metadata['ndt']))
+
+    # Get negative uniform part:
+    choice_tmp = np.random.choice(metadata['possible_choices'],
+                                    size = n_unif_down)
+    
+    rt_tmp = np.random.uniform(low = - 1.0,
+                                high = 0.0001,
+                                size = n_unif_down)
+
+    out[(n_kde + n_unif_up):, 0] = rt_tmp
+    out[(n_kde + n_unif_up):, 1] = choice_tmp
+    out[(n_kde + n_unif_up):, 2] = -66.77497
+    
+    if idx % 10 == 0:
+        print(idx)
+    
+    return out.astype(np.float)
+
+# def make_kde_data(idx = 0):
+
+#     data = file_[1][idx, :, :]
+#     metadata = file_[2]
+
+#     out = np.zeros((n_kde + n_unif_up + n_unif_down, 3))
+#     tmp_kde = kde_class.logkde((data[:, 0], data[:, 1], metadata))
+    
+#     # Get kde part
+#     samples_kde = tmp_kde.kde_sample(n_samples = n_kde)
+#     likelihoods_kde = tmp_kde.kde_eval(data = samples_kde).ravel()
+    
+#     out[:n_kde, 0] = samples_kde[0].ravel()
+#     out[:n_kde, 1] = samples_kde[1].ravel()
+#     out[:n_kde, 2] = likelihoods_kde
+
+#     # Get positive uniform part:
+#     choice_tmp = np.random.choice(metadata['possible_choices'], size = n_unif_up)
+
+#     if metadata['max_t'] < 100:
+#         rt_tmp = np.random.uniform(low = 0.0001,
+#                                 high = metadata['max_t'],
+#                                 size = n_unif_up) 
+#     else: 
+#         rt_tmp = np.random.uniform(low = 0.0001, 
+#                                 high = 100,
+#                                 size = n_unif_up)
+
+#     likelihoods_unif = tmp_kde.kde_eval(data = (rt_tmp, choice_tmp)).ravel()
+
+
+#     out[n_kde:(n_kde + n_unif_up), 0] = rt_tmp
+#     out[n_kde:(n_kde + n_unif_up), 1] = choice_tmp
+#     out[n_kde:(n_kde + n_unif_up), 2] = likelihoods_unif
+
+
+#     # Get negative uniform part:
+#     choice_tmp = np.random.choice(metadata['possible_choices'], #['possible_choices'],
+#                                     size = n_unif_down)
+    
+#     rt_tmp = np.random.uniform(low = - 1,
+#                                 high = 0.0001,
+#                                 size = n_unif_down)
+
+#     out[(n_kde + n_unif_up):, 0] = rt_tmp
+#     out[(n_kde + n_unif_up):, 1] = choice_tmp
+#     out[(n_kde + n_unif_up):, 2] = -66.77497
+#     if idx % 10 == 0:
+#         print(idx)
+
+#     return out                                  
+
+# We should be able to parallelize this !
+def kde_from_simulations_fast_parallel(base_simulation_folder = '',
+                                       file_name_prefix = '',
+                                       file_id = 1,
+                                       target_folder = '', 
+                                       n_by_param = 3000,
+                                       mixture_p = [0.8, 0.1, 0.1],
+                                       process_params = ['v', 'a', 'w', 'c1', 'c2'],
+                                       print_info = False,
+                                       n_processes = 'all',
+                                       analytic = False):
+
+    file_ = pickle.load(open( base_simulation_folder + '/' + file_name_prefix + '_' + str(file_id) + '.pickle', 'rb' ) )
+    stat_ = pickle.load(open( base_simulation_folder + '/simulator_statistics' + '_' + str(file_id) + '.pickle', 'rb' ) )
+
+    # Initialize dataframe
+    my_columns = process_params + ['rt', 'choice', 'log_l']
+    data = pd.DataFrame(np.zeros((np.sum(stat_['keep_file']) * n_by_param, len(my_columns))),
+                        columns = my_columns)             
+    
+    # Initializations
+    n_kde = int(n_by_param * mixture_p[0])
+    n_unif_down = int(n_by_param * mixture_p[1])
+    n_unif_up = int(n_by_param * mixture_p[2])
+    n_kde = n_kde + (n_by_param - n_kde - n_unif_up - n_unif_down) # correct n_kde if sum != n_by_param
+    
+    # Add possible choices to file_[2] which is the meta data for the simulator (expected when loaded the kde class)
+    
+    # TODO: THIS INFORMATION SHOULD BE INCLUDED AS META-DATA INTO THE BASE SIMULATOIN FILES
+    file_[2]['possible_choices'] = np.unique([-1,1])
+    #file_[2]['possible_choices'] = np.unique(file_[1][0, :, 1])
+    file_[2]['possible_choices'].sort()
+
+    # CONTINUE HERE   
+    # Preparation loop --------------------------------------------------------------------
+    s_id_kde = np.sum(stat_['keep_file']) * (n_unif_down + n_unif_up)
+    cnt = 0
+    starmap_iterator = ()
+    tmp_sim_data_ok = 0
+    for i in range(file_[1].shape[0]):
+        if stat_['keep_file'][i]:
+
+            if tmp_sim_data_ok:
+                pass
+            else:
+                tmp_sim_data = file_[1][i]
+                tmp_sim_data_ok = 1
+            lb = cnt * (n_unif_down + n_unif_up + n_kde)
+            lb_kde = s_id_kde + (cnt * (n_kde))
+            
+            # Make empty dataframe of appropriate size
+            p_cnt = 0
+            
+            for param in process_params:
+                data.iloc[(lb):(lb + n_unif_down + n_unif_up + n_kde), my_columns.index(param)] = file_[0][i, p_cnt]
+                p_cnt += 1
+            
+            # Allocate to starmap tuple for mixture component 3
+            starmap_iterator += ((file_[1][i, :, :].copy(), file_[2].copy(), stat_['keep_file'][i].copy(), n_kde, n_unif_up, n_unif_down, cnt), )
+            # alternative
+            # tmp = i
+            # starmap_iterator += ((tmp), )
+            
+            cnt += 1
+            if i % 100 == 0:
+                print(i, 'unif part generated')
+    
+    # Parallel
+    if n_processes == 'all':
+        n_cpus = psutil.cpu_count(logical = False)
+    else:
+        n_cpus = n_processes
+
+    print('Number of cpus: ')
+    print(n_cpus)
+    #file_
+    #stat_
+    
+    if analytic:
+        with Pool(processes = n_cpus, maxtasksperchild=1000) as pool:
+            result = np.array(pool.starmap(make_fptd_data, starmap_iterator))   #.reshape((-1, 3))
+    else:
+        with Pool(processes = n_cpus, maxtasksperchild=1000) as pool:
+            result = np.array(pool.starmap(make_kde_data, starmap_iterator))   #.reshape((-1, 3))
+        
+    
+    data.values[: , -3:] = result.reshape((-1, 3))
+
+    # [['rt', 'choice', 'log_l']] 
+    #pickle.dump(data, open('/users/afengler/batch_job_out/test_out.pickle', 'wb'), protocol = 4)
+    #result.reshape((-1, 3)).shape
+    #pickle.dump(result.reshape((-1, 3)), open('/users/afengler/batch_job_out/test_out_2.pickle', 'wb'), protocol = 4)
+        #print(data)
+        # for result in pool.imap(make_kde_data, starmap_iterator, chunksize = 20):
+        #     print(result)
+
+        #np.array(pool.imap(make_kde_data, starmap_iterator, chunksize = 20)).reshape((-1, 3))
+        #print(result)
+        #data.iloc[: , -3:] = 
+        #print(data)
+    # ----------------------------------------------------------------------------------
+
+    # Store data
+    print('writing data to file: ', target_folder + '/data_' + str(file_id) + '.pickle')
+    pickle.dump(data.values, open(target_folder + '/data_' + str(file_id) + '.pickle', 'wb'), protocol = 4)
+    
+    #data.to_pickle(target_folder + '/data_' + str(file_id) + '.pickle' , protocol = 4)
+
+    # Write metafile if it doesn't exist already
+    # Hack for now: Just copy one of the base simulations files over
+    
+    if os.path.isfile(target_folder + '/meta_data.pickle'):
+        pass
+    else:
+        pickle.dump(tmp_sim_data, open(target_folder + '/meta_data.pickle', 'wb') )
+
+    return 0 #data
+                                       
+                                       
 def kde_from_simulations_fast(base_simulation_folder = '',
                               file_name_prefix = '',
                               file_id = 1,
@@ -203,7 +483,7 @@ def kde_from_simulations_fast(base_simulation_folder = '',
     file_[2]['possible_choices'].sort()
     # CONTINUE HERE   
     # Main while loop --------------------------------------------------------------------
-    row_cnt = 0
+    #row_cnt = 0
     cnt = 0
     for i in range(file_[1].shape[0]):
         if stat_['keep_file'][i]:
@@ -275,6 +555,7 @@ def kde_from_simulations_fast(base_simulation_folder = '',
         pickle.dump(tmp_sim_data, open(target_folder + '/meta_data.pickle', 'wb') )
 
     return data
+                                       
 
 def kde_load_data_new(path = '',
                       file_id_list = '',

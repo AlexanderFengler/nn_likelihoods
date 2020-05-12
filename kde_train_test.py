@@ -45,6 +45,9 @@ if __name__ == "__main__":
     CLI.add_argument('--nproc',
                     type = int,
                     default = 8)
+    CLI.add_argument('--analytic',
+                     type = int,
+                     default = 0)
     
     args = CLI.parse_args()
     print(args)
@@ -76,7 +79,8 @@ if __name__ == "__main__":
                                                 mixture_p = args.mixture,
                                                 process_params = process_params,
                                                 print_info = False,
-                                                n_processes= args.nproc)
+                                                n_processes= args.nproc,
+                                                analytic = args.analytic)
     
 # UNUSED --------------------------
     # LBA
