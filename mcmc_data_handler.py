@@ -99,15 +99,18 @@ if __name__ == "__main__":
     if machine == 'ccv':
         method_comparison_folder = '/users/afengler/data/kde/' + method + '/method_comparison/'
         
-        with open("/users/afengler/git_repos/nn_likelihoods/model_paths.yaml") as tmp_file:
-            if nnbatchid == -1:
-                network_path = yaml.load(tmp_file)[method]
-                network_id = network_path[list(re.finditer('/', network_path))[-2].end():]
+        if method == 'ddm_analytic':
+            network_id = ''
+        else:
+            with open("/users/afengler/git_repos/nn_likelihoods/model_paths.yaml") as tmp_file:
+                if nnbatchid == -1:
+                    network_path = yaml.load(tmp_file)[method]
+                    network_id = network_path[list(re.finditer('/', network_path))[-2].end():]
 
-            else:
-                network_path = yaml.load(tmp_file)[method + '_batch'][nnbatchid]
-                network_id = network_path[list(re.finditer('/', network_path))[-2].end():]
-                
+                else:
+                    network_path = yaml.load(tmp_file)[method + '_batch'][nnbatchid]
+                    network_id = network_path[list(re.finditer('/', network_path))[-2].end():]
+
     if machine == 'x7':
         method_comparison_folder = '/media/data_cifs/afengler/data/kde/' + model + '/method_comparison/'
         
