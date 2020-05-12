@@ -98,7 +98,7 @@ if __name__ == "__main__":
     
     if machine == 'ccv':        
         if method == 'ddm_analytic':
-            method_comparison_folder = '/users/afengler/data/analytic/' + method + '/method_comparison/'
+            method_comparison_folder = '/users/afengler/data/analytic/' + 'ddm' + '/method_comparison/'
             network_id = ''
             network_path = ''
         else:
