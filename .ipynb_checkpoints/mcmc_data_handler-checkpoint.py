@@ -96,13 +96,14 @@ if __name__ == "__main__":
     if machine == 'home':
         method_comparison_folder = '/Users/afengler/OneDrive/project_nn_likelihoods/data/kde/' + method + '/method_comparison/'
     
-    if machine == 'ccv':
-        method_comparison_folder = '/users/afengler/data/kde/' + method + '/method_comparison/'
-        
+    if machine == 'ccv':        
         if method == 'ddm_analytic':
+            method_comparison_folder = '/users/afengler/data/analytic/' + method + '/method_comparison/'
             network_id = ''
             network_path = ''
         else:
+            method_comparison_folder = '/users/afengler/data/kde/' + method + '/method_comparison/'
+
             with open("/users/afengler/git_repos/nn_likelihoods/model_paths.yaml") as tmp_file:
                 if nnbatchid == -1:
                     network_path = yaml.load(tmp_file)[method]
