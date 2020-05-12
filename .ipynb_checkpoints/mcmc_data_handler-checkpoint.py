@@ -101,7 +101,7 @@ if __name__ == "__main__":
         
         if method == 'ddm_analytic':
             network_id = ''
-            nework_path = ''
+            network_path = ''
         else:
             with open("/users/afengler/git_repos/nn_likelihoods/model_paths.yaml") as tmp_file:
                 if nnbatchid == -1:
