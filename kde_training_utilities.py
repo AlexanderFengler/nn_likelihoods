@@ -237,9 +237,9 @@ def make_fptd_data(data = [], params = [], metadata  = [], keep_file = 0, n_kde 
     out[:n_kde, 1] = samples_kde[1].ravel()
     out[:n_kde, 2] = np.log(batch_fptd(out[:n_kde, 0] * out[:n_kde, 1] * (- 1),
                                        params[0],
-                                       metadata[1] * 2,
-                                       metadata[2],
-                                       metadata[3]))
+                                       params[1] * 2,
+                                       params[2],
+                                       params[3]))
     
     # Get positive uniform part:
     choice_tmp = np.random.choice(metadata['possible_choices'], size = n_unif_up)
@@ -259,18 +259,18 @@ def make_fptd_data(data = [], params = [], metadata  = [], keep_file = 0, n_kde 
     out[n_kde:(n_kde + n_unif_up), 0] = rt_tmp
     out[n_kde:(n_kde + n_unif_up), 1] = choice_tmp
     out[n_kde:(n_kde + n_unif_up), 2] = np.log(batch_fptd(out[n_kde:(n_kde + n_unif_up), 0] * out[n_kde:(n_kde + n_unif_up), 1] * (- 1),
-                                               metadata['v'],
-                                               metadata['a'] * 2,
-                                               metadata['w'],
-                                               metadata['ndt']))
+                                               params[0],
+                                               params[1] * 2,
+                                               params[2],
+                                               params[3]))
 
     # Get negative uniform part:
     choice_tmp = np.random.choice(metadata['possible_choices'],
-                                    size = n_unif_down)
+                                  size = n_unif_down)
     
     rt_tmp = np.random.uniform(low = - 1.0,
-                                high = 0.0001,
-                                size = n_unif_down)
+                               high = 0.0001,
+                               size = n_unif_down)
 
     out[(n_kde + n_unif_up):, 0] = rt_tmp
     out[(n_kde + n_unif_up):, 1] = choice_tmp
