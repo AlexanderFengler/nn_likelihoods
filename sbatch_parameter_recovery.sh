@@ -22,7 +22,7 @@
 declare -a dgps=( "ddm" "angle" "weibull_cdf" "ornstein" "lca" "race_model" )
 n_samples=( 100 200 400 800 1600 3200 6400 ) #( 50000 100000 200000 400000 )
 n_choices=( 3 4 5 6 ) #4 5 6 )
-n_parameter_sets=1000  #20000
+n_parameter_sets=10000  #20000
 n_bins=( 256 512 )
 # outer -------------------------------------
 for bins in "${n_bins[@]}"
