@@ -392,7 +392,7 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
             
             # Allocate to starmap tuple for mixture component 3
             if analytic:
-                starmap_iterator += ((file_[1][i, :, :].copy(), file[0][i, :].copy(), file_[2].copy(), stat_['keep_file'][i].copy(), n_kde, n_unif_up, n_unif_down, cnt), )
+                starmap_iterator += ((file_[1][i, :, :].copy(), file_[0][i, :].copy(), file_[2].copy(), stat_['keep_file'][i].copy(), n_kde, n_unif_up, n_unif_down, cnt), )
             else:
                 starmap_iterator += ((file_[1][i, :, :].copy(), file_[2].copy(), stat_['keep_file'][i].copy(), n_kde, n_unif_up, n_unif_down, cnt), )
             # alternative
