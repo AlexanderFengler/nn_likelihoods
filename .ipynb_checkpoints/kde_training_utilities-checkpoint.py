@@ -227,7 +227,7 @@ def make_kde_data(data = [], metadata  = [], keep_file = 0, n_kde = 100, n_unif_
     return out.astype(np.float)
 
 
-def make_fptd_data(data = [], metadata  = [], keep_file = 0, n_kde = 100, n_unif_up = 100, n_unif_down = 100, idx = 0):
+def make_fptd_data(data = [], params = [], metadata  = [], keep_file = 0, n_kde = 100, n_unif_up = 100, n_unif_down = 100, idx = 0):
     out = np.zeros((n_kde + n_unif_up + n_unif_down, 3))
     tmp_kde = kde_class.logkde((data[:, 0], data[:, 1], metadata))
     
@@ -236,10 +236,10 @@ def make_fptd_data(data = [], metadata  = [], keep_file = 0, n_kde = 100, n_unif
     out[:n_kde, 0] = samples_kde[0].ravel()
     out[:n_kde, 1] = samples_kde[1].ravel()
     out[:n_kde, 2] = np.log(batch_fptd(out[:n_kde, 0] * out[:n_kde, 1] * (- 1),
-                                       metadata['v'],
-                                       metadata['a'] * 2,
-                                       metadata['w'],
-                                       metadata['ndt']))
+                                       params[0],
+                                       metadata[1] * 2,
+                                       metadata[2],
+                                       metadata[3]))
     
     # Get positive uniform part:
     choice_tmp = np.random.choice(metadata['possible_choices'], size = n_unif_up)
@@ -391,7 +391,10 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
                 p_cnt += 1
             
             # Allocate to starmap tuple for mixture component 3
-            starmap_iterator += ((file_[1][i, :, :].copy(), file_[2].copy(), stat_['keep_file'][i].copy(), n_kde, n_unif_up, n_unif_down, cnt), )
+            if analytic:
+                starmap_iterator += ((file_[1][i, :, :].copy(), file[0][i, :].copy(), file_[2].copy(), stat_['keep_file'][i].copy(), n_kde, n_unif_up, n_unif_down, cnt), )
+            else:
+                starmap_iterator += ((file_[1][i, :, :].copy(), file_[2].copy(), stat_['keep_file'][i].copy(), n_kde, n_unif_up, n_unif_down, cnt), )
             # alternative
             # tmp = i
             # starmap_iterator += ((tmp), )
