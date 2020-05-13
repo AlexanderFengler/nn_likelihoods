@@ -36,11 +36,14 @@ method='ddm_analytic'
 machine='ccv'
 maxidfiles=300
 
+# USE THIS DATAFOLDER FOR ANY CASE UP TO DDM ANALYTIC
+# datafolder=/users/afengler/data/kde/${method}/training_data_binned_0_nbins_0_n_20000/
+
 #!/bin/bash
 for i in {1..1}
 do
    echo "Now starting run: $i \n"
-   python -u /users/afengler/git_repos/nn_likelihoods/keras_fit_model.py --machine $machine --method $method --nfiles $nfiles --maxidfiles $maxidfiles --datafolder /users/afengler/data/kde/${method}/training_data_binned_0_nbins_0_n_20000/ --nbydataset 10000000 --warmstart 0
+   python -u /users/afengler/git_repos/nn_likelihoods/keras_fit_model.py --machine $machine --method $method --nfiles $nfiles --maxidfiles $maxidfiles --datafolder /users/afengler/data/analytic/ddm/training_data_binned_0_nbins_0_n_20000/ --nbydataset 10000000 --warmstart 0
 done
 
 #!/bin/bash
