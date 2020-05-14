@@ -301,7 +301,7 @@ if __name__ == "__main__":
 
 
     # Apply epsilon correction
-    epsilon_bound_correction = 0.02
+    epsilon_bound_correction = 0.001
     sampler_param_bounds[:, 0] = sampler_param_bounds[:, 0] + epsilon_bound_correction
     sampler_param_bounds[:, 1] = sampler_param_bounds[:, 1] - epsilon_bound_correction
 
