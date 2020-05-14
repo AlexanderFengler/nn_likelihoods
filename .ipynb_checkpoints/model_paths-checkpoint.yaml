@@ -45,3 +45,14 @@ full_ddm2: /users/afengler/data/kde/full_ddm2/keras_models/dnnregressor_full_ddm
 
 # Within model network repitions 150 DATASETS
 ddm_batch: ['/users/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_03_29_20_17_38_58/', '/users/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_05_03_20_12_55_23/', '/users/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_05_03_20_13_31_28/', '/users/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_05_03_20_14_24_59/', '/users/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_05_03_20_15_03_43/', '/users/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_05_03_20_16_28_18/', '/users/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_05_03_20_17_11_19/', '/users/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_05_03_20_17_49_51/', '/users/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_05_03_20_18_30_30/', '/users/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_05_03_20_19_58_07/']
+ddm_analytical_batch: ['/users/afengler/data/analytical/ddm/keras_models/dnnregressor_ddm_analytic_05_13_20_11_58_30/',
+'/users/afengler/data/analytical/ddm/keras_models/dnnregressor_ddm_analytic_05_13_20_13_24_20/',
+'/users/afengler/data/analytical/ddm/keras_models/dnnregressor_ddm_analytic_05_13_20_15_42_15/',
+'/users/afengler/data/analytical/ddm/keras_models/dnnregressor_ddm_analytic_05_13_20_17_58_51/',
+'/users/afengler/data/analytical/ddm/keras_models/dnnregressor_ddm_analytic_05_13_20_20_17_38/',
+'/users/afengler/data/analytical/ddm/keras_models/dnnregressor_ddm_analytic_05_13_20_22_36_03/',
+'/users/afengler/data/analytical/ddm/keras_models/dnnregressor_ddm_analytic_05_13_20_12_02_03/',
+'/users/afengler/data/analytical/ddm/keras_models/dnnregressor_ddm_analytic_05_13_20_14_23_10/',
+'/users/afengler/data/analytical/ddm/keras_models/dnnregressor_ddm_analytic_05_13_20_16_41_57/',
+'/users/afengler/data/analytical/ddm/keras_models/dnnregressor_ddm_analytic_05_13_20_19_00_49/',
+'/users/afengler/data/analytical/ddm/keras_models/dnnregressor_ddm_analytic_05_13_20_21_22_18/']
