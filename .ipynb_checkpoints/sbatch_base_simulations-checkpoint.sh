@@ -32,7 +32,7 @@ binned=0
 machine="ccv" #"ccv" "home" "x7"
 datatype="parameter_recovery" #"parameter_recovery_hierarchical" "parameter_recovery" "cnn_train"
 nsubjects=1 #10
-mode="mlp"  #'mlp' 'cnn'
+mode="test"  #'mlp' 'cnn'
 maxt=20
 # outer -------------------------------------
 for bins in "${n_bins[@]}"

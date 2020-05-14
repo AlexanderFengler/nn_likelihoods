@@ -183,7 +183,7 @@ class data_generator():
         eps = 0
         if self.config['datatype'] == 'parameter_recovery' and self.config['mode'] != 'test':
             # TD make eps parameter
-            eps = 0.2
+            eps = 0.05
             
         print('epsilon correction', eps)
 

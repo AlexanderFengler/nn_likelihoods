@@ -10,13 +10,14 @@ import uuid
 import os
 import sys
 from datetime import datetime
+from scipy.stats import truncnorm
 #from tqdm import tqdm
 
 import boundary_functions as bf
 import multiprocessing as mp
 import cddm_data_simulation as cd
 from cdwiener import batch_fptd
-import clba
+#import clba
 
 # Parallelization
 import multiprocessing as mp
@@ -52,6 +53,13 @@ class data_generator():
                                                   "nn_likelihoods/kde_stats.pickle", "rb"))[self.method]
             self.method_comparison_folder = self.method_params['output_folder']
             self.method_folder = self.method_params['method_folder']
+
+        if self.machine == 'home':
+            self.method_params = pickle.load(open("/Users/afengler/OneDrive/git_repos/" + \
+                                                  "nn_likelihoods/kde_stats.pickle", "rb"))[self.method]
+            self.method_comparison_folder = self.method_params['output_folder_home']
+            self.method_folder = self.method_params['method_folder_home']
+        
 
         self.dgp_hyperparameters = dict(self.method_params['dgp_hyperparameters'])
         self.dgp_hyperparameters['max_t'] = max_t
@@ -175,7 +183,7 @@ class data_generator():
         eps = 0
         if self.config['datatype'] == 'parameter_recovery' and self.config['mode'] != 'test':
             # TD make eps parameter
-            eps = 0.2
+            eps = 0.05
             
         print('epsilon correction', eps)
 
@@ -296,7 +304,8 @@ class data_generator():
         with Pool(processes = n_cpus) as pool:
             data_grid = np.array(pool.starmap(self.data_generator, args_list))
 
-        return data_grid     
+        return data_grid   
+  
         
     def make_dataset_perturbation_experiment(self,
                                              save = True):
@@ -441,7 +450,120 @@ class data_generator():
             return 'Dataset completed'
         else:
             return param_grid, data_grid
+
+    #
+    def make_param_grid_hierarchical(self,
+                                     ):
+
+        # Initializations
+        params_upper_bnd, params_lower_bnd = self.clean_up_parameters()
+        nparams = len(params_upper_bnd)
+        
+        # Initialize global parameters
+        params_ranges_half = (np.array(params_upper_bnd) - np.array(params_lower_bnd)) / 2
+        
+        global_stds = np.random.uniform(low = 0.001,
+                                        high = params_ranges_half / 10,
+                                        size = (self.config['nparamsets'], nparams))
+        global_means = np.random.uniform(low = np.array(params_lower_bnd) + (params_ranges_half / 5),
+                                         high = np.array(params_upper_bnd) - (params_ranges_half / 5),
+                                         size = (self.config['nparamsets'], nparams))
+
+        # Initialize local parameters (by condition)
+        subject_param_grid = np.zeros((self.config['nparamsets'], self.config['nsubjects'], nparams))
+        
+        for n in range(self.config['nparamsets']):
+            for i in range(self.config['nsubjects']):
+                a, b = (np.array(params_lower_bnd) - global_means[n]) / global_stds[n], (np.array(params_upper_bnd) - global_means[n]) / global_stds[n]
+                subject_param_grid[n, i, :] = np.float32(global_means[n] + truncnorm.rvs(a, b, size = global_stds.shape[1]) * global_stds[n])
+                print('random variates')
+                print(truncnorm.rvs(a, b, size = global_stds.shape[1]))
+                print('samples')
+                print(subject_param_grid[n, i, :])
+
+        return subject_param_grid, global_stds, global_means
+
+    def generate_data_grid_hierarchical_parallel(self, 
+                                                 param_grid = []):
+        
+        nparams = param_grid.shape[2]
+        args_list = self.make_args_starmap_ready(param_grid = np.reshape(param_grid, (-1, nparams)))
+
+        if self.config['n_cpus'] == 'all':
+            n_cpus = psutil.cpu_count(logical = False)
+        else:
+            n_cpus = self.config['n_cpus']
+
+        # Run Data generation
+        with Pool(processes = n_cpus) as pool:
+            data_grid = np.array(pool.starmap(self.data_generator, args_list))
+
+        data_grid = np.reshape(data_grid, (self.config['nparamsets'], self.config['nsubjects'], self.config['nsamples'], self.config['nchoices']))
     
+        return data_grid
+
+    def make_dataset_parameter_recovery_hierarchical(self,
+                                                     save = True):
+
+        param_grid, global_stds, global_means = self.make_param_grid_hierarchical()
+        
+        self.nsamples = [self.config['nsamples'] for i in range(self.config['nparamsets'] * self.config['nsubjects'])]
+        
+        if self.config['binned']:
+            data_grid = np.zeros((self.config['nreps'],
+                                  self.config['nparamsets'],
+                                  self.config['nsubjects'], # add to config
+                                  self.config['nbins'],
+                                  self.config['nchoices']))
+        else:
+            data_grid = np.zeros((self.config['nreps'],
+                                  self.config['nparamsets'],
+                                  self.config['nsubjects'],
+                                  self.config['nsamples'],
+                                  2))
+        
+        for rep in range(self.config['nreps']):
+            # TD: ADD generate_data_grid_parallel_multisubject
+            data_grid[rep] = np.array(self.generate_data_grid_hierarchical_parallel(param_grid = param_grid))
+            print(rep, ' repetition finished') 
+        
+        if save:
+            training_data_folder = self.method_folder + 'parameter_recovery_hierarchical_data_binned_' + str(int(self.config['binned'])) + \
+                                   '_nbins_' + str(self.config['nbins']) + \
+                                   '_n_' + str(self.config['nsamples'])
+            if not os.path.exists(training_data_folder):
+                os.makedirs(training_data_folder)
+            
+            print('saving dataset as ', training_data_folder + '/' + \
+                                        self.method + \
+                                        '_nchoices_' + str(self.config['nchoices']) + \
+                                        '_parameter_recovery_hierarchical_' + \
+                                        'binned_' + str(int(self.config['binned'])) + \
+                                        '_nbins_' + str(self.config['nbins']) + \
+                                        '_nreps_' + str(self.config['nreps']) + \
+                                        '_n_' + str(self.config['nsamples']) + \
+                                        '.pickle')
+            
+            meta = self.dgp_hyperparameters.copy()
+            if 'boundary' in meta.keys():
+                del meta['boundary']
+
+            pickle.dump(([param_grid, global_stds, global_means], data_grid, meta), 
+                        open(training_data_folder + '/' + \
+                            self.method + \
+                            '_nchoices_' + str(self.config['nchoices']) + \
+                            '_parameter_recovery_hierarchical_' + \
+                            'binned_' + str(int(self.config['binned'])) + \
+                            '_nbins_' + str(self.config['nbins']) + \
+                            '_nreps_' + str(self.config['nreps']) + \
+                            '_n_' + str(self.config['nsamples']) + \
+                            '.pickle', 'wb'), 
+                        protocol = self.config['pickleprotocol'])
+            
+            return 'Dataset completed'
+        else:
+            return ([param_grid, global_stds, global_means], data_grid, meta)
+
     def make_dataset_r_sim(self,
                            n_sim_bnds = [10000, 100000],
                            save = True):
@@ -555,6 +677,8 @@ def make_dataset_r_dgp(dgp_list = ['ddm', 'ornstein', 'angle', 'weibull', 'full_
             out_folder = '/media/data_cifs/afengler/data/kde/rdgp/'
         if machine == 'ccv':
             out_folder = '/users/afengler/data/kde/rdgp/'
+        if machine == 'home':
+            out_folder = '/Users/afengler/OneDrive/project_nn_likelihoods/data/kde/rdgp/'
             
         out_folder = out_folder + 'training_data_' + str(int(config['binned'])) + \
                      '_nbins_' + str(config['nbins']) + \
@@ -606,24 +730,24 @@ def bin_simulator_output(self,
                              bin_dt = 0.04,
                              nbins = 0): # ['v', 'a', 'w', 'ndt', 'angle']
         
-        # Generate bins
-        if nbins == 0:
-            nbins = int(out[2]['max_t'] / bin_dt)
-            bins = np.zeros(nbins + 1)
-            bins[:nbins] = np.linspace(0, out[2]['max_t'], nbins)
-            bins[nbins] = np.inf
-        else:  
-            bins = np.zeros(nbins + 1)
-            bins[:nbins] = np.linspace(0, out[2]['max_t'], nbins)
-            bins[nbins] = np.inf
+    # Generate bins
+    if nbins == 0:
+        nbins = int(out[2]['max_t'] / bin_dt)
+        bins = np.zeros(nbins + 1)
+        bins[:nbins] = np.linspace(0, out[2]['max_t'], nbins)
+        bins[nbins] = np.inf
+    else:  
+        bins = np.zeros(nbins + 1)
+        bins[:nbins] = np.linspace(0, out[2]['max_t'], nbins)
+        bins[nbins] = np.inf
 
-        cnt = 0
-        counts = np.zeros( (nbins, len(out[2]['possible_choices']) ) )
+    cnt = 0
+    counts = np.zeros( (nbins, len(out[2]['possible_choices']) ) )
 
-        for choice in out[2]['possible_choices']:
-            counts[:, cnt] = np.histogram(out[0][out[1] == choice], bins = bins)[0] / out[2]['n_samples']
-            cnt += 1
-        return counts
+    for choice in out[2]['possible_choices']:
+        counts[:, cnt] = np.histogram(out[0][out[1] == choice], bins = bins)[0] / out[2]['n_samples']
+        cnt += 1
+    return counts
     
 # -------------------------------------------------------------------------------------
 
@@ -641,7 +765,10 @@ if __name__ == "__main__":
                      default = ['ddm', 'ornstein', 'angle', 'weibull', 'full_ddm'])
     CLI.add_argument("--datatype",
                      type = str,
-                     default = 'uniform') # 'parameter_recovery, 'perturbation_experiment', 'r_sim', 'r_dgp', 'cnn_train'
+                     default = 'uniform') # 'parameter_recovery, 'perturbation_experiment', 'r_sim', 'r_dgp', 'cnn_train', 'parameter_recovery_hierarchical'
+    CLI.add_argument("--nsubjects",
+                    type = int,
+                    default = 5)
     CLI.add_argument("--nreps",
                      type = int,
                      default = 1)
@@ -699,6 +826,9 @@ if __name__ == "__main__":
         config = yaml.load(open("/users/afengler/git_repos/nn_likelihoods/config_files/config_data_generator.yaml"),
                           Loader = yaml.SafeLoader)
      
+    if machine == 'home':
+        config = yaml.load(open("/Users/afengler/OneDrive/git_repos/nn_likelihoods/config_files/config_data_generator.yaml"))
+
     # Update config with specifics of run
     config['method'] = args.dgplist[0]
     config['mode'] = args.mode
@@ -712,9 +842,8 @@ if __name__ == "__main__":
     config['nreps'] = args.nreps
     config['pickleprotocol'] = args.pickleprotocol
     config['nsimbnds'] = args.nsimbnds
+    config['nsubjects'] = args.nsubjects
     
-
-
     # Get data for the type of dataset we want
     start_t = datetime.now()
 
@@ -728,10 +857,10 @@ if __name__ == "__main__":
         
     if args.datatype == 'parameter_recovery':
         dg = data_generator(machine = args.machine,
-                             file_id = args.fileid,
-                             max_t = args.maxt,
-                             delta_t = args.deltat,
-                             config = config)
+                            file_id = args.fileid,
+                            max_t = args.maxt,
+                            delta_t = args.deltat,
+                            config = config)
         out = dg.make_dataset_parameter_recovery(save = args.save)
     
     if args.datatype == 'perturbation_experiment':      
@@ -761,6 +890,15 @@ if __name__ == "__main__":
                                  delta_t = args.deltat,
                                  config = config,
                                  save = args.save)
+
+    if args.datatype == 'parameter_recovery_hierarchical':
+        dg = data_generator(machine = args.machine,
+                            file_id = args.fileid,
+                            max_t = args.maxt,
+                            delta_t = args.deltat,
+                            config = config)
+
+        out = dg.make_dataset_parameter_recovery_hierarchical()
 
     finish_t = datetime.now()
     print('Time elapsed: ', finish_t - start_t)
