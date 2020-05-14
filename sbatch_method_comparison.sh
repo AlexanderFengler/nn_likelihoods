@@ -58,8 +58,8 @@
 nmcmcsamples=20000
 nbyarrayjob=10
 nsamples=( 1024 2048 4096 ) #( 1024 2048 4096 )
-method='full_ddm2'  #"full_ddm2"
-ids=( -1 )
+method='ddm_analytic'  #"full_ddm2"
+ids=( 1 )
 machine='ccv'
 #SLURM_ARRAY_TASK_ID=1
 

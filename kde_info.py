@@ -391,7 +391,7 @@ temp = {
     "boundary_param_bounds_cnn": [],
     # "param_bounds_network": [[-2.0, 2.0], [0.5, 1.5], [0.3, 0.7], [0.0, 1.0]],
     "param_bounds_network": [[-2.0, 2.0], [0.3, 2], [0.2, 0.8], [0.0, 2.0]],
-    "param_bounds_sampler": [[-2.5, 2.5], [0.3, 2], [0.05, 95], [0.0, 2.5]],
+    "param_bounds_sampler": [[-1.8, 1.8], [0.4, 1.7], [0.3, 0.70], [0.1, 1.9]],
     "param_bounds_cnn": [[-2.0, 2.0], [0.2, 2], [0.1, 0.0], [0.0, 2.0]],
     "dgp_hyperparameters": [['s', 1.0], 
                             ['delta_t', 0.001], 
