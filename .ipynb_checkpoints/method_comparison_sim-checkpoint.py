@@ -138,7 +138,7 @@ if __name__ == "__main__":
     CLI.add_argument("--nnbatchid",  # nnbatchid is used if we use the '_batch' parts of the model_path files (essentially to for pposterior sample runs that check if for the same model across networks we observe similar behavior)
                      type = int,
                      default = -1)
-    CLI.add_argument("-analytic",
+    CLI.add_argument("--analytic",
                      type = int,
                      default = 0)
     
