@@ -138,6 +138,9 @@ if __name__ == "__main__":
     CLI.add_argument("--nnbatchid",  # nnbatchid is used if we use the '_batch' parts of the model_path files (essentially to for pposterior sample runs that check if for the same model across networks we observe similar behavior)
                      type = int,
                      default = -1)
+    CLI.add_argument("-analytic",
+                     type = int,
+                     default = 0)
     
     args = CLI.parse_args()
     print(args)
@@ -156,6 +159,7 @@ if __name__ == "__main__":
     n_cpus = args.ncpus
     n_by_arrayjob = args.nbyarrayjob
     nnbatchid = args.nnbatchid
+    analytic= args.analytic
 
     # Initialize the frozen dimensions
     if len(args.frozendims) >= 1:
@@ -218,12 +222,11 @@ if __name__ == "__main__":
         out_file_signature = 'post_samp_perturbation_experiment_nexp_1_n_' + str(n_samples) + '_' + infile_id                                                                      
     
     if data_type == 'parameter_recovery':
-        if method == 'ddm_analytic':
-            file_ = 'parameter_recovery_data_binned_0_nbins_0_n_' + str(n_samples) + '/' + 'ddm' + '_nchoices_2_parameter_recovery_binned_0_nbins_0_nreps_1_n_' + str(n_samples) + '.pickle'
-        else:
-            file_ = 'parameter_recovery_data_binned_0_nbins_0_n_' + str(n_samples) + '/' + method + '_nchoices_2_parameter_recovery_binned_0_nbins_0_nreps_1_n_' + str(n_samples) + '.pickle'
-        #file_ = 'base_data_param_recov_unif_reps_1_n_' + str(n_samples) + '_' + infile_id + '.pickle'
+        file_ = 'parameter_recovery_data_binned_0_nbins_0_n_' + str(n_samples) + '/' + method + '_nchoices_2_parameter_recovery_binned_0_nbins_0_nreps_1_n_' + str(n_samples) + '.pickle'
         
+        if analytic:
+            pass
+        else:  
             if not os.path.exists(output_folder + network_id):
                 os.makedirs(output_folder + network_id)
         
@@ -439,13 +442,16 @@ if __name__ == "__main__":
     start_time = time.time()
     if n_cpus != 1:
         if method == 'lba_analytic':
-            posterior_samples = np.array(p.map(lba_posterior, zip(data_grid, init_grid, sampler_param_bounds)))
-        elif method == 'ddm_analytic':
+            posterior_samples = np.array(p.map(lba_posterior, zip(data_grid,
+                                                                  init_grid,
+                                                                  sampler_param_bounds)))
+        elif analytic and method == 'ddm_analytic':
             posterior_samples = p.map(nf_posterior, zip(data_grid, 
                                                         init_grid,
                                                         sampler_param_bounds))
         else:
-            posterior_samples = p.map(mlp_posterior, zip(data_grid, init_grid, sampler_param_bounds))
+            posterior_samples = p.map(mlp_posterior, zip(data_grid, init_grid, 
+                                                         sampler_param_bounds))
     else:
         for i in range((out_file_id - 1) * 6, (out_file_id) * 6, 1):
             posterior_samples = mlp_posterior((data_grid[i],
@@ -456,7 +462,7 @@ if __name__ == "__main__":
     
     # Store files
     print('saving to file')
-    if method == 'ddm_analytic':
+    if analytic:
         pickle.dump((param_grid, data_grid, posterior_samples, exec_time),
                     open(output_folder + out_file_signature + '_' + out_file_id + '.pickle', 'wb'))
         print(output_folder +  out_file_signature + '_' + out_file_id + ".pickle")
