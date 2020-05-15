@@ -61,7 +61,6 @@ def collect_datasets_diff_evo(in_files = [],
     return out_dict
 
 
-
 if __name__ == "__main__":
     CLI = argparse.ArgumentParser()
     CLI.add_argument("--machine",

@@ -15,6 +15,9 @@
 
 scp afengler@transfer.ccv.brown.edu:/users/afengler/data/analytic/ddm/method_comparison/dnnregressor_ddm_analytic_05_13_20_13_24_20/summary* /Users/afengler/OneDrive/project_nn_likelihoods/data/analytic/ddm/method_comparison/dnnregressor_ddm_analytic_05_13_20_13_24_20/
 
+scp afengler@transfer.ccv.brown.edu:/users/afengler/data/analytic/ddm/method_comparison/dnnregressor_ddm_analytic_05_13_20_15_42_15/summary* /Users/afengler/OneDrive/project_nn_likelihoods/data/analytic/ddm/method_comparison/dnnregressor_ddm_analytic_05_13_20_15_42_15/
+
+scp afengler@transfer.ccv.brown.edu:/users/afengler/data/analytic/ddm/method_comparison/dnnregressor_ddm_analytic_05_13_20_17_58_51/summary* /Users/afengler/OneDrive/project_nn_likelihoods/data/analytic/ddm/method_comparison/dnnregressor_ddm_analytic_05_13_20_17_58_51/
 
 # scp afengler@transfer.ccv.brown.edu:/users/afengler/data/kde/ddm/method_comparison/dnnregressor_ddm_03_29_20_17_38_58/summary* /Users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm/method_comparison/dnnregressor_ddm_03_29_20_17_38_58/
 
