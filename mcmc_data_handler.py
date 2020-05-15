@@ -106,6 +106,7 @@ if __name__ == "__main__":
             network_path = ''
         else:
             method_comparison_folder = '/users/afengler/data/kde/' + method + '/method_comparison/'
+        
         if analytic:
             pass
         else:
