@@ -81,6 +81,9 @@ if __name__ == "__main__":
     CLI.add_argument("--nnbatchid",
                      type= int,
                      default = -1)
+    CLI.add_argument("--analytic",
+                     type = int,
+                     default = 0)
     
     args = CLI.parse_args()
     print(args)
@@ -91,6 +94,7 @@ if __name__ == "__main__":
     ndata = args.ndata
     nsubsample = args.nsubsample
     nnbatchid = args.nnbatchid
+    analytic = args.analytic
 
     if machine == 'home':
         method_comparison_folder = '/Users/afengler/OneDrive/project_nn_likelihoods/data/kde/' + method + '/method_comparison/'
@@ -102,7 +106,9 @@ if __name__ == "__main__":
             network_path = ''
         else:
             method_comparison_folder = '/users/afengler/data/kde/' + method + '/method_comparison/'
-
+        if analytic:
+            pass
+        else:
             with open("/users/afengler/git_repos/nn_likelihoods/model_paths.yaml") as tmp_file:
                 if nnbatchid == -1:
                     network_path = yaml.load(tmp_file)[method]
