@@ -451,7 +451,7 @@ temp = {
     "boundary_param_names": ["theta"],
     # "param_bounds_network": [[-1.5, 1.5], [0.6, 1.5], [0.3, 0.7], [0.0, 1.0]],
     "param_bounds_network": [[-3.0, 3.0], [0.3, 2], [0.2, 0.8], [0.0, 2.0]],
-    "param_bounds_sampler": [[-2.9, 2.9], [0.4, 1.9], [0.25, 0.75], [0.05, 1.95]],
+    "param_bounds_sampler": [[-2.7, 2.7], [0.4, 1.7], [0.3, 0.7], [0.1, 1.9]],
     "param_bounds_cnn": [[-2.5, 2.5], [0.2, 2.0], [0.1, 0.9], [0.0, 2.0]],
     #"boundary_param_bounds_network": [[0, (np.pi / 2 - .2)]],
     'boundary_param_bounds_network':[[-.1, (np.pi / 2 - .1)]],
