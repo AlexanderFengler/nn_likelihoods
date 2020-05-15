@@ -21,13 +21,13 @@
 machine="ccv"
 ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
 ndata=( 1024 2048 4096 )
-method="full_ddm2"
+method="ddm"
 
 for n in "${ndata[@]}"
 do
     for id in "${ids[@]}"
     do 
-       python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --nburnin 5000 --ndata $n --nsubsample 10000 --nnbatchid $id
+       python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --nburnin 5000 --ndata $n --nsubsample 20000 --nnbatchid $id
     done
 done
 
