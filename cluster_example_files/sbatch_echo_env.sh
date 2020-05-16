@@ -20,4 +20,4 @@
 #SBATCH --array=1-2
 
 echo $my_fancy_var
-
+echo 'test output'
