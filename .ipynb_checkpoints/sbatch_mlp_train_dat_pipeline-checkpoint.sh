@@ -6,8 +6,8 @@
 #SBATCH -J train_dat
 
 # priority
-#SBATCH --account=bibs-frankmj-condo
-##SBATCH --account=carney-frankmj-condo
+##SBATCH --account=bibs-frankmj-condo
+#SBATCH --account=carney-frankmj-condo
 
 # output file
 #SBATCH --output /users/afengler/batch_job_out/tpl_1_%A_%a.out
@@ -17,7 +17,7 @@
 #SBATCH --mem=64G
 #SBATCH -c 14
 #SBATCH -N 1
-#SBATCH --array=1-300
+#SBATCH --array=1-100
 
 # --------------------------------------------------------------------------------------
 # Sequentially run different kind of models
