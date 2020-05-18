@@ -7,8 +7,8 @@
 
 # priority
 ##SBATCH --account=bibs-frankmj-condo
-#SBATCH --account=carney-frankmj-condo
-
+##SBATCH --account=carney-frankmj-condo
+#SBATCH --account=bibs-frankmj-condo
 
 # output file
 #SBATCH --output /users/afengler/batch_job_out/meth_comp_%A_%a.out
