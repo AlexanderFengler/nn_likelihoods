@@ -29,6 +29,7 @@
 source /users/afengler/.bashrc
 conda deactivate
 conda activate tf-gpu-py37
+#conda activate tf-cpu
 
 gpu=1
 

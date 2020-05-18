@@ -63,7 +63,7 @@ if __name__ == "__main__":
                      type = int,
                      default = 100)
     CLI.add_argument("--gpu",
-                     nargs = int,
+                     type = int,
                      default = 0)
     
     args = CLI.parse_args()
