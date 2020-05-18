@@ -17,7 +17,7 @@
 #SBATCH --mem=64G
 #SBATCH -c 14
 #SBATCH -N 1
-#SBATCH --array=1-100
+#SBATCH --array=1-300
 
 # --------------------------------------------------------------------------------------
 # Sequentially run different kind of models
@@ -26,7 +26,7 @@
 declare -a dgps=( "ddm_sdv_analytic" )     # ( "angle2" )  #( "weibull_cdf" ) # ( "ddm_seq2_angle" "ddm_mic2_angle" "ddm_par2_angle" )
 n_samples=( 20000 )   # ( 128 256 512 1024 2048 4096 8192 50000 100000 200000 400000 )
 n_choices=( 2 ) #( 4 5 6 )
-n_parameter_sets=1000   #20000
+n_parameter_sets=10000   #20000
 n_bins=( 0 )
 binned=0
 machine="ccv" #"ccv"
