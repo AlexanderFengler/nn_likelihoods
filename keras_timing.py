@@ -45,7 +45,6 @@ def nf_target(params, data, likelihood_min = 1e-10):
                                                params[2],
                                                params[3])),
                                                np.log(likelihood_min)))
-    
 
 # INITIALIZATIONS -------------------------------------------------------------
 if __name__ == "__main__":
@@ -89,6 +88,14 @@ if __name__ == "__main__":
                 
             print('Loading network from: ')
             print(network_path)
+            
+    if machine == 'home':
+        with open("model_paths_home.yaml") as tmp_file:
+            network_path = yaml.load(tmp_file)[method]
+            network_id = network_path[list(re.finditer('/', network_path))[-2].end():]
+            
+            print('Loading network from: ')
+            print(network_path)
 
     # Load network parameters in
     biases = pickle.load(open(network_path + 'biases.pickle', 'rb'))
@@ -96,7 +103,7 @@ if __name__ == "__main__":
     activations = pickle.load(open(network_path + 'activations.pickle', 'rb'))
     
     # Load keras model
-    keras_model = keras.models.load_model(network_path + 'model_final.h5')
+    keras_model = keras.models.load_model(network_path + 'model_final.h5', compile = False)
 
     info = {}
     info['numpy_timings'] = []
@@ -104,10 +111,11 @@ if __name__ == "__main__":
     info['keras_fix_batch_timings'] = []
     info['keras_no_batch_timings'] = []
     info['navarro_timings'] = []
+    info['keras_var_batch_no_pred_timings'] = []
     info['nsamples'] = []
 
     # Run timingss
-    for n in [1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072]:
+    for n in [1024, 2048, 4096]: # 8192, 16384, 32768, 65536, 131072]:
         
         print('nsamples: ', n)
         # Generate toy dataset
@@ -160,6 +168,14 @@ if __name__ == "__main__":
             keras_input_batch[:, :4] = params_rep
             keras_model.predict(keras_input_batch, batch_size = 1024)
             info['keras_fix_batch_timings'].append((datetime.now() - start).total_seconds())
+            
+        # Keras timings fixed batch size
+        print('Running keras var batch no pred')
+        for i in range(nreps):
+            start = datetime.now()
+            keras_input_batch[:, :4] = params_rep
+            keras_model(keras_input_batch)
+            info['keras_var_batch_no_pred_timings'].append((datetime.now() - start).total_seconds())
 
         # Keras timings unspecified batch size
         print('Running keras no batch')
@@ -168,5 +184,9 @@ if __name__ == "__main__":
             keras_input_batch[:, :4] = params_rep
             keras_model.predict(keras_input_batch)
             info['keras_no_batch_timings'].append((datetime.now() - start).total_seconds())
-
-    pickle.dump(info, open('/users/afengler/data/timings/timings.pickle', 'wb'), protocol = 4)
+    
+    if machine == 'ccv':
+        pickle.dump(info, open('/users/afengler/data/timings/timings.pickle', 'wb'), protocol = 4)
+     
+    if machine == 'home':
+        pickle.dump(info, open('/users/afengler/OneDrive/project_nn_likelihoods/data/timings/timings.pickle', 'wb'), protocol = 4)

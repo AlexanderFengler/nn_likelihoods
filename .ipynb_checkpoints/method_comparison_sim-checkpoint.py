@@ -41,6 +41,11 @@ import clba
 import ckeras_to_numpy as ktnp
 
 import keras_to_numpy_class as ktnpc
+
+
+# Tensorflow 
+import tensorflow as tf
+from tensorflow import keras
 # -----------------------------------------------------------------------------
 
 # SUPPORT FUNCTIONS -----------------------------------------------------------
@@ -201,6 +206,8 @@ if __name__ == "__main__":
             print('Loading network from: ')
             print(network_path)
             
+            keras_model = keras.models.load_model(network_path + '/model_final.h5', compile = False)
+            
     if machine == 'home':
         method_params = pickle.load(open("/users/afengler/OneDrive/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))[method]
         output_folder = method_params['output_folder_home']
@@ -339,7 +346,8 @@ if __name__ == "__main__":
         # params_rep = np.tile(params, (data.shape[0], 1))
         # input_batch = np.concatenate([params_rep, data], axis = 1)
         #return np.sum(np.maximum(mlpt.predict(mlp_input_batch), ll_min))
-        return np.sum(np.core.umath.maximum(ktnp.predict(mlp_input_batch, weights, biases, activations, n_layers), ll_min))
+        #return np.sum(np.core.umath.maximum(ktnp.predict(mlp_input_batch, weights, biases, activations, n_layers), ll_min))
+        return np.sum(np.core.umath.maximum(keras_model(mlp_input_batch), ll_min))
 
     # def mlp_target(params,
     #                data,

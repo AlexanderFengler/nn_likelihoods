@@ -26,8 +26,11 @@
 #SBATCH -p gpu --gres=gpu:1
 #SBATCH --array=1-1
 
-source /users/afengler/.bashrc
-conda deactivate
-conda activate tf-gpu-py37
+# source /users/afengler/.bashrc
+# conda deactivate
+# conda activate tf-gpu-py37
 
-python -u /users/afengler/git_repos/nn_likelihoods/keras_timing.py --machine ccv --nreps 200 --method ddm
+#python -u /users/afengler/git_repos/nn_likelihoods/keras_timing.py --machine home --nreps 100 --method ddm
+
+
+python -u /users/afengler/OneDrive/git_repos/nn_likelihoods/keras_timing.py --machine home --nreps 100 --method ddm

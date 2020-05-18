@@ -53,9 +53,13 @@
 #     python -u method_comparison_sim.py --machine ccv --method angle2 --nsamples $n --nmcmcsamples $nmcmcsamples --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 --samplerinit mle --ncpus 10 --nbyarrayjob $nbyarrayjob #$SLURM_ARRAY_TASK_ID 
 # done
 
+source /users/afengler/.bashrc
+conda deactivate
+conda activate tf-cpu
+
 # NNBATCH RUNS
 
-nmcmcsamples=25000
+nmcmcsamples=20000
 nbyarrayjob=10
 nsamples=( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
 method='angle2'  #"full_ddm2"
@@ -68,7 +72,7 @@ for n in "${nsamples[@]}"
 do
     for id in "${ids[@]}"
     do 
-        python -u method_comparison_sim.py --machine $machine --method $method --nsamples $n --nmcmcsamples $nmcmcsamples --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 --samplerinit mle --ncpus 10 --nbyarrayjob $nbyarrayjob --nnbatchid $id --analytic $analytic
+        python -u method_comparison_sim.py --machine $machine --method $method --nsamples $n --nmcmcsamples $nmcmcsamples --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 --samplerinit mle --ncpus 10 --nbyarrayjob $nbyarrayjob --nnbatchid $id --analytic $analytic
     done
 done
 
