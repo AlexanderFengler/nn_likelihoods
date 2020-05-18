@@ -14,7 +14,7 @@
 #SBATCH --mail-type=ALL
 
 # output file
-#SBATCH --output /users/afengler/batch_job_out/timings.out
+#SBATCH --output /users/afengler/batch_job_out/timings_%A.out
 
 # Request runtime, memory, cores
 #SBATCH --time=4:00:00
@@ -26,10 +26,12 @@
 #SBATCH -p gpu --gres=gpu:1
 #SBATCH --array=1-1
 
-# source /users/afengler/.bashrc
-# conda deactivate
-# conda activate tf-gpu-py37
+source /users/afengler/.bashrc
+conda deactivate
+conda activate tf-gpu-py37
 
 #python -u /users/afengler/git_repos/nn_likelihoods/keras_timing.py --machine home --nreps 100 --method ddm
 
-python -u /users/afengler/OneDrive/git_repos/nn_likelihoods/keras_timing.py --machine home --nreps 100 --method ddm
+gpu=1
+
+python -u /users/afengler/OneDrive/git_repos/nn_likelihoods/keras_timing.py --machine ccv --nreps 100 --method ddm --gpu $gpu

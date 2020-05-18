@@ -62,6 +62,9 @@ if __name__ == "__main__":
     CLI.add_argument("--nreps",
                      type = int,
                      default = 100)
+    CLI.add_argument("--gpu",
+                     nargs = int,
+                     default = 0)
     
     args = CLI.parse_args()
     print(args)
@@ -70,6 +73,7 @@ if __name__ == "__main__":
     method = args.method
     nsamples = args.nsamples
     nreps = args.nreps
+    gpu = args.gpu
 
     # Get (machine dependent) network directory 
     if machine == 'x7':
@@ -112,10 +116,11 @@ if __name__ == "__main__":
     info['keras_no_batch_timings'] = []
     info['navarro_timings'] = []
     info['keras_var_batch_no_pred_timings'] = []
+    info['keras_fix_batch_no_pred_timings'] = []
     info['nsamples'] = []
 
     # Run timingss
-    for n in [1024, 2048, 4096]: # 8192, 16384, 32768, 65536, 131072]:
+    for n in [1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072]:
         
         print('nsamples: ', n)
         # Generate toy dataset
@@ -176,7 +181,16 @@ if __name__ == "__main__":
             keras_input_batch[:, :4] = params_rep
             keras_model(keras_input_batch)
             info['keras_var_batch_no_pred_timings'].append((datetime.now() - start).total_seconds())
-
+        
+        for i in range(nreps):
+            n_batches = int(n / 1024)
+            start = datetime.now()
+            keras_input_batch[:, :4] = params_rep
+            for j in range(n_batches):
+                keras_model(keras_input_batch[(j * 1024):((j + 1) * 1024), :])
+            
+            info['keras_fix_batch_no_pred_timings'].append((datetime.now() - start).total_seconds())
+            
         # Keras timings unspecified batch size
         print('Running keras no batch')
         for i in range(nreps):
@@ -186,7 +200,9 @@ if __name__ == "__main__":
             info['keras_no_batch_timings'].append((datetime.now() - start).total_seconds())
     
     if machine == 'ccv':
-        pickle.dump(info, open('/users/afengler/data/timings/timings.pickle', 'wb'), protocol = 4)
+        pickle.dump(info, open('/users/afengler/data/timings/timings_gpu_' + str(gpu) + '.pickle', 'wb'), 
+                    protocol = 4)
      
     if machine == 'home':
-        pickle.dump(info, open('/users/afengler/OneDrive/project_nn_likelihoods/data/timings/timings.pickle', 'wb'), protocol = 4)
+        pickle.dump(info, open('/users/afengler/OneDrive/project_nn_likelihoods/data/timings/timings_gpu_' + str(gpu) + '.pickle', 'wb'), 
+                    protocol = 4)
