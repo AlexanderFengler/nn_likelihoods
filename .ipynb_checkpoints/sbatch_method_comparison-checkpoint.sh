@@ -6,10 +6,12 @@
 #SBATCH -J angle_bg
 
 # priority
-#SBATCH --account=bibs-frankmj-condo
+##SBATCH --account=bibs-frankmj-condo
+#SBATCH --account=carney-frankmj-condo
+
 
 # output file
-#SBATCH --output /users/afengler/batch_job_out/angle_bg_%A_%a.out
+#SBATCH --output /users/afengler/batch_job_out/meth_comp_%A_%a.out
 
 # Request runtime, memory, cores:
 #SBATCH --time=24:00:00
