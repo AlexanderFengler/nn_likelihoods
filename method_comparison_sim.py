@@ -461,7 +461,7 @@ if __name__ == "__main__":
             posterior_samples = p.map(mlp_posterior, zip(data_grid, init_grid, 
                                                          sampler_param_bounds))
     else:
-        for i in range((out_file_id - 1) * 6, (out_file_id) * 6, 1):
+        for i in range((out_file_id - 1) * 10, (out_file_id) * 10, 1):
             posterior_samples = mlp_posterior((data_grid[i],
                                                init_grid[i],
                                                sampler_param_bounds[i]))
