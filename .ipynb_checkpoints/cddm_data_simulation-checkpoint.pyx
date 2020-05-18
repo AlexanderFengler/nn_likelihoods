@@ -514,19 +514,19 @@ def full_ddm(float v = 0,
 # @cythonboundscheck(False)
 # @cythonwraparound(False)
 def ddm_sdv(float v = 0,
-                 float a = 1,
-                 float w = 0.5,
-                 float ndt = 0.0,
-                 float sdv = 0.1,
-                 float s = 1,
-                 float delta_t = 0.001,
-                 float max_t = 20,
-                 int n_samples = 20000,
-                 print_info = True,
-                 boundary_fun = None, # function of t (and potentially other parameters) that takes in (t, *args)
-                 boundary_multiplicative = True,
-                 boundary_params = {}
-                 ):
+            float a = 1,
+            float w = 0.5,
+            float ndt = 0.0,
+            float sdv = 0.1,
+            float s = 1,
+            float delta_t = 0.001,
+            float max_t = 20,
+            int n_samples = 20000,
+            print_info = True,
+            boundary_fun = None, # function of t (and potentially other parameters) that takes in (t, *args)
+            boundary_multiplicative = True,
+            boundary_params = {}
+            ):
 
     rts = np.zeros((n_samples, 1), dtype = DTYPE)
     choices = np.zeros((n_samples, 1), dtype = np.intc)

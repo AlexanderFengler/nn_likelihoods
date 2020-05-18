@@ -8005,8 +8005,8 @@ static PyObject *__pyx_pf_20cddm_data_simulation_8full_ddm(CYTHON_UNUSED PyObjec
  * # @cythonboundscheck(False)
  * # @cythonwraparound(False)
  * def ddm_sdv(float v = 0,             # <<<<<<<<<<<<<<
- *                  float a = 1,
- *                  float w = 0.5,
+ *             float a = 1,
+ *             float w = 0.5,
  */
 
 /* Python wrapper */
@@ -8034,29 +8034,29 @@ static PyObject *__pyx_pw_20cddm_data_simulation_11ddm_sdv(PyObject *__pyx_self,
     PyObject* values[13] = {0,0,0,0,0,0,0,0,0,0,0,0,0};
 
     /* "cddm_data_simulation.pyx":525
- *                  float max_t = 20,
- *                  int n_samples = 20000,
- *                  print_info = True,             # <<<<<<<<<<<<<<
- *                  boundary_fun = None, # function of t (and potentially other parameters) that takes in (t, *args)
- *                  boundary_multiplicative = True,
+ *             float max_t = 20,
+ *             int n_samples = 20000,
+ *             print_info = True,             # <<<<<<<<<<<<<<
+ *             boundary_fun = None, # function of t (and potentially other parameters) that takes in (t, *args)
+ *             boundary_multiplicative = True,
  */
     values[9] = ((PyObject *)Py_True);
 
     /* "cddm_data_simulation.pyx":526
- *                  int n_samples = 20000,
- *                  print_info = True,
- *                  boundary_fun = None, # function of t (and potentially other parameters) that takes in (t, *args)             # <<<<<<<<<<<<<<
- *                  boundary_multiplicative = True,
- *                  boundary_params = {}
+ *             int n_samples = 20000,
+ *             print_info = True,
+ *             boundary_fun = None, # function of t (and potentially other parameters) that takes in (t, *args)             # <<<<<<<<<<<<<<
+ *             boundary_multiplicative = True,
+ *             boundary_params = {}
  */
     values[10] = ((PyObject *)Py_None);
 
     /* "cddm_data_simulation.pyx":527
- *                  print_info = True,
- *                  boundary_fun = None, # function of t (and potentially other parameters) that takes in (t, *args)
- *                  boundary_multiplicative = True,             # <<<<<<<<<<<<<<
- *                  boundary_params = {}
- *                  ):
+ *             print_info = True,
+ *             boundary_fun = None, # function of t (and potentially other parameters) that takes in (t, *args)
+ *             boundary_multiplicative = True,             # <<<<<<<<<<<<<<
+ *             boundary_params = {}
+ *             ):
  */
     values[11] = ((PyObject *)Py_True);
     values[12] = __pyx_k__4;
@@ -8272,8 +8272,8 @@ static PyObject *__pyx_pw_20cddm_data_simulation_11ddm_sdv(PyObject *__pyx_self,
  * # @cythonboundscheck(False)
  * # @cythonwraparound(False)
  * def ddm_sdv(float v = 0,             # <<<<<<<<<<<<<<
- *                  float a = 1,
- *                  float w = 0.5,
+ *             float a = 1,
+ *             float w = 0.5,
  */
 
   /* function exit code */
@@ -8332,7 +8332,7 @@ static PyObject *__pyx_pf_20cddm_data_simulation_10ddm_sdv(CYTHON_UNUSED PyObjec
   __Pyx_RefNannySetupContext("ddm_sdv", 0);
 
   /* "cddm_data_simulation.pyx":531
- *                  ):
+ *             ):
  * 
  *     rts = np.zeros((n_samples, 1), dtype = DTYPE)             # <<<<<<<<<<<<<<
  *     choices = np.zeros((n_samples, 1), dtype = np.intc)
@@ -9156,8 +9156,8 @@ static PyObject *__pyx_pf_20cddm_data_simulation_10ddm_sdv(CYTHON_UNUSED PyObjec
  * # @cythonboundscheck(False)
  * # @cythonwraparound(False)
  * def ddm_sdv(float v = 0,             # <<<<<<<<<<<<<<
- *                  float a = 1,
- *                  float w = 0.5,
+ *             float a = 1,
+ *             float w = 0.5,
  */
 
   /* function exit code */
@@ -32299,8 +32299,8 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * # @cythonboundscheck(False)
  * # @cythonwraparound(False)
  * def ddm_sdv(float v = 0,             # <<<<<<<<<<<<<<
- *                  float a = 1,
- *                  float w = 0.5,
+ *             float a = 1,
+ *             float w = 0.5,
  */
   __pyx_tuple__45 = PyTuple_Pack(31, __pyx_n_s_v, __pyx_n_s_a, __pyx_n_s_w, __pyx_n_s_ndt, __pyx_n_s_sdv, __pyx_n_s_s, __pyx_n_s_delta_t, __pyx_n_s_max_t, __pyx_n_s_n_samples, __pyx_n_s_print_info, __pyx_n_s_boundary_fun, __pyx_n_s_boundary_multiplicative, __pyx_n_s_boundary_params, __pyx_n_s_rts, __pyx_n_s_choices, __pyx_n_s_rts_view, __pyx_n_s_choices_view, __pyx_n_s_delta_t_sqrt, __pyx_n_s_sqrt_st, __pyx_n_s_num_draws, __pyx_n_s_boundary, __pyx_n_s_boundary_view, __pyx_n_s_i, __pyx_n_s_tmp, __pyx_n_s_y, __pyx_n_s_t, __pyx_n_s_n, __pyx_n_s_ix, __pyx_n_s_m, __pyx_n_s_drift_increment, __pyx_n_s_gaussian_values); if (unlikely(!__pyx_tuple__45)) __PYX_ERR(0, 516, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__45);
@@ -32972,10 +32972,10 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "cddm_data_simulation.pyx":528
- *                  boundary_fun = None, # function of t (and potentially other parameters) that takes in (t, *args)
- *                  boundary_multiplicative = True,
- *                  boundary_params = {}             # <<<<<<<<<<<<<<
- *                  ):
+ *             boundary_fun = None, # function of t (and potentially other parameters) that takes in (t, *args)
+ *             boundary_multiplicative = True,
+ *             boundary_params = {}             # <<<<<<<<<<<<<<
+ *             ):
  * 
  */
   __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 528, __pyx_L1_error)
@@ -32988,8 +32988,8 @@ if (!__Pyx_RefNanny) {
  * # @cythonboundscheck(False)
  * # @cythonwraparound(False)
  * def ddm_sdv(float v = 0,             # <<<<<<<<<<<<<<
- *                  float a = 1,
- *                  float w = 0.5,
+ *             float a = 1,
+ *             float w = 0.5,
  */
   __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_20cddm_data_simulation_11ddm_sdv, NULL, __pyx_n_s_cddm_data_simulation); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 516, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
