@@ -28,10 +28,10 @@
 
 source /users/afengler/.bashrc
 conda deactivate
-conda activate tf-gpu-py37
-#conda activate tf-cpu
+#conda activate tf-gpu-py37
+conda activate tf-cpu
 
-gpu=1
+gpu=0
 
 python -u /users/afengler/git_repos/nn_likelihoods/keras_timing.py --machine ccv --nreps 100 --method ddm --gpu $gpu
 
