@@ -22,15 +22,15 @@
 #SBATCH -c 14
 #SBATCH -N 1
 
-##SBATCH --constraint='quadrortx'
+#SBATCH --constraint='quadrortx'
 ##SBATCH --constraint='cascade'
-##SBATCH -p gpu --gres=gpu:1
+#SBATCH -p gpu --gres=gpu:1
 #SBATCH --array=1-1
 
 source /users/afengler/.bashrc
 conda deactivate
-#conda activate tf-gpu-py37
-conda activate tf-cpu
+conda activate tf-gpu-py37
+#conda activate tf-cpu
 
 gpu=0
 

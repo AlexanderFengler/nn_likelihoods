@@ -30,6 +30,9 @@ cdef double fptd_small(double t, double w, int k):
 cdef double calculate_leading_term(double t, double v, double a, double w):
     return 1 / (a**2) * exp( - (v * a * w) - (((v**2) * t) / 2))
 
+cdef double calculate_leading_term_with_drift_noise(double t, double v, double a, double w, double sdv):
+    return (1 / ((a**2) * sqrt((sdv**2) * t + 1))) * exp((((a * w * sdv)**2) - ( 2 * a * v * w ) - ( (v**2) * t )) / ((2 * (sdv**2) * t) + 2))
+
 # Choice function to determine which approximation is appropriate (small or large time)
 cdef choice_function(double t, double eps):
     eps_l = fmin(eps, 1 / (t * M_PI))
@@ -39,7 +42,7 @@ cdef choice_function(double t, double eps):
     return k_s - k_l, k_l, k_s
 
 # Actual fptd (first-passage-time-distribution) algorithm
-def fptd(t, v, a, w, eps=1e-10):
+def fptd(t = 0, v = 0, a = 1, w = 0.5, eps=1e-10):
     # negative reaction times signify upper boundary crossing
     # we have to change the parameters as suggested by navarro & fuss (2009)
     if t < 0:
@@ -61,11 +64,15 @@ def fptd(t, v, a, w, eps=1e-10):
         return 1e-29
 # --------------------------------
 
-def batch_fptd(t, double v = 1, double a = 1, double w = 0.5, double ndt = 1.0, double eps = 1e-20):
+def batch_fptd(t, double v = 1, double a = 1, double w = 0.5, double ndt = 1.0, double sdv = 0, double eps = 1e-20):
     # Use when rts and choices vary, but parameters are held constant
     cdef int i
     cdef double[:] t_view = t
     cdef int n = t.shape[0]
+    
+    # NEW
+    leading_terms = np.zeros(n)
+    cdef double[:] leading_terms_view = leading_terms
 
     likelihoods = np.zeros(n)
     cdef double[:] likelihoods_view = likelihoods
@@ -83,12 +90,17 @@ def batch_fptd(t, double v = 1, double a = 1, double w = 0.5, double ndt = 1.0, 
                 likelihoods_view[i] = 1e-48
             else:
                 sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
-                leading_term = calculate_leading_term(t_view[i], (-1) * v, a, 1 - w)
+                
+                if sdv == 0:
+                    leading_terms_view[i] = calculate_leading_term(t_view[i], (-1) * v, a, 1 - w)
+                else:
+                    leading_terms_view[i] = calculate_leading_term_with_drift_noise(t_view[i], (-1) * v, a, 1 - w, sdv)
+            
                 if sgn_lambda >= 0:
-                    likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(t_view[i] / (a**2),
+                    likelihoods_view[i] = fmax(1e-48, leading_terms_view[i] * fptd_large(t_view[i] / (a**2),
                         1 - w, k_l))
                 else:
-                    likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(t_view[i] / (a**2),
+                    likelihoods_view[i] = fmax(1e-48, leading_terms_view[i] * fptd_small(t_view[i] / (a**2),
                         1 - w, k_s))
         elif t_view[i] > 0:
             # adjust rt for ndt
@@ -98,14 +110,19 @@ def batch_fptd(t, double v = 1, double a = 1, double w = 0.5, double ndt = 1.0, 
                 likelihoods_view[i] = 1e-48
             else:
                 sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
-                leading_term = calculate_leading_term(t_view[i], v, a, w)
+                
+                if sdv == 0:
+                    leading_terms_view[i] = calculate_leading_term(t_view[i], v, a, w)
+                else:
+                    leading_terms_view[i] = calculate_leading_term_with_drift_noise(t_view[i], v, a, w, sdv)
+                 
                 if sgn_lambda >= 0:
-                    likelihoods_view[i] = fmax(1e-48, leading_term * fptd_large(t_view[i] / (a**2),
+                    likelihoods_view[i] = fmax(1e-48, leading_terms_view[i] * fptd_large(t_view[i] / (a**2),
                         w, k_l))
                 else:
-                    likelihoods_view[i] = fmax(1e-48, leading_term * fptd_small(t_view[i] / (a**2),
+                    likelihoods_view[i] = fmax(1e-48, leading_terms_view[i] * fptd_small(t_view[i] / (a**2),
                         w, k_s))
-
+    
     return likelihoods
 
 def array_fptd(t, v, a, w, double eps=1e-9):
@@ -147,4 +164,3 @@ def array_fptd(t, v, a, w, double eps=1e-9):
                     t_view[i] / (a_view[i]**2), w_view[i], k_s))
 
     return likelihoods
-

@@ -235,11 +235,23 @@ def make_fptd_data(data = [], params = [], metadata  = [], keep_file = 0, n_kde 
     samples_kde = tmp_kde.kde_sample(n_samples = n_kde)
     out[:n_kde, 0] = samples_kde[0].ravel()
     out[:n_kde, 1] = samples_kde[1].ravel()
-    out[:n_kde, 2] = np.log(batch_fptd(out[:n_kde, 0] * out[:n_kde, 1] * (- 1),
-                                       params[0],
-                                       params[1] * 2,
-                                       params[2],
-                                       params[3]))
+    
+    # If we have 4 parameters we know we have the ddm --> use default sdv = 0
+    if len(params) == 4:
+        out[:n_kde, 2] = np.log(batch_fptd(out[:n_kde, 0] * out[:n_kde, 1] * ( -1),
+                                           params[0],
+                                           params[1] * 2,
+                                           params[2],
+                                           params[3]))
+    
+    # If we have 5 parameters but analytic we know we need to use the ddm_sdv --> supply sdv value to batch_fptd
+    if len(params) == 5:
+        out[:n_kde, 2] = np.log(batch_fptd(out[:n_kde, 0] * out[:n_kde, 1] * ( -1),
+                                           params[0],
+                                           params[1] * 2,
+                                           params[2],
+                                           params[3],
+                                           params[4]))
     
     # Get positive uniform part:
     choice_tmp = np.random.choice(metadata['possible_choices'], size = n_unif_up)
@@ -258,12 +270,24 @@ def make_fptd_data(data = [], params = [], metadata  = [], keep_file = 0, n_kde 
 
     out[n_kde:(n_kde + n_unif_up), 0] = rt_tmp
     out[n_kde:(n_kde + n_unif_up), 1] = choice_tmp
-    out[n_kde:(n_kde + n_unif_up), 2] = np.log(batch_fptd(out[n_kde:(n_kde + n_unif_up), 0] * out[n_kde:(n_kde + n_unif_up), 1] * (- 1),
-                                               params[0],
-                                               params[1] * 2,
-                                               params[2],
-                                               params[3]))
-
+    
+    # If we have 4 parameters we know we have the ddm --> use default sdv = 0
+    if len(params) == 4:
+        out[n_kde:(n_kde + n_unif_up), 2] = np.log(batch_fptd(out[n_kde:(n_kde + n_unif_up), 0] * out[n_kde:(n_kde + n_unif_up), 1] * (- 1),
+                                                   params[0],
+                                                   params[1] * 2,
+                                                   params[2],
+                                                   params[3]))
+        
+    # If we have 5 parameters but analytic we know we need to use the ddm_sdv --> supply sdv value to batch_fptd
+    if len(params) == 5:
+        out[n_kde:(n_kde + n_unif_up), 2] = np.log(batch_fptd(out[n_kde:(n_kde + n_unif_up), 0] * out[n_kde:(n_kde + n_unif_up), 1] * (- 1),
+                                                   params[0],
+                                                   params[1] * 2,
+                                                   params[2],
+                                                   params[3],
+                                                   params[4]))
+        
     # Get negative uniform part:
     choice_tmp = np.random.choice(metadata['possible_choices'],
                                   size = n_unif_down)

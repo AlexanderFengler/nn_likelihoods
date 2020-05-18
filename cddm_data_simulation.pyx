@@ -510,6 +510,106 @@ def full_ddm(float v = 0,
 
 # -------------------------------------------------------------------------------------------------
 
+# Simulate (rt, choice) tuples from: Full DDM with flexible bounds --------------------------------
+# @cythonboundscheck(False)
+# @cythonwraparound(False)
+def ddm_sdv(float v = 0,
+                 float a = 1,
+                 float w = 0.5,
+                 float ndt = 0.0,
+                 float sdv = 0.1,
+                 float s = 1,
+                 float delta_t = 0.001,
+                 float max_t = 20,
+                 int n_samples = 20000,
+                 print_info = True,
+                 boundary_fun = None, # function of t (and potentially other parameters) that takes in (t, *args)
+                 boundary_multiplicative = True,
+                 boundary_params = {}
+                 ):
+
+    rts = np.zeros((n_samples, 1), dtype = DTYPE)
+    choices = np.zeros((n_samples, 1), dtype = np.intc)
+
+    cdef float[:, :] rts_view = rts
+    cdef int[:, :] choices_view = choices
+
+    cdef float delta_t_sqrt = sqrt(delta_t) # correct scalar so we can use standard normal samples for the brownian motion
+    cdef float sqrt_st = delta_t_sqrt * s # scalar to ensure the correct variance for the gaussian step
+
+    # Boundary storage for the upper bound
+    cdef int num_draws = int((max_t / delta_t) + 1)
+    boundary = np.zeros(num_draws, dtype = DTYPE)
+    cdef float[:] boundary_view = boundary
+    
+    cdef int i
+    cdef float tmp
+
+    # Precompute boundary evaluations
+    if boundary_multiplicative:
+        for i in range(num_draws):
+            tmp = a * boundary_fun(t = i * delta_t, **boundary_params)
+            if tmp > 0:
+                boundary_view[i] = tmp
+    else:
+        for i in range(num_draws):
+            tmp = a + boundary_fun(t = i * delta_t, **boundary_params)
+            if tmp > 0:
+                boundary_view[i] = tmp
+    
+    cdef float y, t
+    cdef int n, ix
+    cdef int m = 0
+    cdef float drift_increment = 0.0
+    cdef float[:] gaussian_values = draw_gaussian(num_draws) 
+
+    # Loop over samples
+    for n in range(n_samples):
+        # initialize starting point
+        y = ((-1) * boundary_view[0]) + (w * 2.0 * (boundary_view[0]))  # reset starting position
+        
+        # get drift by random displacement of v 
+        drift_increment = (v + sdv * gaussian_values[m]) * delta_t
+        
+        # increment m appropriately
+        m += 1
+        if m == num_draws:
+                gaussian_values = draw_gaussian(num_draws)
+                m = 0
+        
+        t = 0 # reset time
+        ix = 0 # reset boundary index
+        
+        # Random walker
+        while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
+            y += drift_increment + (sqrt_st * gaussian_values[m])
+            t += delta_t
+            ix += 1
+            m += 1
+            
+            if m == num_draws:
+                gaussian_values = draw_gaussian(num_draws)
+                m = 0
+
+        rts_view[n, 0] = t + ndt # Store rt
+        choices_view[n, 0] = np.sign(y) # Store choice
+
+    return (rts, choices,  {'v': v,
+                            'a': a,
+                            'w': w,
+                            'ndt': ndt,
+                            'sdv': sdv,
+                            's': s,
+                            **boundary_params,
+                            'delta_t': delta_t,
+                            'max_t': max_t,
+                            'n_samples': n_samples,
+                            'simulator': 'ddm_sdv',
+                            'boundary_fun_type': boundary_fun.__name__,
+                            'possible_choices': [-1, 1]})
+
+# -------------------------------------------------------------------------------------------------
+
 # Simulate (rt, choice) tuples from: Onstein-Uhlenbeck with flexible bounds -----------------------
 # @cythonboundscheck(False)
 # @cythonwraparound(False)
