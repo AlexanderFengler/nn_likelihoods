@@ -182,6 +182,8 @@ if __name__ == "__main__":
             keras_model(keras_input_batch)
             info['keras_var_batch_no_pred_timings'].append((datetime.now() - start).total_seconds())
         
+        # Keras
+        print('Running keras fix batch no pred')
         for i in range(nreps):
             n_batches = int(n / 1024)
             start = datetime.now()
