@@ -21,9 +21,10 @@
 #SBATCH --mem=32G
 #SBATCH -c 14
 #SBATCH -N 1
-#SBATCH --constraint='quadrortx'
+
+##SBATCH --constraint='quadrortx'
 ##SBATCH --constraint='cascade'
-#SBATCH -p gpu --gres=gpu:1
+##SBATCH -p gpu --gres=gpu:1
 #SBATCH --array=1-1
 
 source /users/afengler/.bashrc

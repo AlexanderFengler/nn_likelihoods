@@ -200,7 +200,8 @@ if __name__ == "__main__":
             keras_input_batch[:, :4] = params_rep
             keras_model.predict(keras_input_batch)
             info['keras_no_batch_timings'].append((datetime.now() - start).total_seconds())
-    
+            
+        print(info)
     if machine == 'ccv':
         pickle.dump(info, open('/users/afengler/data/timings/timings_gpu_' + str(gpu) + '.pickle', 'wb'), 
                     protocol = 4)
