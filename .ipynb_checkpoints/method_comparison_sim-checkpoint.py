@@ -461,10 +461,11 @@ if __name__ == "__main__":
             posterior_samples = p.map(mlp_posterior, zip(data_grid, init_grid, 
                                                          sampler_param_bounds))
     else:
-        for i in range((int(out_file_id) - 1) * 10, (int(out_file_id)) * 10, 1):
-            posterior_samples = mlp_posterior((data_grid[i],
-                                               init_grid[i],
-                                               sampler_param_bounds[i]))
+        posterior_samples = ()
+        for i in range(n_by_arrayjob):
+            posterior_samples += ((mlp_posterior((data_grid[i],
+                                                  init_grid[i],
+                                                  sampler_param_bounds[i]))), )
     end_time = time.time()
     exec_time = end_time - start_time
     
