@@ -14,7 +14,7 @@
 
 # Request runtime, memory, cores
 #SBATCH --time=12:00:00
-#SBATCH --mem=128G
+#SBATCH --mem=96G
 #SBATCH -c 14
 #SBATCH -N 1
 #SBATCH --array=1-300
@@ -34,7 +34,7 @@ datatype="cnn_train" #"cnn_train" # "parameter_recovery"
 mode="mlp"
 analytic=0
 maxt=20
-nproc=14
+nproc=10
 
 # params concerning training data generation
 nbyparam=1000
