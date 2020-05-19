@@ -33,8 +33,8 @@ machine="ccv" #"ccv"
 datatype="cnn_train" #"cnn_train" # "parameter_recovery"
 mode="mlp"
 analytic=0
-maxt=16
-nproc=
+maxt=20
+nproc=16
 
 # params concerning training data generation
 nbyparam=1000
