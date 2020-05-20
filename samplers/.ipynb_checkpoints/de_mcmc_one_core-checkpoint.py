@@ -1,17 +1,20 @@
 import numpy as np
 import scipy
 import scipy.optimize as scp_opt
-import diagnostics as mcmcdiag
+import scipy.stats as scp_stat
+import samplers.diagnostics as mcmcdiag
 
 class DifferentialEvolutionSequential():
     
     def __init__(self, 
                  bounds, 
                  target, 
-                 NP_multiplier = 4, 
-                 gamma = 0.4, 
-                 proposal_var = 0.01, 
-                 crp = 0.3):
+                 NP_multiplier = 5, 
+                 gamma = 'auto', # 'auto' or float 
+                 mode_switch_p = 0.1,
+                 proposal_std = 0.01,
+                 crp = 0.3,
+                 n_burn_in = 1000):
         
         """
         Params
@@ -29,16 +32,32 @@ class DifferentialEvolutionSequential():
         gamma: float
             gamma parameter to mediate the magnitude of the update
         """
+        
         self.optimizer = scp_opt.differential_evolution
         self.dims = len(bounds) #np.array([i for i in range(len(bounds))])
         self.bounds = bounds
         self.NP = int(np.floor(NP_multiplier * self.dims))
         self.target = target
-        self.gamma = gamma
-        self.proposal_var = proposal_var
+        
+        if gamma == 'auto':
+            self.gamma = 2.38 / np.sqrt(2 * self.dims)
+        else: 
+            self.gamma = gamma
+
+        #self.gamma = gamma 
+        self.mode_switch_p = mode_switch_p
+        self.proposal_std = proposal_std
         self.crp = crp
+        self.n_burn_in = n_burn_in
         self.accept_cnt = 0
         self.total_cnt = 0
+        self.gelman_rubin = 10
+        self.gelman_rubin_r_hat = []
+        np.random.seed()
+        self.random_seed = np.random.get_state()
+
+        #print(self.random_seed)
+        print(np.random.normal(size = 10))
     
     def attach_sample(self, samples):
         assert samples.shape[0] == self.NP, 'Population size of previous sample does not match NP parameter value'
@@ -71,19 +90,26 @@ class DifferentialEvolutionSequential():
             R2 = pop
             while R2 == pop or R2 == R1:
                 R2 = np.random.choice(pop_seq)
-             
-            proposals[pop, :] += self.gamma * (proposals[R1, :] - proposals[R2, :]) +  \
-                                                        np.random.normal(loc = 0, scale = self.proposal_var, size = self.dims)
+                
+            # Assign gamma == 1 according to parameter mode_switch_p
+            gamma_cur = np.random.choice([self.gamma, 1],  p = [1 - self.mode_switch_p, self.mode_switch_p]) 
+            proposals[pop, :] += gamma_cur * (proposals[R1, :] - proposals[R2, :]) +  \
+                                                        np.random.normal(loc = 0, scale = self.proposal_std, size = self.dims)
+                                                        #self.proposal_std * np.random.standard_t(df = 2, size = self.dims)
+                                                        
             
-            # Clip proposal at bounds:
+            # Clip proposal at bounds: TD REFLECT AT BOUND?
             for dim in range(self.dims):
                 proposals[pop, dim] = np.clip(proposals[pop, dim], self.bounds[dim][0], self.bounds[dim][1])
             
             # Crossover:
-            if crossover == True:
-                n_keep = np.random.binomial(self.dims - 1, p = 1 - self.crp)
-                id_keep = np.random.choice(self.dims, n_keep, replace = False)
-                proposals[pop, id_keep] = self.samples[pop, idx - 1, id_keep]
+            if gamma_cur == 1: # If we allow mode switch --> we do not subsample dimensions
+                 pass  
+            else: # If we are not mode switching we use dimension subsampling
+                 if crossover == True:
+                    n_keep = np.random.binomial(self.dims - 1, p = 1 - self.crp)
+                    id_keep = np.random.choice(self.dims, n_keep, replace = False)
+                    proposals[pop, id_keep] = self.samples[pop, idx - 1, id_keep]
             
             proposals_lps[pop] = self.target(proposals[pop, :], self.data)
             acceptance_prob = proposals_lps[pop] - self.lps[pop, idx - 1]
@@ -103,8 +129,9 @@ class DifferentialEvolutionSequential():
                anneal_k = 1 / 80, 
                anneal_L = 10,
                init = 'random',
-               active_dims = None,
-               frozen_dim_vals = None): 
+               active_dims = None, # ADD ACTIVE DIMS PROPERLY HERE
+               frozen_dim_vals = None,
+               gelman_rubin_force_stop = False): 
         
         if add == False:
             self.data = data
@@ -147,33 +174,72 @@ class DifferentialEvolutionSequential():
         print("Beginning sampling:")
         n_samples_final = self.samples.shape[1]
         i = id_start
-        
+        continue_ = 1
         while i < n_samples_final:
+            
+            # Print iteration number periodically
             if (i % 200 == 0):
                 print("Iteration {}".format(i))
+            
+            # Apply adaptations during burn in
+            if ((i > 1000) and (i % 200 == 0) and (i < self.n_burn_in)):
                 
-                # Adaptive step
-                if (i > 1000 and self.n_adaptations < 10):
-                    if (self.accept_cnt / self.total_cnt) < 0.1:
-                        self.proposal_var = self.proposal_var / 2
-                        print('New proposal variance: ', self.proposal_var)
-                    if (self.accept_cnt / self.total_cnt) > 0.4:
-                        self.proposal_var = self.proposal_var * 1.5
-                        print('New proposal variance: ', self.proposal_var)
-                    
-                    self.accept_cnt = 0
-                    self.total_cnt = 0
-                    
-                if ((i > 2000) and (i % 1000)):
-                    continue_, r_hat = mcmcdiag.get_gelman_rubin_mv(chains = self.samples,
-                                                                burn_in = 1000,
-                                                                tresh = 1.005)
-                    print('Gelman Rubin: ', r_hat)
-                    print('Contineu: ', continue_)
-                    if not continue_:
+                acc_rat_tmp = self.accept_cnt / self.total_cnt
+                print('Acceptance ratio: ', acc_rat_tmp)
+                if (acc_rat_tmp) < 0.05:
+                    self.proposal_std = self.proposal_std / 2
+                    print('New proposal std: ', self.proposal_std)
+
+                if (acc_rat_tmp) > 0.5:
+                    self.proposal_std = self.proposal_std * 1.5
+                    print('New proposal std: ', self.proposal_std)
+
+                self.accept_cnt = 0
+                self.total_cnt = 0
+
+                # Pull outlier chains in: TD make adaptive periods proper !
+
+                # Get log posterior means
+                lp_means = np.mean(self.lps[int(i / 2):i, :], axis = 0)
+
+                # Get first quantile
+                q1 = np.quantile(lp_means, .25)
+
+                # Get interquartile range
+                iqr = scp_stat.iqr(lp_means)
+
+                # Get the ids of outliers and proper chains
+                okids = (lp_means > (q1 - 2 * iqr)).nonzero()
+                outlierids = (lp_means < (q1 - 2 * iqr)).nonzero()
+
+                # Exchange last sample of outlier chains with proper chains
+                for outlierid in outlierids:
+                    okid = np.random.choice(okids)
+                    self.samples[outlierid, i - 1, :] = self.samples[okid, i - 1, :]
+                    self.lps[outlierid, i - 1] = self.lps[okid, i - 1]
+
+                print('Number of Outliers: ', len(outlierids))
+
+                # If outliers were pulled in we extend burn in period
+                if len(outlierids) >= 1:
+                    self.n_burn_in += 200
+                    print('Burn in extended to: ', self.n_burn_in)
+                
+            # Periodically compute gelman rubin and potentially use it as stopping rule if desired 
+            if ((i > self.n_burn_in) and (i % 1000)):
+                # Compute gelman rubin
+                continue_, r_hat = mcmcdiag.get_gelman_rubin_mv(chains = self.samples,
+                                                                burn_in = self.n_burn_in,
+                                                                thresh = 1.01)
+                self.gelman_rubin_r_hat.append(r_hat)
+
+                print('Gelman Rubin: ', r_hat)
+                print('Continue: ', continue_)
+
+                if not continue_:
+                    if gelman_rubin_force_stop:
                         break
                     
-            
             self.propose(i, anneal_k, anneal_L, crossover)
             i += 1
         
@@ -181,4 +247,4 @@ class DifferentialEvolutionSequential():
             # Here I need to adjust samples so that the final datastructure doesn't have 0 elements
             pass
         
-        return (self.samples, self.lps)
+        return (self.samples, self.lps, self.gelman_rubin_r_hat, self.random_seed)

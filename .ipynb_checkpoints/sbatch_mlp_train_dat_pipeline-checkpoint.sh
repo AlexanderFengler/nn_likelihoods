@@ -17,13 +17,13 @@
 #SBATCH --mem=96G
 #SBATCH -c 14
 #SBATCH -N 1
-#SBATCH --array=1-300
+#SBATCH --array=1-150
 
 # --------------------------------------------------------------------------------------
 # Sequentially run different kind of models
 
 #declare -a dgps=( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "lca" "race_model" "ddm_seq2" "ddm_par2" "ddm_mic2" "ddm_seq2_angle" "ddm_par2_angle" "ddm_mic2_angle") 
-declare -a dgps=( "ddm_sdv" )     # ( "angle2" )  #( "weibull_cdf" ) # ( "ddm_seq2_angle" "ddm_mic2_angle" "ddm_par2_angle" )
+declare -a dgps=( "ddm_sdv_red" )  # ( "angle2" )  #( "weibull_cdf" ) # ( "ddm_seq2_angle" "ddm_mic2_angle" "ddm_par2_angle" )
 n_samples=( 20000 )   # ( 128 256 512 1024 2048 4096 8192 50000 100000 200000 400000 )
 n_choices=( 2 ) #( 4 5 6 )
 n_parameter_sets=10000   #20000
@@ -32,9 +32,9 @@ binned=0
 machine="ccv" #"ccv"
 datatype="cnn_train" #"cnn_train" # "parameter_recovery"
 mode="mlp"
-analytic=0
+analytic=1
 maxt=20
-nproc=10
+nproc=12
 
 # params concerning training data generation
 nbyparam=1000
