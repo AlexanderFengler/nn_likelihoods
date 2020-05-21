@@ -66,7 +66,7 @@ conda activate tf-gpu-py37
 # NNBATCH RUNS
 
 nmcmcsamples=2000
-nbyarrayjob=1
+nbyarrayjob=4
 nsamples=( 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
 method='angle2'  #"full_ddm2"
 ids=( -1 )
