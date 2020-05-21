@@ -19,7 +19,7 @@
 #SBATCH -c 12
 #SBATCH -N 1
 ##SBATCH -p gpu --gres=gpu:1
-#SBATCH --array=1-100
+#SBATCH --array=1-1
 
 # Run a command
 #source /users/afengler/miniconda3/etc/profile.d/conda.sh
@@ -63,7 +63,7 @@ conda activate tf-cpu
 
 nmcmcsamples=20000
 nbyarrayjob=1
-nsamples=( 4096 8192 ) # 2048 4096 ) #( 1024 2048 4096 )
+nsamples=( 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
 method='angle2'  #"full_ddm2"
 ids=( -1 )
 machine='ccv'

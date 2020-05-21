@@ -206,6 +206,7 @@ if __name__ == "__main__":
             print('Loading network from: ')
             print(network_path)
             
+            global keras_model
             keras_model = keras.models.load_model(network_path + '/model_final.h5', compile = False)
             
     if machine == 'home':
