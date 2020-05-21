@@ -46,6 +46,8 @@ import keras_to_numpy_class as ktnpc
 # Tensorflow 
 import tensorflow as tf
 from tensorflow import keras
+
+print('Tensorflow version: ', tf.__version__)
 # -----------------------------------------------------------------------------
 
 # SUPPORT FUNCTIONS -----------------------------------------------------------

@@ -226,7 +226,7 @@ class DifferentialEvolutionSequential():
                     print('Burn in extended to: ', self.n_burn_in)
                 
             # Periodically compute gelman rubin and potentially use it as stopping rule if desired 
-            if ((i > self.n_burn_in) and (i % 1000)):
+            if ((i > self.n_burn_in) and (i % 1000 == 0)):
                 # Compute gelman rubin
                 continue_, r_hat = mcmcdiag.get_gelman_rubin_mv(chains = self.samples,
                                                                 burn_in = self.n_burn_in,
