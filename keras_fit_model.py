@@ -42,12 +42,21 @@ if __name__ == "__main__":
     CLI.add_argument('--warmstart',
                      type = int,
                      default = 0)
+    CLI.add_argument('--analytic',
+                     type = int,
+                     default = 0)
     
     args = CLI.parse_args()
     print(args)
 
     # CHOOSE ---------
-    method = args.method
+    
+    # If we training data comes from analytic likelihood add analytic tag to model to pick out the correct key in dictionary loaded with kde_stats.pickle
+    if args.analytic:
+        method = args.method + '_analytic'
+    else:
+        method = args.method
+    
     # method = "weibull_cdf" # ddm, linear_collapse, ornstein, full, lba
     warm_start = args.warmstart
     n_training_datasets_to_load = args.nfiles

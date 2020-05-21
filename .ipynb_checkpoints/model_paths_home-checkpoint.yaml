@@ -25,7 +25,6 @@ linear_collapse: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/linear
 # This weibull model is based on 100 files 1billion training samples
 #weibull_cdf: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/weibull_cdf/keras_models/dnnregressor_weibull_cdf_12_15_19_21_41_21/
 
-
 # This is an older angle mlp that used the more constrained parameter space
 # angle: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/angle/keras_models/dnnregressor_angle_ndt_09_28_19_18_05_42/
 # This is an older weibull mlp that used the more constrained parameter space

@@ -347,7 +347,7 @@ if __name__ == "__main__":
         # input_batch = np.concatenate([params_rep, data], axis = 1)
         #return np.sum(np.maximum(mlpt.predict(mlp_input_batch), ll_min))
         #return np.sum(np.core.umath.maximum(ktnp.predict(mlp_input_batch, weights, biases, activations, n_layers), ll_min))
-        return np.sum(np.core.umath.maximum(keras_model(mlp_input_batch), ll_min))
+        return np.sum(np.core.umath.maximum(keras_model.predict_on_batch(mlp_input_batch), ll_min))
 
     # def mlp_target(params,
     #                data,

@@ -33,21 +33,36 @@ conda activate tf-gpu-py37
 
 nfiles=150
 method='ddm_sdv_red'
+analytic=0
 machine='ccv'
-maxidfiles=150
-model_type='analytic'
+maxidfiles=300
+
+
+if [ $analytic -eq 1 ]; then
+    for i in {1..5}
+    do
+       echo "Now starting run: $i \n"
+       python -u /users/afengler/git_repos/nn_likelihoods/keras_fit_model.py --machine $machine --method $method --nfiles $nfiles --maxidfiles $maxidfiles --datafolder /users/afengler/data/analytic/${method}/training_data_binned_0_nbins_0_n_20000/ --nbydataset 10000000 --warmstart 0 --analytic $analytic
+    done
+else
+    for i in {1..5}
+    do
+       echo "Now starting run: $i \n"
+       python -u /users/afengler/git_repos/nn_likelihoods/keras_fit_model.py --machine $machine --method $method --nfiles $nfiles --maxidfiles $maxidfiles --datafolder /users/afengler/data/kde/${method}/training_data_binned_0_nbins_0_n_20000/ --nbydataset 10000000 --warmstart 0 --analytic $analytic
+    done
+
+fi
 
 # USE THIS DATAFOLDER FOR ANY CASE UP TO DDM ANALYTIC
 # datafolder=/users/afengler/data/kde/${method}/training_data_binned_0_nbins_0_n_20000/
 
-#!/bin/bash
-for i in {1..5}
-do
-   echo "Now starting run: $i \n"
-   python -u /users/afengler/git_repos/nn_likelihoods/keras_fit_model.py --machine $machine --method $method --nfiles $nfiles --maxidfiles $maxidfiles --datafolder /users/afengler/data/${model_type}/${method}/training_data_binned_0_nbins_0_n_20000/ --nbydataset 10000000 --warmstart 0
-done
+# for i in {1..5}
+# do
+#    echo "Now starting run: $i \n"
+#    python -u /users/afengler/git_repos/nn_likelihoods/keras_fit_model.py --machine $machine --method $method --nfiles $nfiles --maxidfiles $maxidfiles --datafolder /users/afengler/data/${model_type}/${method}/training_data_binned_0_nbins_0_n_20000/ --nbydataset 10000000 --warmstart 0
+# done
 
-#!/bin/bash
+# #!/bin/bash
 
 
 # Pick number of files to consider
