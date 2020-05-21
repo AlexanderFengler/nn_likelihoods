@@ -159,7 +159,7 @@ if __name__ == "__main__":
     sampler = args.sampler
     data_type = args.datatype
     n_samples = args.nsamples
-    n_slice_samples = args.nmcmcsamples
+    nmcmcsamples = args.nmcmcsamples
     infile_id = args.infileid
     out_file_id = args.outfileid
     out_file_signature = args.outfilesig
@@ -402,10 +402,13 @@ if __name__ == "__main__":
                                                     crp = 0.3)
         
         (samples, lps, gelman_rubin_r_hat, random_seed) = model.sample(data = args[0],
-                                                                       num_samples = n_slice_samples,
+                                                                       max_samples = nmcmcsamples,
+                                                                       min_samples = 2000,
+                                                                       n_burn_in = 1000,
                                                                        init = args[1],
                                                                        active_dims = active_dims,
-                                                                       frozen_dim_vals = frozen_dims)
+                                                                       frozen_dim_vals = frozen_dims,
+                                                                       gelman_rubin_force_stop = True)
         return (samples, lps, gelman_rubin_r_hat, random_seed)
 
     # Test navarro-fuss
@@ -425,10 +428,13 @@ if __name__ == "__main__":
                                                     crp = 0.3)
         
         (samples, lps, gelman_rubin_r_hat, random_seed) = model.sample(data = args[0],
-                                                                       num_samples = n_slice_samples,
+                                                                       max_samples = nmcmcsamples,
+                                                                       min_samples = 2000,
+                                                                       n_burn_in = 1000,
                                                                        init = args[1],
                                                                        active_dims = active_dims,
-                                                                       frozen_dim_vals = frozen_dims)
+                                                                       frozen_dim_vals = frozen_dims,
+                                                                       gelman_rubin_force_stop = True)
        
         return (samples, lps, gelman_rubin_r_hat, random_seed)
 
@@ -439,7 +445,7 @@ if __name__ == "__main__":
                              w = .4 / 1024,
                              p = 8)
         
-        model.sample(args[0], num_samples = n_slice_samples, init = args[1])
+        model.sample(args[0], max_samples = nmcmcsamples, init = args[1])
         return model.samples
 
     # Make available the specified amount of cpus

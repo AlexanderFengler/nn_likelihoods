@@ -65,3 +65,13 @@ ddm_analytic_batch: ['/users/afengler/data/analytic/ddm/keras_models/dnnregresso
 '/users/afengler/data/analytic/ddm/keras_models/dnnregressor_ddm_analytic_05_13_20_16_41_57/',
 '/users/afengler/data/analytic/ddm/keras_models/dnnregressor_ddm_analytic_05_13_20_19_00_49/',
 '/users/afengler/data/analytic/ddm/keras_models/dnnregressor_ddm_analytic_05_13_20_21_22_18/']
+ddm_sdv_batch: ['/users/afengler/data/kde/ddm_sdv/keras_models/dnnregressor_ddm_sdv_05_20_20_09_11_02/',
+'/users/afengler/data/kde/ddm_sdv/keras_models/dnnregressor_ddm_sdv_05_20_20_11_40_02/',
+'/users/afengler/data/kde/ddm_sdv/keras_models/dnnregressor_ddm_sdv_05_20_20_14_08_32/',
+'/users/afengler/data/kde/ddm_sdv/keras_models/dnnregressor_ddm_sdv_05_20_20_16_37_06/',
+'/users/afengler/data/kde/ddm_sdv/keras_models/dnnregressor_ddm_sdv_05_20_20_18_45_28/']
+ddm_sdv_analytic_batch: ['/users/afengler/data/analytic/ddm_sdv/keras_models/dnnregressor_ddm_sdv_05_20_20_02_26_31/',
+'/users/afengler/data/analytic/ddm_sdv/keras_models/dnnregressor_ddm_sdv_05_20_20_04_54_29/',
+'/users/afengler/data/analytic/ddm_sdv/keras_models/dnnregressor_ddm_sdv_05_20_20_07_13_54/',
+'/users/afengler/data/analytic/ddm_sdv/keras_models/dnnregressor_ddm_sdv_05_20_20_09_34_46/',
+'/users/afengler/data/analytic/ddm_sdv/keras_models/dnnregressor_ddm_sdv_05_20_20_11_54_58/']

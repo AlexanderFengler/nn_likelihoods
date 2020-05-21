@@ -123,7 +123,7 @@ class DifferentialEvolutionSequential():
    
     def sample(self, 
                data, 
-               num_samples = 800, 
+               max_samples = 5000, 
                add = False, 
                crossover = True, 
                anneal_k = 1 / 80, 
@@ -131,12 +131,18 @@ class DifferentialEvolutionSequential():
                init = 'random',
                active_dims = None, # ADD ACTIVE DIMS PROPERLY HERE
                frozen_dim_vals = None,
+               n_burn_in = 2000,
+               min_samples = 3000,
                gelman_rubin_force_stop = False): 
         
         if add == False:
+            self.n_burn_in = n_burn_in
+            self.min_samples = min_samples
+            self.max_samples = max_samples
+            
             self.data = data
-            self.lps = np.zeros((self.NP, num_samples))
-            self.samples = np.zeros((self.NP, num_samples, self.dims))
+            self.lps = np.zeros((self.NP, max_samples))
+            self.samples = np.zeros((self.NP, max_samples, self.dims))
             
             # Accept and total counts reset
             self.accept_cnt = 0
@@ -157,11 +163,11 @@ class DifferentialEvolutionSequential():
         if add == True:
             # Make extended data structure
             shape_prev = self.samples.shape
-            samples_tmp = np.zeros((shape_prev[0], shape_prev[1] + num_samples, shape_prev[2]))
+            samples_tmp = np.zeros((shape_prev[0], shape_prev[1] + max_samples, shape_prev[2]))
             samples_tmp[:shape_prev[0], :shape_prev[1], :shape_prev[2]] = self.samples
             self.samples = samples_tmp
 
-            lps_tmp = np.zeros((self.NP, shape_prev[1] + num_samples))
+            lps_tmp = np.zeros((self.NP, shape_prev[1] + max_samples))
             lps_tmp[:, :shape_prev[1]] = self.lps
             self.lps = lps_tmp
 
@@ -172,7 +178,8 @@ class DifferentialEvolutionSequential():
             self.total_cnt = 0
             
         print("Beginning sampling:")
-        n_samples_final = self.samples.shape[1]
+        n_samples_final = self.samples.shape[1] # If we allow adding samples to a set of previous samples we need to access samples.shape instead of simply picking max_samples --> if add == False then max_samples = n_samples_final
+        adaptation_start = int(self.n_burn_in / 2)
         i = id_start
         continue_ = 1
         while i < n_samples_final:
@@ -182,7 +189,7 @@ class DifferentialEvolutionSequential():
                 print("Iteration {}".format(i))
             
             # Apply adaptations during burn in
-            if ((i > 1000) and (i % 200 == 0) and (i < self.n_burn_in)):
+            if ((i > adaptation_start) and (i % 200 == 0) and (i < self.n_burn_in)):
                 
                 acc_rat_tmp = self.accept_cnt / self.total_cnt
                 print('Acceptance ratio: ', acc_rat_tmp)
@@ -203,6 +210,9 @@ class DifferentialEvolutionSequential():
                 lp_means = np.mean(self.lps[:, int(i / 2):(i - 1)], axis = 1)
                 print('LP means: ' , lp_means)
                 print('LP means dim: ', lp_means.shape)
+                
+                # Get corresponding parameter values 
+                print(self.samples[:, (i-1), :])
                 
                 # Get first quantile
                 q1 = np.quantile(lp_means, .25)
@@ -227,6 +237,8 @@ class DifferentialEvolutionSequential():
                 # If outliers were pulled in we extend burn in period
                 if len(outlierids) >= 1:
                     self.n_burn_in += 200
+                    # We also extend min sample accordingly
+                    self.min_samples += 200
                     print('Burn in extended to: ', self.n_burn_in)
                 
             # Periodically compute gelman rubin and potentially use it as stopping rule if desired 
@@ -241,7 +253,7 @@ class DifferentialEvolutionSequential():
                 print('Continue: ', continue_)
 
                 if not continue_:
-                    if gelman_rubin_force_stop:
+                    if gelman_rubin_force_stop and (i > self.min_samples):
                         break
                     
             self.propose(i, anneal_k, anneal_L, crossover)
@@ -251,4 +263,4 @@ class DifferentialEvolutionSequential():
             # Here I need to adjust samples so that the final datastructure doesn't have 0 elements
             pass
         
-        return (self.samples, self.lps, self.gelman_rubin_r_hat, self.random_seed)
+        return (self.samples[:, self.n_burn_in:, :], self.lps[:, self.n_burn_in:], self.gelman_rubin_r_hat, self.random_seed)

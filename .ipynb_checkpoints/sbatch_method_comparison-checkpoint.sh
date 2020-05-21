@@ -21,9 +21,9 @@
 #SBATCH -p gpu --gres=gpu:1
 #SBATCH --array=1-1
 
-source /users/afengler/.bashrc
-conda deactivate
-conda activate tf-gpu-py37
+# source /users/afengler/.bashrc
+# conda deactivate
+# conda activate tf-gpu-py37
 
 # Run a command
 #source /users/afengler/miniconda3/etc/profile.d/conda.sh
@@ -65,12 +65,12 @@ conda activate tf-gpu-py37
 
 # NNBATCH RUNS
 
-nmcmcsamples=2000
-nbyarrayjob=4
-ncpus=4
+nmcmcsamples=40000
+nbyarrayjob=1
+ncpus=1
 nsamples=( 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
 method='angle2'  #"full_ddm2"
-ids=( -1 )
+ids=( 1 )
 machine='ccv'
 analytic=0
 #SLURM_ARRAY_TASK_ID=1
