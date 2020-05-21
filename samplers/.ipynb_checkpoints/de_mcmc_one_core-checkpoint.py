@@ -201,17 +201,21 @@ class DifferentialEvolutionSequential():
 
                 # Get log posterior means
                 lp_means = np.mean(self.lps[int(i / 2):i, :], axis = 0)
-
+                print('LP means: ' , lp_means)
+                print('LP means dim: ', lp_means.shape)
+                
                 # Get first quantile
                 q1 = np.quantile(lp_means, .25)
-
+                print('quantile: ', q1)
+                
                 # Get interquartile range
                 iqr = scp_stat.iqr(lp_means)
-
+                print('iqr: ', iqr)
                 # Get the ids of outliers and proper chains
                 okids = (lp_means > (q1 - 2 * iqr)).nonzero()
                 outlierids = (lp_means < (q1 - 2 * iqr)).nonzero()
-
+                print(okids)
+                print(outlierids)
                 # Exchange last sample of outlier chains with proper chains
                 for outlierid in outlierids:
                     okid = np.random.choice(okids)
