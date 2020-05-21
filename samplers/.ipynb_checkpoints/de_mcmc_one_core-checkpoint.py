@@ -136,7 +136,7 @@ class DifferentialEvolutionSequential():
         if add == False:
             self.data = data
             self.lps = np.zeros((self.NP, num_samples))
-            self.samples = np.zeros((self.NP, num_samples, self.dims)) 
+            self.samples = np.zeros((self.NP, num_samples, self.dims))
             
             # Accept and total counts reset
             self.accept_cnt = 0
@@ -200,7 +200,7 @@ class DifferentialEvolutionSequential():
                 # Pull outlier chains in: TD make adaptive periods proper !
 
                 # Get log posterior means
-                lp_means = np.mean(self.lps[int(i / 2):i, :], axis = 0)
+                lp_means = np.mean(self.lps[:, int(i / 2):(i - 1)], axis = 1)
                 print('LP means: ' , lp_means)
                 print('LP means dim: ', lp_means.shape)
                 
