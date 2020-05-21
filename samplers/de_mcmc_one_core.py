@@ -14,7 +14,7 @@ class DifferentialEvolutionSequential():
                  mode_switch_p = 0.1,
                  proposal_std = 0.01,
                  crp = 0.3,
-                 n_burn_in = 1000):
+                 n_burn_in = 2000):
         
         """
         Params
