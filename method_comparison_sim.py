@@ -482,6 +482,7 @@ if __name__ == "__main__":
                                                   sampler_param_bounds[i]))), )
     end_time = time.time()
     exec_time = end_time - start_time
+    print('Execution Time: ', exec_time)
     
     # Store files
     print('saving to file')
