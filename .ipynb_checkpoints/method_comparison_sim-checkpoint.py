@@ -167,6 +167,8 @@ if __name__ == "__main__":
     n_by_arrayjob = args.nbyarrayjob
     nnbatchid = args.nnbatchid
     analytic= args.analytic
+    
+    global keras_model
 
     # Initialize the frozen dimensions
     if len(args.frozendims) >= 1:
@@ -208,14 +210,13 @@ if __name__ == "__main__":
             print('Loading network from: ')
             print(network_path)
             
-            global keras_model
-            keras_model = keras.models.load_model(network_path + '/model_final.h5', compile = False)
+#             keras_model = keras.models.load_model(network_path + '/model_final.h5', compile = False)
             
     if machine == 'home':
         method_params = pickle.load(open("/users/afengler/OneDrive/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))[method]
         output_folder = method_params['output_folder_home']
         method_folder = method_params['method_folder_home']
-        with open("model_paths.yaml") as tmp_file:
+        with open("model_paths_home.yaml") as tmp_file:
             if nnbatchid == -1:
                 network_path = yaml.load(tmp_file)[method]
                 network_id = network_path[list(re.finditer('/', network_path))[-2].end():]
@@ -226,6 +227,10 @@ if __name__ == "__main__":
                 
             print('Loading network from: ')
             print(network_path)
+            
+#             global keras_model
+            keras_model = keras.models.load_model(network_path + '/model_final.h5', compile = False)
+            
             
     if data_type == 'perturbation_experiment':
         file_ = 'base_data_perturbation_experiment_nexp_1_n_' + str(n_samples) + '_' + infile_id + '.pickle'

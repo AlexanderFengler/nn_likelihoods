@@ -59,13 +59,13 @@ conda activate tf-gpu-py37
 #     python -u method_comparison_sim.py --machine ccv --method angle2 --nsamples $n --nmcmcsamples $nmcmcsamples --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 --samplerinit mle --ncpus 10 --nbyarrayjob $nbyarrayjob #$SLURM_ARRAY_TASK_ID 
 # done
 
-source /users/afengler/.bashrc
-conda deactivate
-conda activate tf-cpu
+# source /users/afengler/.bashrc
+# conda deactivate
+# conda activate tf-cpu
 
 # NNBATCH RUNS
 
-nmcmcsamples=20000
+nmcmcsamples=2000
 nbyarrayjob=1
 nsamples=( 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
 method='angle2'  #"full_ddm2"
