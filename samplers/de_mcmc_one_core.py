@@ -212,8 +212,8 @@ class DifferentialEvolutionSequential():
                 iqr = scp_stat.iqr(lp_means)
                 print('iqr: ', iqr)
                 # Get the ids of outliers and proper chains
-                okids = (lp_means > (q1 - 2 * iqr)).nonzero()
-                outlierids = (lp_means < (q1 - 2 * iqr)).nonzero()
+                okids = (lp_means > (q1 - 2 * iqr)).nonzero()[0]
+                outlierids = (lp_means < (q1 - 2 * iqr)).nonzero()[0]
                 print(okids)
                 print(outlierids)
                 # Exchange last sample of outlier chains with proper chains
