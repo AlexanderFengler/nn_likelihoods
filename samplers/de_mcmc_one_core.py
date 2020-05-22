@@ -172,7 +172,7 @@ class DifferentialEvolutionSequential():
             if init == 'random':
                 for pop in range(self.NP):
                     
-                    gfor dim in range(self.dims):
+                    for dim in range(self.dims):
                         # Initialize at random but give leave some buffer on each side of parameter boundaries
                         dim_range = self.bounds[dim][1] - self.bounds[dim][0]
                         temp[pop, dim] = np.random.uniform(low = self.bounds[dim][0] + (0.2 * dim_range), 
