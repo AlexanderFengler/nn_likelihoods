@@ -128,7 +128,7 @@ class DifferentialEvolutionSequential():
                crossover = True, 
                anneal_k = 1 / 80, 
                anneal_L = 10,
-               init = 'random',
+               init = 'random', # TD: Initialization only random at this point
                active_dims = None, # ADD ACTIVE DIMS PROPERLY HERE
                frozen_dim_vals = None,
                n_burn_in = 2000,
@@ -153,7 +153,8 @@ class DifferentialEvolutionSequential():
             
             for pop in range(self.NP):
                 for dim in range(self.dims):
-                    temp[pop, dim] = np.random.uniform(low = self.bounds[dim][0], high = self.bounds[dim][1])
+                    # Initialize at random but give leave some buffer on each side of parameter boundaries
+                    temp[pop, dim] = np.random.uniform(low = self.bounds[dim][0] + 0.1, high = self.bounds[dim][1] - 0.1)
 
                 self.samples[pop, 0, :] = temp[pop, :]
                 self.lps[pop, 0] = self.target(temp[pop, :], self.data)

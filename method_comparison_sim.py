@@ -155,7 +155,7 @@ if __name__ == "__main__":
     mode = args.boundmode
     machine = args.machine
     method = args.method
-    analytic = ('analytic' in method)
+    #analytic = ('analytic' in method)
     sampler = args.sampler
     data_type = args.datatype
     n_samples = args.nsamples
@@ -366,13 +366,23 @@ if __name__ == "__main__":
     #     return np.sum(np.maximum(model.predict(mlp_input_batch)[:, 0], ll_min))
     
     # NAVARRO FUSS (DDM)
-    def nf_target(params, data, likelihood_min = 1e-10):
-        return np.sum(np.maximum(np.log(batch_fptd(data[:, 0] * data[:, 1] * (- 1),
-                                                   params[0],
-                                                   params[1] * 2, 
-                                                   params[2],
-                                                   params[3])),
-                                                   np.log(likelihood_min)))
+    if 'sdv' in method:
+        def nf_target(params, data, likelihood_min = 1e-10):
+            return np.sum(np.maximum(np.log(batch_fptd(data[:, 0] * data[:, 1] * (- 1),
+                                                       params[0],
+                                                       params[1] * 2, 
+                                                       params[2],
+                                                       params[3],
+                                                       params[4])),
+                                                       np.log(likelihood_min)))
+    else:
+        def nf_target(params, data, likelihood_min = 1e-10):
+            return np.sum(np.maximum(np.log(batch_fptd(data[:, 0] * data[:, 1] * (- 1),
+                                                       params[0],
+                                                       params[1] * 2, 
+                                                       params[2],
+                                                       params[3])),
+                                                       np.log(likelihood_min)))
 
     # LBA ANALYTIC 
     def lba_target(params, data): # TODO add active and frozen dim vals
@@ -467,10 +477,11 @@ if __name__ == "__main__":
             posterior_samples = np.array(p.map(lba_posterior, zip(data_grid,
                                                                   init_grid,
                                                                   sampler_param_bounds)))
-        elif analytic and method == 'ddm_analytic':
+        elif analytic and 'ddm' in method:
             posterior_samples = p.map(nf_posterior, zip(data_grid, 
                                                         init_grid,
                                                         sampler_param_bounds))
+            
         else:
             posterior_samples = p.map(mlp_posterior, zip(data_grid, init_grid, 
                                                          sampler_param_bounds))
