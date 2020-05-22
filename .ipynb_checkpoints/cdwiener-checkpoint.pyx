@@ -16,14 +16,17 @@ cdef double fptd_large(double t, double w, int k):
 
 # Small-time approximation to fpt distribution
 cdef double fptd_small(double t, double w, int k):
-    cdef double temp = (k - 1) / 2
-    cdef int floor = np.floor(temp)
-    cdef int ceiling = - np.ceil(temp)
+    cdef double temp = ((k - 1) / 2)
+    
+    # This is what I think makes more sense... second equation
+    cdef int upper_k = np.ceil(temp)
+    cdef int lower_k = - np.floor(temp)
+    
     cdef double fptd_sum = 0
     cdef int i
 
-    for i in range(ceiling, floor + 1, 1):
-        fptd_sum += (w + 2 * i) * exp(- ((w + 2 * i)**2) / (2 * t))
+    for i in range(lower_k, upper_k + 1, 1):
+        fptd_sum += (w + (2 * i)) * exp(- ((w + (2 * i))**2) / (2 * t))
     return fptd_sum * (1 / sqrt(2 * M_PI * (t**3)))
 
 # Leading term (shows up for both large and small time)
@@ -64,7 +67,7 @@ def fptd(t = 0, v = 0, a = 1, w = 0.5, eps=1e-10):
         return 1e-29
 # --------------------------------
 
-def batch_fptd(t, double v = 1, double a = 1, double w = 0.5, double ndt = 1.0, double sdv = 0, double eps = 1e-20):
+def batch_fptd(t, double v = 1, double a = 1, double w = 0.5, double ndt = 1.0, double sdv = 0, double eps = 1e-48):
     # Use when rts and choices vary, but parameters are held constant
     cdef int i
     cdef double[:] t_view = t
@@ -89,7 +92,7 @@ def batch_fptd(t, double v = 1, double a = 1, double w = 0.5, double ndt = 1.0, 
             if t_view[i] <= 0:
                 likelihoods_view[i] = 1e-48
             else:
-                sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
+                sgn_lambda, k_l, k_s = choice_function(t_view[i] / (a**2), eps)
                 
                 if sdv == 0:
                     leading_terms_view[i] = calculate_leading_term(t_view[i], (-1) * v, a, 1 - w)
@@ -109,7 +112,7 @@ def batch_fptd(t, double v = 1, double a = 1, double w = 0.5, double ndt = 1.0, 
             if t_view[i] <= 0:
                 likelihoods_view[i] = 1e-48
             else:
-                sgn_lambda, k_l, k_s = choice_function(t_view[i], eps)
+                sgn_lambda, k_l, k_s = choice_function(t_view[i] / (a**2), eps)
                 
                 if sdv == 0:
                     leading_terms_view[i] = calculate_leading_term(t_view[i], v, a, w)
