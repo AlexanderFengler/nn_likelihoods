@@ -119,8 +119,9 @@ class DifferentialEvolutionSequential():
 #                 proposals[pop, dim] = np.clip(proposals[pop, dim], self.bounds[dim][0], self.bounds[dim][1])
             
             proposals[pop, :] = np.clip(proposals[pop, :], self.bounds[:, 0], self.bounds[:, 1])
+            
             # If we didn't clip anything away we run rejection step
-            if np.array_equal(tmp_prop, proposals[pop, :]):
+            if np.array_equal(self.tmp_prop, proposals[pop, :]):
                 proposals_lps[pop] = self.target(proposals[pop, :], self.data)
                 acceptance_prob = proposals_lps[pop] - self.lps[pop, idx - 1]
                 self.total_cnt += 1
@@ -280,13 +281,14 @@ class DifferentialEvolutionSequential():
 
                 if not continue_:
                     if gelman_rubin_force_stop and (i > self.min_samples):
+                        print('Sampler stopped...')
                         break
                     
             self.propose(i, anneal_k, anneal_L, crossover)
             i += 1
         
-        if not continue_:
+        if continue_:
             # Here I need to adjust samples so that the final datastructure doesn't have 0 elements
-            pass
+            print( 'Stopped due to max sampler, NOT converged' )
         
         return (self.samples[:, self.n_burn_in:, :], self.lps[:, self.n_burn_in:], self.gelman_rubin_r_hat, self.random_seed)
