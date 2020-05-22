@@ -171,19 +171,15 @@ class DifferentialEvolutionSequential():
             
             if init == 'random':
                 for pop in range(self.NP):
+                    
                     for dim in range(self.dims):
                         # Initialize at random but give leave some buffer on each side of parameter boundaries
                         dim_range = self.bounds[dim][1] - self.bounds[dim][0]
                         temp[pop, dim] = np.random.uniform(low = self.bounds[dim][0] + (0.2 * dim_range), 
                                                            high = self.bounds[dim][1] - (0.2 * dim_range))
-#             if init == 'true':
-#                 for pop in range(self.NP):
-#                     for dim in range(self.dims):
-#                         # Initialize at random but give leave some buffer on each side of parameter boundaries
-#                         temp[pop, dim] = np.random.uniform(low = self.bounds[dim][0] + 0.1, high = self.bounds[dim][1] - 0.1)
 
-                self.samples[pop, 0, :] = temp[pop, :]
-                self.lps[pop, 0] = self.target(temp[pop, :], self.data)
+                    self.samples[pop, 0, :] = temp[pop, :]
+                    self.lps[pop, 0] = self.target(temp[pop, :], self.data)
             
             id_start = 1
             
