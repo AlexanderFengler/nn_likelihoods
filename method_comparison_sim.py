@@ -166,7 +166,7 @@ if __name__ == "__main__":
     n_cpus = args.ncpus
     n_by_arrayjob = args.nbyarrayjob
     nnbatchid = args.nnbatchid
-    analytic= args.analytic
+    analytic = args.analytic
     
     global keras_model
 
