@@ -319,7 +319,7 @@ if __name__ == "__main__":
 
 
     # Apply epsilon correction
-    epsilon_bound_correction = 0.001
+    epsilon_bound_correction = 0.005
     sampler_param_bounds[:, 0] = sampler_param_bounds[:, 0] + epsilon_bound_correction
     sampler_param_bounds[:, 1] = sampler_param_bounds[:, 1] - epsilon_bound_correction
 
@@ -340,7 +340,8 @@ if __name__ == "__main__":
     
     if not analytic:
         mlpt = ktnpc.mlp_target(weights = weights, biases = biases, activations = activations, n_datapoints = data_grid.shape[1])
-
+    
+    # Can probably cache this function with good defaults...
     def mlp_target(params, 
                    data, 
                    ll_min = -16.11809 # corresponds to 1e-7

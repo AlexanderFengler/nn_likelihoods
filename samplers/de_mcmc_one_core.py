@@ -33,8 +33,8 @@ class DifferentialEvolutionSequential():
             gamma parameter to mediate the magnitude of the update
         """
         
-        self.optimizer = scp_opt.differential_evolution
-        self.dims = len(bounds) #np.array([i for i in range(len(bounds))])
+        self.optimizer = scp_opt.differential_evolution # TD: USE FOR INITIALIZATION
+        self.dims = bounds.shape[0] #np.array([i for i in range(len(bounds))])
         self.bounds = bounds
         self.NP = int(np.floor(NP_multiplier * self.dims))
         self.target = target
@@ -55,6 +55,9 @@ class DifferentialEvolutionSequential():
         self.gelman_rubin_r_hat = []
         np.random.seed()
         self.random_seed = np.random.get_state()
+        
+        # variables to carry around
+        #self.tmp_prop = np.zeros(self.sample)
 
         #print(self.random_seed)
         print(np.random.normal(size = 10))
@@ -97,29 +100,40 @@ class DifferentialEvolutionSequential():
                                                         np.random.normal(loc = 0, scale = self.proposal_std, size = self.dims)
                                                         #self.proposal_std * np.random.standard_t(df = 2, size = self.dims)
                                                         
-            
-            # Clip proposal at bounds: TD REFLECT AT BOUND?
-            for dim in range(self.dims):
-                proposals[pop, dim] = np.clip(proposals[pop, dim], self.bounds[dim][0], self.bounds[dim][1])
-            
             # Crossover:
             if gamma_cur == 1: # If we allow mode switch --> we do not subsample dimensions
-                 pass  
+                pass  
             else: # If we are not mode switching we use dimension subsampling
-                 if crossover == True:
+                if crossover == True:
                     n_keep = np.random.binomial(self.dims - 1, p = 1 - self.crp)
                     id_keep = np.random.choice(self.dims, n_keep, replace = False)
                     proposals[pop, id_keep] = self.samples[pop, idx - 1, id_keep]
+
+            # Clip proposal at bounds: 
+            # TD: THERE MUST BE A BETTER WAY TO DEAL WITH THIS.. Point is to avoid getting stuck on the borders... 
+            # If in a certain dimension all chains reach the border we have no way of returning from the border
+            # This is in part due to the minimal actual 'noise' perturbation that the sampler uses...
+            self.tmp_prop[:] = proposals[pop, :]
             
-            proposals_lps[pop] = self.target(proposals[pop, :], self.data)
-            acceptance_prob = proposals_lps[pop] - self.lps[pop, idx - 1]
+#             for dim in range(self.dims):
+#                 proposals[pop, dim] = np.clip(proposals[pop, dim], self.bounds[dim][0], self.bounds[dim][1])
             
-            self.total_cnt += 1
-            
-            if (np.log(np.random.uniform()) / self.anneal_logistic(x = idx, k = anneal_k, L = anneal_L)) < acceptance_prob :
-                self.samples[pop, idx, :] = proposals[pop, :]
-                self.lps[pop, idx] = proposals_lps[pop]
-                self.accept_cnt += 1
+            proposals[pop, :] = np.clip(proposals[pop, :], self.bounds[:, 0], self.bounds[:, 1])
+            # If we didn't clip anything away we run rejection step
+            if np.array_equal(tmp_prop, proposals[pop, :]):
+                proposals_lps[pop] = self.target(proposals[pop, :], self.data)
+                acceptance_prob = proposals_lps[pop] - self.lps[pop, idx - 1]
+                self.total_cnt += 1
+
+                if (np.log(np.random.uniform()) / self.anneal_logistic(x = idx, k = anneal_k, L = anneal_L)) < acceptance_prob :
+                    self.samples[pop, idx, :] = proposals[pop, :]
+                    self.lps[pop, idx] = proposals_lps[pop]
+                    self.accept_cnt += 1
+             
+            # If we needed to clip we reject immediately
+            else:
+                self.total_cnt += 1
+                self.samples[pop, idx, :] = self.samples[pop, idx - 1, :]
    
     def sample(self, 
                data, 
@@ -148,13 +162,24 @@ class DifferentialEvolutionSequential():
             self.accept_cnt = 0
             self.total_cnt = 0
             
+            # variables to carry around
+            self.tmp_prop = self.samples[0, 0, :]
+            
             # Initialize parameters
             temp = np.zeros((self.NP, self.dims))
             
-            for pop in range(self.NP):
-                for dim in range(self.dims):
-                    # Initialize at random but give leave some buffer on each side of parameter boundaries
-                    temp[pop, dim] = np.random.uniform(low = self.bounds[dim][0] + 0.1, high = self.bounds[dim][1] - 0.1)
+            if init == 'random':
+                for pop in range(self.NP):
+                    for dim in range(self.dims):
+                        # Initialize at random but give leave some buffer on each side of parameter boundaries
+                        dim_range = self.bounds[dim][1] - self.bounds[dim][0]
+                        temp[pop, dim] = np.random.uniform(low = self.bounds[dim][0] + (0.2 * dim_range), 
+                                                           high = self.bounds[dim][1] - (0.2 * dim_range))
+#             if init == 'true':
+#                 for pop in range(self.NP):
+#                     for dim in range(self.dims):
+#                         # Initialize at random but give leave some buffer on each side of parameter boundaries
+#                         temp[pop, dim] = np.random.uniform(low = self.bounds[dim][0] + 0.1, high = self.bounds[dim][1] - 0.1)
 
                 self.samples[pop, 0, :] = temp[pop, :]
                 self.lps[pop, 0] = self.target(temp[pop, :], self.data)
