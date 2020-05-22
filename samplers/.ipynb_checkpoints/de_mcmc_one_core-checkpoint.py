@@ -200,6 +200,7 @@ class DifferentialEvolutionSequential():
             self.accept_cnt = 0
             self.total_cnt = 0
             
+            
         print("Beginning sampling: ")
         n_samples_final = self.samples.shape[1] # If we allow adding samples to a set of previous samples we need to access samples.shape instead of simply picking max_samples --> if add == False then max_samples = n_samples_final
         adaptation_start = int(self.n_burn_in / 2)
