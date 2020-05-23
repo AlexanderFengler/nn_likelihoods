@@ -166,7 +166,7 @@ if __name__ == "__main__":
     n_cpus = args.ncpus
     n_by_arrayjob = args.nbyarrayjob
     nnbatchid = args.nnbatchid
-    analytic= args.analytic
+    analytic = args.analytic
     
     global keras_model
 
@@ -240,7 +240,8 @@ if __name__ == "__main__":
         file_ = 'parameter_recovery_data_binned_0_nbins_0_n_' + str(n_samples) + '/' + method + '_nchoices_2_parameter_recovery_binned_0_nbins_0_nreps_1_n_' + str(n_samples) + '.pickle'
         
         if analytic:
-            pass
+            if not os.path.exits(output_folder + '/analytic'):
+                os.makedirs(output_folder + '/analytic')
         else:  
             if not os.path.exists(output_folder + network_id):
                 os.makedirs(output_folder + network_id)
@@ -500,7 +501,7 @@ if __name__ == "__main__":
     print('saving to file')
     if analytic:
         pickle.dump((param_grid, data_grid, posterior_samples, exec_time),
-                    open(output_folder + out_file_signature + '_' + out_file_id + '.pickle', 'wb'))
+                    open(output_folder + 'analytic/' + out_file_signature + '_' + out_file_id + '.pickle', 'wb'))
         print(output_folder +  out_file_signature + '_' + out_file_id + ".pickle")
 
     else:

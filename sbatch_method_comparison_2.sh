@@ -3,7 +3,7 @@
 # Default resources are 1 core with 2.8GB of memory per core.
 
 # job name:
-#SBATCH -J angle_bg
+#SBATCH -J ddm_analy
 
 # priority
 ##SBATCH --account=bibs-frankmj-condo
@@ -40,7 +40,7 @@ nmcmcsamples=25000
 nbyarrayjob=10
 ncpus=10
 nsamples=( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
-method='ddm'   #'ddm_sdv_analytic'  #"full_ddm2"
+method='ddm_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
 ids=( 1 )
 machine='ccv'
 samplerinit='true'
