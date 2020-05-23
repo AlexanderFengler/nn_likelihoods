@@ -500,7 +500,7 @@ if __name__ == "__main__":
     print('saving to file')
     if analytic:
         pickle.dump((param_grid, data_grid, posterior_samples, exec_time),
-                    open(output_folder + out_file_signature + '_' + out_file_id + '.pickle', 'wb'))
+                    open(output_folder + 'analytic/' + out_file_signature + '_' + out_file_id + '.pickle', 'wb'))
         print(output_folder +  out_file_signature + '_' + out_file_id + ".pickle")
 
     else:
