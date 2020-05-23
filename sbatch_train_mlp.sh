@@ -14,7 +14,7 @@
 #SBATCH --mail-type=ALL
 
 # output file
-#SBATCH --output /users/afengler/batch_job_out/mlp_train_ddm_sdv_analytic_%A_%a.out
+#SBATCH --output /users/afengler/batch_job_out/mlp_train_ddm_analytic_%A_%a.out
 
 # Request runtime, memory, cores
 #SBATCH --time=18:00:00

@@ -14,7 +14,7 @@
 #SBATCH --mail-type=ALL
 
 # output file
-#SBATCH --output /users/afengler/batch_job_out/mlp_train_ddm_sdv_kde_%A_%a.out
+#SBATCH --output /users/afengler/batch_job_out/mlp_train_ddm_kde_%A_%a.out
 
 # Request runtime, memory, cores
 #SBATCH --time=18:00:00
@@ -32,7 +32,7 @@ conda activate tf-gpu-py37
 # module load python/3.7.4 cuda/10.0.130 cudnn/7.4 tensorflow/2.0.0_gpu_py37
 
 nfiles=150
-method='ddm_sdv'
+method='ddm'
 analytic=0
 machine='ccv'
 maxidfiles=300
