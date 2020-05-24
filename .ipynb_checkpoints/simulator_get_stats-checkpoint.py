@@ -20,7 +20,7 @@ import argparse
 
 # My own code
 import kde_class as kde
-import ddm_data_simulation as ddm_simulator 
+#import cddm_data_simulation as ddm_simulator 
 import boundary_functions as bf
 import kde_training_utilities as kde_utils
 
@@ -65,13 +65,17 @@ if __name__ == "__main__":
               }
     
     # Run filter new
+    start_time = time.time()
     kde_utils.filter_simulations_fast(base_simulation_folder = base_simulation_folder,
-                                       file_name_prefix = args.fileprefix,
-                                       file_id = args.fileid,
-                                       method_params = method_params,
-                                       param_ranges = 'none',
-                                       filters = filters)
-
+                                      file_name_prefix = args.fileprefix,
+                                      file_id = args.fileid,
+                                      method_params = method_params,
+                                      param_ranges = 'none',
+                                      filters = filters)
+    
+    end_time = time.time()
+    exec_time = end_time - start_time
+    print('Time elapsed: ', exec_time)
 # unused ---------------------------------------------------------------
     # DDM ANGLE NDT
 #     param_ranges = {'v': [-2.0, 2.0],
@@ -80,6 +84,3 @@ if __name__ == "__main__":
 #                     'ndt': [0, 1],
 #                     'theta': [0, np.pi/2 - 0.2]
 #                     }  
-
-
-

@@ -8,6 +8,7 @@ import multiprocessing as mp
 import psutil
 import pickle
 import os
+import time
 import sys
 import argparse
 
@@ -71,6 +72,7 @@ if __name__ == "__main__":
         os.mkdir(method_folder + args.outfolder + '/')
 
     # Main function 
+    start_time = time.time()
     kde_util.kde_from_simulations_fast_parallel(base_simulation_folder = method_folder + args.simfolder,
                                                 file_name_prefix = args.fileprefix,
                                                 file_id = args.fileid,
@@ -81,6 +83,10 @@ if __name__ == "__main__":
                                                 print_info = False,
                                                 n_processes= args.nproc,
                                                 analytic = args.analytic)
+    
+    end_time = time.time()
+    exec_time = end_time - start_time
+    print('Time elapsed: ', exec_time)
     
 # UNUSED --------------------------
     # LBA

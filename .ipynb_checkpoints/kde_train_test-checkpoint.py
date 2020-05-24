@@ -1,4 +1,4 @@
-import ddm_data_simulation as ddm_sim
+#import ddm_data_simulation as ddm_sim
 import scipy as scp
 import numpy as np
 import pandas as pd
@@ -8,6 +8,7 @@ import multiprocessing as mp
 import psutil
 import pickle
 import os
+import time
 import sys
 import argparse
 
@@ -42,6 +43,12 @@ if __name__ == "__main__":
                      nargs = '*',
                      type = float,
                      default = [0.8, 0.1, 0.1])
+    CLI.add_argument('--nproc',
+                    type = int,
+                    default = 8)
+    CLI.add_argument('--analytic',
+                     type = int,
+                     default = 0)
     
     args = CLI.parse_args()
     print(args)
@@ -65,14 +72,21 @@ if __name__ == "__main__":
         os.mkdir(method_folder + args.outfolder + '/')
 
     # Main function 
-    kde_util.kde_from_simulations_fast(base_simulation_folder = method_folder + args.simfolder,
-                                       file_name_prefix = args.fileprefix,
-                                       file_id = args.fileid,
-                                       target_folder = method_folder + args.outfolder,
-                                       n_by_param = args.nbyparam,
-                                       mixture_p = args.mixture,
-                                       process_params = process_params,
-                                       print_info = False)
+    start_time = time.time()
+    kde_util.kde_from_simulations_fast_parallel(base_simulation_folder = method_folder + args.simfolder,
+                                                file_name_prefix = args.fileprefix,
+                                                file_id = args.fileid,
+                                                target_folder = method_folder + args.outfolder,
+                                                n_by_param = args.nbyparam,
+                                                mixture_p = args.mixture,
+                                                process_params = process_params,
+                                                print_info = False,
+                                                n_processes= args.nproc,
+                                                analytic = args.analytic)
+    
+    end_time = time.time()
+    exec_time = end_time - start_time
+    print('Time elapsed: ', exec_time)
     
 # UNUSED --------------------------
     # LBA
