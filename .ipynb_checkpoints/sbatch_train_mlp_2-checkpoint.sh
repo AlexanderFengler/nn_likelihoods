@@ -35,7 +35,7 @@ nfiles=150
 method='ddm'
 analytic=0
 machine='ccv'
-maxidfiles=300
+maxidfiles=290
 
 
 if [ $analytic -eq 1 ]; then
