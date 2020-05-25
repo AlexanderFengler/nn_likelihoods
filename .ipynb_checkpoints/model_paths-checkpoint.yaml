@@ -75,7 +75,7 @@ ddm_sdv_batch: ['/users/afengler/data/kde/ddm_sdv/keras_models/dnnregressor_ddm_
 
 ddm_analytic_batch: ['/users/afengler/data/analytic/ddm/keras_models/dnnregressor_ddm_analytic_05_24_20_00_31_56/',
 '/users/afengler/data/analytic/ddm/keras_models/dnnregressor_ddm_analytic_05_23_20_17_16_26/',
-'/users/afengler/data/analytic/ddm_sdv/keras_models/dnnregressor_ddm_analytic_05_24_20_10_47_30/']
+'/users/afengler/data/analytic/ddm/keras_models/dnnregressor_ddm_analytic_05_24_20_10_47_30/']
 
 ddm_sdv_analytic_batch: ['/users/afengler/data/analytic/ddm_sdv/keras_models/dnnregressor_ddm_sdv_analytic_05_23_20_01_08_43/',
 '/users/afengler/data/analytic/ddm_sdv/keras_models/dnnregressor_ddm_sdv_analytic_05_23_20_03_32_25/',
