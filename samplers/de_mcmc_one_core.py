@@ -201,12 +201,11 @@ class DifferentialEvolutionSequential():
                                              polish = mle_polish,
                                              disp = mle_disp,
                                              maxiter = mle_maxiter)
-                    print('MLE vector: ', out.x)
+                        print('MLE vector: ', out.x)
                         tmp[cnt, :] = np.clip(out.x, 
                                               self.bounds[:, 0] + 0.01, 
                                               self.bounds[:, 1] - 0.01)
                     else:
-                        
                         temp[cnt, :] = np.clip(out.x + np.random.normal(loc = 0, 
                                                                         scale = 0.05, 
                                                                         size = self.bounds.shape[0]),
