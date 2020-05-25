@@ -84,7 +84,7 @@ class DifferentialEvolutionSequential():
         np.random.shuffle(pop_seq)
         
         for pop in pop_seq:
-            
+            # TD: MODE SWITCH UPON GAMMA = 1 CAN BE BE IMPLEMENTED BETTER (Actually attempt exchange of modes?)
             # Get candidates that affect current vectors update:
             R1 = pop
             while R1 == pop:
@@ -109,32 +109,34 @@ class DifferentialEvolutionSequential():
                     id_keep = np.random.choice(self.dims, n_keep, replace = False)
                     proposals[pop, id_keep] = self.samples[pop, idx - 1, id_keep]
 
-            # Clip proposal at bounds: 
-            # TD: THERE MUST BE A BETTER WAY TO DEAL WITH THIS.. Point is to avoid getting stuck on the borders... 
+            # Clip proposal and reflect (should help with not getting stuck on the bounds all the time) at bounds: 
             # If in a certain dimension all chains reach the border we have no way of returning from the border
             # This is in part due to the minimal actual 'noise' perturbation that the sampler uses...
+            # Note how reflecting works: clipped + (clipped - prev)
+            # IF clipped > prev (low end) we add something 
+            # IF clipped < prev (upper end) we deduct something
+            # IF clipped = prev no effect
+            
             self.tmp_prop[:] = proposals[pop, :]
-            
-#             for dim in range(self.dims):
-#                 proposals[pop, dim] = np.clip(proposals[pop, dim], self.bounds[dim][0], self.bounds[dim][1])
-            
             proposals[pop, :] = np.clip(proposals[pop, :], self.bounds[:, 0], self.bounds[:, 1])
-            
-            # If we didn't clip anything away we run rejection step
-            if np.array_equal(self.tmp_prop, proposals[pop, :]):
-                proposals_lps[pop] = self.target(proposals[pop, :], self.data)
-                acceptance_prob = proposals_lps[pop] - self.lps[pop, idx - 1]
-                self.total_cnt += 1
+            proposals[pop, :] = proposals[pop, :] + (proposals[pop, :] - self.tmp_prop[:])
 
-                if (np.log(np.random.uniform()) / self.anneal_logistic(x = idx, k = anneal_k, L = anneal_L)) < acceptance_prob :
-                    self.samples[pop, idx, :] = proposals[pop, :]
-                    self.lps[pop, idx] = proposals_lps[pop]
-                    self.accept_cnt += 1
-             
-            # If we needed to clip we reject immediately
-            else:
-                self.total_cnt += 1
-                self.samples[pop, idx, :] = self.samples[pop, idx - 1, :]
+            # If we didn't clip anything away we run rejection step ( DEPRECATED )
+            # if np.array_equal(self.tmp_prop, proposals[pop, :]):
+                
+            proposals_lps[pop] = self.target(proposals[pop, :], self.data)
+            acceptance_prob = proposals_lps[pop] - self.lps[pop, idx - 1]
+            self.total_cnt += 1
+
+            if (np.log(np.random.uniform()) / self.anneal_logistic(x = idx, k = anneal_k, L = anneal_L)) < acceptance_prob:
+                self.samples[pop, idx, :] = proposals[pop, :]
+                self.lps[pop, idx] = proposals_lps[pop]
+                self.accept_cnt += 1
+
+            # If we needed to clip we reject immediately ( DEPRECATED )
+#             else:
+#                 self.total_cnt += 1
+#                 self.samples[pop, idx, :] = self.samples[pop, idx - 1, :]
    
     def sample(self, 
                data, 
@@ -148,7 +150,11 @@ class DifferentialEvolutionSequential():
                frozen_dim_vals = None,
                n_burn_in = 2000,
                min_samples = 3000,
-               gelman_rubin_force_stop = False): 
+               gelman_rubin_force_stop = False,
+               mle_popsize = 100,
+               mle_polist = False,
+               mle_disp = True,
+               mle_maxiter = 20): 
         
         if add == False:
             self.n_burn_in = n_burn_in
@@ -180,6 +186,34 @@ class DifferentialEvolutionSequential():
 
                     self.samples[pop, 0, :] = temp[pop, :]
                     self.lps[pop, 0] = self.target(temp[pop, :], self.data)
+            
+            if init == 'mle':
+                # Make bounds for mle optimizer
+                bounds_tmp = [tuple(b) for b in self.bounds]   
+                # Run mle 
+                cnt = 0
+                while cnt < (int(self.NP)):
+                    if cnt % 5 == 0:
+                        out = self.optimizer(self.target, 
+                                             bounds = bounds_tmp, 
+                                             args = (self.data,), 
+                                             popsize = mle_popsize,
+                                             polish = mle_polish,
+                                             disp = mle_disp,
+                                             maxiter = mle_maxiter)
+                    print('MLE vector: ', out.x)
+                        tmp[cnt, :] = np.clip(out.x, 
+                                              self.bounds[:, 0] + 0.01, 
+                                              self.bounds[:, 1] - 0.01)
+                    else:
+                        
+                        temp[cnt, :] = np.clip(out.x + np.random.normal(loc = 0, 
+                                                                        scale = 0.05, 
+                                                                        size = self.bounds.shape[0]),
+                                               self.bounds[:, 0] + 0.01, 
+                                               self.bounds[:, 1] - 0.01)
+                    
+                    cnt += 1
                     
             else:
                 for pop in range(self.NP):
