@@ -187,7 +187,7 @@ class DifferentialEvolutionSequential():
                     self.samples[pop, 0, :] = temp[pop, :]
                     self.lps[pop, 0] = self.target(temp[pop, :], self.data)
             
-            if init == 'mle':
+            elif init == 'mle':
                 # Make bounds for mle optimizer
                 bounds_tmp = [tuple(b) for b in self.bounds]   
                 # Run mle 
