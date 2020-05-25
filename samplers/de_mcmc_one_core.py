@@ -152,7 +152,7 @@ class DifferentialEvolutionSequential():
                min_samples = 3000,
                gelman_rubin_force_stop = False,
                mle_popsize = 100,
-               mle_polist = False,
+               mle_polish = False,
                mle_disp = True,
                mle_maxiter = 20): 
         
