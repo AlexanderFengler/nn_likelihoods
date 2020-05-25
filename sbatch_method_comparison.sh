@@ -19,7 +19,7 @@
 #SBATCH -c 12
 #SBATCH -N 1
 #SBATCH -p gpu --gres=gpu:1
-#SBATCH --array=1-1
+#SBATCH --array=1-20
 
 # Run a command
 #source /users/afengler/miniconda3/etc/profile.d/conda.sh
@@ -37,14 +37,14 @@ conda activate tf-gpu-py37
 # NNBATCH RUNS
 
 nmcmcsamples=25000
-nbyarrayjob=10
+nbyarrayjob=50
 ncpus=1
-nsamples=( 1024 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
-method="ddm_analytic" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
+nsamples=( 1024 2048 4096 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
+method="ddm_sdv_analytic" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
 ids=( 2 )
 machine='ccv'
 samplerinit='random'
-analytic=0
+analytic=1
 #SLURM_ARRAY_TASK_ID=1
 
 for n in "${nsamples[@]}"
