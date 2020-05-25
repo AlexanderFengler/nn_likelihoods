@@ -490,9 +490,15 @@ if __name__ == "__main__":
     else:
         posterior_samples = ()
         for i in range(n_by_arrayjob):
-            posterior_samples += ((mlp_posterior((data_grid[i],
-                                                  init_grid[i],
-                                                  sampler_param_bounds[i]))), )
+            print('Starting job: ', i)
+            if analytic and 'ddm' in method:
+                posterior_samples += ((nf_posterior((data_grid[i],
+                                                     init_grid[i],
+                                                     sampler_param_bounds[i]))), )
+            else:
+                posterior_samples += ((mlp_posterior((data_grid[i],
+                                                      init_grid[i],
+                                                      sampler_param_bounds[i]))), )
     end_time = time.time()
     exec_time = end_time - start_time
     print('Execution Time: ', exec_time)
