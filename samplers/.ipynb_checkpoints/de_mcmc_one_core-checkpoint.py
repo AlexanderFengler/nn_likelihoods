@@ -191,9 +191,9 @@ class DifferentialEvolutionSequential():
                 # Make bounds for mle optimizer
                 bounds_tmp = [tuple(b) for b in self.bounds]
                 # Run mle 
-                cnt = 0
-                while cnt < (int(self.NP)):
-                    if cnt % 5 == 0:
+                pop = 0
+                while pop < (int(self.NP)):
+                    if pop % 5 == 0:
                         out = self.optimizer(self.target, 
                                              bounds = bounds_tmp, 
                                              args = (self.data,), 
@@ -213,8 +213,12 @@ class DifferentialEvolutionSequential():
                                                                         size = self.bounds.shape[0]),
                                                self.bounds[:, 0] + 0.01, 
                                                self.bounds[:, 1] - 0.01)
+                        
+                    self.samples[pop, 0, :] = temp[pop, :]
+                    self.lps[pop, 0] = self.target(temp[pop, :], self.data)
+            
                     
-                    cnt += 1
+                    pop += 1
                     
             else:
                 for pop in range(self.NP):
