@@ -327,7 +327,7 @@ if __name__ == "__main__":
     sampler_param_bounds = [sampler_param_bounds for i in range(data_grid.shape[0])]
     
     print('sampler_params_bounds: ' , sampler_param_bounds)
-    #print('shape sampler param bounds: ', sampler_param_bounds[0].shape)
+    print('shape sampler param bounds: ', sampler_param_bounds[0].shape)
     print('active dims: ', active_dims)
     print('frozen_dims: ', frozen_dims)
     print('param_grid: ', param_grid)
@@ -503,14 +503,14 @@ if __name__ == "__main__":
     exec_time = end_time - start_time
     print('Execution Time: ', exec_time)
     
-    # Store files
-    print('saving to file')
-    if analytic:
-        pickle.dump((param_grid, data_grid, posterior_samples, exec_time),
-                    open(output_folder + 'analytic/' + out_file_signature + '_' + out_file_id + '.pickle', 'wb'))
-        print(output_folder +  out_file_signature + '_' + out_file_id + ".pickle")
+#     # Store files
+#     print('saving to file')
+#     if analytic:
+#         pickle.dump((param_grid, data_grid, posterior_samples, exec_time),
+#                     open(output_folder + 'analytic/' + out_file_signature + '_' + out_file_id + '.pickle', 'wb'))
+#         print(output_folder +  out_file_signature + '_' + out_file_id + ".pickle")
 
-    else:
-        print(output_folder + network_id + out_file_signature + '_' + out_file_id + ".pickle")
-        pickle.dump((param_grid, data_grid, posterior_samples, exec_time), 
-                    open(output_folder + network_id + out_file_signature + '_' + out_file_id + ".pickle", "wb"))
+#     else:
+#         print(output_folder + network_id + out_file_signature + '_' + out_file_id + ".pickle")
+#         pickle.dump((param_grid, data_grid, posterior_samples, exec_time), 
+#                     open(output_folder + network_id + out_file_signature + '_' + out_file_id + ".pickle", "wb"))
