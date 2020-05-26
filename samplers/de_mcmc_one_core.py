@@ -39,6 +39,12 @@ class DifferentialEvolutionSequential():
         self.NP = int(np.floor(NP_multiplier * self.dims))
         self.target = target
         
+        # for optimization ( --> minimization) need to return - target (loglikelihood)
+        def opt_target(params, data):
+            return - self.target(params, data)
+        
+        self.opt_target = opt_target
+        
         if gamma == 'auto':
             self.gamma = 2.38 / np.sqrt(2 * self.dims)
         else: 
@@ -194,7 +200,7 @@ class DifferentialEvolutionSequential():
                 pop = 0
                 while pop < (int(self.NP)):
                     if pop % 5 == 0:
-                        out = self.optimizer(self.target, 
+                        out = self.optimizer(self.opt_target, 
                                              bounds = bounds_tmp, 
                                              args = (self.data,), 
                                              popsize = mle_popsize,
