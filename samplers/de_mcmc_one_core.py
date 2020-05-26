@@ -60,7 +60,7 @@ class DifferentialEvolutionSequential():
         #self.tmp_prop = np.zeros(self.sample)
 
         #print(self.random_seed)
-        print(np.random.normal(size = 10))
+        #print(np.random.normal(size = 10))
     
     def attach_sample(self, samples):
         assert samples.shape[0] == self.NP, 'Population size of previous sample does not match NP parameter value'
@@ -200,7 +200,9 @@ class DifferentialEvolutionSequential():
                                              popsize = mle_popsize,
                                              polish = mle_polish,
                                              disp = mle_disp,
-                                             maxiter = mle_maxiter)
+                                             maxiter = mle_maxiter,
+                                             workers = 1)
+                        
                         print('MLE vector: ', out.x)
                         tmp[cnt, :] = np.clip(out.x, 
                                               self.bounds[:, 0] + 0.01, 
