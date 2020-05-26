@@ -189,7 +189,7 @@ class DifferentialEvolutionSequential():
             
             elif init == 'mle':
                 # Make bounds for mle optimizer
-                bounds_tmp = [tuple(b) for b in self.bounds]   
+                bounds_tmp = [tuple(b) for b in self.bounds]
                 # Run mle 
                 cnt = 0
                 while cnt < (int(self.NP)):
@@ -204,7 +204,7 @@ class DifferentialEvolutionSequential():
                                              workers = 1)
                         
                         print('MLE vector: ', out.x)
-                        tmp[cnt, :] = np.clip(out.x, 
+                        temp[cnt, :] = np.clip(out.x, 
                                               self.bounds[:, 0] + 0.01, 
                                               self.bounds[:, 1] - 0.01)
                     else:
