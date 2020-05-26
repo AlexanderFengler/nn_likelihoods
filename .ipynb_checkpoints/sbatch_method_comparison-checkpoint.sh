@@ -43,7 +43,7 @@ nsamples=( 1024 ) #2048 4096 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 40
 method="ddm_sdv_analytic" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
 ids=( 2 )
 machine='ccv'
-samplerinit='mle'
+samplerinit='random'
 analytic=0
 SLURM_ARRAY_TASK_ID=1
 
