@@ -45,7 +45,7 @@ ids=( 2 )
 machine='ccv'
 samplerinit='mle'
 analytic=0
-#SLURM_ARRAY_TASK_ID=1
+SLURM_ARRAY_TASK_ID=1
 
 for n in "${nsamples[@]}"
 do
