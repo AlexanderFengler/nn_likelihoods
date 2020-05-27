@@ -51,7 +51,7 @@ for n in "${nsamples[@]}"
 do
     for id in "${ids[@]}"
     do 
-        python -u method_comparison_sim.py --machine $machine --method $method --nsamples $n --nmcmcsamples $nmcmcsamples --datatype parameter_recovery --sampler diffevo --infileid 1 --boundmode train --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 --samplerinit $samplerinit --ncpus $ncpus --nbyarrayjob $nbyarrayjob --nnbatchid $id --analytic $analytic
+        python -u method_comparison_sim.py --machine $machine --method $method --nsamples $n --nmcmcsamples $nmcmcsamples --datatype parameter_recovery --sampler diffevo --infileid 1 --outfilesig _expanded_bounds_test --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 --samplerinit $samplerinit --ncpus $ncpus --nbyarrayjob $nbyarrayjob --nnbatchid $id --analytic $analytic
     done
 done
 
