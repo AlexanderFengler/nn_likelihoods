@@ -52,14 +52,9 @@ print('Tensorflow version: ', tf.__version__)
 
 # SUPPORT FUNCTIONS -----------------------------------------------------------
 # Get full parameter vector including bounds
-def make_parameter_bounds_for_sampler(mode = 'test',
-                                      method_params = []):
+def make_parameter_bounds_for_sampler(method_params = []):
     
-    if mode == 'test':
-        param_bounds = method_params['param_bounds_sampler'] + method_params['boundary_param_bounds_sampler']
-    if mode == 'train':
-        param_bounds = method_params['param_bounds_network'] + method_params['boundary_param_bounds_network']
-
+    param_bounds = method_params['param_bounds_network'] + method_params['boundary_param_bounds_network']
 
     # If model is lba, lca, race we need to expand parameter boundaries to account for
     # parameters that depend on the number of choices
@@ -111,13 +106,10 @@ if __name__ == "__main__":
                      default = 'TEST')
     CLI.add_argument("--infileid",
                      type = str,
-                     default = 'none')
+                     default = '')
     CLI.add_argument("--outfilesig",
                      type = str,
                      default = 'signature')
-    CLI.add_argument("--boundmode",
-                     type = str,
-                     default = 'train')
     CLI.add_argument("--nchoices",
                      type = int,
                      default = 2)
@@ -167,6 +159,7 @@ if __name__ == "__main__":
     n_by_arrayjob = args.nbyarrayjob
     nnbatchid = args.nnbatchid
     analytic = args.analytic
+    samplerinit = args.samplerinit
     
     global keras_model
 
@@ -246,7 +239,7 @@ if __name__ == "__main__":
             if not os.path.exists(output_folder + network_id):
                 os.makedirs(output_folder + network_id)
         
-        out_file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + str(n_samples) + '_' + infile_id
+        out_file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + '_init_' + samplerinit + '_' + str(n_samples) + '_' + infile_id
     
     if data_type == 'real':                                                                        
         file_ = args.infileid
@@ -305,19 +298,17 @@ if __name__ == "__main__":
         print('Unknown Datatype, results will likely not make sense')   
     
     # 
-    if args.samplerinit == 'random':
+    if samplerinit == 'random':
         init_grid = ['random' for i in range(data_grid.shape[0])]
-    elif args.samplerinit == 'true':
+    elif samplerinit == 'true':
         if not (data_type == 'parameter_recovery' or data_type == 'perturbation_experiment'):
             print('You cannot initialize true parameters if we are dealing with real data....')
         init_grid = data[0]
-    elif args.samplerinit == 'mle':
+    elif samplerinit == 'mle':
         init_grid = ['mle' for i in range(data_grid.shape[0])]
     
     # Parameter bounds to pass to sampler    
-    sampler_param_bounds = make_parameter_bounds_for_sampler(mode = mode, 
-                                                             method_params = method_params)
-
+    sampler_param_bounds = make_parameter_bounds_for_sampler(method_params = method_params)
 
     # Apply epsilon correction
     epsilon_bound_correction = 0.005
@@ -328,8 +319,8 @@ if __name__ == "__main__":
     
     print('sampler_params_bounds: ' , sampler_param_bounds)
     print('shape sampler param bounds: ', sampler_param_bounds[0].shape)
-    print('active dims: ', active_dims)
-    print('frozen_dims: ', frozen_dims)
+    #print('active dims: ', active_dims)
+    #print('frozen_dims: ', frozen_dims)
     print('param_grid: ', param_grid)
     print('shape of param_grid:', len(param_grid))
     print('shape of data_grid:', data_grid.shape)
@@ -351,22 +342,10 @@ if __name__ == "__main__":
         mlp_input_batch = np.zeros((data_grid.shape[1], sampler_param_bounds[0].shape[0] + 2), dtype = np.float32)
         mlp_input_batch[:, :n_params] = params
         mlp_input_batch[:, n_params:] = data
-
-        #print(mlpt.predict(x = mlp_input_batch))
-        # params_rep = np.tile(params, (data.shape[0], 1))
-        # input_batch = np.concatenate([params_rep, data], axis = 1)
-        #return np.sum(np.maximum(mlpt.predict(mlp_input_batch), ll_min))
         #return np.sum(np.core.umath.maximum(ktnp.predict(mlp_input_batch, weights, biases, activations, n_layers), ll_min))
         return np.sum(np.core.umath.maximum(keras_model.predict_on_batch(mlp_input_batch), ll_min))
 
-    # def mlp_target(params,
-    #                data,
-    #                ll_min = -16.11809):
-    #     mlp_input_batch[:, :n_params] = params
-    #     mlp_input_batch[:, n_params:] = data
-    #     #print(model.predict(mlp_input_batch).shape)
-    #     return np.sum(np.maximum(model.predict(mlp_input_batch)[:, 0], ll_min))
-    
+
     # NAVARRO FUSS (DDM)
     if 'sdv' in method:
         def nf_target(params, data, likelihood_min = 1e-10):
@@ -466,10 +445,6 @@ if __name__ == "__main__":
     else: 
         p = mp.Pool(n_cpus)
 
-    #print(data_grid.shape)
-    #print(param_grid)
-    #print(sampler_param_bounds)
-
     # Subset parameter and data grid
     
     # Run the sampler with correct target as specified above
@@ -491,6 +466,7 @@ if __name__ == "__main__":
         posterior_samples = ()
         for i in range(n_by_arrayjob):
             print('Starting job: ', i)
+            print('Ground truth parameters for job: ', param_grid[i, :])
             if analytic and 'ddm' in method:
                 posterior_samples += ((nf_posterior((data_grid[i],
                                                      init_grid[i],
@@ -503,14 +479,14 @@ if __name__ == "__main__":
     exec_time = end_time - start_time
     print('Execution Time: ', exec_time)
     
-#     # Store files
-#     print('saving to file')
-#     if analytic:
-#         pickle.dump((param_grid, data_grid, posterior_samples, exec_time),
-#                     open(output_folder + 'analytic/' + out_file_signature + '_' + out_file_id + '.pickle', 'wb'))
-#         print(output_folder +  out_file_signature + '_' + out_file_id + ".pickle")
+    # Store files
+    print('saving to file')
+    if analytic:
+        pickle.dump((param_grid, data_grid, posterior_samples, exec_time),
+                    open(output_folder + 'analytic/' + out_file_signature + '_' + out_file_id + '.pickle', 'wb'))
+        print(output_folder +  out_file_signature + '_' + out_file_id + ".pickle")
 
-#     else:
-#         print(output_folder + network_id + out_file_signature + '_' + out_file_id + ".pickle")
-#         pickle.dump((param_grid, data_grid, posterior_samples, exec_time), 
-#                     open(output_folder + network_id + out_file_signature + '_' + out_file_id + ".pickle", "wb"))
+    else:
+        print(output_folder + network_id + out_file_signature + '_' + out_file_id + ".pickle")
+        pickle.dump((param_grid, data_grid, posterior_samples, exec_time), 
+                    open(output_folder + network_id + out_file_signature + '_' + out_file_id + ".pickle", "wb"))

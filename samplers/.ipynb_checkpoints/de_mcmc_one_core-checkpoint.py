@@ -37,6 +37,7 @@ class DifferentialEvolutionSequential():
         self.dims = bounds.shape[0] #np.array([i for i in range(len(bounds))])
         self.bounds = bounds
         self.NP = int(np.floor(NP_multiplier * self.dims))
+        self.NP_multiplier = NP_multiplier
         self.target = target
         
         # for optimization ( --> minimization) need to return - target (loglikelihood)
@@ -160,7 +161,7 @@ class DifferentialEvolutionSequential():
                mle_popsize = 100,
                mle_polish = False,
                mle_disp = True,
-               mle_maxiter = 20): 
+               mle_maxiter = 30): 
         
         if add == False:
             self.n_burn_in = n_burn_in
@@ -196,10 +197,15 @@ class DifferentialEvolutionSequential():
             elif init == 'mle':
                 # Make bounds for mle optimizer
                 bounds_tmp = [tuple(b) for b in self.bounds]
+                
                 # Run mle 
                 pop = 0
                 while pop < (int(self.NP)):
-                    if pop % 5 == 0:
+                    # Run one mle for each parameter in the model
+                    # Then create starting points by slight perturbation around this mle estimate
+                    # Running one mle for each parameter is somewhat arbitrary --> point is to create some initial spread and
+                    # detect potentially local modes
+                    if pop % self.NP_multiplier == 0:
                         out = self.optimizer(self.opt_target, 
                                              bounds = bounds_tmp, 
                                              args = (self.data,), 
@@ -225,10 +231,10 @@ class DifferentialEvolutionSequential():
             
                     
                     pop += 1
-                    
-            else:
+                
+            elif init == 'groundtruth':
                 for pop in range(self.NP):
-                    temp[pop, :] = init + np.random.normal(loc = 0, scale = 0.05, size = len(init))
+                    temp[pop, :] = groundtruth + np.random.normal(loc = 0, scale = 0.05, size = len(init))
                     temp[pop, :] = np.clip(temp[pop, :], self.bounds[:, 0] + 0.01, self.bounds[:, 1] - 0.01)
                     
                     self.samples[pop, 0, :] = temp[pop, :]

@@ -23,12 +23,13 @@ ids=( 0 1 2 ) #( 0 1 2 3 4 5 6 7 8 9)
 ndata=( 1024 2048 4096 )
 method="ddm_analytic"
 analytic=0
+initmode='mle'
 
 for n in "${ndata[@]}"
 do
     for id in "${ids[@]}"
     do 
-       python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --nburnin 5000 --ndata $n --nsubsample 20000 --nnbatchid $id --analytic $analytic
+       python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --initmode $initmode --ndata $n --nsubsample 20000 --nnbatchid $id --analytic $analytic
     done
 done
 

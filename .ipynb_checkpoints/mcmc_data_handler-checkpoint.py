@@ -9,7 +9,6 @@ import yaml
 
 def collect_datasets_diff_evo(in_files = [],
                               out_file = [],
-                              burn_in = 5000,
                               n_post_samples_by_param = 10000,
                               sort_ = True,
                               save = True):
@@ -39,8 +38,8 @@ def collect_datasets_diff_evo(in_files = [],
         for i in range(n_param_sets_file):
             
             # Extract samples and log likelihood sequences
-            tmp_samples = np.reshape(tmp_data[2][i][0][:, burn_in:, :], (-1, n_params))
-            tmp_log_l = np.reshape(tmp_data[2][i][1][:, burn_in:], (-1))        
+            tmp_samples = np.reshape(tmp_data[2][i][0][:, :, :], (-1, n_params))
+            tmp_log_l = np.reshape(tmp_data[2][i][1][:, :], (-1))        
             
             # Fill in return datastructures
             posterior_subsamples[(n_param_sets_file * file_cnt) + i, :, :] = tmp_samples[np.random.choice(tmp_samples.shape[0], size = n_post_samples_by_param), :]
@@ -84,6 +83,9 @@ if __name__ == "__main__":
     CLI.add_argument("--analytic",
                      type = int,
                      default = 0)
+    CLI.add_argument("--initmode",
+                     type = str,
+                     default = '')
     
     args = CLI.parse_args()
     print(args)
@@ -95,6 +97,7 @@ if __name__ == "__main__":
     nsubsample = args.nsubsample
     nnbatchid = args.nnbatchid
     analytic = args.analytic
+    initmode = args.initmode
 
     if machine == 'home':
         method_comparison_folder = '/Users/afengler/OneDrive/project_nn_likelihoods/data/kde/' + method + '/method_comparison/'
@@ -135,7 +138,11 @@ if __name__ == "__main__":
     print('Loading network from: ')
     print(network_path)
     
-    file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + str(ndata) + '_1_'
+    if initmode = '':
+        file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + str(ndata) + '_1_'
+    else:
+        file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + '_init_' + initmode + '_' + str(ndata) + '_1_'
+    
     summary_file = method_comparison_folder + network_id + '/summary_' + file_signature[:-1] + '.pickle'
     file_signature_len = len(file_signature)
     files = os.listdir(method_comparison_folder + network_id + '/')
@@ -143,7 +150,6 @@ if __name__ == "__main__":
     
     _ = collect_datasets_diff_evo(in_files = files_,
                                   out_file = summary_file,
-                                  burn_in = nburnin,
                                   n_post_samples_by_param = nsubsample,
                                   sort_ = True,
                                   save = True)
