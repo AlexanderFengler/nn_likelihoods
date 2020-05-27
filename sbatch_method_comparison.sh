@@ -29,15 +29,15 @@
 # conda deactivate
 # conda activate tf-cpu
 
-# source /users/afengler/.bashrc
-# conda deactivate
-# conda activate tf-gpu-py37
+source /users/afengler/.bashrc
+conda deactivate
+conda activate tf-gpu-py37
 
 
 # NNBATCH RUNS
 
 nmcmcsamples=25000
-nbyarrayjob=2
+nbyarrayjob=50
 ncpus=1
 nsamples=( 1024 4096 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
 method="ddm_sdv_analytic" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
@@ -45,7 +45,7 @@ ids=( 2 )
 machine='ccv'
 samplerinit='mle'
 analytic=0
-SLURM_ARRAY_TASK_ID=1
+#SLURM_ARRAY_TASK_ID=1
 
 for n in "${nsamples[@]}"
 do

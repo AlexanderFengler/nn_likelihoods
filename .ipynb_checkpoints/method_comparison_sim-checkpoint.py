@@ -239,7 +239,7 @@ if __name__ == "__main__":
             if not os.path.exists(output_folder + network_id):
                 os.makedirs(output_folder + network_id)
         
-        out_file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + '_init_' + samplerinit + '_' + str(n_samples) + '_' + infile_id
+        out_file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' +  str(n_samples) + '_init_' + samplerinit + '_' + infile_id
     
     if data_type == 'real':                                                                        
         file_ = args.infileid
