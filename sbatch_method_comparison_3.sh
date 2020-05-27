@@ -25,9 +25,9 @@
 #source /users/afengler/miniconda3/etc/profile.d/conda.sh
 #conda activate tony
 
-source /users/afengler/.bashrc
-conda deactivate
-conda activate tf-cpu
+# source /users/afengler/.bashrc
+# conda deactivate
+# conda activate tf-cpu
 
 source /users/afengler/.bashrc
 conda deactivate

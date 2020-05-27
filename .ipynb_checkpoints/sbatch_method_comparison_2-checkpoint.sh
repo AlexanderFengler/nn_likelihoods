@@ -18,20 +18,20 @@
 #SBATCH --mem=64G
 #SBATCH -c 10
 #SBATCH -N 1
-##SBATCH -p gpu --gres=gpu:1
+#SBATCH -p gpu --gres=gpu:1
 #SBATCH --array=1-20
 
 # Run a command
 #source /users/afengler/miniconda3/etc/profile.d/conda.sh
 #conda activate tony
 
-source /users/afengler/.bashrc
-conda deactivate
-conda activate tf-cpu
-
 # source /users/afengler/.bashrc
 # conda deactivate
-# conda activate tf-gpu-py37
+# conda activate tf-cpu
+
+source /users/afengler/.bashrc
+conda deactivate
+conda activate tf-gpu-py37
 
 
 # NNBATCH RUNS

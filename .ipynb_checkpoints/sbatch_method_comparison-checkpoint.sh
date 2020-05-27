@@ -18,7 +18,7 @@
 #SBATCH --mem=64G
 #SBATCH -c 10
 #SBATCH -N 1
-##SBATCH -p gpu --gres=gpu:1
+#SBATCH -p gpu --gres=gpu:1
 #SBATCH --array=1-20
 
 # Run a command
@@ -37,7 +37,7 @@
 # NNBATCH RUNS
 
 nmcmcsamples=25000
-nbyarrayjob=10
+nbyarrayjob=2
 ncpus=1
 nsamples=( 1024 4096 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
 method="ddm_sdv_analytic" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
@@ -45,7 +45,7 @@ ids=( 2 )
 machine='ccv'
 samplerinit='mle'
 analytic=0
-SLURM_ARRAY_TASK_ID=1
+#SLURM_ARRAY_TASK_ID=1
 
 for n in "${nsamples[@]}"
 do
