@@ -144,7 +144,7 @@ if __name__ == "__main__":
     args = CLI.parse_args()
     print(args)
     
-    mode = args.boundmode
+    #mode = args.boundmode
     machine = args.machine
     method = args.method
     #analytic = ('analytic' in method)
