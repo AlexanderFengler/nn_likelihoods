@@ -25,13 +25,13 @@
 #source /users/afengler/miniconda3/etc/profile.d/conda.sh
 #conda activate tony
 
-# source /users/afengler/.bashrc
-# conda deactivate
-# conda activate tf-cpu
-
 source /users/afengler/.bashrc
 conda deactivate
-conda activate tf-gpu-py37
+conda activate tf-cpu
+
+# source /users/afengler/.bashrc
+# conda deactivate
+# conda activate tf-gpu-py37
 
 
 # NNBATCH RUNS
@@ -39,9 +39,9 @@ conda activate tf-gpu-py37
 nmcmcsamples=25000
 nbyarrayjob=50
 ncpus=1
-nsamples=( 1024 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
+nsamples=( 1024 ) # 2048 4096 ) #( 1024 2048 4096 )
 method='full_ddm2'   #'ddm_sdv_analytic'  #"full_ddm2"
-ids=( 2 )
+ids=( -1 )
 machine='ccv'
 samplerinit='mle'
 analytic=0
