@@ -14,24 +14,24 @@
 #SBATCH --output /users/afengler/batch_job_out/meth_comp_%A_%a.out
 
 # Request runtime, memory, cores:
-#SBATCH --time=24:00:00
+#SBATCH --time=30:00:00
 #SBATCH --mem=64G
 #SBATCH -c 10
 #SBATCH -N 1
-#SBATCH -p gpu --gres=gpu:1
+##SBATCH -p gpu --gres=gpu:1
 #SBATCH --array=1-20
 
 # Run a command
 #source /users/afengler/miniconda3/etc/profile.d/conda.sh
 #conda activate tony
 
-# source /users/afengler/.bashrc
-# conda deactivate
-# conda activate tf-cpu
-
 source /users/afengler/.bashrc
 conda deactivate
-conda activate tf-gpu-py37
+conda activate tf-cpu
+
+# source /users/afengler/.bashrc
+# conda deactivate
+# conda activate tf-gpu-py37
 
 
 # NNBATCH RUNS
@@ -40,8 +40,8 @@ nmcmcsamples=25000
 nbyarrayjob=50
 ncpus=1
 nsamples=( 1024 4096 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
-method="ddm_sdv_analytic" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
-ids=( 2 )
+method="angle2" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
+ids=( -1 )
 machine='ccv'
 samplerinit='mle'
 analytic=0
