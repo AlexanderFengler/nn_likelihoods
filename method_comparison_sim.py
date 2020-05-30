@@ -375,7 +375,6 @@ if __name__ == "__main__":
                                 s = params[4],
                                 ndt = params[5])
 
-
     # Define posterior samplers for respective likelihood functions
     def mlp_posterior(args): # args = (data, true_params)
         scp.random.seed()
