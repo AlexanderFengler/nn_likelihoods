@@ -3,7 +3,7 @@
 # Default resources are 1 core with 2.8GB of memory per core.
 
 # job name:
-#SBATCH -J sdv_analy
+#SBATCH -J ddm_a_a_4
 
 # priority
 ##SBATCH --account=bibs-frankmj-condo
@@ -11,7 +11,7 @@
 ##SBATCH --account=bibs-frankmj-condo
 
 # output file
-#SBATCH --output /users/afengler/batch_job_out/meth_comp_%A_%a.out
+#SBATCH --output /users/afengler/batch_job_out/mc_ddm_a_a_4_%A_%a.out
 
 # Request runtime, memory, cores:
 #SBATCH --time=30:00:00
@@ -39,12 +39,12 @@ conda activate tf-cpu
 nmcmcsamples=25000
 nbyarrayjob=50
 ncpus=1
-nsamples=( 4096 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
-method="full_ddm2" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
-ids=( -1 )
+nsamples=( 1024 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
+method="ddm_analytic" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
+ids=( 2 )
 machine='ccv'
 samplerinit='mle'
-analytic=0
+analytic=1
 #SLURM_ARRAY_TASK_ID=1
 
 for n in "${nsamples[@]}"
