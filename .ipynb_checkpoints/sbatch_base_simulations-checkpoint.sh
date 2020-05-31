@@ -15,25 +15,25 @@
 # Request runtime, memory, cores
 #SBATCH --time=48:00:00
 #SBATCH --mem=32G
-#SBATCH -c 14
+#SBATCH -c 10
 #SBATCH -N 1
-#SBATCH --array=1-1
+#SBATCH --array=1-150
 
 # --------------------------------------------------------------------------------------
 # Sequentially run different kind of models
 
 # declare -a dgps=( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "levy" ) # "lca" "race_model" "ddm_seq2" "ddm_par2" "ddm_mic2" "ddm_seq2_angle" "ddm_par2_angle" "ddm_mic2_angle")
-declare -a dgps=( "ddm_analytic" "ddm" ) #"ddm_sdv_analytic" "ddm_sdv_red_analytic" ) #( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "levy" )  #( "ddm_mic2_angle" "ddm_par2_angle" ) # ( "ddm_seq2_angle" )
-n_samples=( 1024 2048 4096 )   # ( 128 256 512 1024 2048 4096 8192 50000 100000 200000 400000 )
+declare -a dgps=( "ddm_sdv" "levy" "full_ddm2" ) #"ddm_sdv_analytic" "ddm_sdv_red_analytic" ) #( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "levy" )  #( "ddm_mic2_angle" "ddm_par2_angle" ) # ( "ddm_seq2_angle" )
+n_samples=( 100000 )   # ( 128 256 512 1024 2048 4096 8192 50000 100000 200000 400000 )
 n_choices=( 2 ) #( 4 5 6 )
-n_parameter_sets=1000   #20000
-n_bins=( 0 )
-binned=0
+n_parameter_sets=20000   # mlp 10000 but 300 array
+n_bins=( 512 )
+binned=1
 machine="ccv" #"ccv" "home" "x7"
-datatype="parameter_recovery" #"parameter_recovery_hierarchical" "parameter_recovery" "cnn_train"
+datatype="cnn_train" #"parameter_recovery" #"parameter_recovery_hierarchical" "parameter_recovery" "cnn_train"
 nsubjects=1 #10
-mode="test"  #'mlp' 'cnn'
-maxt=20
+mode="cnn" #"test"  #'mlp' 'cnn'
+maxt=10 # 20 for mlp
 # outer -------------------------------------
 for bins in "${n_bins[@]}"
 do
