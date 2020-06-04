@@ -146,6 +146,8 @@ if __name__ == "__main__":
     
     summary_file = method_comparison_folder + network_id + '/summary_' + file_signature[:-1] + '.pickle'
     file_signature_len = len(file_signature)
+    
+    print(method_comparison_folder + network_id + '/')
     files = os.listdir(method_comparison_folder + network_id + '/')
     files_ = [method_comparison_folder + network_id + '/' + file_ for file_ in files if file_[:file_signature_len] == file_signature]
     
