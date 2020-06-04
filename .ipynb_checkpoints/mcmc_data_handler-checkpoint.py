@@ -138,7 +138,7 @@ if __name__ == "__main__":
     print('Loading network from: ')
     print(network_path)
     
-    if initmode = '':
+    if initmode == '':
         file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + str(ndata) + '_1_'
     else:
         file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + '_init_' + initmode + '_' + str(ndata) + '_1_'
