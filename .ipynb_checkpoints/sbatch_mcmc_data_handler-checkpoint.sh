@@ -19,9 +19,9 @@
 #SBATCH --array=1-1
 
 machine="ccv"
-ids=( 2 ) #( 0 1 2 3 4 5 6 7 8 9)
-ndata=( 4096 ) #  4096 )
-method="ddm_analytic"
+ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
+ndata=( 1024 4096 ) #  4096 )
+method="angle2"
 analytic=0
 initmode='mle'
 
