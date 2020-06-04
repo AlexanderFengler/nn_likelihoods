@@ -128,7 +128,7 @@ class data_generator():
         if self.config['nchoices'] <= 2 and self.method != 'lba':
             process_param_tuples = tuple(map(tuple, param_grid[:, :n_process_params]))
         
-        elif self.config['nchoices'] > 2 or self.method == 'lba':
+        elif self.config['nchoices'] >= 2 and (self.method == 'lba' or self.method == 'lca' or self.method == 'race_model'):
             process_param_tuples = tuple()
             for i in range(param_grid.shape[0]):
                 tuple_tmp = tuple()
@@ -141,7 +141,7 @@ class data_generator():
                     else:
                         tuple_tmp += (param_grid[i, cnt], )
                         cnt += 1
-                process_param_tuples += (tuple_tmp, )
+                process_param_tuples += (tuple_tmp, )     
                 
         # If models is race we want pass noise standarad deviation as an array instead of a single value
         if self.method == 'race_model':
