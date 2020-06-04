@@ -104,16 +104,16 @@ if __name__ == "__main__":
     
     if machine == 'ccv':        
         if method == 'ddm_analytic':
-            method_comparison_folder = '/users/afengler/data/analytic/' + 'ddm' + '/method_comparison/analytic/'
+            method_comparison_folder = '/users/afengler/data/analytic/' + 'ddm' + '/method_comparison/'
             network_id = ''
             network_path = ''
         elif method == 'ddm_sdv_analytic':
-            method_comparison_folder = '/users/afengler/data/analytic/' + 'ddm_sdv' + '/method_comparison/analytic/'
+            method_comparison_folder = '/users/afengler/data/analytic/' + 'ddm_sdv' + '/method_comparison/'
         else:
             method_comparison_folder = '/users/afengler/data/kde/' + method + '/method_comparison/'
         
         if analytic:
-            pass
+            method_comparison_folder += 'analytic/'
         else:
             with open("/users/afengler/git_repos/nn_likelihoods/model_paths.yaml") as tmp_file:
                 if nnbatchid == -1:
