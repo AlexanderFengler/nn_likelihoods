@@ -107,7 +107,7 @@ if __name__ == "__main__":
             method_comparison_folder = '/users/afengler/data/analytic/' + 'ddm' + '/method_comparison/analytic/'
             network_id = ''
             network_path = ''
-        if method == 'ddm_sdv_analytic':
+        elif method == 'ddm_sdv_analytic':
             method_comparison_folder = '/users/afengler/data/analytic/' + 'ddm_sdv' + '/method_comparison/analytic/'
         else:
             method_comparison_folder = '/users/afengler/data/kde/' + method + '/method_comparison/'
