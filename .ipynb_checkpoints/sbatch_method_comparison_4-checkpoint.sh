@@ -3,7 +3,7 @@
 # Default resources are 1 core with 2.8GB of memory per core.
 
 # job name:
-#SBATCH -J ddm_a_m_1_4
+#SBATCH -J weibull_1_4
 
 # priority
 ##SBATCH --account=bibs-frankmj-condo
@@ -11,7 +11,7 @@
 ##SBATCH --account=bibs-frankmj-condo
 
 # output file
-#SBATCH --output /users/afengler/batch_job_out/mc_ddm_a_m_1_4_%A_%a.out
+#SBATCH --output /users/afengler/batch_job_out/mc_weibull_1_4_%A_%a.out
 
 # Request runtime, memory, cores:
 #SBATCH --time=30:00:00
@@ -40,8 +40,8 @@ nmcmcsamples=25000
 nbyarrayjob=50
 ncpus=1
 nsamples=( 1024 4096 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
-method="ddm_analytic" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
-ids=( 2 )
+method="weibull_cdf" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
+ids=( -1 )
 machine='ccv'
 samplerinit='mle'
 analytic=0
@@ -51,6 +51,6 @@ for n in "${nsamples[@]}"
 do
     for id in "${ids[@]}"
     do 
-        python -u method_comparison_sim.py --machine $machine --method $method --nsamples $n --nmcmcsamples $nmcmcsamples --datatype parameter_recovery --sampler diffevo --infileid 1  --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 --samplerinit $samplerinit --ncpus $ncpus --nbyarrayjob $nbyarrayjob --nnbatchid $id --analytic $analytic
+        python -u method_comparison_sim.py --machine $machine --method $method --nsamples $n --nmcmcsamples $nmcmcsamples --datatype parameter_recovery --sampler diffevo --infileid 1  --outfileid $SLURM_ARRAY_TASK_ID --activedims 0 1 2 3 4 5 6 --samplerinit $samplerinit --ncpus $ncpus --nbyarrayjob $nbyarrayjob --nnbatchid $id --analytic $analytic
     done
 done
