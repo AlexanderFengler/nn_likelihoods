@@ -21,7 +21,7 @@
 machine="ccv"
 ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
 ndata=( 1024 4096 ) #  4096 )
-method="ornstein"
+method="ddm_sdv"
 analytic=0
 initmode='mle'
 
