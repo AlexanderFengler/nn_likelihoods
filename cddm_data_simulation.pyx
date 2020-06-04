@@ -1236,7 +1236,7 @@ def lca(v = np.array([0, 0, 0], dtype = DTYPE), # drift parameters (np.array exp
         boundary_params = {}):
 
     # Initializations
-    cdef int n_particles = len(v)
+    cdef int n_particles = v.shape[0]
     
     rts = np.zeros((n_samples, 1), dtype = DTYPE)
     cdef float[:,:] rts_view = rts

@@ -167,6 +167,7 @@ class data_generator():
                 args_list.append(process_params + sampler_hyperparameters + boundary_params)
                 #print(self.dgp_hyperparameters)
                 #print(process_params + sampler_hyperparameters + boundary_params)
+        print(args_list)
         return args_list
     
     def clean_up_parameters(self):
