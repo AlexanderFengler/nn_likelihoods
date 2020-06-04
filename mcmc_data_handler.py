@@ -141,7 +141,7 @@ if __name__ == "__main__":
     if initmode == '':
         file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + str(ndata) + '_1_'
     else:
-        file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + '_init_' + initmode + '_' + str(ndata) + '_1_'
+        file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + 'init_' + initmode + '_' + str(ndata) + '_1_'
         print('file_signature: ', file_signature)
     
     summary_file = method_comparison_folder + network_id + '/summary_' + file_signature[:-1] + '.pickle'
