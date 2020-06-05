@@ -18,3 +18,6 @@ scp afengler@transfer.ccv.brown.edu:/users/afengler/data/kde/full_ddm2/method_co
 scp afengler@transfer.ccv.brown.edu:/users/afengler/data/kde/ornstein/method_comparison/dnnregressor_ornstein_03_30_20_16_03_04/summary* /Users/afengler/OneDrive/project_nn_likelihoods/data/kde/ornstein/method_comparison/dnnregressor_ornstein_03_30_20_16_03_04/
 
 # MISSING LEVY WEIBULL CDF
+scp afengler@transfer.ccv.brown.edu:/users/afengler/data/kde/weibull_cdf/method_comparison/dnnregressor_weibull_cdf_04_03_20_02_11_43/summary* /Users/afengler/OneDrive/project_nn_likelihoods/data/kde/weibull_cdf/method_comparison/dnnregressor_weibull_cdf_04_03_20_02_11_43/
+
+scp afengler@transfer.ccv.brown.edu:/users/afengler/data/kde/levy/method_comparison/dnnregressor_levy_03_28_20_13_53_14/summary* /Users/afengler/OneDrive/project_nn_likelihoods/data/kde/levy/method_comparison/dnnregressor_levy_03_28_20_13_53_14/
