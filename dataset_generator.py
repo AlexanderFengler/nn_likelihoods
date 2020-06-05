@@ -127,8 +127,10 @@ class data_generator():
         # Process parameters to make suitable for parallel processing
         if self.config['nchoices'] <= 2 and self.method != 'lba':
             process_param_tuples = tuple(map(tuple, param_grid[:, :n_process_params]))
+            print('passed through false')
         
         elif self.config['nchoices'] >= 2 and (self.method == 'lba' or self.method == 'lca' or self.method == 'race_model'):
+            print('passed through correct')
             process_param_tuples = tuple()
             for i in range(param_grid.shape[0]):
                 tuple_tmp = tuple()
