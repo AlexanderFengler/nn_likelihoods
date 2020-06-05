@@ -21,8 +21,8 @@
 machine="ccv"
 ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
 ndata=( 1024 4096 ) #  4096 )
-method="ddm_analytic"
-analytic=1
+method="weibull_cdf"
+analytic=0
 initmode='mle'
 
 for n in "${ndata[@]}"
