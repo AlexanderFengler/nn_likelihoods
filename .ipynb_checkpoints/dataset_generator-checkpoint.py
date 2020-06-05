@@ -125,7 +125,7 @@ class data_generator():
                                                         self.method_params['boundary_param_names'])
         
         # Process parameters to make suitable for parallel processing
-        if self.config['nchoices'] <= 2 and self.method != 'lba':
+        if self.config['nchoices'] <= 2 and self.method != 'lba' and self.method != 'lca' and self.method != 'race_model':
             process_param_tuples = tuple(map(tuple, param_grid[:, :n_process_params]))
             print('passed through false')
         
