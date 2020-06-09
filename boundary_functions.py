@@ -76,4 +76,4 @@ def weibull_cdf(t = 1,
 #     if t >= node:
 #         return (t - node) * (- np.sin(theta) / np.cos(theta))
 #     else:
-#         return 0  
+#         return 0

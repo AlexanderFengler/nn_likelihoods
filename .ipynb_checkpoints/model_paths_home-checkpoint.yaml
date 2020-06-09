@@ -39,20 +39,25 @@ full_ddm: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/full_ddm/kera
 levy: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/levy/keras_models/dnnregressor_levy_03_28_20_13_53_14/
 ornstein: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/ornstein/keras_models/dnnregressor_ornstein_03_30_20_16_03_04/
 weibull_cdf: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/weibull_cdf/keras_models/dnnregressor_weibull_cdf_04_03_20_02_11_43/
-angle2: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/angle2/keras_models/dnnregressor_angle2_05_01_20_11_37_10/
+# Question mark around model path for angle2 
+angle2: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/angle2/keras_models/dnnregressor_angle2_05_07_20_04_23_32/
 full_ddm2: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/full_ddm2/keras_models/dnnregressor_full_ddm2_05_01_20_01_55_17/
 
 # Within model network repitions 150 DATASETS
 ddm_batch: ['/users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm/keras_models/dnnregressor_ddm_03_29_20_17_38_58/', '/users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm/keras_models/dnnregressor_ddm_05_03_20_12_55_23/', '/users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm/keras_models/dnnregressor_ddm_05_03_20_13_31_28/', '/users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm/keras_models/dnnregressor_ddm_05_03_20_14_24_59/', '/users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm/keras_models/dnnregressor_ddm_05_03_20_15_03_43/', '/users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm/keras_models/dnnregressor_ddm_05_03_20_16_28_18/', '/users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm/keras_models/dnnregressor_ddm_05_03_20_17_11_19/', '/users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm/keras_models/dnnregressor_ddm_05_03_20_17_49_51/', '/users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm/keras_models/dnnregressor_ddm_05_03_20_18_30_30/', '/users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm/keras_models/dnnregressor_ddm_05_03_20_19_58_07/']
 
-ddm_analytic_batch: ['/users/afengler/data/analytic/ddm/keras_models/dnnregressor_ddm_analytic_05_13_20_13_24_20/',
-'/users/afengler/data/analytic/ddm/keras_models/dnnregressor_ddm_analytic_05_13_20_15_42_15/',
-'/users/afengler/data/analytic/ddm/keras_models/dnnregressor_ddm_analytic_05_13_20_17_58_51/',
-'/users/afengler/data/analytic/ddm/keras_models/dnnregressor_ddm_analytic_05_13_20_11_58_30/',
-'/users/afengler/data/analytic/ddm/keras_models/dnnregressor_ddm_analytic_05_13_20_20_17_38/',
-'/users/afengler/data/analytic/ddm/keras_models/dnnregressor_ddm_analytic_05_13_20_22_36_03/',
-'/users/afengler/data/analytic/ddm/keras_models/dnnregressor_ddm_analytic_05_13_20_12_02_03/',
-'/users/afengler/data/analytic/ddm/keras_models/dnnregressor_ddm_analytic_05_13_20_14_23_10/',
-'/users/afengler/data/analytic/ddm/keras_models/dnnregressor_ddm_analytic_05_13_20_16_41_57/',
-'/users/afengler/data/analytic/ddm/keras_models/dnnregressor_ddm_analytic_05_13_20_19_00_49/',
-'/users/afengler/data/analytic/ddm/keras_models/dnnregressor_ddm_analytic_05_13_20_21_22_18/']
+ddm_analytic_batch: ['/users/afengler/OneDrive/project_nn_likelihoods/data/analytic/ddm/keras_models/dnnregressor_ddm_analytic_05_24_20_00_31_56/',
+'/users/afengler/OneDrive/project_nn_likelihoods/data/analytic/ddm/keras_models/dnnregressor_ddm_analytic_05_23_20_17_16_26/',
+'/users/afengler/OneDrive/project_nn_likelihoods/data/analytic/ddm/keras_models/dnnregressor_ddm_analytic_05_24_20_10_47_30/']
+
+ddm_sdv_analytic_batch: ['/users/afengler/OneDrive/project_nn_likelihoods/data/analytic/ddm_sdv/keras_models/dnnregressor_ddm_sdv_analytic_05_23_20_01_08_43/',
+'/users/afengler/OneDrive/project_nn_likelihoods/data/analytic/ddm_sdv/keras_models/dnnregressor_ddm_sdv_analytic_05_23_20_03_32_25/',
+'/users/afengler/OneDrive/project_nn_likelihoods/data/analytic/ddm_sdv/keras_models/dnnregressor_ddm_sdv_analytic_05_23_20_05_55_22/',
+'/users/afengler/OneDrive/project_nn_likelihoods/data/analytic/ddm_sdv/keras_models/dnnregressor_ddm_sdv_analytic_05_23_20_08_18_05/',
+'/users/afengler/OneDrive/project_nn_likelihoods/data/analytic/ddm_sdv/keras_models/dnnregressor_ddm_sdv_analytic_05_23_20_10_41_27/']
+
+ddm_sdv_batch: ['/users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm_sdv/keras_models/dnnregressor_ddm_sdv_05_23_20_01_08_43/',
+'//users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm_sdv/keras_models/dnnregressor_ddm_sdv_05_23_20_01_55_24/',
+'/users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm_sdv/keras_models/dnnregressor_ddm_sdv_05_23_20_03_16_07/',
+'/users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm_sdv/keras_models/dnnregressor_ddm_sdv_05_23_20_04_50_37/',
+'/users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm_sdv/keras_models/dnnregressor_ddm_sdv_05_23_20_07_19_35/']
