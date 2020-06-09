@@ -32,7 +32,7 @@ def kde_vs_mlp_likelihoods(ax_titles = [],
                            n_samples = 10,
                            nreps = 10,
                            save = True,
-                           show = True,
+                           show = False,
                            machine = 'home',
                            method = 'mlp'):
     
@@ -232,9 +232,11 @@ def kde_vs_mlp_likelihoods(ax_titles = [],
         plt.subplots_adjust(top = 0.9)
         plt.subplots_adjust(hspace = 0.3, wspace = 0.3)
         plt.savefig(fig_dir + '/' + figure_name + model + '.png', dpi = 300) #, bbox_inches = 'tight')
-        plt.close()
     if show:
         return plt.show()
+    else:
+        plt.close()
+        return
     
 # Predict
 def mlp_manifold(params = [],
@@ -320,7 +322,10 @@ def mlp_manifold(params = [],
                 bbox_inches = 'tight',
                 dpi = 300)
     if show:
-        plt.show()
+        return plt.show()
+    else:
+        plt.close()
+        return
     
     
 if __name__ == "__main__":
@@ -445,7 +450,7 @@ if __name__ == "__main__":
     
     plt.savefig('/Users/afengler/OneDrive/git_repos/nn_likelihoods/figures/mlp/prediction_errors/prediction_error_distribution_' + model + '.png', 
                 dpi = 300, bbox_inches = 'tight')
-    plt.show()
+    plt.close()
 
     # Graph showing number of cases where prediction error is larger than 1, with loglikelihood of prediction on the x axis
     cnts = {}
@@ -460,9 +465,9 @@ if __name__ == "__main__":
     plt.title('Prediction Error / ll: ' + model.upper(), size = 24)
     plt.ylim((0, 0.05))
     plt.legend(title = 'Error size', title_fontsize = 14, labelspacing = 0.1, fontsize = 10)
-    plt.savefig('/Users/afengler/OneDrive/git_repos/nn_likelihoods/figures/mlp/prediction_errors/prediction_error_vs_likelihood_' + model + '.png', 
+    plt.savefig('/Users/afengler/OneDrive/git_repos/nn_likelihoods/figures/' + mlp/prediction_errors/prediction_error_vs_likelihood_' + model + '.png', 
                 dpi = 300, bbox_inches = 'tight')
-    plt.show()
+    plt.close()
 
 
     param_bounds = np.array(model_params['param_bounds_sampler'] + model_params['boundary_param_bounds_sampler'])
@@ -489,7 +494,7 @@ if __name__ == "__main__":
                            n_samples = 20000,
                            nreps = mlekdereps,
                            save = True,
-                           show = True,
+                           show = False,
                            machine = 'home',
                            method = 'mlp')
     
