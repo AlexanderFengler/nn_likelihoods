@@ -176,4 +176,5 @@ for n_tmp in "${n[@]}"
 do
     python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair
 done
+
 # -----------------------------------------------------------
