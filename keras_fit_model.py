@@ -111,12 +111,13 @@ if __name__ == "__main__":
     #                                    prelog_cutoff = 1e-7 # cut out data with likelihood lower than 1e-7
     #                                   )
     
-    X, y = kde_load_data_new(path = data_folder,
+    dataset = kde_load_data_new(path = data_folder,
                              file_id_list = list(1 + np.random.choice(maxidfiles, replace = False, size = n_training_datasets_to_load)),
                              # file_id_list = [i for i in range(1, n_training_datasets_to_load + 1, 1)],
                              return_log = True,
                              prelog_cutoff_low = 1e-7,
-                             prelog_cutoff_high = 100)
+                             prelog_cutoff_high = 100,
+                             make_split = True)
 
 
     # --------------------------------------------------------------------------------
@@ -198,11 +199,12 @@ if __name__ == "__main__":
                                                   min_delta = 0.0001,
                                                   min_lr = 0.0000001)
 
-    history = model.fit(X, y,  
+    history = model.fit(dataset[0][0], dataset[0][1],  
                         #validation_split = 0.01,
                         epochs = dnn_params["n_epochs"],
                         batch_size = dnn_params["batch_size"],
                         shuffle = True,
+                        validation_data = dataset[1],
                         callbacks = [checkpoint, reduce_lr, earlystopping], 
                         verbose = 2,
                         #validation_data = (X_val, y_val)

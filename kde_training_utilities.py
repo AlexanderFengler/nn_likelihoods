@@ -537,7 +537,9 @@ def kde_load_data_new(path = '',
                       prelog_cutoff_low = 1e-29,
                       prelog_cutoff_high = 100,
                       n_samples_by_dataset = 10000000,
-                      return_log = True):
+                      return_log = True,
+                      make_split = True,
+                      val_p = 0.01):
     
     # Read in two datasets to get meta data for the subsequent
     print('Reading in initial dataset')
@@ -589,7 +591,16 @@ def kde_load_data_new(path = '',
     if prelog_cutoff_high != 'none':    
         labels[labels > np.log(prelog_cutoff_high)] = np.log(prelog_cutoff_high)
         
+        
     if return_log == False:
         labels = np.exp(labels)
-    
-    return features, labels
+        
+
+    if make_split:
+        # Making train test split
+        print('Making train test split...')
+        train_idx = np.random.choice(a = [False, True], size = cnt_samples, p = [val_p, 1 - val_p])
+        test_idx = np.invert(train_idx)
+        return ((train_features[train_idx, :], train_labels[train_idx, :]), (test_features[test_idx, :], test_labels[test_idx, :]))
+    else: 
+        return features, labels
