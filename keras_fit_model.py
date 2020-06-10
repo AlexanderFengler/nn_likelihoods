@@ -199,9 +199,9 @@ if __name__ == "__main__":
                                                   min_lr = 0.0000001)
 
     history = model.fit(X, y,  
-                        validation_split = 0.01,
+                        #validation_split = 0.01,
                         epochs = dnn_params["n_epochs"],
-                        batch_size = dnn_params["batch_size"], 
+                        batch_size = dnn_params["batch_size"],
                         shuffle = True,
                         callbacks = [checkpoint, reduce_lr, earlystopping], 
                         verbose = 2,
