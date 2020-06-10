@@ -3,7 +3,7 @@
 # Default resources are 1 core with 2.8GB of memory per core.
 
 # job name:
-#SBATCH -J mlp_kde
+#SBATCH -J mlp_analytic
 
 # priority
 ##SBATCH --account=bibs-frankmj-condo
@@ -14,7 +14,7 @@
 #SBATCH --mail-type=ALL
 
 # output file
-#SBATCH --output /users/afengler/batch_job_out/mlp_train_ddm_kde_%A_%a.out
+#SBATCH --output /users/afengler/batch_job_out/mlp_train_ddm_analytic_%A_%a.out
 
 # Request runtime, memory, cores
 #SBATCH --time=18:00:00
@@ -32,7 +32,7 @@ conda activate tf-gpu-py37
 # module load python/3.7.4 cuda/10.0.130 cudnn/7.4 tensorflow/2.0.0_gpu_py37
 
 nfiles=150
-method='ddm'
+method='weibull_cdf2'
 analytic=0
 machine='ccv'
 maxidfiles=300

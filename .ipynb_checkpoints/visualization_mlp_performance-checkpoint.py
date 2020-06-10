@@ -34,7 +34,8 @@ def kde_vs_mlp_likelihoods(ax_titles = [],
                            save = True,
                            show = False,
                            machine = 'home',
-                           method = 'mlp'):
+                           method = 'mlp',
+                           traindatanalytic = 0):
     
     # Initialize rows and graph parameters
     rows = int(np.ceil(len(ax_titles) / cols))
@@ -80,6 +81,21 @@ def kde_vs_mlp_likelihoods(ax_titles = [],
                                         a = parameter_matrix[i, 1],
                                         w = parameter_matrix[i, 2],
                                         ndt = parameter_matrix[i, 3],
+                                        s = 1,
+                                        delta_t = 0.001,
+                                        max_t = 20, 
+                                        n_samples = n_samples,
+                                        print_info = False,
+                                        boundary_fun = bf.constant,
+                                        boundary_multiplicative = True,
+                                        boundary_params = {})
+                
+            if model == 'ddm_sdv':
+                out = cds.ddm_sdv(v = parameter_matrix[i, 0],
+                                        a = parameter_matrix[i, 1],
+                                        w = parameter_matrix[i, 2],
+                                        ndt = parameter_matrix[i, 3],
+                                        sdv = parameter_matrix[i, 4],
                                         s = 1,
                                         delta_t = 0.001,
                                         max_t = 20, 
@@ -231,12 +247,17 @@ def kde_vs_mlp_likelihoods(ax_titles = [],
         figure_name = 'mlp_vs_kde_likelihood_'
         plt.subplots_adjust(top = 0.9)
         plt.subplots_adjust(hspace = 0.3, wspace = 0.3)
-        plt.savefig(fig_dir + '/' + figure_name + model + '.png', dpi = 300) #, bbox_inches = 'tight')
+        
+        if traindatanalytic == 1:
+            plt.savefig(fig_dir + '/' + figure_name + model + '_analytic' + '.png', dpi = 300) #, bbox_inches = 'tight')
+        else:
+            plt.savefig(fig_dir + '/' + figure_name + model + '_kde' + '.png', dpi = 300) #, bbox_inches = 'tight')
+        
     if show:
         return plt.show()
     else:
         plt.close()
-        return
+        return 'finished'
     
 # Predict
 def mlp_manifold(params = [],
@@ -249,6 +270,7 @@ def mlp_manifold(params = [],
                  show = True,
                  title = 'MLP Manifold',
                  model = 'ddm',
+                 traindatanalytic = 0,
                 ):
     
     mpl.rcParams.update(mpl.rcParamsDefault)
@@ -318,14 +340,21 @@ def mlp_manifold(params = [],
     ax.w_xaxis.set_pane_color((1.0, 1.0, 1.0, 1.0))
     ax.w_yaxis.set_pane_color((1.0, 1.0, 1.0, 1.0))
     ax.w_zaxis.set_pane_color((1.0, 1.0, 1.0, 1.0))
-    plt.savefig('./figures/mlp/manifolds/mlp_manifold_' + model + '_vary_' + vary_name + '.png', 
-                bbox_inches = 'tight',
-                dpi = 300)
+   
+    if traindatanalytic:
+        plt.savefig('./figures/mlp/manifolds/mlp_manifold_' + model + '_vary_' + vary_name +  '_analytic' + '.png', 
+                    bbox_inches = 'tight',
+                    dpi = 300)
+    else:
+        plt.savefig('./figures/mlp/manifolds/mlp_manifold_' + model + '_vary_' + vary_name + '_kde' + '.png', 
+                    bbox_inches = 'tight',
+                    dpi = 300)
+        
     if show:
         return plt.show()
     else:
         plt.close()
-        return
+        return 'finished ...'
     
     
 if __name__ == "__main__":
@@ -363,7 +392,7 @@ if __name__ == "__main__":
     ngraphs = args.ngraphs
     trainfileidx = args.trainfileidx
     networkidx = args.networkidx
-    analytic = args.traindatanalytic
+    traindatanalytic = args.traindatanalytic
     mlekdereps = args.mlekdereps
     manifoldlayers = args.manifoldlayers
     
@@ -406,13 +435,13 @@ if __name__ == "__main__":
 
     # Load training data
     if machine == 'home':
-        if analytic:
+        if traindatanalytic:
             training_file_folder = '/users/afengler/OneDrive/project_nn_likelihoods/data/analytic/' + model + '/training_data_binned_0_nbins_0_n_20000/'
         else:
             training_file_folder = '/users/afengler/OneDrive/project_nn_likelihoods/data/kde/' + model + '/training_data_binned_0_nbins_0_n_20000/'
     
     if machine == 'ccv':
-        if analytic:
+        if traindatanalytic:
             training_file_folder = '/users/afengler/data/analytic/' + model + '/training_data_binned_0_nbins_0_n_20000/'
         else:
             training_file_folder = '/users/afengler/data/kde/' + model + '/training_data_binned_0_nbins_0_n_20000/'
@@ -448,8 +477,14 @@ if __name__ == "__main__":
     plt.title('Prediction Error: ' + model.upper(), 
               size = 24)
     
-    plt.savefig('/Users/afengler/OneDrive/git_repos/nn_likelihoods/figures/mlp/prediction_errors/prediction_error_distribution_' + model + '.png', 
-                dpi = 300, bbox_inches = 'tight')
+    if traindatanalytic:
+        plt.savefig('/Users/afengler/OneDrive/git_repos/nn_likelihoods/figures/mlp/prediction_errors/prediction_error_distribution_' + model + '_analytic' + '.png', 
+                    dpi = 300, 
+                    bbox_inches = 'tight')
+    else:
+        plt.savefig('/Users/afengler/OneDrive/git_repos/nn_likelihoods/figures/mlp/prediction_errors/prediction_error_distribution_' + model + '_kde' + '.png', 
+                    dpi = 300, 
+                    bbox_inches = 'tight')
     plt.close()
 
     # Graph showing number of cases where prediction error is larger than 1, with loglikelihood of prediction on the x axis
@@ -465,8 +500,16 @@ if __name__ == "__main__":
     plt.title('Prediction Error / ll: ' + model.upper(), size = 24)
     plt.ylim((0, 0.05))
     plt.legend(title = 'Error size', title_fontsize = 14, labelspacing = 0.1, fontsize = 10)
-    plt.savefig('/Users/afengler/OneDrive/git_repos/nn_likelihoods/figures/' + mlp/prediction_errors/prediction_error_vs_likelihood_' + model + '.png', 
-                dpi = 300, bbox_inches = 'tight')
+    
+    if traindatanalytic:
+        plt.savefig('/Users/afengler/OneDrive/git_repos/nn_likelihoods/figures/mlp/prediction_errors/prediction_error_vs_likelihood_' + model + '_analytic' + '.png', 
+                    dpi = 300, 
+                    bbox_inches = 'tight')
+        
+    else:
+        plt.savefig('/Users/afengler/OneDrive/git_repos/nn_likelihoods/figures/mlp/prediction_errors/prediction_error_vs_likelihood_' + model + '_kde' + '.png', 
+                    dpi = 300, 
+                    bbox_inches = 'tight')
     plt.close()
 
 
@@ -496,11 +539,12 @@ if __name__ == "__main__":
                            save = True,
                            show = False,
                            machine = 'home',
-                           method = 'mlp')
+                           method = 'mlp',
+                           traindatanalytic = traindatanalytic)
     
     
     # MANIFOLD PLOTS
-    if model == 'ddm':
+    if model == 'ddm' or model == 'ddm_analytic':
         vary_idx_vec = [0, 1, 2, 3]
         start_params = [0, 1.5, 0.5, 1]
         vary_range_vec = [[-2, 2], [0.3, 2], [0.2, 0.8], [0, 2]]
@@ -525,7 +569,7 @@ if __name__ == "__main__":
         vary_name_vec = ['v', 'a', 'w', 'ndt', 'w noise', 'v noise', 'ndt noise']
         
     # add full_ddm2
-
+    
     if model == 'levy':
         vary_idx_vec = [0, 1, 2, 3, 4]
         start_params = [0.0, 1.5, 0.5, 1.5, 1.0]
@@ -540,7 +584,7 @@ if __name__ == "__main__":
         
     if model == 'ddm_sdv' or model == 'ddm_sdv_analytic':
         vary_idx_vec = [0, 1, 2, 3, 4]
-        start_params = [0.0, 1.5, 0.5, 1.0, 0.0]
+        start_params = [0.0, 1.5, 0.5, 1.0, 0.5]
         vary_range_vec = [[-2, 2], [0.3, 2], [0.2, 0.8], [0.25, 2],  [0.0, 2.0]]
         vary_name_vec = ['v', 'a', 'w', 'ndt', 'v_noise']
         
@@ -557,4 +601,5 @@ if __name__ == "__main__":
                      save = True,
                      show = False,
                      title = 'MLP Manifold',
-                     model = model)
+                     model = model,
+                     traindatanalytic = traindatanalytic)

@@ -32,8 +32,8 @@ conda activate tf-gpu-py37
 # module load python/3.7.4 cuda/10.0.130 cudnn/7.4 tensorflow/2.0.0_gpu_py37
 
 nfiles=150
-method='ddm'
-analytic=1
+method='weibull_cdf2'
+analytic=0
 machine='ccv'
 maxidfiles=300
 
