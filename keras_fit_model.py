@@ -126,7 +126,8 @@ if __name__ == "__main__":
     print('Setting up keras model')
 
     if not warm_start:
-        input_shape = X.shape[1]
+        #input_shape = X.shape[1]
+        input_shape = data[0][0].shape[1]
         model = keras.Sequential()
 
         for i in range(len(dnn_params['hidden_layers'])):
