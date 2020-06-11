@@ -601,6 +601,6 @@ def kde_load_data_new(path = '',
         print('Making train test split...')
         train_idx = np.random.choice(a = [False, True], size = cnt_samples, p = [val_p, 1 - val_p])
         test_idx = np.invert(train_idx)
-        return ((train_features[train_idx, :], train_labels[train_idx, :]), (test_features[test_idx, :], test_labels[test_idx, :]))
+        return ((features[train_idx, :], labels[train_idx, :]), (features[test_idx, :], labels[test_idx, :]))
     else: 
         return features, labels
