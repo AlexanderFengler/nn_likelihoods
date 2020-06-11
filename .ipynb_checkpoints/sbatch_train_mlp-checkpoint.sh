@@ -18,7 +18,7 @@
 
 # Request runtime, memory, cores
 #SBATCH --time=18:00:00
-#SBATCH --mem=64G
+#SBATCH --mem=128G
 ##SBATCH --mem=320G
 #SBATCH -c 14
 #SBATCH -N 1
@@ -32,7 +32,7 @@ conda deactivate
 conda activate tf-gpu-py37
 # module load python/3.7.4 cuda/10.0.130 cudnn/7.4 tensorflow/2.0.0_gpu_py37
 
-nfiles=20
+nfiles=50
 method='weibull_cdf2'
 analytic=0
 machine='ccv'
