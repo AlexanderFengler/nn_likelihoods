@@ -14,7 +14,7 @@
 # Request runtime, memory, cores:
 #SBATCH --time=36:00:00
 #SBATCH --mem=32G
-#SBATCH -c 12
+#SBATCH -c 4
 #SBATCH -N 1
 #SBATCH --array=1-1
 
@@ -32,6 +32,34 @@ do
        python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --initmode $initmode --ndata $n --nsubsample 20000 --nnbatchid $id --analytic $analytic
     done
 done
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # # python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method ddm --nburnin 5000 --ndata 2048 --nsubsample 10000 --nnbatchid -1
 # python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method ddm --nburnin 5000 --ndata 4096 --nsubsample 10000 --nnbatchid -1

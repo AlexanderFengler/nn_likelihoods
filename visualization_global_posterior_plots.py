@@ -1191,7 +1191,6 @@ if __name__ == "__main__":
                      default = [])
     
     
-
     args = CLI.parse_args()
     print(args)
     print(args.plots)

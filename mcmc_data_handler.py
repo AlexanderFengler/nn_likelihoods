@@ -22,11 +22,14 @@ def collect_datasets_diff_evo(in_files = [],
     n_chains = tmp[2][0][0].shape[0]
     n_samples = tmp[2][0][0].shape[1]
     n_params = tmp[2][0][0].shape[2]
+    n_data = tmp[1].shape[1]
+    n_choices = tmp[1].shape[2]
     
     # Data containers 
     means = np.zeros((n_param_sets, n_params))
     maps = np.zeros((n_param_sets, n_params))
     orig_params = np.zeros((n_param_sets, n_params))
+    orig_data = np.zeros((n_param_sets, n_data, n_choices))
     r_hat_last = np.zeros((n_param_sets))
     posterior_subsamples = np.zeros((n_param_sets, n_post_samples_by_param, n_params))
     posterior_subsamples_ll = np.zeros((n_param_sets, n_post_samples_by_param))
@@ -47,12 +50,14 @@ def collect_datasets_diff_evo(in_files = [],
             means[(n_param_sets_file * file_cnt) + i, :] = np.mean(tmp_samples, axis = 0)
             maps[(n_param_sets_file * file_cnt) + i, :] = tmp_samples[np.argmax(tmp_log_l), :]
             orig_params[(n_param_sets_file * file_cnt) + i, :] = tmp_data[0][i, :]
+            orig_data[(n_parmam_sets_file * file_cnt) + i, :, :] = tmp_data[1][i, :, :]
             r_hat_last[(n_param_sets_file * file_cnt) + i] = tmp_data[2][i][2][-1]
             
         print(file_cnt)
         file_cnt += 1
     
-    out_dict = {'means': means, 'maps': maps, 'gt': orig_params, 'r_hats': r_hat_last, 'posterior_samples': posterior_subsamples, 'posterior_ll': posterior_subsamples_ll}
+    out_dict = {'means': means, 'maps': maps, 'gt': orig_params, 'r_hats': r_hat_last, 'posterior_samples': posterior_subsamples, 'posterior_ll': posterior_subsamples_ll, 'data': orig_data}
+    
     if save == True:
         print('writing to file to ' + out_file)
         pickle.dump(out_dict, open(out_file, 'wb'), protocol = 2)

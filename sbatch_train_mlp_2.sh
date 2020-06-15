@@ -37,7 +37,6 @@ analytic=0
 machine='ccv'
 maxidfiles=300
 
-
 if [ $analytic -eq 1 ]; then
     for i in {1..1}
     do
