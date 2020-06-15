@@ -18,170 +18,185 @@
 #SBATCH -N 1
 #SBATCH --array=1-1
 
+# machine="ccv"
+# ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
+# ndata=( 1024 4096 ) #  4096 )
+# method="ddm"
+# analytic=0
+# initmode='mle'
+
+# for n in "${ndata[@]}"
+# do
+#     for id in "${ids[@]}"
+#     do 
+#        python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --initmode $initmode --ndata $n --nsubsample 20000 --nnbatchid $id --analytic $analytic
+#     done
+# done
+
+
+# machine="ccv"
+# ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
+# ndata=( 1024 4096 ) #  4096 )
+# method="ddm_analytic"
+# analytic=0
+# initmode='mle'
+
+# for n in "${ndata[@]}"
+# do
+#     for id in "${ids[@]}"
+#     do 
+#        python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --initmode $initmode --ndata $n --nsubsample 20000 --nnbatchid $id --analytic $analytic
+#     done
+# done
+
+
+# machine="ccv"
+# ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
+# ndata=( 1024 4096 ) #  4096 )
+# method="ddm_analytic"
+# analytic=1
+# initmode='mle'
+
+# for n in "${ndata[@]}"
+# do
+#     for id in "${ids[@]}"
+#     do 
+#        python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --initmode $initmode --ndata $n --nsubsample 20000 --nnbatchid $id --analytic $analytic
+#     done
+# done
+
+
+# machine="ccv"
+# ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
+# ndata=( 1024 4096 ) #  4096 )
+# method="ddm_sdv"
+# analytic=0
+# initmode='mle'
+
+# for n in "${ndata[@]}"
+# do
+#     for id in "${ids[@]}"
+#     do 
+#        python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --initmode $initmode --ndata $n --nsubsample 20000 --nnbatchid $id --analytic $analytic
+#     done
+# done
+
+
+# machine="ccv"
+# ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
+# ndata=( 1024 4096 ) #  4096 )
+# method="ddm_sdv_analytic"
+# analytic=0
+# initmode='mle'
+
+# for n in "${ndata[@]}"
+# do
+#     for id in "${ids[@]}"
+#     do 
+#        python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --initmode $initmode --ndata $n --nsubsample 20000 --nnbatchid $id --analytic $analytic
+#     done
+# done
+
+
+# machine="ccv"
+# ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
+# ndata=( 1024 4096 ) #  4096 )
+# method="ddm_sdv_analytic"
+# analytic=1
+# initmode='mle'
+
+# for n in "${ndata[@]}"
+# do
+#     for id in "${ids[@]}"
+#     do 
+#        python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --initmode $initmode --ndata $n --nsubsample 20000 --nnbatchid $id --analytic $analytic
+#     done
+# done
+
+
+# machine="ccv"
+# ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
+# ndata=( 1024 4096 ) #  4096 )
+# method="ornstein"
+# analytic=0
+# initmode='mle'
+
+# for n in "${ndata[@]}"
+# do
+#     for id in "${ids[@]}"
+#     do 
+#        python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --initmode $initmode --ndata $n --nsubsample 20000 --nnbatchid $id --analytic $analytic
+#     done
+# done
+
+
+# machine="ccv"
+# ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
+# ndata=( 1024 4096 ) #  4096 )
+# method="levy"
+# analytic=0
+# initmode='mle'
+
+# for n in "${ndata[@]}"
+# do
+#     for id in "${ids[@]}"
+#     do 
+#        python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --initmode $initmode --ndata $n --nsubsample 20000 --nnbatchid $id --analytic $analytic
+#     done
+# done
+
+
+# machine="ccv"
+# ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
+# ndata=( 1024 4096 ) #  4096 )
+# method="full_ddm2"
+# analytic=0
+# initmode='mle'
+
+# for n in "${ndata[@]}"
+# do
+#     for id in "${ids[@]}"
+#     do 
+#        python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --initmode $initmode --ndata $n --nsubsample 20000 --nnbatchid $id --analytic $analytic
+#     done
+# done
+
+
+# machine="ccv"
+# ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
+# ndata=( 1024 4096 ) #  4096 )
+# method="weibull_cdf2"
+# analytic=0
+# initmode='mle'
+
+# for n in "${ndata[@]}"
+# do
+#     for id in "${ids[@]}"
+#     do 
+#        python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --initmode $initmode --ndata $n --nsubsample 20000 --nnbatchid $id --analytic $analytic
+#     done
+# done
+
+
+# machine="ccv"
+# ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
+# ndata=( 1024 4096 ) #  4096 )
+# method="angle2"
+# analytic=0
+# initmode='mle'
+
+# for n in "${ndata[@]}"
+# do
+#     for id in "${ids[@]}"
+#     do 
+#        python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --initmode $initmode --ndata $n --nsubsample 20000 --nnbatchid $id --analytic $analytic
+#     done
+# done
+
 machine="ccv"
 ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
 ndata=( 1024 4096 ) #  4096 )
-method="ddm"
-analytic=0
-initmode='mle'
-
-for n in "${ndata[@]}"
-do
-    for id in "${ids[@]}"
-    do 
-       python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --initmode $initmode --ndata $n --nsubsample 20000 --nnbatchid $id --analytic $analytic
-    done
-done
-
-
-machine="ccv"
-ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
-ndata=( 1024 4096 ) #  4096 )
-method="ddm_analytic"
-analytic=0
-initmode='mle'
-
-for n in "${ndata[@]}"
-do
-    for id in "${ids[@]}"
-    do 
-       python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --initmode $initmode --ndata $n --nsubsample 20000 --nnbatchid $id --analytic $analytic
-    done
-done
-
-
-machine="ccv"
-ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
-ndata=( 1024 4096 ) #  4096 )
-method="ddm_analytic"
-analytic=1
-initmode='mle'
-
-for n in "${ndata[@]}"
-do
-    for id in "${ids[@]}"
-    do 
-       python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --initmode $initmode --ndata $n --nsubsample 20000 --nnbatchid $id --analytic $analytic
-    done
-done
-
-
-machine="ccv"
-ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
-ndata=( 1024 4096 ) #  4096 )
-method="ddm_sdv"
-analytic=0
-initmode='mle'
-
-for n in "${ndata[@]}"
-do
-    for id in "${ids[@]}"
-    do 
-       python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --initmode $initmode --ndata $n --nsubsample 20000 --nnbatchid $id --analytic $analytic
-    done
-done
-
-
-machine="ccv"
-ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
-ndata=( 1024 4096 ) #  4096 )
-method="ddm_sdv_analytic"
-analytic=0
-initmode='mle'
-
-for n in "${ndata[@]}"
-do
-    for id in "${ids[@]}"
-    do 
-       python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --initmode $initmode --ndata $n --nsubsample 20000 --nnbatchid $id --analytic $analytic
-    done
-done
-
-
-machine="ccv"
-ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
-ndata=( 1024 4096 ) #  4096 )
-method="ddm_sdv_analytic"
-analytic=1
-initmode='mle'
-
-for n in "${ndata[@]}"
-do
-    for id in "${ids[@]}"
-    do 
-       python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --initmode $initmode --ndata $n --nsubsample 20000 --nnbatchid $id --analytic $analytic
-    done
-done
-
-
-machine="ccv"
-ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
-ndata=( 1024 4096 ) #  4096 )
-method="ornstein"
-analytic=0
-initmode='mle'
-
-for n in "${ndata[@]}"
-do
-    for id in "${ids[@]}"
-    do 
-       python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --initmode $initmode --ndata $n --nsubsample 20000 --nnbatchid $id --analytic $analytic
-    done
-done
-
-
-machine="ccv"
-ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
-ndata=( 1024 4096 ) #  4096 )
-method="levy"
-analytic=0
-initmode='mle'
-
-for n in "${ndata[@]}"
-do
-    for id in "${ids[@]}"
-    do 
-       python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --initmode $initmode --ndata $n --nsubsample 20000 --nnbatchid $id --analytic $analytic
-    done
-done
-
-
-machine="ccv"
-ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
-ndata=( 1024 4096 ) #  4096 )
-method="full_ddm2"
-analytic=0
-initmode='mle'
-
-for n in "${ndata[@]}"
-do
-    for id in "${ids[@]}"
-    do 
-       python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --initmode $initmode --ndata $n --nsubsample 20000 --nnbatchid $id --analytic $analytic
-    done
-done
-
-
-machine="ccv"
-ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
-ndata=( 1024 4096 ) #  4096 )
-method="weibull_cdf2"
-analytic=0
-initmode='mle'
-
-for n in "${ndata[@]}"
-do
-    for id in "${ids[@]}"
-    do 
-       python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --initmode $initmode --ndata $n --nsubsample 20000 --nnbatchid $id --analytic $analytic
-    done
-done
-
-
-machine="ccv"
-ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
-ndata=( 1024 4096 ) #  4096 )
-method="angle2"
+method="ornstein_pos"
 analytic=0
 initmode='mle'
 

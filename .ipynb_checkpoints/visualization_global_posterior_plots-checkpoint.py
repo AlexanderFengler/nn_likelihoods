@@ -53,64 +53,95 @@ def hdi_eval(posterior_samples = [],
     
     return vec, prop_covered_by_param, prop_covered_all
 
-def collect_datasets_diff_evo(in_files = [],
-                              out_file = [],
-                              burn_in = 5000,
-                              n_post_samples_by_param = 10000,
-                              sort_ = True,
-                              save = True):
-    """Function prepares raw mcmc data for plotting"""
-    
-    # Intialization
-    in_files = sorted(in_files)
-    tmp = pickle.load(open(in_files[0],'rb'))
-    n_param_sets = len(in_files) * len(tmp[2])
-    n_param_sets_file = len(tmp[2])
-    n_chains = tmp[2][0][0].shape[0]
-    n_samples = tmp[2][0][0].shape[1]
-    n_params = tmp[2][0][0].shape[2]
-    
-    # Data containers 
-    means = np.zeros((n_param_sets, n_params))
-    maps = np.zeros((n_param_sets, n_params))
-    orig_params = np.zeros((n_param_sets, n_params))
-    r_hat_last = np.zeros((n_param_sets))
-    posterior_subsamples = np.zeros((n_param_sets, n_post_samples_by_param, n_params))
-    posterior_subsamples_ll = np.zeros((n_param_sets, n_post_samples_by_param))
+# PREPARE mcmc_dict for plotting
 
-    file_cnt = 0
-    for file_ in in_files:
-        # Load datafile in
-        tmp_data = pickle.load(open(file_, 'rb'))
-        for i in range(n_param_sets_file):
-            
-            # Extract samples and log likelihood sequences
-            tmp_samples = np.reshape(tmp_data[2][i][0][:, burn_in:, :], (-1, n_params))
-            tmp_log_l = np.reshape(tmp_data[2][i][1][:, burn_in:], (-1))        
-            
-            # Fill in return datastructures
-            posterior_subsamples[(n_param_sets_file * file_cnt) + i, :, :] = tmp_samples[np.random.choice(tmp_samples.shape[0], size = n_post_samples_by_param), :]
-            posterior_subsamples_ll[(n_param_sets_file * file_cnt) + i, :] = tmp_log_l[np.random.choice(tmp_log_l.shape[0], size = n_post_samples_by_param)]
-            means[(n_param_sets_file * file_cnt) + i, :] = np.mean(tmp_samples, axis = 0)
-            maps[(n_param_sets_file * file_cnt) + i, :] = tmp_samples[np.argmax(tmp_log_l), :]
-            orig_params[(n_param_sets_file * file_cnt) + i, :] = tmp_data[0][i, :]
-            r_hat_last[(n_param_sets_file * file_cnt) + i] = tmp_data[2][i][2][-1]
-            
-        print(file_cnt)
-        file_cnt += 1
+def clean_mcmc_dict(mcmc_dict = {},
+                    filter_ = 'choice_p',  # 'boundary', 'choice_p' 'none'
+                    choice_p_lim = 0.95,
+                    param_lims = [],
+                    method = []):
     
-    out_dict = {'means': means, 'maps': maps, 'gt': orig_params, 'r_hats': r_hat_last, 'posterior_samples': posterior_subsamples, 'posterior_ll': posterior_subsamples_ll}
-    if save == True:
-        print('writing to file to ' + out_file)
-        pickle.dump(out_dict, open(out_file, 'wb'), protocol = 2)
+    # Filter out cases that have choice which are too imbalanced
     
-    return out_dict
+    # Get indices of imbalanced samples
+    n_data = mcmc_dict['data'].shape[1]
+    n_params = mcmc_dict['data'].shape[0]
+    n_choices = np.unique(mcmc_dict['data'][0, :, 1]).shape[0]
+    test_choice = np.unique(mcmc_dict['data'][0, : , 1])[0]
+    ok_ids = np.zeros(n_params, dtype = np.bool)
+    
+    if filter_ == 'choice_p':
+        for i in range(n_params):
+            ok_ids[i] = (np.sum(mcmc_dict['data'][i, :, 1] == test_choice) < (n_data * choice_p_lim) and (np.sum(mcmc_dict['data'][i, :, 1] == test_choice) > (n_data * (1 - choice_p_lim))))
+            
+#             if i == 100:
+#                 print(mcmc_dict['data'])
+#                 print(mcmc_dict['data'].shape)
+#             if not ok_ids[i]:
+#                 print('rejected')
+                
+            
+    # Filter out severe boundary cases
+    if filter_ == 'boundary':
+        cnt = 0
+        adj_size = 0.1
+        for param_bnd_tmp in param_lims:
+            if ax_titles[cnt] == 'ndt':
+                cnt += 1
+            else:
+                if cnt == 0:
+                    bool_vec = ( mcmc_dict['means'][:, cnt] > param_bnd_tmp[1] - 0.1 ) + ( mcmc_dict['means'][:, cnt] < param_bnd_tmp[0] + 0.1 ) 
+                    cnt += 1
+                else:
+                    bool_vec = (bool_vec + (( mcmc_dict['means'][:, cnt] > param_bnd_tmp[1] - 0.1 ) + ( mcmc_dict['means'][:, cnt] < param_bnd_tmp[0] + 0.1 ))) > 0
+                    cnt += 1
+            print(np.sum(1 - bool_vec))
+        print(np.sum(1 - bool_vec))
 
-# A of T statistics
+        ok_ids = (1 - bool_vec) > 0
+
+    for tmp_key in mcmc_dict.keys():
+        mcmc_dict[tmp_key] = mcmc_dict[tmp_key][ok_ids]
+
+    # Calulate quantities from posterior samples
+    mcmc_dict['sds'] = np.std(mcmc_dict['posterior_samples'][:, :, :], axis = 1)
+    mcmc_dict['sds_mean_in_row'] = np.min(mcmc_dict['sds'], axis = 1)
+    mcmc_dict['gt_cdf_score'], mcmc_dict['p_covered_by_param'], mcmc_dict['p_covered_all'] = hdi_eval(posterior_samples = mcmc_dict['posterior_samples'],
+                                                                                                      ground_truths = mcmc_dict['gt'])
+
+    # Get regression coefficients on mcmc_dict 
+    mcmc_dict['r2_means'] = get_r2_vec(estimates = mcmc_dict['means'], 
+                              ground_truths = mcmc_dict['gt'])
+
+    mcmc_dict['r2_maps'] = get_r2_vec(estimates = mcmc_dict['maps'], 
+                              ground_truths = mcmc_dict['gt'])
+
+    #mcmc_dict['gt'][mcmc_dict['r_hats'] < r_hat_cutoff, :]
+
+    mcmc_dict['boundary_rmse'], mcmc_dict['boundary_dist_param_euclid'] = compute_boundary_rmse(mode = 'max_t_global',
+                                                                                                boundary_fun = bf.weibull_cdf,
+                                                                                                parameters_estimated = mcmc_dict['means'],
+                                                                                                parameters_true = mcmc_dict['gt'],
+                                                                                                data = mcmc_dict['data'],
+                                                                                                model = model,
+                                                                                                max_t = 20,
+                                                                                                n_probes = 1000)
+
+    mcmc_dict['euc_dist_means_gt'] = np.linalg.norm(mcmc_dict['means'] - mcmc_dict['gt'], axis = 1)
+    mcmc_dict['euc_dist_maps_gt'] = np.linalg.norm(mcmc_dict['maps'] - mcmc_dict['gt'], axis = 1)
+    mcmc_dict['euc_dist_means_gt_sorted_id'] = np.argsort(mcmc_dict['euc_dist_means_gt'])
+    mcmc_dict['euc_dist_maps_gt_sorted_id'] = np.argsort(mcmc_dict['euc_dist_maps_gt'])
+    mcmc_dict['boundary_rmse_sorted_id'] = np.argsort(mcmc_dict['boundary_rmse'])
+    mcmc_dict['method'] = method
+    
+    return mcmc_dict
+
+# A of T statistics (considering a of t only for timerange that spans observed data)
 def compute_boundary_rmse(mode = 'max_t_global', # max_t_global, max_t_local, quantile
                           boundary_fun = bf.weibull_cdf, # bf.angle etc.
                           parameters_estimated =  [], #mcmc_dict['means'][mcmc_dict['r_hats'] < r_hat_cutoff, :],
                           parameters_true = [], # mcmc_dict['gt'][mcmc_dict['r_hats'] < r_hat_cutoff, :],
+                          data = [],
                           model = 'weibull_cdf',
                           max_t = 20,
                           n_probes = 1000):
@@ -120,13 +151,16 @@ def compute_boundary_rmse(mode = 'max_t_global', # max_t_global, max_t_local, qu
     
     #print(parameters_estimated_tup)
     parameters_true_tup = tuple(map(tuple, parameters_true[:, 4:]))
-    t_probes = np.linspace(0, max_t, n_probes)
+    #t_probes = np.linspace(0, max_t, n_probes)
     bnd_est = np.zeros((len(parameters_estimated), n_probes))
     bnd_true = np.zeros((len(parameters_estimated), n_probes))
     
     # get bound estimates
     for i in range(len(parameters_estimated)):
         #print(parameters_estimated[i])
+        max_t = np.max(data[i, :, 0])
+        t_probes = np.linspace(0, max_t, n_probes)
+        
         if model == 'weibull_cdf':
             bnd_est[i] = np.maximum(parameters_estimated[i, 1] * boundary_fun(*(t_probes, ) + parameters_estimated_tup[i]), 0)
             bnd_true[i] = np.maximum(parameters_true[i, 1] * boundary_fun(*(t_probes, ) + parameters_true_tup[i]), 0)
@@ -141,6 +175,7 @@ def compute_boundary_rmse(mode = 'max_t_global', # max_t_global, max_t_local, qu
             
 #         if i % 100 == 0:
 #             print(i)
+    
     # compute rmse
     rmse_vec = np.zeros((len(parameters_estimated_tup)))
     dist_param_euclid = np.zeros((len(parameters_estimated_tup)))
@@ -1191,7 +1226,6 @@ if __name__ == "__main__":
                      default = [])
     
     
-
     args = CLI.parse_args()
     print(args)
     print(args.plots)
@@ -1247,58 +1281,9 @@ if __name__ == "__main__":
 
     # READ IN SUMMARY FILE
     mcmc_dict = pickle.load(open(summary_file, 'rb'))
-
-    # Filter out severe boundary cases
-    cnt = 0
-    adj_size = 0.1
-    for param_bnd_tmp in param_lims:
-        if ax_titles[cnt] == 'ndt':
-            cnt += 1
-        else:
-            if cnt == 0:
-                bool_vec = ( mcmc_dict['means'][:, cnt] > param_bnd_tmp[1] - 0.1 ) + ( mcmc_dict['means'][:, cnt] < param_bnd_tmp[0] + 0.1 ) 
-                cnt += 1
-            else:
-                bool_vec = (bool_vec + (( mcmc_dict['means'][:, cnt] > param_bnd_tmp[1] - 0.1 ) + ( mcmc_dict['means'][:, cnt] < param_bnd_tmp[0] + 0.1 ))) > 0
-                cnt += 1
-        print(np.sum(1 - bool_vec))
-    print(np.sum(1 - bool_vec))
-
-    ok_ids = (1 - bool_vec) > 0
-
-    for tmp_key in mcmc_dict.keys():
-        mcmc_dict[tmp_key] = mcmc_dict[tmp_key][ok_ids]
-
-    # Calulate quantities from posterior samples
-    mcmc_dict['sds'] = np.std(mcmc_dict['posterior_samples'][:, :, :], axis = 1)
-    mcmc_dict['sds_mean_in_row'] = np.min(mcmc_dict['sds'], axis = 1)
-    mcmc_dict['gt_cdf_score'], mcmc_dict['p_covered_by_param'], mcmc_dict['p_covered_all'] = hdi_eval(posterior_samples = mcmc_dict['posterior_samples'],
-                                                                                                      ground_truths = mcmc_dict['gt'])
-
-    # Get regression coefficients on mcmc_dict 
-    mcmc_dict['r2_means'] = get_r2_vec(estimates = mcmc_dict['means'], 
-                              ground_truths = mcmc_dict['gt'])
-
-    mcmc_dict['r2_maps'] = get_r2_vec(estimates = mcmc_dict['maps'], 
-                              ground_truths = mcmc_dict['gt'])
-
-    #mcmc_dict['gt'][mcmc_dict['r_hats'] < r_hat_cutoff, :]
-
-    mcmc_dict['boundary_rmse'], mcmc_dict['boundary_dist_param_euclid'] = compute_boundary_rmse(mode = 'max_t_global',
-                                                                                                boundary_fun = bf.weibull_cdf,
-                                                                                                parameters_estimated = mcmc_dict['means'],
-                                                                                                parameters_true = mcmc_dict['gt'],
-                                                                                                model = model,
-                                                                                                max_t = 20,
-                                                                                                n_probes = 1000)
-
-    mcmc_dict['euc_dist_means_gt'] = np.linalg.norm(mcmc_dict['means'] - mcmc_dict['gt'], axis = 1)
-    mcmc_dict['euc_dist_maps_gt'] = np.linalg.norm(mcmc_dict['maps'] - mcmc_dict['gt'], axis = 1)
-    mcmc_dict['euc_dist_means_gt_sorted_id'] = np.argsort(mcmc_dict['euc_dist_means_gt'])
-    mcmc_dict['euc_dist_maps_gt_sorted_id'] = np.argsort(mcmc_dict['euc_dist_maps_gt'])
-    mcmc_dict['boundary_rmse_sorted_id'] = np.argsort(mcmc_dict['boundary_rmse'])
-    mcmc_dict['method'] = method
-    
+    mcmc_dict = clean_mcmc_dict(mcmc_dict = mcmc_dict,
+                                filter_ = 'choice_p',
+                                method = method)
     
     # GENERATE PLOTS:
     # POSTERIOR VARIANCE PLOT MLP
@@ -1323,7 +1308,6 @@ if __name__ == "__main__":
                       save = True,
                       method = mcmc_dict['method'],
                       train_data_type = traindattype)
-    
     
     # HDI P PLOT
     if "hdi_p" in args.plots:

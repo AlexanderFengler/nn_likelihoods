@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-plotlist=( "model_uncertainty" "hdi_p" "posterior_variance" ) #( "posterior_variance" "hdi_coverage" "hdi_p" "parameter_recovery_scatter" "parameter_recovery_hist" "posterior_pair" "model_uncertainty" "posterior_predictive" )
+plotlist=( "hdi_p" "hdi_coverage" "parameter_recovery_scatter") #( "posterior_variance" "hdi_coverage" "hdi_p" "parameter_recovery_scatter" "parameter_recovery_hist" "posterior_pair" "model_uncertainty" "posterior_predictive" )
 
 # DDM -----------------------------------------------
 model="ddm"
@@ -57,6 +57,7 @@ done
 
 
 # DDM_SDV -------------------------------------------------
+
 model="ddm_sdv"
 machine="home"
 method="mlp"
@@ -163,7 +164,7 @@ done
 # # -----------------------------------------------------------
 
 # # WEIBULL CDF ---------------------------------------------------
-model="weibull_cdf"
+model="weibull_cdf2"
 machine="home"
 method="mlp"
 traindattype="kde"
@@ -192,7 +193,7 @@ analytic=0
 rhatcutoff=1.1
 npostpred=9
 npostpair=9
-plotlist=( "posterior_variance" "hdi_coverage" "hdi_p" "parameter_recovery_scatter" "parameter_recovery_hist" "posterior_pair" "model_uncertainty" "posterior_predictive" )
+# plotlist=( "posterior_variance" "hdi_coverage" "hdi_p" "parameter_recovery_scatter" "parameter_recovery_hist" "posterior_pair" "model_uncertainty" "posterior_predictive" )
 
 for n_tmp in "${n[@]}"
 do
