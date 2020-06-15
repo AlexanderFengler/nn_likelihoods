@@ -54,7 +54,7 @@ ddm_batch: ['/users/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_03_29_20
 '/users/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_05_03_20_18_30_30/', 
 '/users/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_05_03_20_19_58_07/']
 
-weibull_cdf2: /users/afengler/data/kde/weibull_cdf2/keras_models/dnnregressor_weibull_cdf2_06_11_20_03_30_02
+weibull_cdf2: /users/afengler/data/kde/weibull_cdf2/keras_models/dnnregressor_weibull_cdf2_06_11_20_03_30_02/
 
 
 # ddm_analytic_batch: ['/users/afengler/data/analytic/ddm/keras_models/dnnregressor_ddm_analytic_05_13_20_13_24_20/',
