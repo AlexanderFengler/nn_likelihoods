@@ -16,10 +16,10 @@
 # Request runtime, memory, cores:
 #SBATCH --time=36:00:00
 #SBATCH --mem=64G
-#SBATCH -c 10
+#SBATCH -c 4
 #SBATCH -N 1
 ##SBATCH -p gpu --gres=gpu:1
-#SBATCH --array=1-40
+#SBATCH --array=1-100
 
 # Run a command
 #source /users/afengler/miniconda3/etc/profile.d/conda.sh
@@ -37,7 +37,7 @@ conda activate tf-cpu
 # NNBATCH RUNS
 
 nmcmcsamples=25000
-nbyarrayjob=25
+nbyarrayjob=10
 ncpus=1
 nsamples=( 1024 ) # 2048 4096 ) #( 1024 2048 4096 )
 method="levy"   #'ddm_sdv_analytic'  #"full_ddm2"
