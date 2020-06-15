@@ -24,17 +24,17 @@
 # Sequentially run different kind of models
 
 # declare -a dgps=( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "levy" ) # "lca" "race_model" "ddm_seq2" "ddm_par2" "ddm_mic2" "ddm_seq2_angle" "ddm_par2_angle" "ddm_mic2_angle")
-declare -a dgps=( "ddm" ) # "race_model" "lca" ) #"ddm_sdv_analytic" "ddm_sdv_red_analytic" ) #( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "levy" )  #( "ddm_mic2_angle" "ddm_par2_angle" ) # ( "ddm_seq2_angle" )
-n_samples=( 100000 )   # ( 128 256 512 1024 2048 4096 8192 50000 100000 200000 400000 )
+declare -a dgps=( "weibull_cdf2" ) # "race_model" "lca" ) #"ddm_sdv_analytic" "ddm_sdv_red_analytic" ) #( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "levy" )  #( "ddm_mic2_angle" "ddm_par2_angle" ) # ( "ddm_seq2_angle" )
+n_samples=( 1024 4096 )   # ( 128 256 512 1024 2048 4096 8192 50000 100000 200000 400000 )
 n_choices=( 2 ) #( 4 5 6 )
-n_parameter_sets=20000  # cnn 20000 but 150 array   # mlp 10000 but 300 array
-n_bins=( 512 )
-binned=1
+n_parameter_sets=20000  # cnn 20000 but 150 array   # mlp 10000 but 300 array # KRISHN: 10
+n_bins=( 0 ) # KRISHN: n_bins=0
+binned=0 # KRISHN: binned=0
 machine="ccv" #"ccv" "home" "x7"
-datatype="cnn_train" #"parameter_recovery" #"parameter_recovery" #"parameter_recovery_hierarchical" "parameter_recovery" "cnn_train"
+datatype="parameter_reovery" #"parameter_recovery" #"parameter_recovery" #"parameter_recovery_hierarchical" "parameter_recovery" "cnn_train" # KRISHN: 'parameter_recovery'
 nsubjects=1 #10
-mode="cnn" # "test" #"test"  #'mlp' 'cnn'
-maxt=10 # 20 for mlp
+mode="test" # "test" #"test"  #'mlp' 'cnn' # KRISHN: 'test'
+maxt=10 # 20 for mlp # KRISHN: 20
 # outer -------------------------------------
 for bins in "${n_bins[@]}"
 do

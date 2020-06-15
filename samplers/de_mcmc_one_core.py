@@ -90,6 +90,7 @@ class DifferentialEvolutionSequential():
         pop_seq = np.arange(self.NP)
         np.random.shuffle(pop_seq)
         
+        # LOOP OVER POPULATIONS (CHAINS)
         for pop in pop_seq:
             # TD: MODE SWITCH UPON GAMMA = 1 CAN BE BE IMPLEMENTED BETTER (Actually attempt exchange of modes?)
             # Get candidates that affect current vectors update:
@@ -103,6 +104,7 @@ class DifferentialEvolutionSequential():
                 
             # Assign gamma == 1 according to parameter mode_switch_p
             gamma_cur = np.random.choice([self.gamma, 1],  p = [1 - self.mode_switch_p, self.mode_switch_p]) 
+            
             proposals[pop, :] += gamma_cur * (proposals[R1, :] - proposals[R2, :]) +  \
                                                         np.random.normal(loc = 0, scale = self.proposal_std, size = self.dims)
                                                         #self.proposal_std * np.random.standard_t(df = 2, size = self.dims)

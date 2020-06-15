@@ -10,6 +10,7 @@ import uuid
 import seaborn as sns
 import os
 import cddm_data_simulation as cds
+import cdwiener as cdw
 import boundary_functions as bf
 import kde_training_utilities as kde_utils
 import kde_class as kdec
@@ -74,139 +75,156 @@ def kde_vs_mlp_likelihoods(ax_titles = [],
         ll_out_keras = keras_model.predict(keras_input_batch, 
                                            batch_size = 100)
         
-        # Get predictions from simulations /kde
-        for j in range(nreps):
-            if model == 'ddm':
-                out = cds.ddm_flexbound(v = parameter_matrix[i, 0],
-                                        a = parameter_matrix[i, 1],
-                                        w = parameter_matrix[i, 2],
-                                        ndt = parameter_matrix[i, 3],
-                                        s = 1,
-                                        delta_t = 0.001,
-                                        max_t = 20, 
-                                        n_samples = n_samples,
-                                        print_info = False,
-                                        boundary_fun = bf.constant,
-                                        boundary_multiplicative = True,
-                                        boundary_params = {})
-                
-            if model == 'ddm_sdv':
-                out = cds.ddm_sdv(v = parameter_matrix[i, 0],
-                                        a = parameter_matrix[i, 1],
-                                        w = parameter_matrix[i, 2],
-                                        ndt = parameter_matrix[i, 3],
-                                        sdv = parameter_matrix[i, 4],
-                                        s = 1,
-                                        delta_t = 0.001,
-                                        max_t = 20, 
-                                        n_samples = n_samples,
-                                        print_info = False,
-                                        boundary_fun = bf.constant,
-                                        boundary_multiplicative = True,
-                                        boundary_params = {})
-
-            if model == 'full_ddm':
-                out = cds.full_ddm(v = parameter_matrix[i, 0],
+        # Get prediction from navarro if traindatanalytic = 1
+        if traindatanalytic:
+            ll_out_gt = cdw.batch_fptd(plot_data[:, 0] * plot_data[:, 1], 
+                                   v = parameter_matrix[i, 0],
                                    a = parameter_matrix[i, 1],
                                    w = parameter_matrix[i, 2],
-                                   ndt = parameter_matrix[i, 3],
-                                   dw = parameter_matrix[i, 4],
-                                   sdv = parameter_matrix[i, 5],
-                                   dndt = parameter_matrix[i, 6],
-                                   s = 1,
-                                   delta_t = 0.001,
-                                   max_t = 20,
-                                   n_samples = n_samples,
-                                   print_info = False,
-                                   boundary_fun = bf.constant,
-                                   boundary_multiplicative = True,
-                                   boundary_params = {})
+                                   ndt = parameter_matrix[i, 3])
 
-            if model == 'angle' or model == 'angle2':
-                out = cds.ddm_flexbound(v = parameter_matrix[i, 0],
-                                        a = parameter_matrix[i, 1],
-                                        w = parameter_matrix[i, 2],
-                                        ndt = parameter_matrix[i, 3],
-                                        s = 1,
-                                        delta_t = 0.001, 
-                                        max_t = 20,
-                                        n_samples = n_samples,
-                                        print_info = False,
-                                        boundary_fun = bf.angle,
-                                        boundary_multiplicative = False,
-                                        boundary_params = {'theta': parameter_matrix[i, 4]})
+            sns.lineplot(plot_data[:, 0] * plot_data[:, 1], 
+                     ll_out_gt,
+                     color = 'black',
+                     alpha = 0.5,
+                     label = 'TRUE',
+                     ax = ax[row_tmp, col_tmp])
+        
+        # Get predictions from simulations /kde
+        
+        if not traindatanalytic:
+            for j in range(nreps):
+                if model == 'ddm' or model == 'ddm_analytic':
+                    out = cds.ddm_flexbound(v = parameter_matrix[i, 0],
+                                            a = parameter_matrix[i, 1],
+                                            w = parameter_matrix[i, 2],
+                                            ndt = parameter_matrix[i, 3],
+                                            s = 1,
+                                            delta_t = 0.001,
+                                            max_t = 20, 
+                                            n_samples = n_samples,
+                                            print_info = False,
+                                            boundary_fun = bf.constant,
+                                            boundary_multiplicative = True,
+                                            boundary_params = {})
 
-            if model == 'weibull_cdf':
-                out = cds.ddm_flexbound(v = parameter_matrix[i, 0],
-                                        a = parameter_matrix[i, 1],
-                                        w = parameter_matrix[i, 2],
-                                        ndt = parameter_matrix[i, 3],
-                                        s = 1,
-                                        delta_t = 0.001, 
-                                        max_t = 20,
-                                        n_samples = n_samples,
-                                        print_info = False,
-                                        boundary_fun = bf.weibull_cdf,
-                                        boundary_multiplicative = True,
-                                        boundary_params = {'alpha': parameter_matrix[i, 4],
-                                                           'beta': parameter_matrix[i, 5]})
-                
-            if model == 'levy':
-                out = cds.levy_flexbound(v = parameter_matrix[i, 0],
-                                         a = parameter_matrix[i, 1],
-                                         w = parameter_matrix[i, 2],
-                                         alpha_diff = parameter_matrix[i, 3],
-                                         ndt = parameter_matrix[i, 4],
-                                         s = 1,
-                                         delta_t = 0.001,
-                                         max_t = 20,
-                                         n_samples = n_samples,
-                                         print_info = False,
-                                         boundary_fun = bf.constant,
-                                         boundary_multiplicative = True, 
-                                         boundary_params = {})
+                if model == 'ddm_sdv':
+                    out = cds.ddm_sdv(v = parameter_matrix[i, 0],
+                                            a = parameter_matrix[i, 1],
+                                            w = parameter_matrix[i, 2],
+                                            ndt = parameter_matrix[i, 3],
+                                            sdv = parameter_matrix[i, 4],
+                                            s = 1,
+                                            delta_t = 0.001,
+                                            max_t = 20, 
+                                            n_samples = n_samples,
+                                            print_info = False,
+                                            boundary_fun = bf.constant,
+                                            boundary_multiplicative = True,
+                                            boundary_params = {})
 
-            if model == 'ornstein':
-                out = cds.ornstein_uhlenbeck(v = parameter_matrix[i, 0],
+                if model == 'full_ddm':
+                    out = cds.full_ddm(v = parameter_matrix[i, 0],
+                                       a = parameter_matrix[i, 1],
+                                       w = parameter_matrix[i, 2],
+                                       ndt = parameter_matrix[i, 3],
+                                       dw = parameter_matrix[i, 4],
+                                       sdv = parameter_matrix[i, 5],
+                                       dndt = parameter_matrix[i, 6],
+                                       s = 1,
+                                       delta_t = 0.001,
+                                       max_t = 20,
+                                       n_samples = n_samples,
+                                       print_info = False,
+                                       boundary_fun = bf.constant,
+                                       boundary_multiplicative = True,
+                                       boundary_params = {})
+
+                if model == 'angle' or model == 'angle2':
+                    out = cds.ddm_flexbound(v = parameter_matrix[i, 0],
+                                            a = parameter_matrix[i, 1],
+                                            w = parameter_matrix[i, 2],
+                                            ndt = parameter_matrix[i, 3],
+                                            s = 1,
+                                            delta_t = 0.001, 
+                                            max_t = 20,
+                                            n_samples = n_samples,
+                                            print_info = False,
+                                            boundary_fun = bf.angle,
+                                            boundary_multiplicative = False,
+                                            boundary_params = {'theta': parameter_matrix[i, 4]})
+
+                if model == 'weibull_cdf' or model == 'weibull_cdf2':
+                    out = cds.ddm_flexbound(v = parameter_matrix[i, 0],
+                                            a = parameter_matrix[i, 1],
+                                            w = parameter_matrix[i, 2],
+                                            ndt = parameter_matrix[i, 3],
+                                            s = 1,
+                                            delta_t = 0.001, 
+                                            max_t = 20,
+                                            n_samples = n_samples,
+                                            print_info = False,
+                                            boundary_fun = bf.weibull_cdf,
+                                            boundary_multiplicative = True,
+                                            boundary_params = {'alpha': parameter_matrix[i, 4],
+                                                               'beta': parameter_matrix[i, 5]})
+
+                if model == 'levy':
+                    out = cds.levy_flexbound(v = parameter_matrix[i, 0],
                                              a = parameter_matrix[i, 1],
                                              w = parameter_matrix[i, 2],
-                                             g = parameter_matrix[i, 3],
+                                             alpha_diff = parameter_matrix[i, 3],
                                              ndt = parameter_matrix[i, 4],
                                              s = 1,
-                                             delta_t = 0.001, 
+                                             delta_t = 0.001,
                                              max_t = 20,
                                              n_samples = n_samples,
                                              print_info = False,
                                              boundary_fun = bf.constant,
-                                             boundary_multiplicative = True,
-                                             boundary_params = {})      
-            
-            mykde = kdec.logkde((out[0], out[1], out[2]))
-            ll_out_kde = mykde.kde_eval((plot_data[:, 0], plot_data[:, 1]))
+                                             boundary_multiplicative = True, 
+                                             boundary_params = {})
 
-            # Plot kde predictions
-            if j == 0:
-                sns.lineplot(plot_data[:, 0] * plot_data[:, 1], 
-                             np.exp(ll_out_kde),
-                             color = 'black',
-                             alpha = 0.5,
-                             label = 'KDE',
-                             ax = ax[row_tmp, col_tmp])
-            else:
-                sns.lineplot(plot_data[:, 0] * plot_data[:, 1], 
-                             np.exp(ll_out_kde),
-                             color = 'black',
-                             alpha = 0.5,
-                             ax = ax[row_tmp, col_tmp])
-        
-        # Plot keras predictions
-        sns.lineplot(plot_data[:, 0] * plot_data[:, 1], 
-                     np.exp(ll_out_keras[:, 0]),
-                     color = 'green',
-                     label = 'MLP',
-                     alpha = 1,
-                     ax = ax[row_tmp, col_tmp])
-        
+                if model == 'ornstein':
+                    out = cds.ornstein_uhlenbeck(v = parameter_matrix[i, 0],
+                                                 a = parameter_matrix[i, 1],
+                                                 w = parameter_matrix[i, 2],
+                                                 g = parameter_matrix[i, 3],
+                                                 ndt = parameter_matrix[i, 4],
+                                                 s = 1,
+                                                 delta_t = 0.001, 
+                                                 max_t = 20,
+                                                 n_samples = n_samples,
+                                                 print_info = False,
+                                                 boundary_fun = bf.constant,
+                                                 boundary_multiplicative = True,
+                                                 boundary_params = {})      
+
+                mykde = kdec.logkde((out[0], out[1], out[2]))
+                ll_out_gt = mykde.kde_eval((plot_data[:, 0], plot_data[:, 1]))
+
+                # Plot kde predictions
+                if j == 0:
+                    sns.lineplot(plot_data[:, 0] * plot_data[:, 1], 
+                                 np.exp(ll_out_gt),
+                                 color = 'black',
+                                 alpha = 0.5,
+                                 label = 'KDE',
+                                 ax = ax[row_tmp, col_tmp])
+                elif j > 0:
+                    sns.lineplot(plot_data[:, 0] * plot_data[:, 1], 
+                                 np.exp(ll_out_gt),
+                                 color = 'black',
+                                 alpha = 0.5,
+                                 ax = ax[row_tmp, col_tmp])
+
+            # Plot keras predictions
+            sns.lineplot(plot_data[:, 0] * plot_data[:, 1], 
+                         np.exp(ll_out_keras[:, 0]),
+                         color = 'green',
+                         label = 'MLP',
+                         alpha = 1,
+                         ax = ax[row_tmp, col_tmp])
+
         # Legend adjustments
         if row_tmp == 0 and col_tmp == 0:
             ax[row_tmp, col_tmp].legend(loc = 'upper left', 
@@ -278,6 +296,7 @@ def mlp_manifold(params = [],
     keras_model = keras.models.load_model(network_dir + 'model_final.h5')
 
     # Prepare data structures
+    
     # Data template
     plot_data = np.zeros((4000, 2))
     plot_data[:, 0] = np.concatenate(([i * 0.005 for i in range(2000, 0, -1)], [i * 0.005 for i in range(1, 2001, 1)]))

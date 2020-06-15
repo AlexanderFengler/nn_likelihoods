@@ -311,7 +311,8 @@ def posterior_variance_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
                             data_signature = '',
                             train_data_type = '',
                             model = '',
-                            method = 'cnn'):
+                            method = 'cnn',
+                            range_max = 0.4):
 
     rows = int(np.ceil(len(ax_titles) / cols))
     sns.set(style = "white", 
@@ -320,7 +321,7 @@ def posterior_variance_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
 
     fig, ax = plt.subplots(rows, 
                            cols, 
-                           figsize = (20, 20), 
+                           figsize = (12, 12), 
                            sharex = False, 
                            sharey = False)
     
@@ -337,7 +338,7 @@ def posterior_variance_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
                      kde = False,
                      rug = True,
                      rug_kws = {'alpha': 0.2, 'color': 'grey'},
-                     hist_kws = {'alpha': 1, 'range': (0, 0.2), 'edgecolor': 'black'},
+                     hist_kws = {'alpha': 1, 'range': (0, range_max), 'edgecolor': 'black'},
                      ax = ax[row_tmp, col_tmp])
         
         ax[row_tmp, col_tmp].set_xlabel(ax_titles[i], 
@@ -426,7 +427,7 @@ def hdi_p_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
         figure_name = 'hdi_p_plot_'
         plt.subplots_adjust(top = 0.9)
         plt.subplots_adjust(hspace = 0.3, wspace = 0.3)
-        plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '.png', dpi = 300, )
+        plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300, )
         plt.close()
     return #plt.show(block = False)
 
@@ -509,7 +510,7 @@ def posterior_predictive_plot(ax_titles = [],
                                         boundary_multiplicative = True,
                                         boundary_params = {})
                 
-            if model == 'full_ddm':
+            if model == 'full_ddm' or model == 'full_ddm2':
                 out = cds.full_ddm(v = posterior_samples[i, idx[j], 0],
                                    a = posterior_samples[i, idx[j], 1],
                                    w = posterior_samples[i, idx[j], 2],
@@ -526,7 +527,7 @@ def posterior_predictive_plot(ax_titles = [],
                                    boundary_multiplicative = True,
                                    boundary_params = {})
 
-            if model == 'angle':
+            if model == 'angle' or model == 'angle2':
                 out = cds.ddm_flexbound(v = posterior_samples[i, idx[j], 0],
                                         a = posterior_samples[i, idx[j], 1],
                                         w = posterior_samples[i, idx[j], 2],
@@ -540,7 +541,7 @@ def posterior_predictive_plot(ax_titles = [],
                                         boundary_multiplicative = False,
                                         boundary_params = {'theta': posterior_samples[i, idx[j], 4]})
             
-            if model == 'weibull_cdf':
+            if model == 'weibull_cdf' or model == 'weibull_cdf2':
                 out = cds.ddm_flexbound(v = posterior_samples[i, idx[j], 0],
                                         a = posterior_samples[i, idx[j], 1],
                                         w = posterior_samples[i, idx[j], 2],
@@ -609,13 +610,13 @@ def posterior_predictive_plot(ax_titles = [],
                                     s = 1,
                                     delta_t = 0.001,
                                     max_t = 20, 
-                                    n_samples = 10000,
+                                    n_samples = 20000,
                                     print_info = False,
                                     boundary_fun = bf.constant,
                                     boundary_multiplicative = True,
                                     boundary_params = {})
 
-        if model == 'full_ddm':
+        if model == 'full_ddm' or model == 'full_ddm2':
             out = cds.full_ddm(v = ground_truths[i, 0],
                                a = ground_truths[i, 1],
                                w = ground_truths[i, 2],
@@ -626,13 +627,13 @@ def posterior_predictive_plot(ax_titles = [],
                                s = 1,
                                delta_t = 0.001,
                                max_t = 20,
-                               n_samples = 10000,
+                               n_samples = 20000,
                                print_info = False,
                                boundary_fun = bf.constant,
                                boundary_multiplicative = True,
                                boundary_params = {})
 
-        if model == 'angle':
+        if model == 'angle' or model == 'angle2':
             out = cds.ddm_flexbound(v = ground_truths[i, 0],
                                     a = ground_truths[i, 1],
                                     w = ground_truths[i, 2],
@@ -640,13 +641,13 @@ def posterior_predictive_plot(ax_titles = [],
                                     s = 1,
                                     delta_t = 0.001, 
                                     max_t = 20,
-                                    n_samples = 10000,
+                                    n_samples = 20000,
                                     print_info = False,
                                     boundary_fun = bf.angle,
                                     boundary_multiplicative = False,
                                     boundary_params = {'theta': ground_truths[i, 4]})
 
-        if model == 'weibull_cdf':
+        if model == 'weibull_cdf' or model == 'weibull_cdf2':
             out = cds.ddm_flexbound(v = ground_truths[i, 0],
                                     a = ground_truths[i, 1],
                                     w = ground_truths[i, 2],
@@ -654,7 +655,7 @@ def posterior_predictive_plot(ax_titles = [],
                                     s = 1,
                                     delta_t = 0.001, 
                                     max_t = 20,
-                                    n_samples = 10000,
+                                    n_samples = 20000,
                                     print_info = False,
                                     boundary_fun = bf.weibull_cdf,
                                     boundary_multiplicative = True,
@@ -669,7 +670,7 @@ def posterior_predictive_plot(ax_titles = [],
                                      s = 1,
                                      delta_t = 0.001,
                                      max_t = 20,
-                                     n_samples = 10000,
+                                     n_samples = 20000,
                                      print_info = False,
                                      boundary_fun = bf.constant,
                                      boundary_multiplicative = True, 
@@ -684,7 +685,7 @@ def posterior_predictive_plot(ax_titles = [],
                                          s = 1,
                                          delta_t = 0.001, 
                                          max_t = 20,
-                                         n_samples = 10000,
+                                         n_samples = 20000,
                                          print_info = False,
                                          boundary_fun = bf.constant,
                                          boundary_multiplicative = True,
@@ -699,7 +700,7 @@ def posterior_predictive_plot(ax_titles = [],
                               s = 1,
                               delta_t = 0.001,
                               max_t = 20,
-                              n_samples = samples_by_param,
+                              n_samples = 20000,
                               print_info = False,
                               boundary_fun = bf.constant,
                               boundary_multiplicative = True,
@@ -808,7 +809,7 @@ def boundary_posterior_plot(ax_titles = ['hi-hi', 'hi-lo', 'hi-mid', 'lo-hi', 'l
         
         # Run simulations and add histograms
         # True params
-        if model == 'angle':
+        if model == 'angle' or model == 'angle2':
             out = cds.ddm_flexbound(v = ground_truths[i, 0],
                                     a = ground_truths[i, 1],
                                     w = ground_truths[i, 2],
@@ -822,7 +823,7 @@ def boundary_posterior_plot(ax_titles = ['hi-hi', 'hi-lo', 'hi-mid', 'lo-hi', 'l
                                     boundary_multiplicative = False,
                                     boundary_params = {'theta': ground_truths[i, 4]})
             
-        if model == 'weibull_cdf':
+        if model == 'weibull_cdf' or model == 'weibull_cdf2':
             out = cds.ddm_flexbound(v = ground_truths[i, 0],
                                     a = ground_truths[i, 1],
                                     w = ground_truths[i, 2],
@@ -836,13 +837,29 @@ def boundary_posterior_plot(ax_titles = ['hi-hi', 'hi-lo', 'hi-mid', 'lo-hi', 'l
                                     boundary_multiplicative = True,
                                     boundary_params = {'alpha': ground_truths[i, 4],
                                                        'beta': ground_truths[i, 5]})
+        
+        if model == 'ddm':
+            out = cds.ddm_flexbound(v = ground_truths[i, 0],
+                                    a = ground_truths[i, 1],
+                                    w = ground_truths[i, 2],
+                                    ndt = ground_truths[i, 3],
+                                    s = 1,
+                                    delta_t = 0.01,
+                                    max_t = 20, 
+                                    n_samples = 10000,
+                                    print_info = False,
+                                    boundary_fun = bf.constant,
+                                    boundary_multiplicative = True,
+                                    boundary_params = {})
+            
+        
         tmp_true = np.concatenate([out[0], out[1]], axis = 1)
         choice_p_up_true = np.sum(tmp_true[:, 1] == 1) / tmp_true.shape[0]
         
         # Run Model simulations for posterior samples
         tmp_post = np.zeros((n_post_params*samples_by_param, 2))
         for j in range(n_post_params):
-            if model == 'angle':
+            if model == 'angle' or model == 'angle2':
                 out = cds.ddm_flexbound(v = posterior_samples[i, idx[j], 0],
                                         a = posterior_samples[i, idx[j], 1],
                                         w = posterior_samples[i, idx[j], 2],
@@ -856,7 +873,7 @@ def boundary_posterior_plot(ax_titles = ['hi-hi', 'hi-lo', 'hi-mid', 'lo-hi', 'l
                                         boundary_multiplicative = False,
                                         boundary_params = {'theta': posterior_samples[i, idx[j], 4]})
             
-            if model == 'weibull_cdf':
+            if model == 'weibull_cdf' or model == 'weibull_cdf2':
                 out = cds.ddm_flexbound(v = posterior_samples[i, idx[j], 0],
                                         a = posterior_samples[i, idx[j], 1],
                                         w = posterior_samples[i, idx[j], 2],
@@ -870,6 +887,20 @@ def boundary_posterior_plot(ax_titles = ['hi-hi', 'hi-lo', 'hi-mid', 'lo-hi', 'l
                                         boundary_multiplicative = True,
                                         boundary_params = {'alpha': posterior_samples[i, idx[j], 4],
                                                            'beta': posterior_samples[i, idx[j], 5]})
+                
+            if model == 'ddm':
+                out = cds.ddm_flexbound(v = posterior_samples[i, idx[j], 0],
+                                        a = posterior_samples[i, idx[j], 1],
+                                        w = posterior_samples[i, idx[j], 2],
+                                        ndt = posterior_samples[i, idx[j], 3],
+                                        s = 1,
+                                        delta_t = 0.01,
+                                        max_t = 20, 
+                                        n_samples = samples_by_param,
+                                        print_info = False,
+                                        boundary_fun = bf.constant,
+                                        boundary_multiplicative = True,
+                                        boundary_params = {})
             
             tmp_post[(10 * j):(10 * (j + 1)), :] = np.concatenate([out[0], out[1]], axis = 1)
         
@@ -881,7 +912,7 @@ def boundary_posterior_plot(ax_titles = ['hi-hi', 'hi-lo', 'hi-mid', 'lo-hi', 'l
         ax_tmp.set_yticks([])
         
         counts, bins = np.histogram(tmp_post[tmp_post[:, 1] == 1, 0],
-                                bins = np.linspace(0, 10, 100))
+                                    bins = np.linspace(0, 10, 100))
     
         counts_2, bins = np.histogram(tmp_post[tmp_post[:, 1] == 1, 0],
                                       bins = np.linspace(0, 10, 100),
@@ -944,20 +975,24 @@ def boundary_posterior_plot(ax_titles = ['hi-hi', 'hi-lo', 'hi-mid', 'lo-hi', 'l
         
         # Plot posterior samples 
         for j in range(n_post_params):
-            if model == 'weibull_cdf':
-                b = posterior_samples[i, idx[i], 1] * bf.weibull_cdf(t = t_s, 
+            if model == 'weibull_cdf' or model == 'weibull_cdf2':
+                b = posterior_samples[i, idx[j], 1] * bf.weibull_cdf(t = t_s, 
                                                                         alpha = posterior_samples[i, idx[j], 4],
                                                                         beta = posterior_samples[i, idx[j], 5])
-            if model == 'angle':
-                b = np.maximum(posterior_samples[i, idx[i], 1] + bf.angle(t = t_s, 
+            if model == 'angle' or model == 'angle2':
+                b = np.maximum(posterior_samples[i, idx[j], 1] + bf.angle(t = t_s, 
                                                                              theta = posterior_samples[i, idx[j], 4]), 0)
+            if model == 'ddm':
+                b = posterior_samples[i, idx[j], 1] * np.ones(t_s.shape[0])
+            
             
             start_point_tmp = - posterior_samples[i, idx[j], 1] + \
                               (2 * posterior_samples[i, idx[j], 1] * posterior_samples[i, idx[j], 2])
+            
             slope_tmp = posterior_samples[i, idx[j], 0]
             
             ax[row_tmp, col_tmp].plot(t_s + posterior_samples[i, idx[j], 3], b, 'black',
-                                      t_s + posterior_samples[i, idx[j], 3], -b, 'black', 
+                                      t_s + posterior_samples[i, idx[j], 3], - b, 'black', 
                                       alpha = 0.05,
                                       zorder = 1000)
             
@@ -974,12 +1009,16 @@ def boundary_posterior_plot(ax_titles = ['hi-hi', 'hi-lo', 'hi-mid', 'lo-hi', 'l
                                       zorder = 1000)
             
         # Plot true ground_truths  
-        if model == 'weibull_cdf':
+        if model == 'weibull_cdf' or model == 'weibull_cdf2':
             b = ground_truths[i, 1] * bf.weibull_cdf(t = t_s, 
-                                            alpha = ground_truths[i, 4],
-                                            beta = ground_truths[i, 5])
-        if model == 'angle':
+                                                     alpha = ground_truths[i, 4],
+                                                     beta = ground_truths[i, 5])
+            
+        if model == 'angle' or model == 'angle2':
             b = np.maximum(ground_truths[i, 1] + bf.angle(t = t_s, theta = ground_truths[i, 4]), 0)
+        
+        if model == 'ddm':
+            b = ground_truths[i, 1] * np.ones(t_s.shape[0])
 
         start_point_tmp = - ground_truths[i, 1] + \
                           (2 * ground_truths[i, 1] * ground_truths[i, 2])
@@ -1146,9 +1185,16 @@ if __name__ == "__main__":
     CLI.add_argument("--npostpair",
                      type = int,
                      default = 9)
+    CLI.add_argument("--plots",
+                     nargs = "*",
+                     type = str,
+                     default = [])
+    
+    
 
     args = CLI.parse_args()
     print(args)
+    print(args.plots)
     
     model = args.model
     machine = args.machine
@@ -1256,167 +1302,174 @@ if __name__ == "__main__":
     
     # GENERATE PLOTS:
     # POSTERIOR VARIANCE PLOT MLP
-    print('Making Posterior Variance Plot...')
-    posterior_variance_plot(ax_titles = ax_titles, 
-                        posterior_variances = mcmc_dict['sds'],
-                        cols = 2,
-                        save = True,
-                        data_signature = '_n_' + str(n) + '_' + now,
-                        model = model,
-                        method = mcmc_dict['method'],
-                        train_data_type = traindattype)
+    if "posterior_variance" in args.plots:
+        print('Making Posterior Variance Plot...')
+        posterior_variance_plot(ax_titles = ax_titles, 
+                            posterior_variances = mcmc_dict['sds'],
+                            cols = 2,
+                            save = True,
+                            data_signature = '_n_' + str(n) + '_' + now,
+                            model = model,
+                            method = mcmc_dict['method'],
+                            train_data_type = traindattype)
     
     # HDI_COVERAGE PLOT
-    print('Making HDI Coverage Plot...')
-    hdi_coverage_plot(ax_titles = ax_titles,
-                  model = model,
-                  coverage_probabilities = mcmc_dict['p_covered_by_param'],
-                  data_signature = '_n_' + str(n) + '_' + now,
-                  save = True,
-                  method = mcmc_dict['method'],
-                  train_data_type = traindattype)
+    if "hdi_coverage" in args.plots:
+        print('Making HDI Coverage Plot...')
+        hdi_coverage_plot(ax_titles = ax_titles,
+                      model = model,
+                      coverage_probabilities = mcmc_dict['p_covered_by_param'],
+                      data_signature = '_n_' + str(n) + '_' + now,
+                      save = True,
+                      method = mcmc_dict['method'],
+                      train_data_type = traindattype)
     
     
     # HDI P PLOT
-    print('Making HDI P plot')
-    hdi_p_plot(ax_titles = ax_titles,
-           p_values = mcmc_dict['gt_cdf_score'],
-           cols = 2,
-           save = True,
-           model = model,
-           data_signature = '_n_' + str(n) + '_' + now,
-           method = mcmc_dict['method'],
-           train_data_type = traindattype)
+    if "hdi_p" in args.plots:
+        print('Making HDI P plot')
+        hdi_p_plot(ax_titles = ax_titles,
+               p_values = mcmc_dict['gt_cdf_score'],
+               cols = 2,
+               save = True,
+               model = model,
+               data_signature = '_n_' + str(n) + '_' + now,
+               method = mcmc_dict['method'],
+               train_data_type = traindattype)
     
     # PARAMETER RECOVERY PLOTS: KDE MLP
-    print('Making Parameter Recovery Plot...')
-    parameter_recovery_plot(ax_titles = ax_titles,
-                            title = 'Parameter Recovery: ' + model,
-                            ground_truths = mcmc_dict['gt'],
-                            estimates = mcmc_dict['means'],
-                            estimate_variances = mcmc_dict['sds'],
-                            r2_vec = mcmc_dict['r2_means'],
-                            cols = 3,
-                            save = True,
-                            machine = 'home',
-                            data_signature = '_n_' + str(n) + '_' + now,
-                            method = mcmc_dict['method'],
-                            model = model,
-                            train_data_type = traindattype)
-    
+    if "parameter_recovery_scatter" in args.plots:
+        print('Making Parameter Recovery Plot...')
+        parameter_recovery_plot(ax_titles = ax_titles,
+                                title = 'Parameter Recovery: ' + model,
+                                ground_truths = mcmc_dict['gt'],
+                                estimates = mcmc_dict['means'],
+                                estimate_variances = mcmc_dict['sds'],
+                                r2_vec = mcmc_dict['r2_means'],
+                                cols = 3,
+                                save = True,
+                                machine = 'home',
+                                data_signature = '_n_' + str(n) + '_' + now,
+                                method = mcmc_dict['method'],
+                                model = model,
+                                train_data_type = traindattype)
+
     
     # Parameter recovery hist MLP
-    parameter_recovery_hist(ax_titles = ax_titles,
-                            estimates = mcmc_dict['means'] - mcmc_dict['gt'], 
-                            cols = 2,
-                            save = True,
-                            model = model,
-                            machine = 'home',
-                            posterior_stat = 'mean', # can be 'mean' or 'map'
-                            data_signature =  '_n_' + str(n) + '_' + now,
-                            method = mcmc_dict['method'],
-                            train_data_type = traindattype)
+    if "parameter_recovery_hist" in args.plots:
+        parameter_recovery_hist(ax_titles = ax_titles,
+                                estimates = mcmc_dict['means'] - mcmc_dict['gt'], 
+                                cols = 2,
+                                save = True,
+                                model = model,
+                                machine = 'home',
+                                posterior_stat = 'mean', # can be 'mean' or 'map'
+                                data_signature =  '_n_' + str(n) + '_' + now,
+                                method = mcmc_dict['method'],
+                                train_data_type = traindattype)
     
     # EUC DIST MEANS GT SORTED ID: MLP
     # n_plots = 9
     # random_idx = np.random.choice(mcmc_dict['gt'][mcmc_dict['r_hats'] < r_hat_cutoff, 0].shape[0], size = n_plots)
-    print('Making Posterior Pair Plots...')
-    idx_vecs = [mcmc_dict['euc_dist_means_gt_sorted_id'][:10], 
-                np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - 5), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + 5), 1),
-                mcmc_dict['euc_dist_means_gt_sorted_id'][-10:],
-                np.random.choice(mcmc_dict['gt'].shape[0], size = npostpair)]
+    if "posterior_pair" in args.plots:
+        print('Making Posterior Pair Plots...')
+        idx_vecs = [mcmc_dict['euc_dist_means_gt_sorted_id'][:10], 
+                    mcmc_dict['euc_dist_means_gt_sorted_id'][np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - 5), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + 5), 1)],
+                    mcmc_dict['euc_dist_means_gt_sorted_id'][-10:],
+                    np.random.choice(mcmc_dict['gt'].shape[0], size = npostpair)]
 
-    data_signatures = ['_n_' + str(n) + '_euc_dist_mean_low_idx_',
-                      '_n_' + str(n) + '_euc_dist_mean_medium_idx_',
-                      '_n_' + str(n) + '_euc_dist_mean_high_idx_',
-                      '_n_' + str(n) + '_euc_dist_mean_random_idx_']
-    
-    title_signatures = [', ' + str(n) + ', Recovery Good',
-              ', ' + str(n) + ', Reocvery Medium',
-              ', ' + str(n) + ', Reocvery Bad',
-               ', ' + str(n) + ', Random ID']
-    
-    cnt = 0
-    tot_cnt = 0
-    for idx_vec in idx_vecs:
-        for idx in idx_vec:
-            print('Making Posterior Pair Plot: ', tot_cnt)
-            make_posterior_pair_grid(posterior_samples =  pd.DataFrame(mcmc_dict['posterior_samples'][idx, :, :],
-                                                                       columns = ax_titles),
-                                 gt =  mcmc_dict['gt'][idx, :],
-                                 height = 8,
-                                 aspect = 1,
-                                 n_subsample = 2000,
-                                 data_signature = data_signatures[cnt] + str(idx),
-                                 title_signature = title_signatures[cnt],
-                                 gt_available = True,
-                                 save = True,
-                                 model = model,
-                                 method = mcmc_dict['method'],
-                                 train_data_type = traindattype)
-            tot_cnt += 1
-        cnt += 1
-        
-        
-    # MODEL UNCERTAINTY PLOTS
-    if model == 'angle' or model == 'weibull_cdf':
-        print('Making Model Uncertainty Plots...')
-        idx_vecs = [mcmc_dict['euc_dist_means_gt_sorted_id'][:npostpred], 
-                    np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - np.floor(npostpred / 2)), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + np.ceil(npostpred / 2)), 1),
-                    mcmc_dict['euc_dist_means_gt_sorted_id'][-npostpred:]]
+        data_signatures = ['_n_' + str(n) + '_euc_dist_mean_low_idx_',
+                          '_n_' + str(n) + '_euc_dist_mean_medium_idx_',
+                          '_n_' + str(n) + '_euc_dist_mean_high_idx_',
+                          '_n_' + str(n) + '_euc_dist_mean_random_idx_']
 
-        data_signatures = ['_n_' + str(n) + '_euc_dist_mean_low_',
-                           '_n_' + str(n) + '_euc_dist_mean_medium_',
-                           '_n_' + str(n) + '_euc_dist_mean_high_',]
+        title_signatures = [', ' + str(n) + ', Recovery Good',
+                  ', ' + str(n) + ', Reocvery Medium',
+                  ', ' + str(n) + ', Reocvery Bad',
+                   ', ' + str(n) + ', Random ID']
 
         cnt = 0
+        tot_cnt = 0
         for idx_vec in idx_vecs:
-            print('Making Model Uncertainty Plots... sets: ', cnt)
-            boundary_posterior_plot(ax_titles = [str(i) for i in range(npostpred)], 
-                                    title = 'Model Uncertainty: ',
-                                    posterior_samples = mcmc_dict['posterior_samples'][idx_vec, :, :], # dat_total[1][bottom_idx, 5000:, :],
-                                    ground_truths = mcmc_dict['gt'][idx_vec, :], #dat_total[0][bottom_idx, :],
-                                    cols = 3,
-                                    model = model, # 'weibull_cdf',
-                                    data_signature = data_signatures[cnt],
-                                    n_post_params = 2000,
-                                    samples_by_param = 10,
-                                    max_t = 10,
-                                    show = True,
-                                    save = True,
-                                    method = mcmc_dict['method'],
-                                    train_data_type = traindattype)
+            for idx in idx_vec:
+                print('Making Posterior Pair Plot: ', tot_cnt)
+                make_posterior_pair_grid(posterior_samples =  pd.DataFrame(mcmc_dict['posterior_samples'][idx, :, :],
+                                                                           columns = ax_titles),
+                                     gt =  mcmc_dict['gt'][idx, :],
+                                     height = 8,
+                                     aspect = 1,
+                                     n_subsample = 2000,
+                                     data_signature = data_signatures[cnt] + str(idx),
+                                     title_signature = title_signatures[cnt],
+                                     gt_available = True,
+                                     save = True,
+                                     model = model,
+                                     method = mcmc_dict['method'],
+                                     train_data_type = traindattype)
+                tot_cnt += 1
             cnt += 1
+
+        
+    # MODEL UNCERTAINTY PLOTS
+    if "model_uncertainty" in args.plots:
+        if model == 'angle' or model == 'weibull_cdf' or model == 'angle2' or model == 'ddm':
+            print('Making Model Uncertainty Plots...')
+            idx_vecs = [mcmc_dict['euc_dist_means_gt_sorted_id'][:npostpred], 
+                        mcmc_dict['euc_dist_means_gt_sorted_id'][np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - 5), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + 5), 1)],
+                        mcmc_dict['euc_dist_means_gt_sorted_id'][-npostpred:]]
+
+            data_signatures = ['_n_' + str(n) + '_euc_dist_mean_low_',
+                               '_n_' + str(n) + '_euc_dist_mean_medium_',
+                               '_n_' + str(n) + '_euc_dist_mean_high_',]
+
+            cnt = 0
+            for idx_vec in idx_vecs:
+                print('Making Model Uncertainty Plots... sets: ', cnt)
+                boundary_posterior_plot(ax_titles = [str(i) for i in range(npostpred)], 
+                                        title = 'Model Uncertainty: ',
+                                        posterior_samples = mcmc_dict['posterior_samples'][idx_vec, :, :], # dat_total[1][bottom_idx, 5000:, :],
+                                        ground_truths = mcmc_dict['gt'][idx_vec, :], #dat_total[0][bottom_idx, :],
+                                        cols = 3,
+                                        model = model, # 'weibull_cdf',
+                                        data_signature = data_signatures[cnt],
+                                        n_post_params = 2000,
+                                        samples_by_param = 10,
+                                        max_t = 10,
+                                        show = True,
+                                        save = True,
+                                        method = mcmc_dict['method'],
+                                        train_data_type = traindattype)
+                cnt += 1
             
             
     # POSTERIOR PREDICTIVE PLOTS
-    print('Making Posterior Predictive Plots...')
-    idx_vecs = [mcmc_dict['euc_dist_means_gt_sorted_id'][:10], 
-                np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - 5),
-                          int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + 5), 1),
-                mcmc_dict['euc_dist_means_gt_sorted_id'][-10:]]
+    if "posterior_predictive" in args.plots:
+        print('Making Posterior Predictive Plots...')
+        idx_vecs = [mcmc_dict['euc_dist_means_gt_sorted_id'][:10], 
+                    mcmc_dict['euc_dist_means_gt_sorted_id'][np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - 5), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + 5), 1)],
+                    mcmc_dict['euc_dist_means_gt_sorted_id'][-10:]]
 
-    data_signatures = ['_n_' + str(n) + '_idx_' + '_euc_dist_mean_low_',
-                       '_n_' + str(n) + '_idx_' + '_euc_dist_mean_medium_',
-                       '_n_' + str(n) + '_idx_' + '_euc_dist_mean_high_',]
+        data_signatures = ['_n_' + str(n) + '_idx_' + '_euc_dist_mean_low_',
+                           '_n_' + str(n) + '_idx_' + '_euc_dist_mean_medium_',
+                           '_n_' + str(n) + '_idx_' + '_euc_dist_mean_high_',]
 
-    cnt = 0
-    for idx_vec in idx_vecs:
-        print('Making Posterior Predictive Plots... set: ', cnt)
-        posterior_predictive_plot(ax_titles =[str(i) for i in range(npostpred)],
-                                  title = 'Posterior Predictive: ',
-                                  posterior_samples = mcmc_dict['posterior_samples'][idx_vec, :, :],
-                                  ground_truths =  mcmc_dict['gt'][idx_vec, :],
-                                  cols = 3,
-                                  model = model,
-                                  data_signature = data_signatures[cnt],
-                                  n_post_params = 2000,
-                                  samples_by_param = 10,
-                                  show = True,
-                                  save = True,
-                                  method = mcmc_dict['method'],
-                                  train_data_type = traindattype)
-        cnt += 1
-    
-    
+        cnt = 0
+        for idx_vec in idx_vecs:
+            print('Making Posterior Predictive Plots... set: ', cnt)
+            posterior_predictive_plot(ax_titles =[str(i) for i in range(npostpred)],
+                                      title = 'Posterior Predictive: ',
+                                      posterior_samples = mcmc_dict['posterior_samples'][idx_vec, :, :],
+                                      ground_truths =  mcmc_dict['gt'][idx_vec, :],
+                                      cols = 3,
+                                      model = model,
+                                      data_signature = data_signatures[cnt],
+                                      n_post_params = 2000,
+                                      samples_by_param = 10,
+                                      show = True,
+                                      save = True,
+                                      method = mcmc_dict['method'],
+                                      train_data_type = traindattype)
+            cnt += 1
+
+
     

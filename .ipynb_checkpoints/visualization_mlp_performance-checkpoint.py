@@ -76,7 +76,7 @@ def kde_vs_mlp_likelihoods(ax_titles = [],
         
         # Get predictions from simulations /kde
         for j in range(nreps):
-            if model == 'ddm':
+            if model == 'ddm' or model == 'ddm_analytic':
                 out = cds.ddm_flexbound(v = parameter_matrix[i, 0],
                                         a = parameter_matrix[i, 1],
                                         w = parameter_matrix[i, 2],
@@ -136,7 +136,7 @@ def kde_vs_mlp_likelihoods(ax_titles = [],
                                         boundary_multiplicative = False,
                                         boundary_params = {'theta': parameter_matrix[i, 4]})
 
-            if model == 'weibull_cdf':
+            if model == 'weibull_cdf' or model == 'weibull_cdf2':
                 out = cds.ddm_flexbound(v = parameter_matrix[i, 0],
                                         a = parameter_matrix[i, 1],
                                         w = parameter_matrix[i, 2],
@@ -278,6 +278,7 @@ def mlp_manifold(params = [],
     keras_model = keras.models.load_model(network_dir + 'model_final.h5')
 
     # Prepare data structures
+    
     # Data template
     plot_data = np.zeros((4000, 2))
     plot_data[:, 0] = np.concatenate(([i * 0.005 for i in range(2000, 0, -1)], [i * 0.005 for i in range(1, 2001, 1)]))
