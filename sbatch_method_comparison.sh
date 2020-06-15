@@ -18,7 +18,7 @@
 #SBATCH --mem=64G
 #SBATCH -c 10
 #SBATCH -N 1
-##SBATCH -p gpu --gres=gpu:1
+#SBATCH -p gpu --gres=gpu:1
 #SBATCH --array=1-20
 
 # Run a command
