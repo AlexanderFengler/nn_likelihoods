@@ -17,8 +17,8 @@
 #SBATCH --mem=32G
 #SBATCH -c 10
 #SBATCH -N 1
-#SBATCH --array=1-300  # DO THIS FOR TRAINING DATA GENERATION
-##SBATCH --array=1-1
+##SBATCH --array=1-300  # DO THIS FOR TRAINING DATA GENERATION
+#SBATCH --array=1-1
 
 # --------------------------------------------------------------------------------------
 # Sequentially run different kind of models

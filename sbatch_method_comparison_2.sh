@@ -39,7 +39,7 @@ conda activate tf-cpu
 nmcmcsamples=25000
 nbyarrayjob=10
 ncpus=1
-nsamples=( 1024 ) # 2048 4096 ) #( 1024 2048 4096 )
+nsamples=( 1024 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
 method="ornstein_pos"   #'ddm_sdv_analytic'  #"full_ddm2"
 ids=( -1 )
 machine='ccv'
