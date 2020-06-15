@@ -15,7 +15,7 @@
 
 # Request runtime, memory, cores:
 #SBATCH --time=36:00:00
-#SBATCH --mem=64G
+#SBATCH --mem=32G
 #SBATCH -c 4
 #SBATCH -N 1
 ##SBATCH -p gpu --gres=gpu:1
