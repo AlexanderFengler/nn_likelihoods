@@ -11,7 +11,7 @@
 ##SBATCH --account=bibs-frankmj-condo
 
 # output file
-#SBATCH --output /users/afengler/batch_job_out/mc_ddm_kde_4_%A_%a.out
+#SBATCH --output /users/afengler/batch_job_out/mc_or_pos_kde_4_%A_%a.out
 
 # Request runtime, memory, cores:
 #SBATCH --time=36:00:00
@@ -39,8 +39,8 @@ conda activate tf-cpu
 nmcmcsamples=25000
 nbyarrayjob=10
 ncpus=1
-nsamples=( 1024 ) # 2048 4096 ) #( 1024 2048 4096 )
-method="weibull_cdf2"   #'ddm_sdv_analytic'  #"full_ddm2"
+nsamples=( 1024 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
+method="ornstein_pos"   #'ddm_sdv_analytic'  #"full_ddm2"
 ids=( -1 )
 machine='ccv'
 samplerinit='mle'

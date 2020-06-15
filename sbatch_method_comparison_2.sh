@@ -11,7 +11,7 @@
 ##SBATCH --account=bibs-frankmj-condo
 
 # output file
-#SBATCH --output /users/afengler/batch_job_out/mc_ddm_kde_4_%A_%a.out
+#SBATCH --output /users/afengler/batch_job_out/mc_or_pos_kde_4_%A_%a.out
 
 # Request runtime, memory, cores:
 #SBATCH --time=36:00:00
