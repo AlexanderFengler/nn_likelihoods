@@ -50,7 +50,7 @@ def collect_datasets_diff_evo(in_files = [],
             means[(n_param_sets_file * file_cnt) + i, :] = np.mean(tmp_samples, axis = 0)
             maps[(n_param_sets_file * file_cnt) + i, :] = tmp_samples[np.argmax(tmp_log_l), :]
             orig_params[(n_param_sets_file * file_cnt) + i, :] = tmp_data[0][i, :]
-            orig_data[(n_parmam_sets_file * file_cnt) + i, :, :] = tmp_data[1][i, :, :]
+            orig_data[(n_param_sets_file * file_cnt) + i, :, :] = tmp_data[1][i, :, :]
             r_hat_last[(n_param_sets_file * file_cnt) + i] = tmp_data[2][i][2][-1]
             
         print(file_cnt)
