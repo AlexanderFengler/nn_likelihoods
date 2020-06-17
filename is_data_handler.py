@@ -85,7 +85,7 @@ if __name__ == "__main__":
                      type = str,
                      default = 'x7')
     CLI.add_argument("--method",
-                     nargs = "*"
+                     nargs = "*",
                      type = str,
                      default = 'ddm')
     CLI.add_argument("--ndata",
