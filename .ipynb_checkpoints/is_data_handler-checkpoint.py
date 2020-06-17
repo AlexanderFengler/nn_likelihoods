@@ -115,7 +115,7 @@ if __name__ == "__main__":
         is_sample_folder = '/users/afengler/data/' + isfolder + '/'
 
 
-    print('Started processing model: ', method, ' with ndata: ', n)
+    print('Started processing model: ', method, ' with ndata: ', ndata)
     collect_datasets_is(folder = is_sample_folder,
                         model = method,
                         ndata = ndata,
