@@ -20,7 +20,7 @@ def collect_datasets_is(folder = [],
     
     
     
-    n_data_substring = 'n_' + str(ndata)
+    n_data_substring = 'N_' + str(ndata)
     
     is_dict = {}
     is_dict['gt'] = []
@@ -58,8 +58,8 @@ def collect_datasets_is(folder = [],
             is_dict['data'].append(param_recov_dat[1][0][idx, : , :])
         
             
-        print('Processed file: ', file_)
-        print(model + '_training_' in file_)
+            print('Processed file: ', file_)
+        #print(model + '_training_' in file_)
     
     is_dict['gt'] = np.stack(is_dict['gt'])
     is_dict['posterior_samples'] = np.stack(is_dict['posterior_samples'])
