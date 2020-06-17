@@ -89,7 +89,7 @@ if __name__ == "__main__":
                      type = str,
                      default = 'ddm')
     CLI.add_argument("--ndata",
-                     nargs = "*"
+                     nargs = "*",
                      type = int,
                      default = 1024)
     CLI.add_argument("--nsubsample",
