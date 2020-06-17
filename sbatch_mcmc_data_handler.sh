@@ -222,7 +222,7 @@ for n in "${ndata[@]}"
 do
     for id in "${ids[@]}"
     do 
-       python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine --method $method --ndata $n --nsubsample 20000
+       python -u  /users/afengler/git_repos/nn_likelihoods/is_data_handler.py --machine $machine --method $method --ndata $n --nsubsample 20000
     done
 done
 
