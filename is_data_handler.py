@@ -84,11 +84,9 @@ if __name__ == "__main__":
                      type = str,
                      default = 'x7')
     CLI.add_argument("--method",
-                     nargs = "*",
                      type = str,
                      default = 'ddm')
     CLI.add_argument("--ndata",
-                     nargs = "*",
                      type = int,
                      default = 1024)
     CLI.add_argument("--nsubsample",
@@ -115,11 +113,10 @@ if __name__ == "__main__":
     
     if machine == 'x7':
         is_sample_folder = '/users/afengler/data/' + isfolder + '/'
-        
-    for model in method:
-        for n in ndata:
-            print('Started processing model: ', model, ' with ndata: ', n)
-            collect_datasets_is(folder = is_sample_folder,
-                                model = model,
-                                ndata = n,
-                                nsubsample = nsubsample)
+
+
+    print('Started processing model: ', method, ' with ndata: ', n)
+    collect_datasets_is(folder = is_sample_folder,
+                        model = method,
+                        ndata = ndata,
+                        nsubsample = nsubsample)
