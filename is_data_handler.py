@@ -52,7 +52,7 @@ def collect_datasets_is(folder = [],
             is_dict['importance_weights'].append(tmp['final_w'][sub_idx])
             is_dict['effective_sample_size'].append(1 / np.sum(np.square(tmp['final_w'])))
             is_dict['means'].append(np.mean(tmp['posterior_samples'], axis = 0))
-            is_dict['maps'].append(tmp['posterior_samples'][np.argmax(tmp['log_likelihood']), :])
+            is_dict['maps'].append(tmp['final_x'][np.argmax(tmp['log_likelihood']), :])
             
             # Add data
             is_dict['data'].append(param_recov_dat[1][0][idx, : , :])
