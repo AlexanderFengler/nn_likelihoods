@@ -14,8 +14,8 @@ def collect_datasets_is(folder = [],
                         nsubsample = []):
     
     # Load in parameter recovery data
-    param_recov_files = os.listdir('/users/afengler/data/kde/' + model + '/parameter_recovery_data_binned_1_nbins_512_0_n_' + str(ndata) + '/')
-    param_recov_dat = pickle.load(open('/users/afengler/data/kde/' + model + '/parameter_recovery_data_binned_1_nbins_512_0_n_' + str(ndata) + '/' + param_recov_files[0], 'rb'))
+    param_recov_files = os.listdir('/users/afengler/data/kde/' + model + '/parameter_recovery_data_binned_1_nbins_512_n_' + str(ndata) + '/')
+    param_recov_dat = pickle.load(open('/users/afengler/data/kde/' + model + '/parameter_recovery_data_binned_1_nbins_512_n_' + str(ndata) + '/' + param_recov_files[0], 'rb'))
     
     
     
