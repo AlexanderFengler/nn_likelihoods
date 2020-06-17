@@ -36,7 +36,7 @@ def collect_datasets_is(folder = [],
     files_ = os.listdir(folder)
     
     for file_ in files_:
-        if (model + '_training_') in file_ and n_data_substring in file_ and 'summary' not in file_:
+        if model + '_training_' in file_ and n_data_substring in file_ and 'summary' not in file_:
             # extract id
             st = file_.find('_idx_')
             fin = file_.find('_tdist')
@@ -56,8 +56,10 @@ def collect_datasets_is(folder = [],
             
             # Add data
             is_dict['data'].append(param_recov_dat[1][0][idx, : , :])
+        
             
-        print('Processed file: ', file_)
+            print('Processed file: ', file_)
+            print(model + '_training_' in file_)
     
     is_dict['gt'] = np.stack(is_dict['gt'])
     is_dict['posterior_samples'] = np.stack(is_dict['posterior_samples'])
@@ -114,7 +116,7 @@ if __name__ == "__main__":
     if machine == 'x7':
         is_sample_folder = '/users/afengler/data/' + isfolder + '/'
 
-
+    print(is_sample_folder)
     print('Started processing model: ', method, ' with ndata: ', ndata)
     collect_datasets_is(folder = is_sample_folder,
                         model = method,
