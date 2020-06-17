@@ -161,7 +161,7 @@ def compute_boundary_rmse(mode = 'max_t_global', # max_t_global, max_t_local, qu
         max_t = np.max(data[i, :, 0])
         t_probes = np.linspace(0, max_t, n_probes)
         
-        if model == 'weibull_cdf':
+        if model == 'weibull_cdf' or model == 'weibull_cdf2':
             bnd_est[i] = np.maximum(parameters_estimated[i, 1] * boundary_fun(*(t_probes, ) + parameters_estimated_tup[i]), 0)
             bnd_true[i] = np.maximum(parameters_true[i, 1] * boundary_fun(*(t_probes, ) + parameters_true_tup[i]), 0)
         if model == 'angle':
@@ -197,6 +197,7 @@ def parameter_recovery_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
                             model = '', 
                             machine = '',
                             method = 'cnn',
+                            statistic = 'mean',
                             data_signature = '',
                             train_data_type = ''): # color_param 'none' 
     
@@ -259,7 +260,7 @@ def parameter_recovery_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
             if not os.path.isdir(fig_dir):
                 os.mkdir(fig_dir)
         
-        figure_name = 'parameter_recovery_plot_'
+        figure_name = 'parameter_recovery_plot_' + statistic + '_'
         plt.subplots_adjust(top = 0.9)
         plt.subplots_adjust(hspace = 0.3, wspace = 0.3)
         plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300, )
@@ -1336,6 +1337,22 @@ if __name__ == "__main__":
                                 data_signature = '_n_' + str(n) + '_' + now,
                                 method = mcmc_dict['method'],
                                 model = model,
+                                statistic = 'mean',
+                                train_data_type = traindattype)
+        
+        parameter_recovery_plot(ax_titles = ax_titles,
+                                title = 'Parameter Recovery: ' + model,
+                                ground_truths = mcmc_dict['gt'],
+                                estimates = mcmc_dict['maps'],
+                                estimate_variances = mcmc_dict['sds'],
+                                r2_vec = mcmc_dict['r2_maps'],
+                                cols = 3,
+                                save = True,
+                                machine = 'home',
+                                data_signature = '_n_' + str(n) + '_' + now,
+                                method = mcmc_dict['method'],
+                                model = model,
+                                statistic = 'maps',
                                 train_data_type = traindattype)
 
     
@@ -1396,7 +1413,7 @@ if __name__ == "__main__":
         
     # MODEL UNCERTAINTY PLOTS
     if "model_uncertainty" in args.plots:
-        if model == 'angle' or model == 'weibull_cdf' or model == 'angle2' or model == 'ddm':
+        if model == 'angle' or model == 'weibull_cdf' or model == 'angle2' or model == 'ddm' or model == 'weibull_cdf2':
             print('Making Model Uncertainty Plots...')
             idx_vecs = [mcmc_dict['euc_dist_means_gt_sorted_id'][:npostpred], 
                         mcmc_dict['euc_dist_means_gt_sorted_id'][np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - 5), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + 5), 1)],
@@ -1409,7 +1426,7 @@ if __name__ == "__main__":
             cnt = 0
             for idx_vec in idx_vecs:
                 print('Making Model Uncertainty Plots... sets: ', cnt)
-                boundary_posterior_plot(ax_titles = [str(i) for i in range(npostpred)], 
+                boundary_posterior_plot(ax_titles = [str(i) for i in idx_vec], 
                                         title = 'Model Uncertainty: ',
                                         posterior_samples = mcmc_dict['posterior_samples'][idx_vec, :, :], # dat_total[1][bottom_idx, 5000:, :],
                                         ground_truths = mcmc_dict['gt'][idx_vec, :], #dat_total[0][bottom_idx, :],
@@ -1433,14 +1450,14 @@ if __name__ == "__main__":
                     mcmc_dict['euc_dist_means_gt_sorted_id'][np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - 5), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + 5), 1)],
                     mcmc_dict['euc_dist_means_gt_sorted_id'][-10:]]
 
-        data_signatures = ['_n_' + str(n) + '_idx_' + '_euc_dist_mean_low_',
-                           '_n_' + str(n) + '_idx_' + '_euc_dist_mean_medium_',
-                           '_n_' + str(n) + '_idx_' + '_euc_dist_mean_high_',]
+        data_signatures = ['_n_' + str(n) + '_euc_dist_mean_low_',
+                           '_n_' + str(n) + '_euc_dist_mean_medium_',
+                           '_n_' + str(n) + '_euc_dist_mean_high_',]
 
         cnt = 0
         for idx_vec in idx_vecs:
             print('Making Posterior Predictive Plots... set: ', cnt)
-            posterior_predictive_plot(ax_titles =[str(i) for i in range(npostpred)],
+            posterior_predictive_plot(ax_titles =[str(i) for i in idx_vec],
                                       title = 'Posterior Predictive: ',
                                       posterior_samples = mcmc_dict['posterior_samples'][idx_vec, :, :],
                                       ground_truths =  mcmc_dict['gt'][idx_vec, :],
@@ -1454,6 +1471,3 @@ if __name__ == "__main__":
                                       method = mcmc_dict['method'],
                                       train_data_type = traindattype)
             cnt += 1
-
-
-    
