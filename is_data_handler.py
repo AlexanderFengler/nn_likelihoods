@@ -44,7 +44,7 @@ def collect_datasets_is(folder = [],
             
             tmp = pickle.load(gzip.open(folder + file_, 'rb'), encoding = 'latin1')
             
-            sub_idx = np.random.choice(tmp['posterior_samples'].shape[0], n_subsample, replace = False) 
+            sub_idx = np.random.choice(tmp['posterior_samples'].shape[0], nsubsample, replace = False) 
             is_dict['gt'].append(tmp['gt_params'])
             is_dict['posterior_samples'].append(tmp['posterior_samples'][sub_idx, :])
             is_dict['timings'].append(tmp['timeToConvergence'])
