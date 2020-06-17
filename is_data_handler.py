@@ -5,7 +5,6 @@ import re
 from string import ascii_letters
 from datetime import datetime
 import argparse
-import yaml
 import gzip
 
 
