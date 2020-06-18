@@ -14,8 +14,12 @@ def collect_datasets_is(folder = [],
                         nsubsample = []):
     
     # Load in parameter recovery data
-    param_recov_files = os.listdir('/users/afengler/data/kde/' + model + '/parameter_recovery_data_binned_1_nbins_512_n_' + str(ndata) + '/')
-    param_recov_dat = pickle.load(open('/users/afengler/data/kde/' + model + '/parameter_recovery_data_binned_1_nbins_512_n_' + str(ndata) + '/' + param_recov_files[0], 'rb'))
+    if model == 'weibull':
+        param_recov_files = os.listdir('/users/afengler/data/kde/' + 'weibull_cdf' + '/parameter_recovery_data_binned_1_nbins_512_n_' + str(ndata) + '/')
+        param_recov_dat = pickle.load(open('/users/afengler/data/kde/' + 'weibull_cdf' + '/parameter_recovery_data_binned_1_nbins_512_n_' + str(ndata) + '/' + param_recov_files[0], 'rb'))
+    else:
+        param_recov_files = os.listdir('/users/afengler/data/kde/' + model + '/parameter_recovery_data_binned_1_nbins_512_n_' + str(ndata) + '/')
+        param_recov_dat = pickle.load(open('/users/afengler/data/kde/' + model + '/parameter_recovery_data_binned_1_nbins_512_n_' + str(ndata) + '/' + param_recov_files[0], 'rb'))
     
     n_data_substring = 'N_' + str(ndata)
     
@@ -70,11 +74,20 @@ def collect_datasets_is(folder = [],
     is_dict['maps'] = np.stack(is_dict['maps'])
     is_dict['data'] = np.stack(is_dict['data'])
     
-    print('writing to file: ', '/users/afengler/data/eLIFE_exps/summaries/IS_summary_' + model + \
-                     '_' + n_data_substring + '.pickle')
-    
-    pickle.dump(is_dict, open('/users/afengler/data/eLIFE_exps/summaries/IS_summary_' + model + \
-                     '_' + n_data_substring + '.pickle', 'wb'), protocol = 4)
+    if model == 'weibull':
+        print('writing to file: ', '/users/afengler/data/eLIFE_exps/summaries/IS_summary_' + 'weibull_cdf' + \
+                         '_' + n_data_substring + '.pickle')
+
+        pickle.dump(is_dict, open('/users/afengler/data/eLIFE_exps/summaries/IS_summary_' + 'weibull_cdf' + \
+                         '_' + n_data_substring + '.pickle', 'wb'), protocol = 4)
+        
+    else:
+        print('writing to file: ', '/users/afengler/data/eLIFE_exps/summaries/IS_summary_' + model + \
+                         '_' + n_data_substring + '.pickle')
+
+        pickle.dump(is_dict, open('/users/afengler/data/eLIFE_exps/summaries/IS_summary_' + model + \
+                         '_' + n_data_substring + '.pickle', 'wb'), protocol = 4)
+        
     
     return is_dict
 
@@ -109,6 +122,8 @@ if __name__ == "__main__":
     
     if machine == 'home':
         is_sample_folder = '/Users/afengler/OneDrive/project_nn_likelihoods/data/' + isfolder + '/'
+        if method == 'weibull_cdf' or method == 'weibull_cdf2':
+            method = 'weibull'
     
     if machine == 'ccv':  
         is_sample_folder = '/users/afengler/data/' + isfolder + '/'
