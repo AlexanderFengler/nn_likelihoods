@@ -226,10 +226,24 @@
 #     done
 # done
 
+# machine="ccv"
+# ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
+# ndata=( 1024 4096 ) #  4096 )
+# method="weibull_cdf"
+# analytic=0
+
+# for n in "${ndata[@]}"
+# do
+#     for id in "${ids[@]}"
+#     do 
+#        python -u  /users/afengler/git_repos/nn_likelihoods/is_data_handler.py --machine $machine --method $method --ndata $n --nsubsample 20000
+#     done
+# done
+
 machine="ccv"
 ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
 ndata=( 1024 4096 ) #  4096 )
-method="weibull_cdf"
+method="race_model_3"
 analytic=0
 
 for n in "${ndata[@]}"
@@ -240,19 +254,51 @@ do
     done
 done
 
-# machine="ccv"
-# ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
-# ndata=( 1024 4096 ) #  4096 )
-# method="full_ddm2"
-# analytic=0
+machine="ccv"
+ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
+ndata=( 1024 4096 ) #  4096 )
+method="race_model_4"
+analytic=0
 
-# for n in "${ndata[@]}"
-# do
-#     for id in "${ids[@]}"
-#     do 
-#        python -u  /users/afengler/git_repos/nn_likelihoods/is_data_handler.py --machine $machine --method $method --ndata $n --nsubsample 20000
-#     done
-# done
+for n in "${ndata[@]}"
+do
+    for id in "${ids[@]}"
+    do 
+       python -u  /users/afengler/git_repos/nn_likelihoods/is_data_handler.py --machine $machine --method $method --ndata $n --nsubsample 20000
+    done
+done
+
+machine="ccv"
+ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
+ndata=( 1024 4096 ) #  4096 )
+method="lca_3"
+analytic=0
+
+for n in "${ndata[@]}"
+do
+    for id in "${ids[@]}"
+    do 
+       python -u  /users/afengler/git_repos/nn_likelihoods/is_data_handler.py --machine $machine --method $method --ndata $n --nsubsample 20000
+    done
+done
+
+
+machine="ccv"
+ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
+ndata=( 1024 4096 ) #  4096 )
+method="lca_4"
+analytic=0
+
+for n in "${ndata[@]}"
+do
+    for id in "${ids[@]}"
+    do 
+       python -u  /users/afengler/git_repos/nn_likelihoods/is_data_handler.py --machine $machine --method $method --ndata $n --nsubsample 20000
+    done
+done
+
+
+
 
 
 # # python -u /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine ccv --method ddm --nburnin 5000 --ndata 2048 --nsubsample 10000 --nnbatchid -1
