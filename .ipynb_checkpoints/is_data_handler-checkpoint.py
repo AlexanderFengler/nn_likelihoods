@@ -31,10 +31,12 @@ def collect_datasets_is(folder = [],
     is_dict['data'] = []
     
     files_ = os.listdir(folder)
-    
+    cnt = 0
     for file_ in files_:
         if model + '_training_' in file_ and n_data_substring in file_ and 'summary' not in file_:
+            print(cnt)
             print('Processing file: ', file_)
+            cnt += 1
             # extract id
             st = file_.find('_idx_')
             fin = file_.find('_tdist')
