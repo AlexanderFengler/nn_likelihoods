@@ -127,6 +127,8 @@ if __name__ == "__main__":
     
     if machine == 'ccv':  
         is_sample_folder = '/users/afengler/data/' + isfolder + '/'
+        if method == 'weibull_cdf' or method == 'weibull_cdf2':
+            method = 'weibull'
     
     if machine == 'x7':
         is_sample_folder = '/users/afengler/data/' + isfolder + '/'
