@@ -17,9 +17,6 @@ def collect_datasets_is(folder = [],
     param_recov_files = os.listdir('/users/afengler/data/kde/' + model + '/parameter_recovery_data_binned_1_nbins_512_n_' + str(ndata) + '/')
     param_recov_dat = pickle.load(open('/users/afengler/data/kde/' + model + '/parameter_recovery_data_binned_1_nbins_512_n_' + str(ndata) + '/' + param_recov_files[0], 'rb'))
     
-    
-    
-    
     n_data_substring = 'N_' + str(ndata)
     
     is_dict = {}
@@ -36,6 +33,7 @@ def collect_datasets_is(folder = [],
     files_ = os.listdir(folder)
     
     for file_ in files_:
+        print('Processing file: ', file_)
         if model + '_training_' in file_ and n_data_substring in file_ and 'summary' not in file_:
             # extract id
             st = file_.find('_idx_')

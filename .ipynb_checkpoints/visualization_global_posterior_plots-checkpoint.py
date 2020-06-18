@@ -56,7 +56,7 @@ def hdi_eval(posterior_samples = [],
 # PREPARE mcmc_dict for plotting
 
 def clean_mcmc_dict(mcmc_dict = {},
-                    filter_ = 'choice_p',  # 'boundary', 'choice_p' 'none'
+                    filter_ = 'choice_p', # 'boundary', 'choice_p' 'none'
                     choice_p_lim = 0.95,
                     param_lims = [],
                     method = []):
@@ -71,8 +71,14 @@ def clean_mcmc_dict(mcmc_dict = {},
     ok_ids = np.zeros(n_params, dtype = np.bool)
     
     if filter_ == 'choice_p':
-        for i in range(n_params):
-            ok_ids[i] = (np.sum(mcmc_dict['data'][i, :, 1] == test_choice) < (n_data * choice_p_lim) and (np.sum(mcmc_dict['data'][i, :, 1] == test_choice) > (n_data * (1 - choice_p_lim))))
+        if method == 'mlp':
+            for i in range(n_params):
+                ok_ids[i] = (np.sum(mcmc_dict['data'][i, :, 1] == test_choice) < (n_data * choice_p_lim) and (np.sum(mcmc_dict['data'][i, :, 1] == test_choice) > (n_data * (1 - choice_p_lim))))
+        if method == 'cnn':
+            for i in range(n_params):
+                ok_ids[i] = (np.sum(mcmc_dict['data'][i, :, 1]) < (choice_p_lim) and (np.sum(mcmc_dict['data'][i, :, 1]) > (1 - choice_p_lim)))
+                print(ok_ids[i])
+                print(np.sum(mcmc_dict['data'][i, :, 1]))
             
 #             if i == 100:
 #                 print(mcmc_dict['data'])
@@ -101,7 +107,9 @@ def clean_mcmc_dict(mcmc_dict = {},
         ok_ids = (1 - bool_vec) > 0
 
     for tmp_key in mcmc_dict.keys():
-        mcmc_dict[tmp_key] = mcmc_dict[tmp_key][ok_ids]
+        print(tmp_key)
+        print(np.array(mcmc_dict[tmp_key]))
+        mcmc_dict[tmp_key] = np.array(mcmc_dict[tmp_key])[ok_ids]
 
     # Calulate quantities from posterior samples
     mcmc_dict['sds'] = np.std(mcmc_dict['posterior_samples'][:, :, :], axis = 1)
@@ -1256,29 +1264,32 @@ if __name__ == "__main__":
     info = pickle.load(open('kde_stats.pickle', 'rb'))
     ax_titles = info[model]['param_names'] + info[model]['boundary_param_names']
     param_lims = info[model]['param_bounds_network'] + info[model]['boundary_param_bounds_network']
-
-    if method != 'navarro':
-        with open("model_paths.yaml") as tmp_file:
-            if network_idx == -1:
-                network_path = yaml.load(tmp_file)[model]
-                network_id = network_path[list(re.finditer('/', network_path))[-2].end():]
-            else:
-                if traindattype == 'analytic':
-                    network_path = yaml.load(tmp_file)[model + '_analytic' + '_batch'][network_idx]
+    
+    if method != 'cnn':
+        if method != 'navarro':
+            with open("model_paths.yaml") as tmp_file:
+                if network_idx == -1:
+                    network_path = yaml.load(tmp_file)[model]
+                    network_id = network_path[list(re.finditer('/', network_path))[-2].end():]
                 else:
-                    network_path = yaml.load(tmp_file)[model + '_batch'][network_idx]
+                    if traindattype == 'analytic':
+                        network_path = yaml.load(tmp_file)[model + '_analytic' + '_batch'][network_idx]
+                    else:
+                        network_path = yaml.load(tmp_file)[model + '_batch'][network_idx]
 
-                network_id = network_path[list(re.finditer('/', network_path))[-2].end():]
+                    network_id = network_path[list(re.finditer('/', network_path))[-2].end():]
 
 
-        method_comparison_folder = '/Users/afengler/OneDrive/project_nn_likelihoods/data/' + traindattype + '/' + model + '/method_comparison/' + network_id + '/'
+            method_comparison_folder = '/Users/afengler/OneDrive/project_nn_likelihoods/data/' + traindattype + '/' + model + '/method_comparison/' + network_id + '/'
 
+        else:
+            method_comparison_folder = '/Users/afengler/OneDrive/project_nn_likelihoods/data/analytic/' + model + '/method_comparison/' + '/analytic/'
+
+        # Get trained networks for model
+        file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + str(n) + '_init_mle_1_'
+        summary_file = method_comparison_folder + 'summary_' + file_signature[:-1] + '.pickle'
     else:
-        method_comparison_folder = '/Users/afengler/OneDrive/project_nn_likelihoods/data/analytic/' + model + '/method_comparison/' + '/analytic/'
-
-    # Get trained networks for model
-    file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + str(n) + '_init_mle_1_'
-    summary_file = method_comparison_folder + 'summary_' + file_signature[:-1] + '.pickle'
+        summary_file = '/users/afengler/OneDrive/project_nn_likelihoods/eLIFE_exps/summaries/IS_summary_' + model + '_N_' + str(n) + '.pickle'
 
     # READ IN SUMMARY FILE
     mcmc_dict = pickle.load(open(summary_file, 'rb'))
