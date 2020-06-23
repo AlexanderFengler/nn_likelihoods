@@ -53,6 +53,22 @@ def hdi_eval(posterior_samples = [],
     
     return vec, prop_covered_by_param, prop_covered_all
 
+
+def sbc_eval(posterior_samples = [],
+             ground_truths = []):
+    vec_dim_1 = posterior_samples.shape[0]
+    vec_dim_2 = posterior_samples.shape[2]
+    n_post_samples = posterior_samples.shape[1]
+    
+    rank_mat = np.zeros((vec_dim_1, vec_dim_2))
+    
+    for i in range(vec_dim_1):
+        for j in range(vec_dim_2):
+            samples_tmp = posterior_samples[i, np.random.choice(n_post_samples, size = 100), j]
+            samples_tmp.sort()
+            rank_mat[i, j] = np.sum(samples_tmp <= ground_truths[i, j])
+    return rank_mat
+
 # PREPARE mcmc_dict for plotting
 
 def clean_mcmc_dict(mcmc_dict = {},
@@ -77,16 +93,15 @@ def clean_mcmc_dict(mcmc_dict = {},
         if method == 'cnn':
             for i in range(n_params):
                 ok_ids[i] = (np.sum(mcmc_dict['data'][i, :, 1]) < (choice_p_lim) and (np.sum(mcmc_dict['data'][i, :, 1]) > (1 - choice_p_lim)))
-                print(ok_ids[i])
-                print(np.sum(mcmc_dict['data'][i, :, 1]))
+                # print(ok_ids[i])
+                # print(np.sum(mcmc_dict['data'][i, :, 1]))
             
 #             if i == 100:
 #                 print(mcmc_dict['data'])
 #                 print(mcmc_dict['data'].shape)
 #             if not ok_ids[i]:
 #                 print('rejected')
-                
-            
+                       
     # Filter out severe boundary cases
     if filter_ == 'boundary':
         cnt = 0
@@ -105,10 +120,13 @@ def clean_mcmc_dict(mcmc_dict = {},
         print(np.sum(1 - bool_vec))
 
         ok_ids = (1 - bool_vec) > 0
+        
+    if filter_ == 'none':
+        ok_ids = (1 - ok_ids) > 0
 
     for tmp_key in mcmc_dict.keys():
         print(tmp_key)
-        print(np.array(mcmc_dict[tmp_key]))
+        #print(np.array(mcmc_dict[tmp_key]))
         mcmc_dict[tmp_key] = np.array(mcmc_dict[tmp_key])[ok_ids]
 
     # Calulate quantities from posterior samples
@@ -116,6 +134,8 @@ def clean_mcmc_dict(mcmc_dict = {},
     mcmc_dict['sds_mean_in_row'] = np.min(mcmc_dict['sds'], axis = 1)
     mcmc_dict['gt_cdf_score'], mcmc_dict['p_covered_by_param'], mcmc_dict['p_covered_all'] = hdi_eval(posterior_samples = mcmc_dict['posterior_samples'],
                                                                                                       ground_truths = mcmc_dict['gt'])
+    mcmc_dict['gt_ranks'] = sbc_eval(posterior_samples = mcmc_dict['posterior_samples'],
+                                     ground_truths = mcmc_dict['gt'])
 
     # Get regression coefficients on mcmc_dict 
     mcmc_dict['r2_means'] = get_r2_vec(estimates = mcmc_dict['means'], 
@@ -220,7 +240,10 @@ def parameter_recovery_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
     sns.set(style = "white", 
             palette = "muted", 
             color_codes = True)
-
+    
+    print('n_rows: ', rows)
+    print('n_cols: ', cols)
+    
     fig, ax = plt.subplots(rows, 
                            cols, 
                            figsize = (12, 12), 
@@ -233,7 +256,8 @@ def parameter_recovery_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
     for i in range(estimates.shape[1]):
         row_tmp = int(np.floor(i / cols))
         col_tmp = i - (cols * row_tmp)
-
+        print('row: ', row_tmp)
+        print('col: ', col_tmp)
         sns.regplot(ground_truths[:, i], estimates[:, i], 
                     color = 'black', 
                     marker =  '.',
@@ -471,6 +495,69 @@ def hdi_p_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
         figure_name = 'hdi_p_plot_'
         plt.subplots_adjust(top = 0.9)
         plt.subplots_adjust(hspace = 0.3, wspace = 0.3)
+        plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300, )
+        plt.close()
+    return #plt.show(block = False)
+
+def sbc_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'], 
+             ranks = [0, 0, 0],
+             cols = 3,
+             save = True,
+             model = '',
+             data_signature = '',
+             train_data_type = '',
+             method = 'cnn'):
+
+    rows = int(np.ceil(len(ax_titles) / cols))
+    sns.set(style = "white", 
+            palette = "muted", 
+            color_codes = True)
+
+    fig, ax = plt.subplots(rows, 
+                           cols, 
+                           figsize = (12, 12), 
+                           sharex = False, 
+                           sharey = False)
+    
+    fig.suptitle('Bayesian p value of ground truth: ' + model.upper(), fontsize = 24)
+    sns.despine(right = True)
+
+    for i in range(ranks.shape[1]):
+        row_tmp = int(np.floor(i / cols))
+        col_tmp = i - (cols * row_tmp)
+        
+        sns.distplot(ranks[:, i], 
+                     bins = np.arange(0, 101),
+                     color = 'black',
+                     kde = False,
+                     rug = False,
+                     rug_kws = {'alpha': 0.2, 'color': 'grey'},
+                     hist_kws = {'alpha': 1, 'edgecolor': 'black'},
+                     ax = ax[row_tmp, col_tmp])
+        
+        ax[row_tmp, col_tmp].set_xlabel(ax_titles[i], 
+                                        fontsize = 16);
+        
+        ax[row_tmp, col_tmp].tick_params(axis = "x", 
+                                         labelsize = 14);
+
+    for i in range(ranks.shape[1], rows * cols, 1):
+        row_tmp = int(np.floor(i / cols))
+        col_tmp = i - (cols * row_tmp)
+        ax[row_tmp, col_tmp].axis('off')
+
+    plt.setp(ax, yticks = [])
+    
+    if save == True:
+        if machine == 'home':
+            fig_dir = "/users/afengler/OneDrive/git_repos/nn_likelihoods/figures/" + method + "/sbc"
+            if not os.path.isdir(fig_dir):
+                os.mkdir(fig_dir)
+                
+        figure_name = 'sbc_plot_'
+        plt.subplots_adjust(top = 0.9)
+        plt.subplots_adjust(hspace = 0.3, 
+                            wspace = 0.3)
         plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300, )
         plt.close()
     return #plt.show(block = False)
@@ -805,6 +892,269 @@ def posterior_predictive_plot(ax_titles = [],
     if show:
         return #plt.show(block = False)
 
+# Posterior predictive RACE / LCA (generally --> n_choices > 2)
+def posterior_predictive_plot_race_lca(ax_titles = ['hiconf_go_stnhi.txt',
+                                                    'hiconf_go_stnlo.txt',
+                                                    'hiconf_go_stnmid.txt',
+                                                    'loconf7_go_stnhi.txt',
+                                                    'loconf7_go_stnlo.txt',
+                                                    'loconf7_go_stnmid.txt'], 
+                                        title = 'BG-STN: POSTERIOR PREDICTIVE',
+                                        x_labels = [],
+                                        posterior_samples = [],
+                                        ground_truths = [],
+                                        cols = 3,
+                                        model = 'angle',
+                                        data_signature = '',
+                                        n_post_params = 500,
+                                        samples_by_param = 10,
+                                        show = False,
+                                        save = False,
+                                        method = [],
+                                        train_data_type = ''):
+
+    rows = int(np.ceil(len(ax_titles) / cols))
+    print('nrows: ', rows)
+    sns.set(style = "white", 
+            palette = "muted", 
+            color_codes = True,
+            font_scale = 2)
+
+    fig, ax = plt.subplots(rows, cols, 
+                           figsize = (20, 20), 
+                           sharex = False, 
+                           sharey = False)
+    fig.suptitle(title, fontsize = 40)
+    sns.despine(right = True)
+
+    for i in range(len(ax_titles)):
+        row_tmp = int(np.floor(i / cols))
+        col_tmp = i - (cols * row_tmp)
+        
+        tmp = np.zeros((n_post_params * samples_by_param, 2))
+        idx = np.random.choice(posterior_samples.shape[1], size = n_post_params, replace = False)
+
+        # Run Model simulations
+        for j in range(n_post_params):
+            # Get posterior model simulations
+            if model == 'race_model_3':
+                out = cds.race_model(v = np.float32(posterior_samples[i, idx[j], 0:3]),
+                                        a = np.float32(posterior_samples[i, idx[j], 3]),
+                                        w = np.float32(posterior_samples[i, idx[j], 4:7]),
+                                        ndt = np.float32(posterior_samples[i, idx[j], 7]),
+                                        s = np.array([1., 1., 1., 1.],dtype=np.float32),
+                                        delta_t = 0.001, 
+                                        max_t = 10,
+                                        n_samples = samples_by_param,
+                                        print_info = False,
+                                        boundary_fun = bf.constant,
+                                        boundary_multiplicative = True,
+                                        boundary_params = {})
+#             #tmp[(10 * j):(10 * (j + 1)), :] = np.concatenate([out[0], out[1], out[2], out[3]], axis = 1)
+#             tmp[(10 * j):(10 * (j + 1)), :] = np.concatenate([out[0], out[1]], axis = 1)
+#             #print('posterior samples gathered: ', j')
+          
+            if model == 'race_model_4':
+                out = cds.race_model(v = np.float32(posterior_samples[i, idx[j], 0:4]),
+                                        a = np.float32(posterior_samples[i, idx[j], 4]),
+                                        w = np.float32(posterior_samples[i, idx[j], 5:9]),
+                                        ndt = np.float32(posterior_samples[i, idx[j], 9]),
+                                        s = np.array([1., 1., 1., 1.],dtype=np.float32),
+                                        delta_t = 0.001, 
+                                        max_t = 10,
+                                        n_samples = samples_by_param,
+                                        print_info = False,
+                                        boundary_fun = bf.constant,
+                                        boundary_multiplicative = True,
+                                        boundary_params = {})
+#             #tmp[(10 * j):(10 * (j + 1)), :] = np.concatenate([out[0], out[1], out[2], out[3]], axis = 1)
+#             tmp[(10 * j):(10 * (j + 1)), :] = np.concatenate([out[0], out[1]], axis = 1)
+#             #print('posterior samples gathered: ', j')
+            
+            if model == 'lca_3':
+                out = cds.lca(v = np.float32(posterior_samples[i, idx[j], 0:3]),
+                             a = np.float32(posterior_samples[i, idx[j], 3]),
+                             w = np.float32(posterior_samples[i, idx[j], 4:7]),
+                             g = np.float32(posterior_samples[i, idx[j], 7]),
+                             b = np.float32(posterior_samples[i, idx[j], 8]),
+                             ndt = np.float32(posterior_samples[i, idx[j], 9]),
+                             #s = np.array([1., 1., 1., 1.],dtype = np.float32),
+                             s = 1.0,
+                             delta_t = 0.001, 
+                             max_t = 10,
+                             n_samples = samples_by_param,
+                             print_info = False,
+                             boundary_fun = bf.constant,
+                             boundary_multiplicative = True,
+                             boundary_params = {})
+                
+                if np.std(out[0]) == 0:
+                    print(posterior_samples[i, idx[j], :])
+                    print(np.mean(out[0]))
+
+            
+#             #tmp[(10 * j):(10 * (j + 1)), :] = np.concatenate([out[0], out[1], out[2], out[3]], axis = 1)
+#             tmp[(10 * j):(10 * (j + 1)), :] = np.concatenate([out[0], out[1]], axis = 1)
+#             #print('posterior samples gathered: ', j')
+            
+            if model == 'lca_4':
+                out = cds.lca(v = np.float32(posterior_samples[i, idx[j], 0:4]),
+                              a = np.float32(posterior_samples[i, idx[j], 4]),
+                              w = np.float32(posterior_samples[i, idx[j], 5:9]),
+                              g = np.float32(posterior_samples[i, idx[j], 9]),
+                              b = np.float32(posterior_samples[i, idx[j], 10]),
+                              ndt = np.float32(posterior_samples[i, idx[j], 11]),
+                              #s = np.array([1., 1., 1., 1.], dtype = np.float32),
+                              s = 1.0,
+                              delta_t = 0.001,
+                              max_t = 10,
+                              n_samples = samples_by_param,
+                              print_info = False,
+                              boundary_fun = bf.constant,
+                              boundary_multiplicative = True,
+                              boundary_params = {})
+                if np.std(out[0]) == 0:
+                    print(posterior_samples[i, idx[j], :])
+                    print(np.mean(out[0]))
+
+            
+            
+            #tmp[(10 * j):(10 * (j + 1)), :] = np.concatenate([out[0], out[1], out[2], out[3]], axis = 1)
+            tmp[(10 * j):(10 * (j + 1)), :] = np.concatenate([out[0], out[1]], axis = 1)
+            #print('posterior samples gathered: ', j')
+
+
+        # Get model simulations from true data      
+        if model == 'race_model_3':
+            out = cds.race_model(v = np.float32(ground_truths[i, 0:3]),
+                                 a = np.float32(ground_truths[i, 3]),
+                                 w = np.float32(ground_truths[i, 4:7]),
+                                 ndt = np.float32(ground_truths[i, 7]),
+                                 s = np.array([1., 1., 1.], dtype = np.float32),
+                                 delta_t = 0.001, 
+                                 max_t = 10,
+                                 n_samples = 20000,
+                                 print_info = False,
+                                 boundary_fun = bf.constant,
+                                 boundary_multiplicative = True,
+                                 boundary_params = {})
+
+        if model == 'race_model_4':
+            out = cds.race_model(v = np.float32(ground_truths[i, 0:4]),
+                                 a = np.float32(ground_truths[i, 4]),
+                                 w = np.float32(ground_truths[i, 5:9]),
+                                 ndt = np.float32(ground_truths[i, 9]),
+                                 s = np.array([1., 1., 1., 1.],dtype = np.float32),
+                                 delta_t = 0.001, 
+                                 max_t = 10,
+                                 n_samples = 20000,
+                                 print_info = False,
+                                 boundary_fun = bf.constant,
+                                 boundary_multiplicative = True,
+                                 boundary_params = {})
+            
+        if model == 'lca_3':
+            out = cds.lca(v = np.float32(ground_truths[i, 0:3]),
+                          a = np.float32(ground_truths[i, 3]),
+                          w = np.float32(ground_truths[i, 4:7]),
+                          g = np.float32(ground_truths[i, 7]),
+                          b = np.float32(ground_truths[i, 8]),
+                          ndt = np.float32(ground_truths[i, 9]),
+                          s = 1.0,
+                          #s = np.array([1., 1., 1.],dtype = np.float32),
+                          delta_t = 0.001, 
+                          max_t = 10,
+                          n_samples = 20000,
+                          print_info = False,
+                          boundary_fun = bf.constant,
+                          boundary_multiplicative = True,
+                          boundary_params = {})
+            
+            if np.std(out[0]) == 0:
+                print(ground_truths[i, :])
+                print(np.mean(out[0]))
+                        
+            
+        if model == 'lca_4':
+            out = cds.lca(v = np.float32(ground_truths[i, 0:4]),
+                           a = np.float32(ground_truths[i, 4]),
+                           w = np.float32(ground_truths[i, 5:9]),
+                           g = np.float32(ground_truths[i, 9]),
+                           b = np.float32(ground_truths[i, 10]),
+                           ndt = np.float32(ground_truths[i, 11]),
+                           s = 1.0,
+                           #s = np.array([1., 1., 1., 1.],dtype = np.float32),
+                           delta_t = 0.001, 
+                           max_t = 10,
+                           n_samples = 20000,
+                           print_info = False,
+                           boundary_fun = bf.constant,
+                           boundary_multiplicative = True,
+                           boundary_params = {})
+            
+            if np.std(out[0]) == 0:
+                print(ground_truths[i, :])   
+                print(np.mean(out[0]))
+                  
+
+        tmp_true = np.concatenate([out[0], out[1]], axis = 1)
+        print('passed through')
+        
+        plot_colors = ['blue', 'red', 'orange', 'black', 'grey', 'green', 'brown']
+        for c in range(6):
+            if np.sum(tmp[:, 1] == c) > 0:
+                sns.distplot(tmp[np.where(tmp[:, 1] == c)[0], 0], 
+                             bins = 50, 
+                             hist = False,
+                             kde = True, 
+                             rug = False, 
+                             hist_kws = {'alpha': 0.2, 'color': plot_colors[c], 'density': 1},
+                             kde_kws = {'color': plot_colors[c], 'label': 'Ground Truth'},
+                             ax = ax[row_tmp, col_tmp])
+                sns.distplot(tmp_true[np.where(tmp_true[:, 1] == c)[0], 0], 
+                             bins = 50, 
+                             hist = False,
+                             kde = True, 
+                             rug = False, 
+                             hist_kws = {'alpha': 0.2, 'color': plot_colors[c], 'density': 1},
+                             kde_kws={'linestyle':'--', 'color': plot_colors[c], 'label': 'CNN'},
+                             ax = ax[row_tmp, col_tmp])
+
+        if row_tmp == 0 and col_tmp == 0:
+            ax[row_tmp, col_tmp].legend(fontsize = 12, loc = 'upper right')
+        #    ax[row_tmp, col_tmp].legend(labels = ['Simulations', 'E-D CNN'], fontsize = 20)
+        else:
+            ax[row_tmp, col_tmp].get_legend().remove()
+            
+        ax[row_tmp, col_tmp].set_xlabel('', 
+                                        fontsize = 24);
+        ax[row_tmp, col_tmp].set_ylabel('density', 
+                                        fontsize = 24);
+        ax[row_tmp, col_tmp].set_title(ax_titles[i],
+                                       fontsize = 24)
+        ax[row_tmp, col_tmp].tick_params(axis = 'y', size = 24)
+        ax[row_tmp, col_tmp].tick_params(axis = 'x', size = 24)
+        
+    for i in range(ground_truths.shape[0], rows * cols, 1):
+        row_tmp = int(np.floor(i / cols))
+        col_tmp = i - (cols * row_tmp)
+        ax[row_tmp, col_tmp].axis('off')
+
+  #plt.setp(ax, yticks = [])
+    if save == True:
+        if machine == 'home':
+            fig_dir = "/users/afengler/OneDrive/git_repos/nn_likelihoods/figures/" + method + "/posterior_predictive"
+            if not os.path.isdir(fig_dir):
+                os.mkdir(fig_dir)
+                
+        figure_name = 'posterior_predictive_'
+        #plt.tight_layout()
+        plt.subplots_adjust(top = 0.9)
+        plt.subplots_adjust(hspace = 0.3, wspace = 0.3)
+        plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300) #  bbox_inches = 'tight')
+        plt.close()
+    if show:
+        return #plt.show(block = False)
   
 # Plot bound
 # Mean posterior predictives
@@ -1233,6 +1583,9 @@ if __name__ == "__main__":
                      nargs = "*",
                      type = str,
                      default = [])
+    CLI.add_argument("--datafilter",
+                     type = str,
+                     default = 'choice_p')
     
     
     args = CLI.parse_args()
@@ -1249,6 +1602,7 @@ if __name__ == "__main__":
     now = datetime.now().strftime("%m_%d_%Y")
     npostpred = args.npostpred
     npostpair = args.npostpair
+    datafilter = args.datafilter
 
 # Folder data 
 # model = 'ddm_sdv'
@@ -1263,6 +1617,8 @@ if __name__ == "__main__":
     # Get model metadata
     info = pickle.load(open('kde_stats.pickle', 'rb'))
     ax_titles = info[model]['param_names'] + info[model]['boundary_param_names']
+    print('ax_titles: ', ax_titles)
+    print('length ax_titles: ', len(ax_titles))
     param_lims = info[model]['param_bounds_network'] + info[model]['boundary_param_bounds_network']
     
     if method != 'cnn':
@@ -1294,7 +1650,7 @@ if __name__ == "__main__":
     # READ IN SUMMARY FILE
     mcmc_dict = pickle.load(open(summary_file, 'rb'))
     mcmc_dict = clean_mcmc_dict(mcmc_dict = mcmc_dict,
-                                filter_ = 'choice_p',
+                                filter_ = datafilter,
                                 method = method)
     
     # GENERATE PLOTS:
@@ -1332,7 +1688,18 @@ if __name__ == "__main__":
                data_signature = '_n_' + str(n) + '_' + now,
                method = mcmc_dict['method'],
                train_data_type = traindattype)
-    
+        
+    if "sbc" in args.plots:
+        print('Making SBC plot')
+        sbc_plot(ax_titles = ax_titles,
+                 ranks = mcmc_dict['gt_ranks'],
+                 cols = 2,
+                 save = True,
+                 model = model,
+                 data_signature = '_n_' + str(n) + '_' + now,
+                 method = mcmc_dict['method'],
+                 train_data_type = traindattype)
+        
     # PARAMETER RECOVERY PLOTS: KDE MLP
     if "parameter_recovery_scatter" in args.plots:
         print('Making Parameter Recovery Plot...')
@@ -1407,17 +1774,17 @@ if __name__ == "__main__":
                 print('Making Posterior Pair Plot: ', tot_cnt)
                 make_posterior_pair_grid(posterior_samples =  pd.DataFrame(mcmc_dict['posterior_samples'][idx, :, :],
                                                                            columns = ax_titles),
-                                     gt =  mcmc_dict['gt'][idx, :],
-                                     height = 8,
-                                     aspect = 1,
-                                     n_subsample = 2000,
-                                     data_signature = data_signatures[cnt] + str(idx),
-                                     title_signature = title_signatures[cnt],
-                                     gt_available = True,
-                                     save = True,
-                                     model = model,
-                                     method = mcmc_dict['method'],
-                                     train_data_type = traindattype)
+                                         gt =  mcmc_dict['gt'][idx, :],
+                                         height = 8,
+                                         aspect = 1,
+                                         n_subsample = 2000,
+                                         data_signature = data_signatures[cnt] + str(idx),
+                                         title_signature = title_signatures[cnt],
+                                         gt_available = True,
+                                         save = True,
+                                         model = model,
+                                         method = mcmc_dict['method'],
+                                         train_data_type = traindattype)
                 tot_cnt += 1
             cnt += 1
 
@@ -1468,17 +1835,35 @@ if __name__ == "__main__":
         cnt = 0
         for idx_vec in idx_vecs:
             print('Making Posterior Predictive Plots... set: ', cnt)
-            posterior_predictive_plot(ax_titles =[str(i) for i in idx_vec],
-                                      title = 'Posterior Predictive: ',
-                                      posterior_samples = mcmc_dict['posterior_samples'][idx_vec, :, :],
-                                      ground_truths =  mcmc_dict['gt'][idx_vec, :],
-                                      cols = 3,
-                                      model = model,
-                                      data_signature = data_signatures[cnt],
-                                      n_post_params = 2000,
-                                      samples_by_param = 10,
-                                      show = True,
-                                      save = True,
-                                      method = mcmc_dict['method'],
-                                      train_data_type = traindattype)
+            if 'race' in model or 'lca' in model:
+                if cnt != 0 or 'race' in model:
+                    posterior_predictive_plot_race_lca(ax_titles = [str(i) for i in idx_vec], 
+                                                    title = 'Posterior Predictive',
+                                                    x_labels = [],
+                                                    posterior_samples = mcmc_dict['posterior_samples'][idx_vec, :, :],
+                                                    ground_truths = mcmc_dict['gt'][idx_vec, :],
+                                                    cols = 3,
+                                                    model = model,
+                                                    data_signature = data_signatures[cnt],
+                                                    n_post_params = 2000,
+                                                    samples_by_param = 10,
+                                                    show = True,
+                                                    save = True, 
+                                                    method = mcmc_dict['method'],
+                                                    train_data_type = traindattype)
+                                                                
+            else:
+                posterior_predictive_plot(ax_titles =[str(i) for i in idx_vec],
+                                          title = 'Posterior Predictive: ',
+                                          posterior_samples = mcmc_dict['posterior_samples'][idx_vec, :, :],
+                                          ground_truths =  mcmc_dict['gt'][idx_vec, :],
+                                          cols = 3,
+                                          model = model,
+                                          data_signature = data_signatures[cnt],
+                                          n_post_params = 2000,
+                                          samples_by_param = 10,
+                                          show = True,
+                                          save = True,
+                                          method = mcmc_dict['method'],
+                                          train_data_type = traindattype)
             cnt += 1

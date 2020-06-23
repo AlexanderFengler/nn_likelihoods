@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Default resources are 1 core with 2.8GB of memory per core.
+# SLURM INSTRUCTIONS IF RUN AS SBATCH JOB ---------------------------
 
 # job name:
 #SBATCH -J ornstein_sim
@@ -17,55 +17,42 @@
 #SBATCH -c 14
 #SBATCH -N 1
 #SBATCH --array=1-100
+# --------------------------------------------------------------------
 
-# # Run a command
-declare -a dgps=( "ddm" "angle" "weibull_cdf" "ornstein" "lca" "race_model" )
-n_samples=( 100 200 400 800 1600 3200 6400 ) #( 50000 100000 200000 400000 )
-n_choices=( 3 4 5 6 ) #4 5 6 )
-n_parameter_sets=10000  #20000
-n_bins=( 256 512 )
-# outer -------------------------------------
+# INITIALIZATIONS ----------------------------------------------------
+declare -a dgps=( "ddm" "angle" "weibull_cdf")
+n_samples=( 50 100 1000 2000 ) # 200 400 800 1600 3200 6400 ) #( 50000 100000 200000 400000 )
+n_choices=( 2 ) # 3 4 5 6 ) #4 5 6 )
+n_parameter_sets=10  #20000
+n_subjects=( 5 10 20 )
+n_bins=( 0 )
+binned=0
+mode='mlp'
+datatype='parameter_recovery_hierarchical'
+machine='other' # 'home' (alex laptop), 'ccv' (oscar), 'x7' (serrelab), 'other' (makes folders in this repo)
+maxt=20
+# ---------------------------------------------------------------------
+
+
+# DATA GENERATION LOOP ------------------------------------------------
+
 for bins in "${n_bins[@]}"
 do
     for n in "${n_samples[@]}"
     do
-    # inner -------------------------------------
         for dgp in "${dgps[@]}"
         do
-            if [[ "$dgp" = "lca" ]] || [[ "$dgp" = "race_model" ]];
-            then
-                for n_c in "${n_choices[@]}"
+            for n_c in "${n_choices[@]}"
+            do
+                for n_s in "${n_subjects[@]}"
                     do
                        echo "$dgp"
                        echo $n_c
-                       python -u dataset_generator.py --machine x7 --dgplist $dgp --datatype 'parameter_recovery' --nreps 10 --binned 1 --nbins $bins --maxt 10 --nchoices $n_c --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1 
-                       
-                done
-            else
-                 echo "$dgp"
-                 echo $n_c
-#                  python -u dataset_generator.py --machine x7 --dgplist $dgp --datatype 'parameter_recovery' --nreps 10 --binned 1 --nbins $bins --maxt 10 --nchoices 2 --nsamples $n --mode cnn --nparamsets $n_parameter_sets --save 1
-            fi
+                       python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype $datatype --nreps 1 --binned $binned --nbins $bins --maxt $maxt --nchoices $n_c --nsamples $n --mode $mode --nparamsets $n_parameter_sets --save 1 --maxt $maxt --nsubjects $n_s
+                    done
+            done
         done
-                # normal call to function
     done
 done
-# -------------------------------------------
-#done
-# -------------------------------------------
 
-# python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv ornstein 2 100000 1 $SLURM_ARRAY_TASK_ID base_simulations 10000 0
-
-# python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv lca 3 100000 1 $SLURM_ARRAY_TASK_ID base_simulations 10000 0
-
-# python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv lca 4 100000 1 $SLURM_ARRAY_TASK_ID base_simulations 10000 0
-
-# python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv lca 5 100000 1 $SLURM_ARRAY_TASK_ID base_simulations 10000 0
-
-# python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv lca 6 100000 1 $SLURM_ARRAY_TASK_ID base_simulations 10000 0
-
-#python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv race_model 3 100000 1 $SLURM_ARRAY_TASK_ID 1000 0
-
-#python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv race_model 5 100000 1 $SLURM_ARRAY_TASK_ID
-
-#python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv race_model 6 100000 1 $SLURM_ARRAY_TASK_ID
+# -----------------------------------------------------------------------

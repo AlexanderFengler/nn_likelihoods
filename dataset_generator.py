@@ -59,8 +59,17 @@ class data_generator():
                                                   "nn_likelihoods/kde_stats.pickle", "rb"))[self.method]
             self.method_comparison_folder = self.method_params['output_folder_home']
             self.method_folder = self.method_params['method_folder_home']
+            
+        if self.machine == 'other': # This doesn't use any extra 
+            self.method_params = pickle.load(open('kde_stats.pickle', 'rb'))[self.method]
+            if not os.path.exists('data_storage'):
+                os.makedirs('data_storage')
+                
+            print('generated new folder: data_storage. Please update git_ignore if this is not supposed to be committed to repo')
+                
+            self.method_comparison_folder = 'data_storage/'
+            self.method_folder = 'data_storage/' + self.method + '_'
         
-
         self.dgp_hyperparameters = dict(self.method_params['dgp_hyperparameters'])
         self.dgp_hyperparameters['max_t'] = max_t
         self.dgp_hyperparameters['n_samples'] = self.config['nsamples']
@@ -169,7 +178,7 @@ class data_generator():
                 args_list.append(process_params + sampler_hyperparameters + boundary_params)
                 #print(self.dgp_hyperparameters)
                 #print(process_params + sampler_hyperparameters + boundary_params)
-        print(args_list)
+        # print(args_list)
         return args_list
     
     def clean_up_parameters(self):
@@ -375,23 +384,8 @@ class data_generator():
                                    '_n_' + str(self.config['nsamples'])
             if not os.path.exists(training_data_folder):
                 os.makedirs(training_data_folder)
-            
-            print('saving dataset as ', training_data_folder + '/' + \
-                                        self.method + \
-                                        '_nchoices_' + str(self.config['nchoices']) + \
-                                        '_parameter_recovery_' + \
-                                        'binned_' + str(int(self.config['binned'])) + \
-                                        '_nbins_' + str(self.config['nbins']) + \
-                                        '_nreps_' + str(self.config['nreps']) + \
-                                        '_n_' + str(self.config['nsamples']) + \
-                                        '.pickle')
-            
-            meta = self.dgp_hyperparameters.copy()
-            if 'boundary' in meta.keys():
-                del meta['boundary']
-
-            pickle.dump((param_grid, data_grid, meta), 
-                        open(training_data_folder + '/' + \
+                
+            full_file_name = training_data_folder + '/' + \
                             self.method + \
                             '_nchoices_' + str(self.config['nchoices']) + \
                             '_parameter_recovery_' + \
@@ -399,7 +393,16 @@ class data_generator():
                             '_nbins_' + str(self.config['nbins']) + \
                             '_nreps_' + str(self.config['nreps']) + \
                             '_n_' + str(self.config['nsamples']) + \
-                            '.pickle', 'wb'), 
+                            '.pickle'
+            
+            print(full_file_name)
+            
+            meta = self.dgp_hyperparameters.copy()
+            if 'boundary' in meta.keys():
+                del meta['boundary']
+
+            pickle.dump((param_grid, data_grid, meta), 
+                        open(full_file_name, 'wb'), 
                         protocol = self.config['pickleprotocol'])
             
             return 'Dataset completed'
@@ -428,33 +431,29 @@ class data_generator():
                                    '_n_' + str(self.config['nsamples'])
             if not os.path.exists(training_data_folder):
                 os.makedirs(training_data_folder)
-            
-            print('saving dataset as ', training_data_folder + '/' + \
-                                        self.method + '_train_data_' + \
-                                        'binned_' + str(int(self.config['binned'])) + \
-                                        '_nbins_' + str(self.config['nbins']) + \
-                                        '_n_' + str(self.config['nsamples']) + \
-                                        '_' + self.file_id + '.pickle')
-            
-            meta = self.dgp_hyperparameters.copy()
-            if 'boundary' in meta.keys():
-                del meta['boundary']
-
-            pickle.dump((param_grid, data_grid, meta), 
-                        open(training_data_folder + '/' + \
+                
+            full_file_name = training_data_folder + '/' + \
                             self.method + \
                             '_nchoices_' + str(self.config['nchoices']) + \
                             '_train_data_' + \
                             'binned_' + str(int(self.config['binned'])) + \
                             '_nbins_' + str(self.config['nbins']) + \
                             '_n_' + str(self.config['nsamples']) + \
-                            '_' + self.file_id + '.pickle', 'wb'), 
+                            '_' + self.file_id + '.pickle'
+            
+            print(full_file_name)
+            
+            meta = self.dgp_hyperparameters.copy()
+            if 'boundary' in meta.keys():
+                del meta['boundary']
+
+            pickle.dump((param_grid, data_grid, meta), 
+                        open(full_file_name, 'wb'), 
                         protocol = self.config['pickleprotocol'])
             return 'Dataset completed'
         else:
             return param_grid, data_grid
 
-    #
     def make_param_grid_hierarchical(self,
                                      ):
 
@@ -479,10 +478,12 @@ class data_generator():
             for i in range(self.config['nsubjects']):
                 a, b = (np.array(params_lower_bnd) - global_means[n]) / global_stds[n], (np.array(params_upper_bnd) - global_means[n]) / global_stds[n]
                 subject_param_grid[n, i, :] = np.float32(global_means[n] + truncnorm.rvs(a, b, size = global_stds.shape[1]) * global_stds[n])
-                print('random variates')
-                print(truncnorm.rvs(a, b, size = global_stds.shape[1]))
-                print('samples')
-                print(subject_param_grid[n, i, :])
+                
+#                 Print statements to test if sampling from truncated distribution works properly
+#                 print('random variates')
+#                 print(truncnorm.rvs(a, b, size = global_stds.shape[1]))
+#                 print('samples')
+#                 print(subject_param_grid[n, i, :])
 
         return subject_param_grid, global_stds, global_means
 
@@ -545,6 +546,7 @@ class data_generator():
                                         '_nbins_' + str(self.config['nbins']) + \
                                         '_nreps_' + str(self.config['nreps']) + \
                                         '_n_' + str(self.config['nsamples']) + \
+                                        '_nsubj_' + str(self.config['nsubjects']) + \
                                         '.pickle')
             
             meta = self.dgp_hyperparameters.copy()
@@ -560,6 +562,7 @@ class data_generator():
                             '_nbins_' + str(self.config['nbins']) + \
                             '_nreps_' + str(self.config['nreps']) + \
                             '_n_' + str(self.config['nsamples']) + \
+                            '_nsubj_' + str(self.config['nsubjects']) + \
                             '.pickle', 'wb'), 
                         protocol = self.config['pickleprotocol'])
             
@@ -682,6 +685,12 @@ def make_dataset_r_dgp(dgp_list = ['ddm', 'ornstein', 'angle', 'weibull', 'full_
             out_folder = '/users/afengler/data/kde/rdgp/'
         if machine == 'home':
             out_folder = '/Users/afengler/OneDrive/project_nn_likelihoods/data/kde/rdgp/'
+        if machine == 'other':
+            if not os.path.exists('data_storage'):
+                os.makedirs('data_storage')
+                os.makedirs('data_storage/rdgp')
+            
+            out_folder = 'data_storage/rdgp/'
             
         out_folder = out_folder + 'training_data_' + str(int(config['binned'])) + \
                      '_nbins_' + str(config['nbins']) + \
@@ -820,7 +829,7 @@ if __name__ == "__main__":
     machine = args.machine
     
     
-    # Load basic config data
+    # YAML DATA basically only use for perturbation experiment data
     if machine == 'x7':
         config = yaml.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/config_files/config_data_generator.yaml"),
                            Loader = yaml.SafeLoader)
@@ -831,9 +840,18 @@ if __name__ == "__main__":
      
     if machine == 'home':
         config = yaml.load(open("/Users/afengler/OneDrive/git_repos/nn_likelihoods/config_files/config_data_generator.yaml"))
-
+    if machine == 'other':
+        config = yaml.load(open("config_files/config_data_generator.yaml"))
+    
+    config = {}
+    config['n_cpus'] = 'all'
+    
     # Update config with specifics of run
-    config['method'] = args.dgplist[0]
+    if args.datatype == 'r_dgp':
+        config['method'] = args.dgplist
+    else:
+        config['method'] = args.dgplist[0]
+        
     config['mode'] = args.mode
     config['file_id'] = args.fileid
     config['nsamples'] = args.nsamples

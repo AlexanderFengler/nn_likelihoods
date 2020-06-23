@@ -1,11 +1,4 @@
-nchoices: 2
-nparamsets: 1000
-nreps: 1
-nexperiments: 100
 perturbation_sizes: [[0.05, 0.1, 0.2, 0.4],
                      [0.05, 0.1, 0.2, 0.4],
                      [0.05, 0.1, 0.2, 0.25],
                      [0.05, 0.1, 0.2, 0.4]]
-n_cpus: 'all'
-nbins: 256
-bin_dt: 0.04
