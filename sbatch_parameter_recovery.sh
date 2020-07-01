@@ -21,7 +21,7 @@
 
 # INITIALIZATIONS ----------------------------------------------------
 declare -a dgps=( "ddm" "angle" "weibull_cdf")
-n_samples=( 50 100 1000 2000 ) # 200 400 800 1600 3200 6400 ) #( 50000 100000 200000 400000 )
+n_samples=( 50 100 1000 2000 ) 
 n_choices=( 2 ) # 3 4 5 6 ) #4 5 6 )
 n_parameter_sets=10  #20000
 n_subjects=( 5 10 20 )
