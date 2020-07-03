@@ -21,7 +21,7 @@
 #SBATCH --mem=96G
 #SBATCH -c 14
 #SBATCH -N 1
-#SBATCH --array=1-300
+#SBATCH --array=1-150
 
 # --------------------------------------------------------------------------------------
 # Sequentially run different kind of models
@@ -39,6 +39,7 @@ mode="mlp"
 analytic=0
 maxt=20
 nproc=12
+pickleprotocol=4
 
 # params concerning training data generation
 nbyparam=1000
@@ -57,7 +58,7 @@ do
                     do
                        echo "$dgp"
                        echo $n_c
-                       python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype $datatype --nreps 1 --binned $binned --nbins $bins --maxt $maxt --nchoices $n_c --nsamples $n --mode $mode --nparamsets $n_parameter_sets --save 1 --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID 
+                       python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype $datatype --nreps 1 --binned $binned --nbins $bins --maxt $maxt --nchoices $n_c --nsamples $n --mode $mode --nparamsets $n_parameter_sets --save 1 --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID --pickleprotocol $pickleprotocol
                        python -u simulator_get_stats.py --machine $machine --method $dgp --simfolder training_data_binned_${binned}_nbins_${bins}_n_${n} --fileprefix ${dgp}_nchoices_${n_c}_train_data_binned_${binned}_nbins_${bins}_n_${n} --fileid $SLURM_ARRAY_TASK_ID
                        python -u kde_train_test.py --machine $machine --method $dgp --simfolder training_data_binned_${binned}_nbins_${bins}_n_${n} --fileprefix ${dgp}_nchoices_${n_c}_train_data_binned_${binned}_nbins_${bins}_n_${n} --outfolder training_data_binned_${binned}_nbins_${bins}_n_${n} --nbyparam $nbyparam --mixture 0.8 0.1 0.1 --fileid $SLURM_ARRAY_TASK_ID --nproc $nproc --analytic $analytic
            
@@ -65,7 +66,7 @@ do
             else
                  echo "$dgp"
                  echo ${n_choices[0]}
-                 python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype $datatype --nreps 1 --binned $binned --nbins $bins --maxt $maxt --nchoices ${n_choices[0]} --nsamples $n --mode $mode --nparamsets $n_parameter_sets --save 1  --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID
+                 python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype $datatype --nreps 1 --binned $binned --nbins $bins --maxt $maxt --nchoices ${n_choices[0]} --nsamples $n --mode $mode --nparamsets $n_parameter_sets --save 1  --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID --pickleprotocol $pickleprotocol
                  python -u simulator_get_stats.py --machine $machine --method $dgp --simfolder training_data_binned_${binned}_nbins_${bins}_n_${n} --fileprefix ${dgp}_nchoices_${n_choices[0]}_train_data_binned_${binned}_nbins_${bins}_n_${n} --fileid $SLURM_ARRAY_TASK_ID
                  python -u kde_train_test.py --machine $machine --method $dgp --simfolder training_data_binned_${binned}_nbins_${bins}_n_${n} --fileprefix ${dgp}_nchoices_${n_choices[0]}_train_data_binned_${binned}_nbins_${bins}_n_${n} --outfolder training_data_binned_${binned}_nbins_${bins}_n_${n} --nbyparam $nbyparam --mixture 0.8 0.1 0.1 --fileid $SLURM_ARRAY_TASK_ID --nproc $nproc --analytic $analytic
             fi

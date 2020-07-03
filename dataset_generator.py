@@ -820,7 +820,7 @@ if __name__ == "__main__":
                      default = 0.001)
     CLI.add_argument("--pickleprotocol",
                      type = int,
-                     default = 2)
+                     default = 4)
     
     args = CLI.parse_args()
     print('Arguments passed: ')
