@@ -17,7 +17,7 @@
 #SBATCH --output /users/afengler/batch_job_out/tpl_ddm_%A_%a.out
 
 # Request runtime, memory, cores
-#SBATCH --time=12:00:00
+#SBATCH --time=18:00:00
 #SBATCH --mem=96G
 #SBATCH -c 14
 #SBATCH -N 1
