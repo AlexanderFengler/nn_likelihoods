@@ -178,10 +178,15 @@ def filter_simulations_fast(base_simulation_folder = '',
                      
     return sim_stat_data                     
 
-def make_kde_data(data = [], metadata  = [], n_kde = 100, n_unif_up = 100, n_unif_down = 100, idx = 0):
+# def make_kde_data(data = [], metadata  = [], n_kde = 100, n_unif_up = 100, n_unif_down = 100, idx = 0):
+def make_kde_data(n_kde = 100, n_unif_up = 100, n_unif_down = 100, idx = 0):
+    
+    meta_data = file_[2]
+    data = file_[1][idx, :, :]
+    
     out = np.zeros((n_kde + n_unif_up + n_unif_down, 3))
     tmp_kde = kde_class.logkde((data[:, 0], data[:, 1], metadata))
-    
+
     # Get kde part
     samples_kde = tmp_kde.kde_sample(n_samples = n_kde)
     likelihoods_kde = tmp_kde.kde_eval(data = samples_kde).ravel()
@@ -319,6 +324,7 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
                                        analytic = False):
 
     file_ = pickle.load(open( base_simulation_folder + '/' + file_name_prefix + '_' + str(file_id) + '.pickle', 'rb' ) )
+    
     stat_ = pickle.load(open( base_simulation_folder + '/simulator_statistics' + '_' + str(file_id) + '.pickle', 'rb' ) )
 
     # Initialize dataframe
@@ -369,7 +375,8 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
             if analytic:
                 starmap_iterator += ((file_[1][i, :, :].copy(), file_[0][i, :].copy(), file_[2].copy(), n_kde, n_unif_up, n_unif_down, cnt), )
             else:
-                starmap_iterator += ((file_[1][i, :, :].copy(), file_[2].copy(), n_kde, n_unif_up, n_unif_down, cnt), )
+                # starmap_iterator += ((file_[1][i, :, :].copy(), file_[2].copy(), n_kde, n_unif_up, n_unif_down, cnt), ) 
+                starmap_iterator += ((n_kde, n_unif_up, n_unif_down, cnt), )
             # alternative
             # tmp = i
             # starmap_iterator += ((tmp), )
@@ -379,8 +386,8 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
                 print(i, 'arguments generated')
     
     # Garbage collection before starting pool:
-    del file_, stat_
-    gc.collect()
+#     del file_
+#     gc.collect()
     
     # Parallel
     if n_processes == 'all':
@@ -392,14 +399,15 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
     print(n_cpus)
     
     if analytic:
-        with Pool(processes = n_cpus, maxtasksperchild=200) as pool:
-            result = np.array(pool.starmap(make_fptd_data, starmap_iterator))   #.reshape((-1, 3))
+        with Pool(processes = n_cpus, maxtasksperchild = 200) as pool:
+            #result = np.array(pool.starmap(make_fptd_data, starmap_iterator))   #.reshape((-1, 3))
+            result = pool.starmap(make_fptd_data, starmap_iterator)
     else:
-        with Pool(processes = n_cpus, maxtasksperchild=200) as pool:
-            result = np.array(pool.starmap(make_kde_data, starmap_iterator))   #.reshape((-1, 3))
-        
+        with Pool(processes = n_cpus, maxtasksperchild = 200) as pool:
+            #result = np.array(pool.starmap(make_kde_data, starmap_iterator))   #.reshape((-1, 3))
+            result = pool.starmap(make_kde_data, starmap_iterator)
     
-    
+    result = np.array(result).reshape((-1, 3))
     # Make dataframe to save
     # Initialize dataframe
     my_columns = process_params + ['rt', 'choice', 'log_l']
