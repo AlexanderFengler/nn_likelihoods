@@ -178,11 +178,11 @@ def filter_simulations_fast(base_simulation_folder = '',
                      
     return sim_stat_data                     
 
-# def make_kde_data(data = [], metadata  = [], n_kde = 100, n_unif_up = 100, n_unif_down = 100, idx = 0):
-def make_kde_data(n_kde = 100, n_unif_up = 100, n_unif_down = 100, idx = 0):
+def make_kde_data(data = [], metadata  = [], n_kde = 100, n_unif_up = 100, n_unif_down = 100, idx = 0):
+# def make_kde_data(n_kde = 100, n_unif_up = 100, n_unif_down = 100, idx = 0):
     
-    meta_data = file_[2]
-    data = file_[1][idx, :, :]
+#     meta_data = file_[2]
+#     data = file_[1][idx, :, :]
     
     out = np.zeros((n_kde + n_unif_up + n_unif_down, 3))
     tmp_kde = kde_class.logkde((data[:, 0], data[:, 1], metadata))
