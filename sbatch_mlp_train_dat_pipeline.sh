@@ -38,7 +38,7 @@ datatype="cnn_train" #"cnn_train" # "parameter_recovery"
 mode="mlp"
 analytic=0
 maxt=20
-nproc=2
+nproc=10
 pickleprotocol=4
 
 # params concerning training data generation
