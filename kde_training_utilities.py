@@ -178,7 +178,7 @@ def filter_simulations_fast(base_simulation_folder = '',
                      
     return sim_stat_data                     
 
-def make_kde_data(data = [], metadata  = [], keep_file = 0, n_kde = 100, n_unif_up = 100, n_unif_down = 100, idx = 0):
+def make_kde_data(data = [], metadata  = [], n_kde = 100, n_unif_up = 100, n_unif_down = 100, idx = 0):
     out = np.zeros((n_kde + n_unif_up + n_unif_down, 3))
     tmp_kde = kde_class.logkde((data[:, 0], data[:, 1], metadata))
     
@@ -228,7 +228,7 @@ def make_kde_data(data = [], metadata  = [], keep_file = 0, n_kde = 100, n_unif_
     return out.astype(np.float)
 
 
-def make_fptd_data(data = [], params = [], metadata  = [], keep_file = 0, n_kde = 100, n_unif_up = 100, n_unif_down = 100, idx = 0):
+def make_fptd_data(data = [], params = [], metadata  = [], n_kde = 100, n_unif_up = 100, n_unif_down = 100, idx = 0):
     out = np.zeros((n_kde + n_unif_up + n_unif_down, 3))
     tmp_kde = kde_class.logkde((data[:, 0], data[:, 1], metadata))
     
@@ -347,12 +347,14 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
     tmp_sim_data_ok = 0
     for i in range(file_[1].shape[0]):
         if stat_['keep_file'][i]:
-
+            
+            # Don't remember what this part is doing....
             if tmp_sim_data_ok:
                 pass
             else:
                 tmp_sim_data = file_[1][i]
                 tmp_sim_data_ok = 1
+                
             lb = cnt * (n_unif_down + n_unif_up + n_kde)
             lb_kde = s_id_kde + (cnt * (n_kde))
             
@@ -365,9 +367,9 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
             
             # Allocate to starmap tuple for mixture component 3
             if analytic:
-                starmap_iterator += ((file_[1][i, :, :].copy(), file_[0][i, :].copy(), file_[2].copy(), stat_['keep_file'][i].copy(), n_kde, n_unif_up, n_unif_down, cnt), )
+                starmap_iterator += ((file_[1][i, :, :].copy(), file_[0][i, :].copy(), file_[2].copy(), n_kde, n_unif_up, n_unif_down, cnt), )
             else:
-                starmap_iterator += ((file_[1][i, :, :].copy(), file_[2].copy(), stat_['keep_file'][i].copy(), n_kde, n_unif_up, n_unif_down, cnt), )
+                starmap_iterator += ((file_[1][i, :, :].copy(), file_[2].copy(), n_kde, n_unif_up, n_unif_down, cnt), )
             # alternative
             # tmp = i
             # starmap_iterator += ((tmp), )
@@ -375,7 +377,6 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
             cnt += 1
             if i % 100 == 0:
                 print(i, 'unif part generated')
-    
     
     # Garbage collection before starting pool:
     del file_, stat_
