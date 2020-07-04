@@ -322,9 +322,9 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
     stat_ = pickle.load(open( base_simulation_folder + '/simulator_statistics' + '_' + str(file_id) + '.pickle', 'rb' ) )
 
     # Initialize dataframe
-    my_columns = process_params + ['rt', 'choice', 'log_l']
-    data = pd.DataFrame(np.zeros((np.sum(stat_['keep_file']) * n_by_param, len(my_columns))),
-                        columns = my_columns)             
+#     my_columns = process_params + ['rt', 'choice', 'log_l']
+#     data = pd.DataFrame(np.zeros((np.sum(stat_['keep_file']) * n_by_param, len(my_columns))),
+#                         columns = my_columns)             
     
     # Initializations
     n_kde = int(n_by_param * mixture_p[0])
@@ -341,7 +341,7 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
 
     # CONTINUE HERE   
     # Preparation loop --------------------------------------------------------------------
-    s_id_kde = np.sum(stat_['keep_file']) * (n_unif_down + n_unif_up)
+    #s_id_kde = np.sum(stat_['keep_file']) * (n_unif_down + n_unif_up)
     cnt = 0
     starmap_iterator = ()
     tmp_sim_data_ok = 0
@@ -356,7 +356,7 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
                 tmp_sim_data_ok = 1
                 
             lb = cnt * (n_unif_down + n_unif_up + n_kde)
-            lb_kde = s_id_kde + (cnt * (n_kde))
+            #lb_kde = s_id_kde + (cnt * (n_kde))
             
             # Make empty dataframe of appropriate size
             p_cnt = 0
@@ -376,7 +376,7 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
             
             cnt += 1
             if i % 100 == 0:
-                print(i, 'unif part generated')
+                print(i, 'arguments generated')
     
     # Garbage collection before starting pool:
     del file_, stat_
@@ -394,27 +394,45 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
     #stat_
     
     if analytic:
-        with Pool(processes = n_cpus, maxtasksperchild=1000) as pool:
+        with Pool(processes = n_cpus, maxtasksperchild=200) as pool:
             result = np.array(pool.starmap(make_fptd_data, starmap_iterator))   #.reshape((-1, 3))
     else:
-        with Pool(processes = n_cpus, maxtasksperchild=1000) as pool:
+        with Pool(processes = n_cpus, maxtasksperchild=200) as pool:
             result = np.array(pool.starmap(make_kde_data, starmap_iterator))   #.reshape((-1, 3))
         
     
+    
+    # Make dataframe to save
+    # Initialize dataframe
+    my_columns = process_params + ['rt', 'choice', 'log_l']
+    data = pd.DataFrame(np.zeros((np.sum(stat_['keep_file']) * n_by_param, len(my_columns))),
+                        columns = my_columns)    
+    
     data.values[: , -3:] = result.reshape((-1, 3))
+    
+    # Filling in training data frame ---------------------------------------------------
+    cnt = 0
+    tmp_sim_data_ok = 0
+    for i in range(file_[1].shape[0]):
+        if stat_['keep_file'][i]:
+            
+            # Don't remember what this part is doing....
+            if tmp_sim_data_ok:
+                pass
+            else:
+                tmp_sim_data = file_[1][i]
+                tmp_sim_data_ok = 1
+                
+            lb = cnt * (n_unif_down + n_unif_up + n_kde)
 
-    # [['rt', 'choice', 'log_l']] 
-    #pickle.dump(data, open('/users/afengler/batch_job_out/test_out.pickle', 'wb'), protocol = 4)
-    #result.reshape((-1, 3)).shape
-    #pickle.dump(result.reshape((-1, 3)), open('/users/afengler/batch_job_out/test_out_2.pickle', 'wb'), protocol = 4)
-        #print(data)
-        # for result in pool.imap(make_kde_data, starmap_iterator, chunksize = 20):
-        #     print(result)
-
-        #np.array(pool.imap(make_kde_data, starmap_iterator, chunksize = 20)).reshape((-1, 3))
-        #print(result)
-        #data.iloc[: , -3:] = 
-        #print(data)
+            # Make empty dataframe of appropriate size
+            p_cnt = 0
+            
+            for param in process_params:
+                data.iloc[(lb):(lb + n_unif_down + n_unif_up + n_kde), my_columns.index(param)] = file_[0][i, p_cnt]
+                p_cnt += 1
+                
+            cnt += 1
     # ----------------------------------------------------------------------------------
 
     # Store data
