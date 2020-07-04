@@ -358,12 +358,12 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
             lb = cnt * (n_unif_down + n_unif_up + n_kde)
             #lb_kde = s_id_kde + (cnt * (n_kde))
             
-            # Make empty dataframe of appropriate size
-            p_cnt = 0
+#             # Make empty dataframe of appropriate size
+#             p_cnt = 0
             
-            for param in process_params:
-                data.iloc[(lb):(lb + n_unif_down + n_unif_up + n_kde), my_columns.index(param)] = file_[0][i, p_cnt]
-                p_cnt += 1
+#             for param in process_params:
+#                 data.iloc[(lb):(lb + n_unif_down + n_unif_up + n_kde), my_columns.index(param)] = file_[0][i, p_cnt]
+#                 p_cnt += 1
             
             # Allocate to starmap tuple for mixture component 3
             if analytic:
@@ -390,8 +390,6 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
 
     print('Number of cpus: ')
     print(n_cpus)
-    #file_
-    #stat_
     
     if analytic:
         with Pool(processes = n_cpus, maxtasksperchild=200) as pool:
