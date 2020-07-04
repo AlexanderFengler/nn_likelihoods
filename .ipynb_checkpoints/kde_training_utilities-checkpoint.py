@@ -22,6 +22,7 @@ import os
 import pickle
 import uuid
 import glob
+import gc
 
 # My own code
 import kde_class
@@ -374,6 +375,11 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
             cnt += 1
             if i % 100 == 0:
                 print(i, 'unif part generated')
+    
+    
+    # Garbage collection before starting pool:
+    del file_, stat_
+    gc.collect()
     
     # Parallel
     if n_processes == 'all':
