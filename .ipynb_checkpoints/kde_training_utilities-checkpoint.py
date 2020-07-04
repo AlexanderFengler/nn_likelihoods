@@ -322,8 +322,17 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
                                        print_info = False,
                                        n_processes = 'all',
                                        analytic = False):
+    
+    # Parallel
+    if n_processes == 'all':
+        n_cpus = psutil.cpu_count(logical = False)
+    else:
+        n_cpus = n_processes
 
-    global file_ = pickle.load(open( base_simulation_folder + '/' + file_name_prefix + '_' + str(file_id) + '.pickle', 'rb' ) )
+    print('Number of cpus: ')
+    print(n_cpus)
+    
+    file_ = pickle.load(open( base_simulation_folder + '/' + file_name_prefix + '_' + str(file_id) + '.pickle', 'rb' ) )
     
     stat_ = pickle.load(open( base_simulation_folder + '/simulator_statistics' + '_' + str(file_id) + '.pickle', 'rb' ) )
 
@@ -351,6 +360,7 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
     cnt = 0
     starmap_iterator = ()
     tmp_sim_data_ok = 0
+    results = []
     for i in range(file_[1].shape[0]):
         if stat_['keep_file'][i]:
             
@@ -375,47 +385,46 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
             if analytic:
                 starmap_iterator += ((file_[1][i, :, :].copy(), file_[0][i, :].copy(), file_[2].copy(), n_kde, n_unif_up, n_unif_down, cnt), )
             else:
-                # starmap_iterator += ((file_[1][i, :, :].copy(), file_[2].copy(), n_kde, n_unif_up, n_unif_down, cnt), ) 
-                starmap_iterator += ((n_kde, n_unif_up, n_unif_down, cnt), )
+                starmap_iterator += ((file_[1][i, :, :].copy(), file_[2].copy(), n_kde, n_unif_up, n_unif_down, cnt), ) 
+                #starmap_iterator += ((n_kde, n_unif_up, n_unif_down, cnt), )
             # alternative
             # tmp = i
             # starmap_iterator += ((tmp), )
             
             cnt += 1
-            if i % 100 == 0:
+            if (cnt % 100 == 0) or (i == file_[1].shape[0] - 1): 
+                with Pool(processes = n_cpus, maxtasksperchild = 200) as pool:
+                    results.append(np.array(pool.starmap(make_kde_data, starmap_iterator)).reshape((-1, 3)))   #.reshape((-1, 3))
+                    #result = pool.starmap(make_kde_data, starmap_iterator)
+                starmap_iterator = ()
                 print(i, 'arguments generated')
     
     # Garbage collection before starting pool:
 #     del file_
 #     gc.collect()
     
-    # Parallel
-    if n_processes == 'all':
-        n_cpus = psutil.cpu_count(logical = False)
-    else:
-        n_cpus = n_processes
 
-    print('Number of cpus: ')
-    print(n_cpus)
+#     if analytic:
+#         with Pool(processes = n_cpus, maxtasksperchild = 200) as pool:
+#             #result = np.array(pool.starmap(make_fptd_data, starmap_iterator))   #.reshape((-1, 3))
+#             result = pool.starmap(make_fptd_data, starmap_iterator)
+#     else:
+#         with Pool(processes = n_cpus, maxtasksperchild = 200) as pool:
+#             #result = np.array(pool.starmap(make_kde_data, starmap_iterator))   #.reshape((-1, 3))
+#             result = pool.starmap(make_kde_data, starmap_iterator)
     
-    if analytic:
-        with Pool(processes = n_cpus, maxtasksperchild = 200) as pool:
-            #result = np.array(pool.starmap(make_fptd_data, starmap_iterator))   #.reshape((-1, 3))
-            result = pool.starmap(make_fptd_data, starmap_iterator)
-    else:
-        with Pool(processes = n_cpus, maxtasksperchild = 200) as pool:
-            #result = np.array(pool.starmap(make_kde_data, starmap_iterator))   #.reshape((-1, 3))
-            result = pool.starmap(make_kde_data, starmap_iterator)
+    # result = np.array(result).reshape((-1, 3))
     
-    result = np.array(result).reshape((-1, 3))
     # Make dataframe to save
     # Initialize dataframe
+    
     my_columns = process_params + ['rt', 'choice', 'log_l']
     data = pd.DataFrame(np.zeros((np.sum(stat_['keep_file']) * n_by_param, len(my_columns))),
                         columns = my_columns)    
     
-    data.values[: , -3:] = result.reshape((-1, 3))
+    #data.values[: , -3:] = result.reshape((-1, 3))
     
+    data.values[:, -3:] = np.concatenate(results)
     # Filling in training data frame ---------------------------------------------------
     cnt = 0
     tmp_sim_data_ok = 0
