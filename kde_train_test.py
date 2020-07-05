@@ -158,7 +158,7 @@ if __name__ == "__main__":
             lb = cnt * (n_unif_down + n_unif_up + n_kde)
 
             # Allocate to starmap tuple for mixture component 3
-            if analytic:
+            if args.analytic:
                 starmap_iterator += ((file_[1][i, :, :].copy(), file_[0][i, :].copy(), file_[2].copy(), n_kde, n_unif_up, n_unif_down, cnt), )
             else:
                 starmap_iterator += ((file_[1][i, :, :], file_[2], n_kde, n_unif_up, n_unif_down, cnt), ) 
