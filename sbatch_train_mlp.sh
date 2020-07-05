@@ -20,33 +20,33 @@
 #SBATCH --time=18:00:00
 ##SBATCH --mem=128G
 #SBATCH --mem=252G
-#SBATCH -c 14
+#SBATCH -c 10
 #SBATCH -N 1
 #SBATCH --constraint='quadrortx'
 ##SBATCH --constraint='cascade'
 #SBATCH -p gpu --gres=gpu:1
-#SBATCH --array=1-300
+#SBATCH --array=1-750
 
 source /users/afengler/.bashrc
 conda deactivate
 conda activate tf-gpu-py37
 # module load python/3.7.4 cuda/10.0.130 cudnn/7.4 tensorflow/2.0.0_gpu_py37
 
-nfiles=150
-method='ornstein_pos'
+nfiles=750
+method='ddm'
 analytic=0
 machine='ccv'
-maxidfiles=300
+maxidfiles=750
 
 
 if [ $analytic -eq 1 ]; then
-    for i in {1..5}
+    for i in {1..1}
     do
        echo "Now starting run: $i"
        python -u /users/afengler/git_repos/nn_likelihoods/keras_fit_model.py --machine $machine --method $method --nfiles $nfiles --maxidfiles $maxidfiles --datafolder /users/afengler/data/analytic/${method}/training_data_binned_0_nbins_0_n_20000/ --nbydataset 10000000 --warmstart 0 --analytic $analytic
     done
 else
-    for i in {1..2}
+    for i in {1..1}
     do
        echo "Now starting run: $i"
        python -u /users/afengler/git_repos/nn_likelihoods/keras_fit_model.py --machine $machine --method $method --nfiles $nfiles --maxidfiles $maxidfiles --datafolder /users/afengler/data/kde/${method}/training_data_binned_0_nbins_0_n_20000/ --nbydataset 10000000 --warmstart 0 --analytic $analytic
