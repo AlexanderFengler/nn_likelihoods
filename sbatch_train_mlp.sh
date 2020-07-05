@@ -20,7 +20,7 @@
 #SBATCH --time=18:00:00
 ##SBATCH --mem=128G
 #SBATCH --mem=252G
-#SBATCH -c 10
+#SBATCH -c 2
 #SBATCH -N 1
 #SBATCH --constraint='quadrortx'
 ##SBATCH --constraint='cascade'
