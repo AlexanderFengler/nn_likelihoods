@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.neighbors import KernelDensity
-#import multiprocessing as mp
+import multiprocessing as mp
 from  multiprocessing import Process
 from  multiprocessing import Pool
 import psutil
@@ -74,6 +74,8 @@ if __name__ == "__main__":
         os.mkdir(method_folder + args.outfolder + '/')
     
     
+    
+    
 # STANDARD VERSION ----------------------------------------------------------------------------------------
     
 #     # Main function 
@@ -108,6 +110,7 @@ if __name__ == "__main__":
     #process_params = ['v', 'a', 'w', 'ndt', 'theta']
     #files_ = pickle.load(open(base_simulation_folder + 'keep_files.pickle', 'rb'))
 
+    print(mp.get_all_start_methods())
     
     
 # ALTERNATIVE VERSION
