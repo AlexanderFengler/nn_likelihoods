@@ -222,5 +222,5 @@ if __name__ == "__main__":
     else:
         pickle.dump(tmp_sim_data, open(method_folder + args.outfolder + '/meta_data.pickle', 'wb') )
 
-    return 0 #data
+    #return 0 #data
                                        
