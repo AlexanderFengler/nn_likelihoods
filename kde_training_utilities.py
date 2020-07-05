@@ -385,14 +385,14 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
             if analytic:
                 starmap_iterator += ((file_[1][i, :, :].copy(), file_[0][i, :].copy(), file_[2].copy(), n_kde, n_unif_up, n_unif_down, cnt), )
             else:
-                starmap_iterator += ((file_[1][i, :, :].copy(), file_[2].copy(), n_kde, n_unif_up, n_unif_down, cnt), ) 
+                starmap_iterator += ((file_[1][i, :, :], file_[2], n_kde, n_unif_up, n_unif_down, cnt), ) 
                 #starmap_iterator += ((n_kde, n_unif_up, n_unif_down, cnt), )
             # alternative
             # tmp = i
             # starmap_iterator += ((tmp), )
             
             cnt += 1
-            if (cnt % 100 == 0) or (i == file_[1].shape[0] - 1): 
+            if (cnt % 100 == 0) or (i == file_[1].shape[0]):
                 with Pool(processes = n_cpus, maxtasksperchild = 200) as pool:
                     results.append(np.array(pool.starmap(make_kde_data, starmap_iterator)).reshape((-1, 3)))   #.reshape((-1, 3))
                     #result = pool.starmap(make_kde_data, starmap_iterator)
