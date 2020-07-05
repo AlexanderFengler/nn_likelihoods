@@ -78,22 +78,22 @@ if __name__ == "__main__":
     
 # STANDARD VERSION ----------------------------------------------------------------------------------------
     
-#     # Main function 
-#     start_time = time.time()
-#     kde_util.kde_from_simulations_fast_parallel(base_simulation_folder = method_folder + args.simfolder,
-#                                                 file_name_prefix = args.fileprefix,
-#                                                 file_id = args.fileid,
-#                                                 target_folder = method_folder + args.outfolder,
-#                                                 n_by_param = args.nbyparam,
-#                                                 mixture_p = args.mixture,
-#                                                 process_params = process_params,
-#                                                 print_info = False,
-#                                                 n_processes= args.nproc,
-#                                                 analytic = args.analytic)
+    # Main function 
+    start_time = time.time()
+    kde_util.kde_from_simulations_fast_parallel(base_simulation_folder = method_folder + args.simfolder,
+                                                file_name_prefix = args.fileprefix,
+                                                file_id = args.fileid,
+                                                target_folder = method_folder + args.outfolder,
+                                                n_by_param = args.nbyparam,
+                                                mixture_p = args.mixture,
+                                                process_params = process_params,
+                                                print_info = False,
+                                                n_processes= args.nproc,
+                                                analytic = args.analytic)
     
-#     end_time = time.time()
-#     exec_time = end_time - start_time
-#     print('Time elapsed: ', exec_time)
+    end_time = time.time()
+    exec_time = end_time - start_time
+    print('Time elapsed: ', exec_time)
 
 #-----------------------------------------------------------------------------------------------------------
 
@@ -110,122 +110,122 @@ if __name__ == "__main__":
     #process_params = ['v', 'a', 'w', 'ndt', 'theta']
     #files_ = pickle.load(open(base_simulation_folder + 'keep_files.pickle', 'rb'))
 
-    print(mp.get_all_start_methods())
+   # print(mp.get_all_start_methods())
     
     
-# ALTERNATIVE VERSION
+# # ALTERNATIVE VERSION
 
-# We should be able to parallelize this !
+# # We should be able to parallelize this !
     
-    # Parallel
-    if args.nproc == 'all':
-        n_cpus = psutil.cpu_count(logical = False)
-    else:
-        n_cpus = args.nproc
+#     # Parallel
+#     if args.nproc == 'all':
+#         n_cpus = psutil.cpu_count(logical = False)
+#     else:
+#         n_cpus = args.nproc
 
-    print('Number of cpus: ')
-    print(n_cpus)
+#     print('Number of cpus: ')
+#     print(n_cpus)
     
-    file_ = pickle.load(open( method_folder + args.simfolder + '/' + args.fileprefix + '_' + str(args.fileid) + '.pickle', 'rb' ) )
+#     file_ = pickle.load(open( method_folder + args.simfolder + '/' + args.fileprefix + '_' + str(args.fileid) + '.pickle', 'rb' ) )
     
-    stat_ = pickle.load(open( method_folder + args.simfolder + '/simulator_statistics' + '_' + str(args.fileid) + '.pickle', 'rb' ) )
+#     stat_ = pickle.load(open( method_folder + args.simfolder + '/simulator_statistics' + '_' + str(args.fileid) + '.pickle', 'rb' ) )
    
-    # Initializations
-    n_kde = int(args.nbyparam * args.mixture[0])
-    n_unif_down = int(args.nbyparam * args.mixture[1])
-    n_unif_up = int(args.nbyparam * args.mixture[2])
-    n_kde = n_kde + (args.nbyparam - n_kde - n_unif_up - n_unif_down) # correct n_kde if sum != args.nbyparam
+#     # Initializations
+#     n_kde = int(args.nbyparam * args.mixture[0])
+#     n_unif_down = int(args.nbyparam * args.mixture[1])
+#     n_unif_up = int(args.nbyparam * args.mixture[2])
+#     n_kde = n_kde + (args.nbyparam - n_kde - n_unif_up - n_unif_down) # correct n_kde if sum != args.nbyparam
     
-    # Add possible choices to file_[2] which is the meta data for the simulator (expected when loaded the kde class)
+#     # Add possible choices to file_[2] which is the meta data for the simulator (expected when loaded the kde class)
     
-    # TODO: THIS INFORMATION SHOULD BE INCLUDED AS META-DATA INTO THE BASE SIMULATOIN FILES
-    file_[2]['possible_choices'] = np.unique([-1, 1])
-    #file_[2]['possible_choices'] = np.unique(file_[1][0, :, 1])
-    file_[2]['possible_choices'].sort()
+#     # TODO: THIS INFORMATION SHOULD BE INCLUDED AS META-DATA INTO THE BASE SIMULATOIN FILES
+#     file_[2]['possible_choices'] = np.unique([-1, 1])
+#     #file_[2]['possible_choices'] = np.unique(file_[1][0, :, 1])
+#     file_[2]['possible_choices'].sort()
 
-    # CONTINUE HERE   
-    # Preparation loop --------------------------------------------------------------------
-    #s_id_kde = np.sum(stat_['keep_file']) * (n_unif_down + n_unif_up)
-    cnt = 0
-    starmap_iterator = ()
-    tmp_sim_data_ok = 0
-    results = []
-    for i in range(file_[1].shape[0]):
-        if stat_['keep_file'][i]:
+#     # CONTINUE HERE   
+#     # Preparation loop --------------------------------------------------------------------
+#     #s_id_kde = np.sum(stat_['keep_file']) * (n_unif_down + n_unif_up)
+#     cnt = 0
+#     starmap_iterator = ()
+#     tmp_sim_data_ok = 0
+#     results = []
+#     for i in range(file_[1].shape[0]):
+#         if stat_['keep_file'][i]:
             
-            # Don't remember what this part is doing....
-            if tmp_sim_data_ok:
-                pass
-            else:
-                tmp_sim_data = file_[1][i]
-                tmp_sim_data_ok = 1
+#             # Don't remember what this part is doing....
+#             if tmp_sim_data_ok:
+#                 pass
+#             else:
+#                 tmp_sim_data = file_[1][i]
+#                 tmp_sim_data_ok = 1
                 
-            lb = cnt * (n_unif_down + n_unif_up + n_kde)
+#             lb = cnt * (n_unif_down + n_unif_up + n_kde)
 
-            # Allocate to starmap tuple for mixture component 3
-            if args.analytic:
-                starmap_iterator += ((file_[1][i, :, :].copy(), file_[0][i, :].copy(), file_[2].copy(), n_kde, n_unif_up, n_unif_down, cnt), )
-            else:
-                starmap_iterator += ((file_[1][i, :, :], file_[2], n_kde, n_unif_up, n_unif_down, cnt), ) 
-                #starmap_iterator += ((n_kde, n_unif_up, n_unif_down, cnt), )
-            # alternative
-            # tmp = i
-            # starmap_iterator += ((tmp), )
+#             # Allocate to starmap tuple for mixture component 3
+#             if args.analytic:
+#                 starmap_iterator += ((file_[1][i, :, :].copy(), file_[0][i, :].copy(), file_[2].copy(), n_kde, n_unif_up, n_unif_down, cnt), )
+#             else:
+#                 starmap_iterator += ((file_[1][i, :, :], file_[2], n_kde, n_unif_up, n_unif_down, cnt), ) 
+#                 #starmap_iterator += ((n_kde, n_unif_up, n_unif_down, cnt), )
+#             # alternative
+#             # tmp = i
+#             # starmap_iterator += ((tmp), )
             
-            cnt += 1
-            if (cnt % 100 == 0) or (i == file_[1].shape[0] - 1):
-                with Pool(processes = n_cpus, maxtasksperchild = 200) as pool:
-                    results.append(np.array(pool.starmap(kde_util.make_kde_data, starmap_iterator)).reshape((-1, 3)))   #.reshape((-1, 3))
-                    #result = pool.starmap(make_kde_data, starmap_iterator)
-                starmap_iterator = ()
-                print(i, 'arguments generated')
+#             cnt += 1
+#             if (cnt % 100 == 0) or (i == file_[1].shape[0] - 1):
+#                 with Pool(processes = n_cpus, maxtasksperchild = 200) as pool:
+#                     results.append(np.array(pool.starmap(kde_util.make_kde_data, starmap_iterator)).reshape((-1, 3)))   #.reshape((-1, 3))
+#                     #result = pool.starmap(make_kde_data, starmap_iterator)
+#                 starmap_iterator = ()
+#                 print(i, 'arguments generated')
      
-    # Make dataframe to save
-    # Initialize dataframe
+#     # Make dataframe to save
+#     # Initialize dataframe
     
-    my_columns = process_params + ['rt', 'choice', 'log_l']
-    data = pd.DataFrame(np.zeros((np.sum(stat_['keep_file']) * args.nbyparam, len(my_columns))),
-                        columns = my_columns)    
+#     my_columns = process_params + ['rt', 'choice', 'log_l']
+#     data = pd.DataFrame(np.zeros((np.sum(stat_['keep_file']) * args.nbyparam, len(my_columns))),
+#                         columns = my_columns)    
     
-    #data.values[: , -3:] = result.reshape((-1, 3))
+#     #data.values[: , -3:] = result.reshape((-1, 3))
     
-    data.values[:, -3:] = np.concatenate(results)
-    # Filling in training data frame ---------------------------------------------------
-    cnt = 0
-    tmp_sim_data_ok = 0
-    for i in range(file_[1].shape[0]):
-        if stat_['keep_file'][i]:
+#     data.values[:, -3:] = np.concatenate(results)
+#     # Filling in training data frame ---------------------------------------------------
+#     cnt = 0
+#     tmp_sim_data_ok = 0
+#     for i in range(file_[1].shape[0]):
+#         if stat_['keep_file'][i]:
             
-            # Don't remember what this part is doing....
-            if tmp_sim_data_ok:
-                pass
-            else:
-                tmp_sim_data = file_[1][i]
-                tmp_sim_data_ok = 1
+#             # Don't remember what this part is doing....
+#             if tmp_sim_data_ok:
+#                 pass
+#             else:
+#                 tmp_sim_data = file_[1][i]
+#                 tmp_sim_data_ok = 1
                 
-            lb = cnt * (n_unif_down + n_unif_up + n_kde)
+#             lb = cnt * (n_unif_down + n_unif_up + n_kde)
 
-            # Make empty dataframe of appropriate size
-            p_cnt = 0
+#             # Make empty dataframe of appropriate size
+#             p_cnt = 0
             
-            for param in process_params:
-                data.iloc[(lb):(lb + n_unif_down + n_unif_up + n_kde), my_columns.index(param)] = file_[0][i, p_cnt]
-                p_cnt += 1
+#             for param in process_params:
+#                 data.iloc[(lb):(lb + n_unif_down + n_unif_up + n_kde), my_columns.index(param)] = file_[0][i, p_cnt]
+#                 p_cnt += 1
                 
-            cnt += 1
-    # ----------------------------------------------------------------------------------
+#             cnt += 1
+#     # ----------------------------------------------------------------------------------
 
-    # Store data
-    print('writing data to file: ', method_folder + args.outfolder + '/data_' + str(args.fileid) + '.pickle')
-    pickle.dump(data.values, open(method_folder + args.outfolder + '/data_' + str(args.fileid) + '.pickle', 'wb'), protocol = 4)
+#     # Store data
+#     print('writing data to file: ', method_folder + args.outfolder + '/data_' + str(args.fileid) + '.pickle')
+#     pickle.dump(data.values, open(method_folder + args.outfolder + '/data_' + str(args.fileid) + '.pickle', 'wb'), protocol = 4)
     
-    # Write metafile if it doesn't exist already
-    # Hack for now: Just copy one of the base simulations files over
+#     # Write metafile if it doesn't exist already
+#     # Hack for now: Just copy one of the base simulations files over
     
-    if os.path.isfile(method_folder + args.outfolder + '/meta_data.pickle'):
-        pass
-    else:
-        pickle.dump(tmp_sim_data, open(method_folder + args.outfolder + '/meta_data.pickle', 'wb') )
+#     if os.path.isfile(method_folder + args.outfolder + '/meta_data.pickle'):
+#         pass
+#     else:
+#         pickle.dump(tmp_sim_data, open(method_folder + args.outfolder + '/meta_data.pickle', 'wb') )
 
-    #return 0 #data
+#     #return 0 #data
                                        
