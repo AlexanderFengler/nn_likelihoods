@@ -123,7 +123,7 @@ if __name__ == "__main__":
     
     file_ = pickle.load(open( method_folder + args.simfolder + '/' + args.fileprefix + '_' + str(args.fileid) + '.pickle', 'rb' ) )
     
-    stat_ = pickle.load(open( method_folder + args.simfolder + '/simulator_statistics' + '_' + str(args.file_id) + '.pickle', 'rb' ) )
+    stat_ = pickle.load(open( method_folder + args.simfolder + '/simulator_statistics' + '_' + str(args.fileid) + '.pickle', 'rb' ) )
    
     # Initializations
     n_kde = int(args.nbyparam * args.mixture[0])
