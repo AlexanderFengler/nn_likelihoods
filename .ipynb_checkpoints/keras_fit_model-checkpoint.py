@@ -110,7 +110,7 @@ if __name__ == "__main__":
     #                                    return_log = True, # Dont take log if you want to train on actual likelihoods
     #                                    prelog_cutoff = 1e-7 # cut out data with likelihood lower than 1e-7
     #                                   
-    folder_list = os.list(data_folder)
+    folder_list = os.listdir(data_folder)
     data_file_names = []
     
     for file_ in folder_list:
