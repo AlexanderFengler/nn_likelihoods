@@ -117,7 +117,7 @@ if __name__ == "__main__":
         if 'data_' == file_[:5]:
             data_file_names.append(file_)
             
-    data_file_names = list(np.random.choices(data_file_names, replace = False, size = n_training_datasets_to_load))
+    data_file_names = list(np.random.choice(data_file_names, replace = False, size = n_training_datasets_to_load))
     
     dataset = kde_load_data_new(path = data_folder,
                                 #file_id_list = list(1 + np.random.choice(maxidfiles, replace = False, size = n_training_datasets_to_load)),
