@@ -109,15 +109,24 @@ if __name__ == "__main__":
     # X, y, X_val, y_val = kde_load_data(folder = data_folder, 
     #                                    return_log = True, # Dont take log if you want to train on actual likelihoods
     #                                    prelog_cutoff = 1e-7 # cut out data with likelihood lower than 1e-7
-    #                                   )
+    #                                   
+    folder_list = os.list(data_folder)
+    data_file_names = []
+    
+    for file_ in folder_list:
+        if 'data_' == file_[:5]:
+            data_file_names.append(file)
+            
+    data_file_names = list(np.random.choices(data_file_names, replace = False, size = n_training_datasets_to_load))
     
     dataset = kde_load_data_new(path = data_folder,
-                                file_id_list = list(1 + np.random.choice(maxidfiles, replace = False, size = n_training_datasets_to_load)),
-                             # file_id_list = [i for i in range(1, n_training_datasets_to_load + 1, 1)],
-                             return_log = True,
-                             prelog_cutoff_low = 1e-7,
-                             prelog_cutoff_high = 100,
-                             make_split = True)
+                                #file_id_list = list(1 + np.random.choice(maxidfiles, replace = False, size = n_training_datasets_to_load)),
+                                file_id_list = data_file_names,
+                                # file_id_list = [i for i in range(1, n_training_datasets_to_load + 1, 1)],
+                                return_log = True,
+                                prelog_cutoff_low = 1e-7,
+                                prelog_cutoff_high = 100,
+                                make_split = True)
 
 
     # --------------------------------------------------------------------------------

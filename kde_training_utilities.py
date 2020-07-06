@@ -398,6 +398,13 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
                     #result = pool.starmap(make_kde_data, starmap_iterator)
                 starmap_iterator = ()
                 print(i, 'arguments generated')
+        if not stat_['keep_file'][i]:
+            if (i == (file_[1].shape[0] - 1)) and len(starmap_iterator) > 0:
+                with Pool(processes = n_cpus, maxtasksperchild = 200) as pool:
+                    results.append(np.array(pool.starmap(make_kde_data, starmap_iterator)).reshape((-1, 3)))   #.reshape((-1, 3))
+                    #result = pool.starmap(make_kde_data, starmap_iterator)
+                starmap_iterator = ()
+                print(i, 'last dataset was not kept')
     
     # Garbage collection before starting pool:
 #     del file_
@@ -583,7 +590,8 @@ def kde_load_data_new(path = '',
     
     # Read in two datasets to get meta data for the subsequent
     print('Reading in initial dataset')
-    tmp_data = np.load(path + 'data_' + str(file_id_list[0]) + '.pickle', allow_pickle = True)
+    #tmp_data = np.load(path + 'data_' + str(file_id_list[0]) + '.pickle', allow_pickle = True)
+    tmp_data = np.load(path + file_id_list[0], allow_pickle = True)
     
 #     features_init = np.load(path + 'feed_features_' + str(file_id_list[0]) + '.npy')
 #     labels_init = np.load(path + 'feed_labels_' + str(file_id_list[0]) + '.npy')
@@ -608,7 +616,8 @@ def kde_load_data_new(path = '',
     
     # Read in remaining files into preallocated np.array
     for i in range(1, n_files, 1):
-        tmp_data = np.load(path + 'data_' + str(file_id_list[i]) + '.pickle', allow_pickle = True)
+        #tmp_data = np.load(path + 'data_' + str(file_id_list[i]) + '.pickle', allow_pickle = True)
+        tmp_data = np.load(path + file_id_list[i], allow_pickle = True)
         n_rows_tmp = tmp_data.shape[0]
         features[(cnt_samples): (cnt_samples + n_rows_tmp), :] = tmp_data[:, :-1]
         labels[(cnt_samples): (cnt_samples + n_rows_tmp), 0] = tmp_data[:, -1]
