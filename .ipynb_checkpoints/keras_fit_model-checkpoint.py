@@ -115,7 +115,7 @@ if __name__ == "__main__":
     
     for file_ in folder_list:
         if 'data_' == file_[:5]:
-            data_file_names.append(file)
+            data_file_names.append(file_)
             
     data_file_names = list(np.random.choices(data_file_names, replace = False, size = n_training_datasets_to_load))
     
