@@ -19,10 +19,10 @@
 # Request runtime, memory, cores
 #SBATCH --time=18:00:00
 ##SBATCH --mem=128G
-#SBATCH --mem=252G
+#SBATCH --mem=64G
 #SBATCH -c 2
 #SBATCH -N 1
-#SBATCH --constraint='quadrortx'
+##SBATCH --constraint='quadrortx'
 ##SBATCH --constraint='cascade'
 #SBATCH -p gpu --gres=gpu:1
 #SBATCH --array=1-1
@@ -32,7 +32,7 @@ conda deactivate
 conda activate tf-gpu-py37
 # module load python/3.7.4 cuda/10.0.130 cudnn/7.4 tensorflow/2.0.0_gpu_py37
 
-nfiles=750
+nfiles=100
 method='ddm'
 analytic=0
 machine='ccv'
