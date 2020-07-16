@@ -3,13 +3,13 @@
 # SLURM INSTRUCTIONS IF RUN AS SBATCH JOB ---------------------------
 
 # job name:
-#SBATCH -J ornstein_sim
+#SBATCH -J gen_param_recov
 
 # priority
-#SBATCH --account=bibs-frankmj-condo
+#SBATCH --account=carney-frankmj-condo
 
 # output file
-#SBATCH --output /users/afengler/batch_job_out/ornstein_sim_%A_%a.out
+#SBATCH --output /users/afengler/batch_job_out/param_recov_%A_%a.out
 
 # Request runtime, memory, cores:
 #SBATCH --time=36:00:00
@@ -21,7 +21,7 @@
 
 # INITIALIZATIONS ----------------------------------------------------
 declare -a dgps=( "ddm" "angle" "weibull_cdf")
-n_samples=( 50 100 1000 2000 ) # 200 400 800 1600 3200 6400 ) #( 50000 100000 200000 400000 )
+n_samples=( 50 100 1000 2000 ) 
 n_choices=( 2 ) # 3 4 5 6 ) #4 5 6 )
 n_parameter_sets=10  #20000
 n_subjects=( 5 10 20 )

@@ -3,7 +3,7 @@
 
 # plotlist=( "hdi_p" "hdi_coverage" "parameter_recovery_scatter" "model_uncertainty" "posterior_predictive" "posterior_pair") #( "posterior_variance" "hdi_coverage" "hdi_p" "parameter_recovery_scatter" "parameter_recovery_hist" "posterior_pair" "model_uncertainty" "posterior_predictive" )
 #plotlist=( "posterior_pair" "model_uncertainty" )
-plotlist=( "posterior_predictive" )
+plotlist=( "model_uncertainty" )
 # CNN
 
 # # DDM -----------------------------------------------
@@ -45,25 +45,25 @@ plotlist=( "posterior_predictive" )
 # done
 # # ---------------------------------------------------
 
-# # ANGLE2 ---------------------------------------------------
-# model="angle"
-# machine="home"
-# method="cnn"
-# traindattype="binned"
-# networkidx=-1
-# n=( 1024 4096 )
-# analytic=0
-# rhatcutoff=1.1
-# npostpred=9
-# npostpair=9
-# datafilter='none'
+# ANGLE2 ---------------------------------------------------
+model="angle"
+machine="home"
+method="cnn"
+traindattype="binned"
+networkidx=-1
+n=( 1024 4096 )
+analytic=0
+rhatcutoff=1.1
+npostpred=9
+npostpair=9
+datafilter='none'
 
-# for n_tmp in "${n[@]}"
-# do
-#     python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
-# done
+for n_tmp in "${n[@]}"
+do
+    python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
+done
 
-# # # -------------------------------------------------------------
+# # -------------------------------------------------------------
 
 # # FULL_DDM2 ---------------------------------------------------
 # model="full_ddm2"
@@ -126,25 +126,25 @@ plotlist=( "posterior_predictive" )
 # done
 # # # -----------------------------------------------------------
 
-# # # WEIBULL CDF 2 ---------------------------------------------------
-# model="weibull_cdf"
-# machine="home"
-# method="cnn"
-# traindattype="binned"
-# networkidx=-1
-# n=( 1024 4096 )
-# analytic=0
-# rhatcutoff=1.1
-# npostpred=9
-# npostpair=9
-# datafilter='none'
+# # WEIBULL CDF 2 ---------------------------------------------------
+model="weibull_cdf"
+machine="home"
+method="cnn"
+traindattype="binned"
+networkidx=-1
+n=( 1024 4096 )
+analytic=0
+rhatcutoff=1.1
+npostpred=9
+npostpair=9
+datafilter='none'
 
-# for n_tmp in "${n[@]}"
-# do
-#     python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
-# done
+for n_tmp in "${n[@]}"
+do
+    python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
+done
 
-# # -----------------------------------------------------------
+# -----------------------------------------------------------
 
 
 # # # RACE 3 ---------------------------------------------------
@@ -188,46 +188,46 @@ plotlist=( "posterior_predictive" )
 # # -----------------------------------------------------------
 
 
-# # LCA 3 ---------------------------------------------------
-model="lca_3"
-machine="home"
-method="cnn"
-traindattype="binned"
-networkidx=-1
-n=( 1024 4096 )
-analytic=0
-rhatcutoff=1.1
-npostpred=9
-npostpair=9
-datafilter='none'
+# # # LCA 3 ---------------------------------------------------
+# model="lca_3"
+# machine="home"
+# method="cnn"
+# traindattype="binned"
+# networkidx=-1
+# n=( 1024 4096 )
+# analytic=0
+# rhatcutoff=1.1
+# npostpred=9
+# npostpair=9
+# datafilter='none'
 
-for n_tmp in "${n[@]}"
-do
-    python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
-done
+# for n_tmp in "${n[@]}"
+# do
+#     python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
+# done
 
-# -----------------------------------------------------------
+# # -----------------------------------------------------------
 
 
-# LCA 4 ---------------------------------------------------
-model="lca_4"
-machine="home"
-method="cnn"
-traindattype="binned"
-networkidx=-1
-n=( 1024 4096 )
-analytic=0
-rhatcutoff=1.1
-npostpred=9
-npostpair=9
-datafilter='none'
+# # LCA 4 ---------------------------------------------------
+# model="lca_4"
+# machine="home"
+# method="cnn"
+# traindattype="binned"
+# networkidx=-1
+# n=( 1024 4096 )
+# analytic=0
+# rhatcutoff=1.1
+# npostpred=9
+# npostpair=9
+# datafilter='none'
 
-for n_tmp in "${n[@]}"
-do
-    python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
-done
+# for n_tmp in "${n[@]}"
+# do
+#     python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
+# done
 
-# -----------------------------------------------------------
+# # -----------------------------------------------------------
 
 
 

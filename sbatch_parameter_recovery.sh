@@ -3,13 +3,13 @@
 # SLURM INSTRUCTIONS IF RUN AS SBATCH JOB ---------------------------
 
 # job name:
-#SBATCH -J ornstein_sim
+#SBATCH -J gen_param_recov
 
 # priority
-#SBATCH --account=bibs-frankmj-condo
+#SBATCH --account=carney-frankmj-condo
 
 # output file
-#SBATCH --output /users/afengler/batch_job_out/ornstein_sim_%A_%a.out
+#SBATCH --output /users/afengler/batch_job_out/param_recov_%A_%a.out
 
 # Request runtime, memory, cores:
 #SBATCH --time=36:00:00
