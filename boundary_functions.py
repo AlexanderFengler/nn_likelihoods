@@ -12,7 +12,7 @@ def constant(t = 0):
 # Angle (additive)
 def angle(t = 1,
           theta = 1):
-    return t * (- np.sin(theta) / np.cos(theta))
+    return np.multiply(t, (- np.sin(theta) / np.cos(theta)))
 
 # Generalized logistic bound (additive)
 def generalized_logistic_bnd(t = 1,
@@ -25,7 +25,7 @@ def generalized_logistic_bnd(t = 1,
 def weibull_cdf(t = 1,
                 alpha  = 1,
                 beta = 1):
-    return (np.exp( - np.power(t / beta, alpha)))
+    return np.exp( - np.power( np.divide(t, beta), alpha))
 
 # # Gamma shape: (additive)
 # def gamma_bnd(t = 1,

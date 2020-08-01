@@ -1557,7 +1557,7 @@ if __name__ == "__main__":
                      default = 'home')
     CLI.add_argument("--method",
                      type = str,
-                     default = "mlp") # "mlp", "cnn", "navarro"
+                     default = "mlp") # "mlp", "cnn", "navarro", 'sbi'
     CLI.add_argument("--networkidx",
                      type = int,
                      default = -1)
@@ -1621,7 +1621,7 @@ if __name__ == "__main__":
     print('length ax_titles: ', len(ax_titles))
     param_lims = info[model]['param_bounds_network'] + info[model]['boundary_param_bounds_network']
     
-    if method != 'cnn':
+    if method != 'cnn' and method != 'sbi':
         if method != 'navarro':
             with open("model_paths.yaml") as tmp_file:
                 if network_idx == -1:
@@ -1644,8 +1644,25 @@ if __name__ == "__main__":
         # Get trained networks for model
         file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + str(n) + '_init_mle_1_'
         summary_file = method_comparison_folder + 'summary_' + file_signature[:-1] + '.pickle'
-    else:
+    elif method == 'cnn':
         summary_file = '/users/afengler/OneDrive/project_nn_likelihoods/eLIFE_exps/summaries/IS_summary_' + model + '_N_' + str(n) + '.pickle'
+    elif method == 'sbi':
+        if model == 'ddm':
+            summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/ddm_bindim_64_abcmethod_SNPE_nsimruns_1000_nsamples_100.pickle'
+        if model == 'angle':
+            summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/angle_bindim_64_abcmethod_SNPE_nsimruns_1000_nsamples_100.pickle'
+        if model == 'full_ddm':
+            summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/full_ddm_bindim_64_abcmethod_SNPE_nsimruns_1000_nsamples_100.pickle'
+        if model == 'levy':
+            summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/levy_bindim_64_abcmethod_SNPE_nsimruns_1000_nsamples_100.pickle'
+        if model == 'ornstein':
+            summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/ornstein_uhlenbeck_bindim_64_abcmethod_SNPE_nsimruns_1000_nsamples_100.pickle'
+        if model == 'weibull_cdf':
+            summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/weibull_cdf_bindim_64_abcmethod_SNPE_nsimruns_1000_nsamples_100.pickle'
+        if model == 'ddm_sdv':
+            summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/ddm_sdv_bindim_64_abcmethod_SNPE_nsimruns_1000_nsamples_100.pickle'
+
+
 
     # READ IN SUMMARY FILE
     mcmc_dict = pickle.load(open(summary_file, 'rb'))
