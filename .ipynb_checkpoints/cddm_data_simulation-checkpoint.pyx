@@ -1356,7 +1356,7 @@ def ddm_flexbound_pre(float v = 0,
 
     rts = np.zeros((n_samples, 1), dtype = DTYPE)
     choices = np.zeros((n_samples, 1), dtype = np.intc)
-    t_s = np.arange(0, max_t, delta_t).astype(DTYPE)
+    t_s = np.arange(0, max_t + delta_t, delta_t).astype(DTYPE)
     boundary = np.zeros(t_s.shape, dtype = DTYPE)
     
     cdef float[:,:] rts_view = rts
@@ -1396,6 +1396,8 @@ def ddm_flexbound_pre(float v = 0,
     cdef int m = 0
     cdef float[:] gaussian_values = draw_gaussian(num_draws)
     cdef float[:] boundary_view = boundary
+    #ixs = np.zeros(n_samples, dtype = np.intc)
+    #cdef int[:] ixs_view = ixs
     
     # Loop over samples
     for n in range(n_samples):
@@ -1415,19 +1417,20 @@ def ddm_flexbound_pre(float v = 0,
 
         rts_view[n, 0] = t + ndt # Store rt
         choices_view[n, 0] = sign(y) # Store choice
+        #ixs_view[n] = ix
 
-    return (rts, choices,  {'v': v,
-                            'a': a,
-                            'w': w,
-                            'ndt': ndt,
-                            's': s,
-                            **boundary_params,
-                            'delta_t': delta_t,
-                            'max_t': max_t,
-                            'n_samples': n_samples,
-                            'simulator': 'ddm_flexbound',
-                            'boundary_fun_type': boundary_fun.__name__,
-                            'possible_choices': [-1, 1]})
+    return (rts, choices, {'v': v,
+                                'a': a,
+                                'w': w,
+                                'ndt': ndt,
+                                's': s,
+                                **boundary_params,
+                                'delta_t': delta_t,
+                                'max_t': max_t,
+                                'n_samples': n_samples,
+                                'simulator': 'ddm_flexbound',
+                                'boundary_fun_type': boundary_fun.__name__,
+                                'possible_choices': [-1, 1]})
 # # ----------------------------------------------------------------------------------------------------
 
 
@@ -1452,7 +1455,8 @@ def ornstein_uhlenbeck_pre(float v = 0, # drift parameter
     # Initializations
     rts = np.zeros((n_samples, 1), dtype = DTYPE) # rt storage
     choices = np.zeros((n_samples, 1), dtype = np.intc) # choice storage
-    t_s = np.arange(0, max_t, delta_t).astype(DTYPE)
+    t_s = np.arange(0, max_t + delta_t, delta_t).astype(DTYPE)
+    boundary = np.zeros(t_s.shape, dtype = DTYPE)
 
     cdef float[:,:] rts_view = rts
     cdef int[:,:] choices_view = choices
@@ -1462,7 +1466,6 @@ def ornstein_uhlenbeck_pre(float v = 0, # drift parameter
 
     # Boundary Storage
     cdef int num_draws = int((max_t / delta_t) + 1)
-    boundary = np.zeros(t_s.shape, dtype = DTYPE)
     
     # Precompute boundary evaluations
     if boundary_multiplicative:
@@ -1537,7 +1540,7 @@ def levy_flexbound_pre(float v = 0,
 
     rts = np.zeros((n_samples, 1), dtype = DTYPE)
     choices = np.zeros((n_samples, 1), dtype = np.intc)
-    t_s = np.arange(0, max_t, delta_t).astype(DTYPE)
+    t_s = np.arange(0, max_t + delta_t, delta_t).astype(DTYPE)
 
     cdef float[:,:] rts_view = rts
     cdef int[:,:] choices_view = choices
@@ -1622,7 +1625,8 @@ def full_ddm_pre(float v = 0,
 
     rts = np.zeros((n_samples, 1), dtype = DTYPE)
     choices = np.zeros((n_samples, 1), dtype = np.intc)
-    t_s = np.arange(0, max_t, delta_t).astype(DTYPE)
+    t_s = np.arange(0, max_t + delta_t, delta_t).astype(DTYPE)
+    boundary = np.zeros(t_s.shape, dtype = DTYPE)    
 
     cdef float[:, :] rts_view = rts
     cdef int[:, :] choices_view = choices
@@ -1632,7 +1636,6 @@ def full_ddm_pre(float v = 0,
 
     # Boundary storage for the upper bound
     cdef int num_draws = int((max_t / delta_t) + 1)
-    boundary = np.zeros(t_s.shape, dtype = DTYPE)    
     
     cdef int i
     cdef float tmp
@@ -1726,7 +1729,8 @@ def ddm_sdv_pre(float v = 0,
 
     rts = np.zeros((n_samples, 1), dtype = DTYPE)
     choices = np.zeros((n_samples, 1), dtype = np.intc)
-    t_s = np.arange(0, max_t, delta_t).astype(DTYPE)
+    t_s = np.arange(0, max_t + delta_t, delta_t).astype(DTYPE)
+    boundary = np.zeros(t_s.shape, dtype = DTYPE)      
 
     cdef float[:, :] rts_view = rts
     cdef int[:, :] choices_view = choices
@@ -1736,7 +1740,6 @@ def ddm_sdv_pre(float v = 0,
 
     # Boundary storage for the upper bound
     cdef int num_draws = int((max_t / delta_t) + 1)
-    boundary = np.zeros(t_s.shape, dtype = DTYPE)      
     
     cdef int i
     cdef float tmp
@@ -1799,6 +1802,7 @@ def ddm_sdv_pre(float v = 0,
                             'n_samples': n_samples,
                             'simulator': 'ddm_sdv',
                             'boundary_fun_type': boundary_fun.__name__,
-                            'possible_choices': [-1, 1]})
+                            'possible_choices': [-1, 1]}
+           )
 
 # -------------------------------------------------------------------------------------------------
