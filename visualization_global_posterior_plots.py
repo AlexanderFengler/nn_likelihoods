@@ -1,6 +1,7 @@
 import os
 import pickle
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 import re
 import argparse
@@ -15,6 +16,29 @@ import boundary_functions as bf
 from datetime import datetime
 from statsmodels.distributions.empirical_distribution import ECDF
 import scipy as scp
+from basic_simulator import simulator
+from functools import partial
+
+# Config -----
+config = {'ddm': {'params':['v', 'a', 'w', 'ndt'],
+                  'param_bounds': [[-2.7, 0.4, 0.15, 0.05], [2.7, 2.2, 0.85, 2.0]],
+                 },
+          'angle':{'params': ['v', 'a', 'w', 'ndt', 'theta'],
+                   'param_bounds': [[-2.7, 0.4, 0.3, 0.1, - .1], [2.7, 1.7, 0.7, 1.9, np.pi / 2 - 0.3]],
+                  },
+          'weibull_cdf':{'params': ['v', 'a', 'w', 'ndt', 'alpha', 'beta'],
+                         'param_bounds': [[-2.7, 0.4, 0.3, 0.1, 0.5, 0.5], [2.7, 1.7, 0.7, 1.9, 4.5, 6.5]]
+                        },
+          'levy':{'params':['v', 'a', 'w','alpha_diff', 'ndt'],
+                  'param_bounds':[[-2.7, 0.4, 0.3, 1.1, 0.1], [2.7, 1.7, 0.7, 1.9, 1.9]]
+                 },
+          'ddm_sdv':{'params':['v', 'a', 'w', 'ndt', 'sdv'],
+                     'param_bounds':[[-2.7, 0.5, 0.15, 0.05, 0.3],[2.7, 2.2, 0.85, 1.95, 2.2]]
+                    },
+          'full_ddm':{'params':['v', 'a', 'w', 'ndt', 'dw', 'sdv', 'dndt'],
+                      'param_bounds':[[-2.5, 0.4, 0.25, 0.3, 0.05, 0.3],[2.5, 1.8, 0.65, 2.2, 0.25, 1.7]]
+                     },
+         }
 
 def get_r2_vec(estimates = [0, 0, 0],
                ground_truths = [0, 0, 0]):
@@ -52,7 +76,6 @@ def hdi_eval(posterior_samples = [],
     prop_covered_all = np.sum(prop_covered_all) / vec.shape[0]
     
     return vec, prop_covered_by_param, prop_covered_all
-
 
 def sbc_eval(posterior_samples = [],
              ground_truths = []):
@@ -164,6 +187,206 @@ def clean_mcmc_dict(mcmc_dict = {},
     
     return mcmc_dict
 
+# def a_of_t_data_prep(mcmc_dict = None,
+#                      model = 'weibull_cdf',
+#                      n_eval_points = 1000,
+#                      max_t = 20,
+#                      p_lims = [0.2, 0.8],
+#                      n_posterior_subsample = 100,
+#                      split_ecdf = False,
+#                      bnd_epsilon = 0.2):
+    
+#     n_posterior_samples = x['posterior_samples'].shape[1]
+#     n_param_sets = x['gt'].shape[0]
+#     n_choices = 2
+#     cdf_list = []
+#     eval_points = np.linspace(0, max_t, n_eval_points)
+    
+#     # boundary_evals = 
+#     dist_in = np.zeros(n_param_sets)
+#     dist_out = np.zeros(n_param_sets)
+    
+#     for i in range(n_param_sets):
+#         if (i % 10) == 0:
+#             print(i)
+#         if model == 'weibull_cdf':
+#             out = cds.ddm_flexbound(v = mcmc_dict['gt'][i, 0],
+#                         a = mcmc_dict['gt'][i, 1],
+#                         w = mcmc_dict['gt'][i, 2],
+#                         ndt = mcmc_dict['gt'][i, 3],
+#                         delta_t = 0.001, 
+#                         s = 1,
+#                         max_t = 20, 
+#                         n_samples = 20000,
+#                         boundary_fun = bf.weibull_cdf,
+#                         boundary_multiplicative = True,
+#                         boundary_params = {'alpha': mcmc_dict['gt'][i, 4],
+#                                            'beta': mcmc_dict['gt'][i, 5]})
+            
+#             in_ = np.zeros(n_eval_points, dtype = np.bool)
+#             if split_ecdf:
+                
+#                 bin_c = [0, 0]
+#                 if np.sum(out[1] == - 1) > 0:
+#                     bin_c[0] = 1
+#                     out_cdf_0 = ECDF(out[0][out[1] == - 1])
+#                     out_cdf_0_eval = out_cdf_0(eval_points)
+#                 if np.sum(out[1] == 1) > 0:
+#                     bin_c[1] = 1
+#                     out_cdf_1 = ECDF(out[0][out[1] == 1])
+#                     out_cdf_1_eval = out_cdf_1(eval_points)
+
+#                 cnt = 0
+# #                 in_ = np.zeros(n_eval_points, dtype = np.bool)
+
+#                 for c in bin_c:
+#                     if c == 1:
+#                         if cnt == 0:
+#                             in_ += ((out_cdf_0_eval > p_lims[0]) * (out_cdf_0_eval < p_lims[1]))
+#                         if cnt == 1:
+#                             in_ += ((out_cdf_1_eval > p_lims[0]) * (out_cdf_1_eval < p_lims[1]))
+#                     cnt += 0
+                 
+#             else:
+#                 out_cdf = ECDF(out[0][:, 0])
+#                 out_cdf_eval = out_cdf(eval_points)
+#                 in_ = ((out_cdf_eval > p_lims[0]) * (out_cdf_eval < p_lims[1]))
+                
+#             out_ = np.invert(in_)
+#             gt_bnd = mcmc_dict['gt'][i, 1] * bf.weibull_cdf(eval_points, 
+#                                                             alpha = mcmc_dict['gt'][i, 4],
+#                                                             beta = mcmc_dict['gt'][i, 5])
+            
+#             tmp_in = np.zeros(n_posterior_subsample)
+#             tmp_out = np.zeros(n_posterior_subsample)
+            
+#             for j in range(n_posterior_subsample):
+#                 idx = np.random.choice(n_posterior_samples)
+#                 post_bnd_tmp = mcmc_dict['posterior_samples'][i, idx, 1] * bf.weibull_cdf(eval_points,
+#                                                                                           alpha = mcmc_dict['posterior_samples'][i, idx , 4],
+#                                                                                           beta = mcmc_dict['posterior_samples'][i, idx , 5])
+                
+                
+#                 #np.mean(  np.square( np.maximum(gt_bnd[in_], 0) - np.maximum(post_bnd_tmp[in_], 0) ) )
+                
+#                 tmp_in[j] = np.mean(  np.square( np.maximum(gt_bnd[in_], 0) - np.maximum(post_bnd_tmp[in_], 0) ) [(gt_bnd[in_] > bnd_epsilon) * (post_bnd_tmp[in_] > bnd_epsilon)] )
+#                 tmp_out[j] = np.mean(  np.square( np.maximum(gt_bnd[out_], 0) - np.maximum(post_bnd_tmp[out_], 0) ) [(gt_bnd[out_] > bnd_epsilon) * (post_bnd_tmp[out_] > bnd_epsilon)] )
+            
+#             dist_in[i] = np.mean(tmp_in)
+#             dist_out[i] = np.mean(tmp_out)
+#     return dist_in, dist_out     
+
+def a_of_t_data_prep(mcmc_dict = {},
+                     model = 'weibull_cdf',
+                     n_eval_points = 1000,
+                     max_t = 20,
+                     p_lims = [0.2, 0.8],
+                     n_posterior_subsample = 10,
+                     split_ecdf = False,
+                     bnd_epsilon = 0.2):
+    
+    n_posterior_samples = mcmc_dict['posterior_samples'].shape[1]
+    n_param_sets = mcmc_dict['gt'].shape[0]
+    n_choices = 2
+    cdf_list = []
+    eval_points = np.linspace(0, max_t, n_eval_points)
+    
+    # boundary_evals = 
+    dist_in = np.zeros(n_param_sets)
+    dist_out = np.zeros(n_param_sets)
+    
+    gt_bnd_pos_mean_in = np.zeros(n_param_sets)
+    gt_bnd_pos_mean_out = np.zeros(n_param_sets)
+    post_bnd_pos_mean_in = np.zeros(n_param_sets)
+    post_bnd_pos_mean_out = np.zeros(n_param_sets)
+    
+    for i in range(n_param_sets):
+        if (i % 10) == 0:
+            print(i)
+        
+        if model == 'weibull_cdf' or model == 'weibull_cdf2':
+            out = cds.ddm_flexbound(v = mcmc_dict['gt'][i, 0],
+                                    a = mcmc_dict['gt'][i, 1],
+                                    w = mcmc_dict['gt'][i, 2],
+                                    ndt = 0,
+                                    #ndt = mcmc_dict['gt'][i, 3],
+                                    delta_t = 0.001, 
+                                    s = 1,
+                                    max_t = 20, 
+                                    n_samples = 2500,
+                                    boundary_fun = bf.weibull_cdf,
+                                    boundary_multiplicative = True,
+                                    boundary_params = {'alpha': mcmc_dict['gt'][i, 4],
+                                                       'beta': mcmc_dict['gt'][i, 5]})
+
+            in_ = np.zeros(n_eval_points, 
+                           dtype = np.bool)
+            
+            if split_ecdf:
+                
+                bin_c = [0, 0]
+                if np.sum(out[1] == - 1) > 0:
+                    bin_c[0] = 1
+                    out_cdf_0 = ECDF(out[0][out[1] == - 1])
+                    out_cdf_0_eval = out_cdf_0(eval_points)
+                if np.sum(out[1] == 1) > 0:
+                    bin_c[1] = 1
+                    out_cdf_1 = ECDF(out[0][out[1] == 1])
+                    out_cdf_1_eval = out_cdf_1(eval_points)
+
+                cnt = 0
+
+                for c in bin_c:
+                    if c == 1:
+                        if cnt == 0:
+                            in_ += ((out_cdf_0_eval > p_lims[0]) * (out_cdf_0_eval < p_lims[1]))
+                        if cnt == 1:
+                            in_ += ((out_cdf_1_eval > p_lims[0]) * (out_cdf_1_eval < p_lims[1]))
+                    cnt += 0
+                 
+            else:
+                
+                out_cdf = ECDF(out[0][:, 0])
+                out_cdf_eval = out_cdf(eval_points)
+                in_ = ((out_cdf_eval > p_lims[0]) * (out_cdf_eval < p_lims[1]))
+                
+            out_ = np.invert(in_)
+            gt_bnd = mcmc_dict['gt'][i, 1] * bf.weibull_cdf(eval_points, 
+                                                            alpha = mcmc_dict['gt'][i, 4],
+                                                            beta = mcmc_dict['gt'][i, 5])
+            
+            gt_bnd_pos = np.maximum(gt_bnd, 0)
+            
+            tmp_dist_in = np.zeros(n_posterior_subsample)
+            tmp_dist_out = np.zeros(n_posterior_subsample)
+            
+            post_bnd_pos_tmp = np.zeros(len(eval_points))
+            post_bnd_pos_mean_tmp_in = np.zeros(n_posterior_subsample)
+            post_bnd_pos_mean_tmp_out = np.zeros(n_posterior_subsample)
+            
+            for j in range(n_posterior_subsample):
+                idx = np.random.choice(n_posterior_samples)
+                post_bnd_pos_tmp[:] = np.maximum(mcmc_dict['posterior_samples'][i, idx, 1] * bf.weibull_cdf(eval_points,
+                                                                                                            alpha = mcmc_dict['posterior_samples'][i, idx , 4],
+                                                                                                            beta = mcmc_dict['posterior_samples'][i, idx , 5]),
+                                                 0)
+                
+                post_bnd_pos_mean_tmp_in[j] = np.mean(post_bnd_pos_tmp[in_] [(gt_bnd_pos[in_] > bnd_epsilon) * (post_bnd_pos_tmp[in_] > bnd_epsilon)] )
+                post_bnd_pos_mean_tmp_out[j] = np.mean(post_bnd_pos_tmp[out_] [(gt_bnd_pos[out_] > bnd_epsilon) * (post_bnd_pos_tmp[out_] > bnd_epsilon)] )
+                tmp_dist_in[j] = np.mean(  np.square( gt_bnd_pos[in_] - post_bnd_pos_tmp[in_] ) [(gt_bnd_pos[in_] > bnd_epsilon) * (post_bnd_pos_tmp[in_] > bnd_epsilon)] )
+                tmp_dist_out[j] = np.mean(  np.square( gt_bnd_pos[out_] - post_bnd_pos_tmp[out_] ) [(gt_bnd_pos[out_] > bnd_epsilon) * (post_bnd_pos_tmp[out_] > bnd_epsilon)] )
+            
+            
+            gt_bnd_pos_mean_in[i] = np.mean(gt_bnd_pos[in_][(gt_bnd_pos[in_] > bnd_epsilon)])
+            gt_bnd_pos_mean_out[i] = np.mean(gt_bnd_pos[out_][(gt_bnd_pos[out_] > bnd_epsilon)])
+            post_bnd_pos_mean_in[i] = np.mean(post_bnd_pos_mean_tmp_in)
+            post_bnd_pos_mean_out[i] = np.mean(post_bnd_pos_mean_tmp_out)
+            
+            dist_in[i] = np.mean(tmp_dist_in)
+            dist_out[i] = np.mean(tmp_dist_out)
+            
+    return dist_in, dist_out, gt_bnd_pos_mean_in, gt_bnd_pos_mean_out, post_bnd_pos_mean_in, post_bnd_pos_mean_out
+
 # A of T statistics (considering a of t only for timerange that spans observed data)
 def compute_boundary_rmse(mode = 'max_t_global', # max_t_global, max_t_local, quantile
                           boundary_fun = bf.weibull_cdf, # bf.angle etc.
@@ -229,6 +452,10 @@ def parameter_recovery_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
                             data_signature = '',
                             train_data_type = ''): # color_param 'none' 
     
+    #matplotlib.rcParams['text.usetex'] = True
+    #matplotlib.rcParams['pdf.fonttype'] = 42
+    matplotlib.rcParams['svg.fonttype'] = 'none'
+    
     grayscale_map = plt.get_cmap('gray')
     
     normalized_sds = np.zeros(estimates.shape)
@@ -250,7 +477,7 @@ def parameter_recovery_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
                            sharex = False, 
                            sharey = False)
     
-    fig.suptitle(title, fontsize = 24)
+    #fig.suptitle(title, fontsize = 24)
     sns.despine(right = True)
 
     for i in range(estimates.shape[1]):
@@ -259,25 +486,24 @@ def parameter_recovery_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
         print('row: ', row_tmp)
         print('col: ', col_tmp)
         sns.regplot(ground_truths[:, i], estimates[:, i], 
-                    color = 'black', 
                     marker =  '.',
                     fit_reg = False,
                     ax = ax[row_tmp, col_tmp],
-                    scatter_kws = {'s': 120, 'alpha': 0.5, 'color': grayscale_map(normalized_sds[:, i])})
+                    scatter_kws = {'s': 120, 'alpha': 0.3, 'color': grayscale_map(normalized_sds[:, i]), 'edgecolor': 'face'})
         unity_coords = np.linspace(*ax[row_tmp, col_tmp].get_xlim())
         ax[row_tmp, col_tmp].plot(unity_coords, unity_coords, color = 'red')
         
         # ax.plot(x, x)
 
-        ax[row_tmp, col_tmp].text(0.7, 0.1, '$R^2$: ' + r2_vec[i], 
+        ax[row_tmp, col_tmp].text(0.6, 0.1, '$R^2$: ' + r2_vec[i], 
                                   transform = ax[row_tmp, col_tmp].transAxes, 
-                                  fontsize = 14)
+                                  fontsize = 22)
         ax[row_tmp, col_tmp].set_xlabel(ax_titles[i] + ' - ground truth', 
-                                        fontsize = 16);
+                                        fontsize = 20);
         ax[row_tmp, col_tmp].set_ylabel(ax_titles[i] + ' - posterior mean', 
-                                        fontsize = 16);
+                                        fontsize = 20);
         ax[row_tmp, col_tmp].tick_params(axis = "x", 
-                                         labelsize = 14)
+                                         labelsize = 18)
 
     for i in range(estimates.shape[1], rows * cols, 1):
         row_tmp = int(np.floor(i / cols))
@@ -295,7 +521,9 @@ def parameter_recovery_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
         figure_name = 'parameter_recovery_plot_' + statistic + '_'
         plt.subplots_adjust(top = 0.9)
         plt.subplots_adjust(hspace = 0.3, wspace = 0.3)
-        plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300, )
+        #plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300, )
+        #plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.svg', format = 'svg', transparent = True, frameon = False) #dpi = 300, )
+        plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.pdf', format = 'pdf', transparent = True, frameon = False) #dpi = 300, )
         plt.close()
     return #plt.show(block = False)
 
@@ -370,7 +598,6 @@ def parameter_recovery_hist(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
         plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300)
         plt.close()
     return #plt.show(block=False)
-
 
 def posterior_variance_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'], 
                             posterior_variances = [0, 0, 0],
@@ -573,9 +800,11 @@ def hdi_coverage_plot(ax_titles = [],
     plt.bar(ax_titles, 
             coverage_probabilities,
             color = 'black')
-    plt.title( model.upper() + ': Ground truth in HDI?', size = 20)
+    plt.title( model.upper() + ': Ground truth in HDI?', 
+              size = 20)
     plt.xticks(size = 20)
-    plt.yticks(np.arange(0, 1, step = 0.2), size = 20)
+    plt.yticks(np.arange(0, 1, step = 0.2),
+               size = 20)
     plt.ylabel('Prob. HDI covers', size = 20)
     
     if save == True:
@@ -588,6 +817,187 @@ def hdi_coverage_plot(ax_titles = [],
         plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300, )
         plt.close()
     return #plt.show(block = False)
+
+# def a_of_t_histogram(mcmc_dict = None,
+#                      model = 'None',
+#                      save = True,
+#                      data_signature = '',
+#                      train_data_type = '',
+#                      method = 'mlp'):
+    
+#     plt.hist(mcmc_dict['a_of_t_dist_out'][ ~np.isnan(mcmc_dict['a_of_t_dist_out'])], 
+#              bins = 40, 
+#              alpha = 1.0,
+#              color = 'black', 
+#              histtype = 'step',
+#              edgecolor = 'black',
+#              label = 'Out of Data')
+#     plt.hist(mcmc_dict['a_of_t_dist_in'][ ~np.isnan(mcmc_dict['a_of_t_dist_in'])], 
+#              bins = 40, 
+#              alpha = 1.0, 
+#              color = 'red',
+#              histtype = 'step',
+#              edgecolor = 'red',
+#              label = 'At Data')
+#     plt.title(model.upper() + ': Boundary RMSE', size = 20)
+#     plt.legend()
+    
+#     if save == True:
+#         if machine == 'home':
+#             fig_dir = "/users/afengler/OneDrive/git_repos/nn_likelihoods/figures/" + method + "/a_of_t"
+#             if not os.path.isdir(fig_dir):
+#                 os.mkdir(fig_dir)
+            
+#             figure_name = 'a_of_t_plot_'
+#             plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300)
+#             plt.close()
+#     return
+
+
+def a_of_t_panel(mcmc_dict = None,
+                 model = 'None',
+                 save = True,
+                 data_signature = '',
+                 train_data_type = '',
+                 method = 'mlp',
+                 z_score_xy = (0.14, 30)):
+
+    # Basic plot hyperparameters
+    fig, ax = plt.subplots(2, 
+                           2, 
+                           figsize = (10, 10), 
+                           sharex = False, 
+                           sharey = False)
+    
+    # Run regressions first 
+    # Out of data
+    print('Size of a of t gt out: ', mcmc_dict['a_of_t_gt_out'].shape)
+    print('Size of post out: ', mcmc_dict['a_of_t_post_out'].shape)
+    print('Size of gt in: ', mcmc_dict['a_of_t_gt_in'].shape)
+    print('Size of post in: ', mcmc_dict['a_of_t_post_in'].shape)
+    
+    n_parameter_sets = mcmc_dict['a_of_t_gt_in'].shape[0]
+    
+    reg_out = LinearRegression().fit(np.asmatrix(mcmc_dict['a_of_t_gt_out']).T, np.asmatrix(mcmc_dict['a_of_t_post_out']).T)
+    r_out = reg_out.score(np.asmatrix(mcmc_dict['a_of_t_gt_out']).T, np.asmatrix(mcmc_dict['a_of_t_post_out']).T)
+    # At data
+    reg_in = LinearRegression().fit(np.asmatrix(mcmc_dict['a_of_t_gt_in']).T, np.asmatrix(mcmc_dict['a_of_t_post_in']).T)
+    r_in = reg_in.score(np.asmatrix(mcmc_dict['a_of_t_gt_in']).T, np.asmatrix(mcmc_dict['a_of_t_post_in']).T)
+    
+    # Run Z-test
+    r_prime_out = 1/2 * np.log((1 + r_out) / (1 - r_out))
+    r_prime_in = 1/2 * np.log((1 + r_in) / (1 - r_in))
+    S = np.sqrt((1 / (n_parameter_sets - 3) + 1 / (n_parameter_sets - 3)))
+    z = np.abs((r_prime_out - r_prime_in) / S)
+    
+    # Get Bootstrap R_squared differences
+    print('Running bootstrapping part...')
+    
+    # fix number of bootstrap samples to take
+    B = 10000
+    r_diff = []
+    
+    for i in range(B):
+        # Get bootstrap sample indices
+        sample = np.random.choice(n_parameter_sets, 
+                                  size = n_parameter_sets,
+                                  replace = True)
+        #max(sample)
+        
+        # Compute R_squared for the bootstrap indices
+        r_out_tmp = reg_out.score(np.asmatrix(mcmc_dict['a_of_t_gt_out'][sample]).T, np.asmatrix(mcmc_dict['a_of_t_post_out'][sample]).T)
+        r_in_tmp = reg_in.score(np.asmatrix(mcmc_dict['a_of_t_gt_in'][sample]).T, np.asmatrix(mcmc_dict['a_of_t_post_in'][sample]).T)
+        
+        r_diff.append(r_in_tmp - r_out_tmp)
+        if i % 100 == 0:
+            print(i)
+            
+    r_diff_cdf = ECDF(r_diff)
+    
+    # Regression part: At data
+    ax[0, 0].scatter(mcmc_dict['a_of_t_gt_in'], 
+                     mcmc_dict['a_of_t_post_in'], 
+                     color = 'black', 
+                     alpha = 0.5)
+    ax[0, 0].set_title('Boundary Recovery: At Data', fontsize = 16)
+    ax[0, 0].text(0.7, 0.1, 
+                  '$R^2$: ' + str(round(r_in,2)), 
+                  transform = ax[0, 0].transAxes, 
+                  fontsize = 14)
+    ax[0, 0].set_xlabel('True', fontsize = 14)
+    ax[0, 0].set_ylabel('Recovered', fontsize = 14)
+    ax[0, 0].tick_params(labelsize = 12)
+
+    # Regression part: Out of Data
+    ax[0, 1].scatter(mcmc_dict['a_of_t_gt_out'],
+                     mcmc_dict['a_of_t_post_out'], 
+                     color = 'black', 
+                     alpha = 0.5)
+    ax[0, 1].set_title('Boundary Recovery: Out of Data', fontsize = 16)
+    ax[0, 1].text(0.7, 0.1,
+                 '$R^2$: ' + str(round(r_out, 2)), 
+                  transform = ax[0, 1].transAxes, 
+                  fontsize = 14)
+    ax[0, 1].set_xlabel('True', fontsize = 14)
+    ax[0, 1].set_ylabel('Recovered', fontsize = 14)
+    ax[0, 1].tick_params(labelsize = 12)
+
+    # Correlation difference part
+    ax[1, 0].hist(r_diff, density = True, bins = 50, histtype = 'step', color = 'black')
+    ax[1, 0].axvline(x = np.linspace(-0.5, 0.5, 10000)[r_diff_cdf(np.linspace(-0.5, 0.5, 10000)) < 0.05][-1], 
+                     color = 'red', 
+                     linestyle = '-.')
+    ax[1, 0].axvline(x = np.linspace(-0.5, 0.5, 10000)[r_diff_cdf(np.linspace(-0.5, 0.5, 10000)) > 0.95][0], 
+                     color = 'red', 
+                     linestyle = '-.')
+    ax[1, 0].set_title('Bootstrap Correlation Difference', 
+                       fontsize = 16)
+    ax[1, 0].set_xlim(left = 0.0) #, 0.2)
+    ax[1, 0].set_xlim(right = ax[1, 0].get_xlim()[1] * 2)
+    
+    mylims_x = ax[1, 0].get_xlim()
+    mylims_y = ax[1, 0].get_ylim()
+    ax[1, 0].text(mylims_x[0] + (2 / 3) * (mylims_x[1] - mylims_x[0]), 
+                  mylims_y[0] + (1/2) * (mylims_y[1] - mylims_y[0]), 
+                  'z-score: ' + str(round(z, 2)) ,
+                  ha = 'center', 
+                  fontsize = 14)
+    ax[1, 0].tick_params(axis = 'x', 
+                         labelrotation = -45) # to Rotate Xticks Label Text
+    ax[1, 0].tick_params(labelsize = 12)
+
+    # Average squared distance histograms
+    ax[1, 1].set_title(r'$\frac{1}{T} \int_T(GT(t) - Recovered(t))^2 dt$', fontsize = 16)
+    ax[1, 1].hist(mcmc_dict['a_of_t_dist_in'][~np.isnan(mcmc_dict['a_of_t_dist_in'])], 
+                  bins = np.linspace(0, 0.5, 100), 
+                  alpha = 0.2, 
+                  color = 'red',
+                  label = 'At Data', 
+                  density = True)
+    
+    ax[1, 1].hist(mcmc_dict['a_of_t_dist_out'][~np.isnan(mcmc_dict['a_of_t_dist_out'])], 
+                  bins = np.linspace(0, 0.5, 100), 
+                  alpha = 0.2,
+                  color = 'black', 
+                  label = 'Out of Data', 
+                  density = True)
+    
+    ax[1, 1].tick_params(labelsize = 12)
+    ax[1, 1].legend(fontsize = 12)
+
+    plt.tight_layout()
+    
+    if save == True:
+        if machine == 'home':
+            fig_dir = "/users/afengler/OneDrive/git_repos/nn_likelihoods/figures/" + method + "/a_of_t"
+            if not os.path.isdir(fig_dir):
+                os.mkdir(fig_dir)
+            
+            figure_name = 'a_of_t_plot_'
+            plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300)
+            plt.close()
+
+    return
 
 def posterior_predictive_plot(ax_titles = [], 
                               title = 'POSTERIOR PREDICTIVES: ',
@@ -618,6 +1028,8 @@ def posterior_predictive_plot(ax_titles = [],
     fig.suptitle(title + model.upper(), fontsize = 24)
     sns.despine(right = True)
 
+    tmp_simulator = partial(simulator, model = model, delta_t = 0.001, max_t = 20, bin_dim = None)
+    
     for i in range(len(ax_titles)):
         row_tmp = int(np.floor(i / cols))
         col_tmp = i - (cols * row_tmp)
@@ -627,216 +1039,15 @@ def posterior_predictive_plot(ax_titles = [],
 
         # Run Model simulations for posterior samples
         for j in range(n_post_params):
-            if model == 'ddm':
-                out = cds.ddm_flexbound(v = posterior_samples[i, idx[j], 0],
-                                        a = posterior_samples[i, idx[j], 1],
-                                        w = posterior_samples[i, idx[j], 2],
-                                        ndt = posterior_samples[i, idx[j], 3],
-                                        s = 1,
-                                        delta_t = 0.001,
-                                        max_t = 20, 
-                                        n_samples = samples_by_param,
-                                        print_info = False,
-                                        boundary_fun = bf.constant,
-                                        boundary_multiplicative = True,
-                                        boundary_params = {})
-                
-            if model == 'full_ddm' or model == 'full_ddm2':
-                out = cds.full_ddm(v = posterior_samples[i, idx[j], 0],
-                                   a = posterior_samples[i, idx[j], 1],
-                                   w = posterior_samples[i, idx[j], 2],
-                                   ndt = posterior_samples[i, idx[j], 3],
-                                   dw = posterior_samples[i, idx[j], 4],
-                                   sdv = posterior_samples[i, idx[j], 5],
-                                   dndt = posterior_samples[i, idx[j], 6],
-                                   s = 1,
-                                   delta_t = 0.001,
-                                   max_t = 20,
-                                   n_samples = samples_by_param,
-                                   print_info = False,
-                                   boundary_fun = bf.constant,
-                                   boundary_multiplicative = True,
-                                   boundary_params = {})
-
-            if model == 'angle' or model == 'angle2':
-                out = cds.ddm_flexbound(v = posterior_samples[i, idx[j], 0],
-                                        a = posterior_samples[i, idx[j], 1],
-                                        w = posterior_samples[i, idx[j], 2],
-                                        ndt = posterior_samples[i, idx[j], 3],
-                                        s = 1,
-                                        delta_t = 0.001, 
-                                        max_t = 20,
-                                        n_samples = samples_by_param,
-                                        print_info = False,
-                                        boundary_fun = bf.angle,
-                                        boundary_multiplicative = False,
-                                        boundary_params = {'theta': posterior_samples[i, idx[j], 4]})
-            
-            if model == 'weibull_cdf' or model == 'weibull_cdf2':
-                out = cds.ddm_flexbound(v = posterior_samples[i, idx[j], 0],
-                                        a = posterior_samples[i, idx[j], 1],
-                                        w = posterior_samples[i, idx[j], 2],
-                                        ndt = posterior_samples[i, idx[j], 3],
-                                        s = 1,
-                                        delta_t = 0.001, 
-                                        max_t = 20,
-                                        n_samples = samples_by_param,
-                                        print_info = False,
-                                        boundary_fun = bf.weibull_cdf,
-                                        boundary_multiplicative = True,
-                                        boundary_params = {'alpha': posterior_samples[i, idx[j], 4],
-                                                           'beta': posterior_samples[i, idx[j], 5]})
-            if model == 'levy':
-                out = cds.levy_flexbound(v = posterior_samples[i, idx[j], 0],
-                                         a = posterior_samples[i, idx[j], 1],
-                                         w = posterior_samples[i, idx[j], 2],
-                                         alpha_diff = posterior_samples[i, idx[j], 3],
-                                         ndt = posterior_samples[i, idx[j], 4],
-                                         s = 1,
-                                         delta_t = 0.001,
-                                         max_t = 20,
-                                         n_samples = samples_by_param,
-                                         print_info = False,
-                                         boundary_fun = bf.constant,
-                                         boundary_multiplicative = True, 
-                                         boundary_params = {})
-            
-            if model == 'ornstein':
-                out = cds.ornstein_uhlenbeck(v = posterior_samples[i, idx[j], 0],
-                                             a = posterior_samples[i, idx[j], 1],
-                                             w = posterior_samples[i, idx[j], 2],
-                                             g = posterior_samples[i, idx[j], 3],
-                                             ndt = posterior_samples[i, idx[j], 4],
-                                             s = 1,
-                                             delta_t = 0.001, 
-                                             max_t = 20,
-                                             n_samples = samples_by_param,
-                                             print_info = False,
-                                             boundary_fun = bf.constant,
-                                             boundary_multiplicative = True,
-                                             boundary_params = {})
-            if model == 'ddm_sdv':
-                out = cds.ddm_sdv(v = posterior_samples[i, idx[j], 0],
-                                  a = posterior_samples[i, idx[j], 1],
-                                  w = posterior_samples[i, idx[j], 2],
-                                  ndt = posterior_samples[i, idx[j], 3],
-                                  sdv = posterior_samples[i, idx[j], 4],
-                                  s = 1,
-                                  delta_t = 0.001,
-                                  max_t = 20,
-                                  n_samples = samples_by_param,
-                                  print_info = False,
-                                  boundary_fun = bf.constant,
-                                  boundary_multiplicative = True,
-                                  boundary_params = {})
-            
+            out = tmp_simulator(theta = posterior_samples[i, idx[j], :], 
+                                n_samples = samples_by_param)
+          
             post_tmp[(samples_by_param * j):(samples_by_param * (j + 1)), :] = np.concatenate([out[0], out[1]], axis = 1)
         
         # Run Model simulations for true parameters
-        if model == 'ddm':
-            out = cds.ddm_flexbound(v = ground_truths[i, 0],
-                                    a = ground_truths[i, 1],
-                                    w = ground_truths[i, 2],
-                                    ndt = ground_truths[i, 3],
-                                    s = 1,
-                                    delta_t = 0.001,
-                                    max_t = 20, 
-                                    n_samples = 20000,
-                                    print_info = False,
-                                    boundary_fun = bf.constant,
-                                    boundary_multiplicative = True,
-                                    boundary_params = {})
-
-        if model == 'full_ddm' or model == 'full_ddm2':
-            out = cds.full_ddm(v = ground_truths[i, 0],
-                               a = ground_truths[i, 1],
-                               w = ground_truths[i, 2],
-                               ndt = ground_truths[i, 3],
-                               dw = ground_truths[i, 4],
-                               sdv = ground_truths[i, 5],
-                               dndt = ground_truths[i, 6],
-                               s = 1,
-                               delta_t = 0.001,
-                               max_t = 20,
-                               n_samples = 20000,
-                               print_info = False,
-                               boundary_fun = bf.constant,
-                               boundary_multiplicative = True,
-                               boundary_params = {})
-
-        if model == 'angle' or model == 'angle2':
-            out = cds.ddm_flexbound(v = ground_truths[i, 0],
-                                    a = ground_truths[i, 1],
-                                    w = ground_truths[i, 2],
-                                    ndt = ground_truths[i, 3],
-                                    s = 1,
-                                    delta_t = 0.001, 
-                                    max_t = 20,
-                                    n_samples = 20000,
-                                    print_info = False,
-                                    boundary_fun = bf.angle,
-                                    boundary_multiplicative = False,
-                                    boundary_params = {'theta': ground_truths[i, 4]})
-
-        if model == 'weibull_cdf' or model == 'weibull_cdf2':
-            out = cds.ddm_flexbound(v = ground_truths[i, 0],
-                                    a = ground_truths[i, 1],
-                                    w = ground_truths[i, 2],
-                                    ndt = ground_truths[i, 3],
-                                    s = 1,
-                                    delta_t = 0.001, 
-                                    max_t = 20,
-                                    n_samples = 20000,
-                                    print_info = False,
-                                    boundary_fun = bf.weibull_cdf,
-                                    boundary_multiplicative = True,
-                                    boundary_params = {'alpha': ground_truths[i, 4],
-                                                       'beta': ground_truths[i, 5]})
-        if model == 'levy':
-            out = cds.levy_flexbound(v = ground_truths[i, 0],
-                                     a = ground_truths[i, 1],
-                                     w = ground_truths[i, 2],
-                                     alpha_diff = ground_truths[i, 3],
-                                     ndt = ground_truths[i, 4],
-                                     s = 1,
-                                     delta_t = 0.001,
-                                     max_t = 20,
-                                     n_samples = 20000,
-                                     print_info = False,
-                                     boundary_fun = bf.constant,
-                                     boundary_multiplicative = True, 
-                                     boundary_params = {})
-
-        if model == 'ornstein':
-            out = cds.ornstein_uhlenbeck(v = ground_truths[i, 0],
-                                         a = ground_truths[i, 1],
-                                         w = ground_truths[i, 2],
-                                         g = ground_truths[i, 3],
-                                         ndt = ground_truths[i, 4],
-                                         s = 1,
-                                         delta_t = 0.001, 
-                                         max_t = 20,
-                                         n_samples = 20000,
-                                         print_info = False,
-                                         boundary_fun = bf.constant,
-                                         boundary_multiplicative = True,
-                                         boundary_params ={})
-            
-        if model == 'ddm_sdv':
-            out = cds.ddm_sdv(v = ground_truths[i, 0],
-                              a = ground_truths[i, 1],
-                              w = ground_truths[i, 2],
-                              ndt = ground_truths[i, 3],
-                              sdv = ground_truths[i, 4],
-                              s = 1,
-                              delta_t = 0.001,
-                              max_t = 20,
-                              n_samples = 20000,
-                              print_info = False,
-                              boundary_fun = bf.constant,
-                              boundary_multiplicative = True,
-                              boundary_params = {})
-        
+        out = tmp_simulator(theta = ground_truths[i, :],
+                            n_samples = 20000)
+  
         gt_tmp = np.concatenate([out[0], out[1]], axis = 1)
         print('passed through')
             
@@ -910,6 +1121,7 @@ def posterior_predictive_plot_race_lca(ax_titles = ['hiconf_go_stnhi.txt',
                                         samples_by_param = 10,
                                         show = False,
                                         save = False,
+                                        max_t = 10,
                                         method = [],
                                         train_data_type = ''):
 
@@ -922,7 +1134,7 @@ def posterior_predictive_plot_race_lca(ax_titles = ['hiconf_go_stnhi.txt',
 
     fig, ax = plt.subplots(rows, cols, 
                            figsize = (20, 20), 
-                           sharex = False, 
+                           sharex = True, 
                            sharey = False)
     fig.suptitle(title, fontsize = 40)
     sns.despine(right = True)
@@ -944,7 +1156,7 @@ def posterior_predictive_plot_race_lca(ax_titles = ['hiconf_go_stnhi.txt',
                                         ndt = np.float32(posterior_samples[i, idx[j], 7]),
                                         s = np.array([1., 1., 1., 1.],dtype=np.float32),
                                         delta_t = 0.001, 
-                                        max_t = 10,
+                                        max_t = max_t,
                                         n_samples = samples_by_param,
                                         print_info = False,
                                         boundary_fun = bf.constant,
@@ -961,7 +1173,7 @@ def posterior_predictive_plot_race_lca(ax_titles = ['hiconf_go_stnhi.txt',
                                         ndt = np.float32(posterior_samples[i, idx[j], 9]),
                                         s = np.array([1., 1., 1., 1.],dtype=np.float32),
                                         delta_t = 0.001, 
-                                        max_t = 10,
+                                        max_t = max_t,
                                         n_samples = samples_by_param,
                                         print_info = False,
                                         boundary_fun = bf.constant,
@@ -981,7 +1193,7 @@ def posterior_predictive_plot_race_lca(ax_titles = ['hiconf_go_stnhi.txt',
                              #s = np.array([1., 1., 1., 1.],dtype = np.float32),
                              s = 1.0,
                              delta_t = 0.001, 
-                             max_t = 10,
+                             max_t = max_t,
                              n_samples = samples_by_param,
                              print_info = False,
                              boundary_fun = bf.constant,
@@ -1007,7 +1219,7 @@ def posterior_predictive_plot_race_lca(ax_titles = ['hiconf_go_stnhi.txt',
                               #s = np.array([1., 1., 1., 1.], dtype = np.float32),
                               s = 1.0,
                               delta_t = 0.001,
-                              max_t = 10,
+                              max_t = max_t,
                               n_samples = samples_by_param,
                               print_info = False,
                               boundary_fun = bf.constant,
@@ -1032,7 +1244,7 @@ def posterior_predictive_plot_race_lca(ax_titles = ['hiconf_go_stnhi.txt',
                                  ndt = np.float32(ground_truths[i, 7]),
                                  s = np.array([1., 1., 1.], dtype = np.float32),
                                  delta_t = 0.001, 
-                                 max_t = 10,
+                                 max_t = max_t,
                                  n_samples = 20000,
                                  print_info = False,
                                  boundary_fun = bf.constant,
@@ -1046,7 +1258,7 @@ def posterior_predictive_plot_race_lca(ax_titles = ['hiconf_go_stnhi.txt',
                                  ndt = np.float32(ground_truths[i, 9]),
                                  s = np.array([1., 1., 1., 1.],dtype = np.float32),
                                  delta_t = 0.001, 
-                                 max_t = 10,
+                                 max_t = max_t,
                                  n_samples = 20000,
                                  print_info = False,
                                  boundary_fun = bf.constant,
@@ -1063,7 +1275,7 @@ def posterior_predictive_plot_race_lca(ax_titles = ['hiconf_go_stnhi.txt',
                           s = 1.0,
                           #s = np.array([1., 1., 1.],dtype = np.float32),
                           delta_t = 0.001, 
-                          max_t = 10,
+                          max_t = max_t,
                           n_samples = 20000,
                           print_info = False,
                           boundary_fun = bf.constant,
@@ -1085,7 +1297,7 @@ def posterior_predictive_plot_race_lca(ax_titles = ['hiconf_go_stnhi.txt',
                            s = 1.0,
                            #s = np.array([1., 1., 1., 1.],dtype = np.float32),
                            delta_t = 0.001, 
-                           max_t = 10,
+                           max_t = max_t,
                            n_samples = 20000,
                            print_info = False,
                            boundary_fun = bf.constant,
@@ -1103,28 +1315,61 @@ def posterior_predictive_plot_race_lca(ax_titles = ['hiconf_go_stnhi.txt',
         plot_colors = ['blue', 'red', 'orange', 'black', 'grey', 'green', 'brown']
         for c in range(6):
             if np.sum(tmp[:, 1] == c) > 0:
-                sns.distplot(tmp[np.where(tmp[:, 1] == c)[0], 0], 
-                             bins = 50, 
-                             hist = False,
-                             kde = True, 
-                             rug = False, 
-                             hist_kws = {'alpha': 0.2, 'color': plot_colors[c], 'density': 1},
-                             kde_kws = {'color': plot_colors[c], 'label': 'Ground Truth'},
-                             ax = ax[row_tmp, col_tmp])
-                sns.distplot(tmp_true[np.where(tmp_true[:, 1] == c)[0], 0], 
-                             bins = 50, 
-                             hist = False,
-                             kde = True, 
-                             rug = False, 
-                             hist_kws = {'alpha': 0.2, 'color': plot_colors[c], 'density': 1},
-                             kde_kws={'linestyle':'--', 'color': plot_colors[c], 'label': 'CNN'},
-                             ax = ax[row_tmp, col_tmp])
+                choice_p_c = np.sum(tmp[:, 1] == c) / tmp.shape[0]
+                counts, bins = np.histogram(tmp[tmp[:, 1] == c, 0],
+                                            bins = np.linspace(0, max_t, 100),
+                                            density = True)
+                
+                ax[row_tmp, col_tmp].hist(bins[:-1],
+                                          bins,
+                                          weights = choice_p_c * counts,
+                                          histtype = 'step',
+                                          alpha = 0.5,
+                                          color = plot_colors[c],
+                                          linestyle = 'dashed',
+                                          edgecolor = plot_colors[c],
+                                          label = 'Choice: ' + str(c) + ' Posterior')
+                
+                choice_p_c_true = np.sum(tmp_true[:, 1] == c) / tmp_true.shape[0]
+                counts_2, bins = np.histogram(tmp_true[tmp_true[:, 1] == c, 0],
+                                              bins = np.linspace(0, max_t, 100),
+                                              density = True)
+                
+                ax[row_tmp, col_tmp].hist(bins[:-1],
+                                          bins,
+                                          weights = choice_p_c_true * counts_2,
+                                          histtype = 'step',
+                                          alpha = 0.5,
+                                          color = plot_colors[c],
+                                          linestyle = 'solid',
+                                          edgecolor = plot_colors[c],
+                                          label = 'Choice: ' + str(c) + ' Ground Truth')
+                
+               # ax[row_tmp, col_tmp].legend()
+
+#                 sns.distplot(tmp[np.where(tmp[:, 1] == c)[0], 0], 
+#                              bins = 50, 
+#                              hist = False,
+#                              kde = True, 
+#                              rug = False, 
+#                              hist_kws = {'alpha': 0.2, 'color': plot_colors[c], 'density': 1},
+#                              kde_kws = {'color': plot_colors[c], 'label': 'Ground Truth'},
+#                              ax = ax[row_tmp, col_tmp])
+#                 sns.distplot(tmp_true[np.where(tmp_true[:, 1] == c)[0], 0], 
+#                              bins = 50, 
+#                              hist = False,
+#                              kde = True, 
+#                              rug = False, 
+#                              hist_kws = {'alpha': 0.2, 'color': plot_colors[c], 'density': 1},
+#                              kde_kws={'linestyle':'--', 'color': plot_colors[c], 'label': 'CNN'},
+#                              ax = ax[row_tmp, col_tmp])
 
         if row_tmp == 0 and col_tmp == 0:
             ax[row_tmp, col_tmp].legend(fontsize = 12, loc = 'upper right')
         #    ax[row_tmp, col_tmp].legend(labels = ['Simulations', 'E-D CNN'], fontsize = 20)
         else:
-            ax[row_tmp, col_tmp].get_legend().remove()
+            pass
+            #ax[row_tmp, col_tmp].get_legend().remove()
             
         ax[row_tmp, col_tmp].set_xlabel('', 
                                         fontsize = 24);
@@ -1132,8 +1377,10 @@ def posterior_predictive_plot_race_lca(ax_titles = ['hiconf_go_stnhi.txt',
                                         fontsize = 24);
         ax[row_tmp, col_tmp].set_title(ax_titles[i],
                                        fontsize = 24)
-        ax[row_tmp, col_tmp].tick_params(axis = 'y', size = 24)
-        ax[row_tmp, col_tmp].tick_params(axis = 'x', size = 24)
+        ax[row_tmp, col_tmp].tick_params(axis = 'y',
+                                         size = 24)
+        ax[row_tmp, col_tmp].tick_params(axis = 'x', 
+                                         size = 24)
         
     for i in range(ground_truths.shape[0], rows * cols, 1):
         row_tmp = int(np.floor(i / cols))
@@ -1155,7 +1402,554 @@ def posterior_predictive_plot_race_lca(ax_titles = ['hiconf_go_stnhi.txt',
         plt.close()
     if show:
         return #plt.show(block = False)
-  
+    return
+
+# Plot bound
+# Mean posterior predictives
+
+def model_plot(posterior_samples = None,
+               ground_truths = [],
+               cols = 3,
+               model = 'weibull_cdf',
+               n_post_params = 500,
+               n_plots = 4,
+               samples_by_param = 10,
+               max_t = 5,
+               input_hddm_trace = False,
+               datatype = 'single_subject', # 'hierarchical', 'single_subject', 'condition'
+               show_model = True,
+               show = False,
+               save = False,
+               machine = 'home',
+               data_signature = '',
+               train_data_type = '',
+               method = 'cnn'):
+    
+    if 'weibull_cdf' in model:
+        model = 'weibull_cdf'
+    if 'angle' in model:
+        model = 'angle'
+    
+    # Inputs are hddm_traces --> make plot ready
+    if input_hddm_trace and posterior_samples is not None:
+        if datatype == 'hierarchical':
+            posterior_samples = _make_trace_plotready_hierarchical(posterior_samples, 
+                                                                   model = model)
+            n_plots = posterior_samples.shape[0]
+#             print(posterior_samples)
+            
+        if datatype == 'single_subject':
+            posterior_samples = _make_trace_plotready_single_subject(posterior_samples, 
+                                                                     model = model)
+        if datatype == 'condition':
+            posterior_samples = _make_trace_plotready_condition(posterior_samples, 
+                                                                model = model)
+            n_plots = posterior_samples.shape[0]
+            #print(posterior_samples)
+            #n_plots = posterior_samples.shape[0]
+
+    tmp_simulator = partial(simulator, 
+                            model = model, 
+                            delta_t = 0.001, 
+                            max_t = 20, 
+                            bin_dim = None)
+
+    # Taking care of special case with 1 plot
+    if n_plots == 1:
+        ground_truths = np.expand_dims(ground_truths, 0)
+        if posterior_samples is not None:
+            posterior_samples = np.expand_dims(posterior_samples, 0)
+            
+    plot_titles = {'ddm': 'DDM', 
+                   'angle': 'ANGLE',
+                   'full_ddm': 'FULL DDM',
+                   'weibull_cdf': 'WEIBULL',
+                   'levy': 'LEVY',
+                   'ornstein': 'ORNSTEIN UHLENBECK',
+                   'ddm_sdv': 'DDM RANDOM SLOPE',
+                  }
+    
+    title = 'Model Plot: '
+    ax_titles = config[model]['params']
+
+    rows = int(np.ceil(n_plots / cols))
+
+    sns.set(style = "white", 
+            palette = "muted", 
+            color_codes = True,
+            font_scale = 2)
+
+    fig, ax = plt.subplots(rows, cols, 
+                           figsize = (20, 20), 
+                           sharex = False, 
+                           sharey = False)
+    
+    my_suptitle = fig.suptitle(title + plot_titles[model], fontsize = 40)
+    sns.despine(right = True)
+    
+    t_s = np.arange(0, max_t, 0.01)
+    
+    for i in range(n_plots):
+        print('Making plot: ', i)
+        row_tmp = int(np.floor(i / cols))
+        col_tmp = i - (cols * row_tmp)
+        
+        if rows > 1 and cols > 1:
+            ax[row_tmp, col_tmp].set_xlim(0, max_t)
+            ax[row_tmp, col_tmp].set_ylim(-2, 2)
+        elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
+            ax[i].set_xlim(0, max_t)
+            ax[i].set_ylim(-2, 2)
+        else:
+            ax.set_xlim(0, max_t)
+            ax.set_ylim(-2, 2)
+        
+        # Run simulations and add histograms
+        # True params
+        print('Running ground truth simulator: ')
+        out = tmp_simulator(theta = ground_truths[i, :],
+                            n_samples = 20000)
+        
+        print('Simulator finished')
+        tmp_true = np.concatenate([out[0], out[1]], axis = 1)
+        choice_p_up_true = np.sum(tmp_true[:, 1] == 1) / tmp_true.shape[0]
+        
+        if posterior_samples is not None:
+            # Run Model simulations for posterior samples
+            tmp_post = np.zeros((n_post_params * samples_by_param, 2))
+            idx = np.random.choice(posterior_samples.shape[1], size = n_post_params, replace = False)
+            
+            print('Running posterior simulator: ')
+            for j in range(n_post_params):
+                
+                out = tmp_simulator(theta = posterior_samples[i, idx[j], :],
+                                   n_samples = samples_by_param)
+                                
+                tmp_post[(samples_by_param * j):(samples_by_param * (j + 1)), :] = np.concatenate([out[0], out[1]], axis = 1)
+            print('Posterior simulator finished')
+            
+         #ax.set_ylim(-4, 2)
+        if rows > 1 and cols > 1:
+            ax_tmp = ax[row_tmp, col_tmp].twinx()
+        elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
+            ax_tmp = ax[i].twinx()
+        else:
+            ax_tmp = ax.twinx()
+        
+        ax_tmp.set_ylim(-2, 2)
+        ax_tmp.set_yticks([])
+        
+        if posterior_samples is not None:
+            choice_p_up_post = np.sum(tmp_post[:, 1] == 1) / tmp_post.shape[0]
+
+
+
+            counts, bins = np.histogram(tmp_post[tmp_post[:, 1] == 1, 0],
+                                        bins = np.linspace(0, max_t, 100))
+
+            counts_2, bins = np.histogram(tmp_post[tmp_post[:, 1] == 1, 0],
+                                          bins = np.linspace(0, max_t, 100),
+                                          density = True)
+            
+            if j == (n_post_params - 1) and row_tmp == 0 and col_tmp == 0:
+                ax_tmp.hist(bins[:-1], 
+                            bins, 
+                            weights = choice_p_up_post * counts_2,
+                            histtype = 'step',
+                            alpha = 0.5, 
+                            color = 'black',
+                            edgecolor = 'black',
+                            zorder = -1,
+                            label = 'Posterior Predictive')
+                
+            else:
+                ax_tmp.hist(bins[:-1], 
+                            bins, 
+                            weights = choice_p_up_post * counts_2,
+                            histtype = 'step',
+                            alpha = 0.5, 
+                            color = 'black',
+                            edgecolor = 'black',
+                            zorder = -1)
+                        
+        counts, bins = np.histogram(tmp_true[tmp_true[:, 1] == 1, 0],
+                                bins = np.linspace(0, max_t, 100))
+
+        counts_2, bins = np.histogram(tmp_true[tmp_true[:, 1] == 1, 0],
+                                      bins = np.linspace(0, max_t, 100),
+                                      density = True)
+        
+        if row_tmp == 0 and col_tmp == 0:
+            ax_tmp.hist(bins[:-1], 
+                        bins, 
+                        weights = choice_p_up_true * counts_2,
+                        histtype = 'step',
+                        alpha = 0.5, 
+                        color = 'red',
+                        edgecolor = 'red',
+                        zorder = -1,
+                        label = 'Ground Truth Data')
+            ax_tmp.legend(loc = 'lower right')
+        else:
+            ax_tmp.hist(bins[:-1], 
+                    bins, 
+                    weights = choice_p_up_true * counts_2,
+                    histtype = 'step',
+                    alpha = 0.5, 
+                    color = 'red',
+                    edgecolor = 'red',
+                    zorder = -1)
+             
+        #ax.invert_xaxis()
+        if rows > 1 and cols > 1:
+            ax_tmp = ax[row_tmp, col_tmp].twinx()
+        elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
+            ax_tmp = ax[i].twinx()
+        else:
+            ax_tmp = ax.twinx()
+            
+        ax_tmp.set_ylim(2, -2)
+        ax_tmp.set_yticks([])
+        
+        if posterior_samples is not None:
+            counts, bins = np.histogram(tmp_post[tmp_post[:, 1] == -1, 0],
+                            bins = np.linspace(0, max_t, 100))
+
+            counts_2, bins = np.histogram(tmp_post[tmp_post[:, 1] == -1, 0],
+                                          bins = np.linspace(0, max_t, 100),
+                                          density = True)
+            ax_tmp.hist(bins[:-1], 
+                        bins, 
+                        weights = (1 - choice_p_up_post) * counts_2,
+                        histtype = 'step',
+                        alpha = 0.5, 
+                        color = 'black',
+                        edgecolor = 'black',
+                        zorder = -1)
+        
+        counts, bins = np.histogram(tmp_true[tmp_true[:, 1] == -1, 0],
+                                    bins = np.linspace(0, max_t, 100))
+    
+        counts_2, bins = np.histogram(tmp_true[tmp_true[:, 1] == -1, 0],
+                                      bins = np.linspace(0, max_t, 100),
+                                      density = True)
+        ax_tmp.hist(bins[:-1], 
+                    bins, 
+                    weights = (1 - choice_p_up_true) * counts_2,
+                    histtype = 'step',
+                    alpha = 0.5, 
+                    color = 'red',
+                    edgecolor = 'red',
+                    zorder = -1)
+        
+        # Plot posterior samples of bounds and slopes (model)
+        print('Making bounds')
+        if show_model:
+            if posterior_samples is not None:
+                for j in range(n_post_params):
+                    if model == 'weibull_cdf' or model == 'weibull_cdf2':
+                        b = posterior_samples[i, idx[j], 1] * bf.weibull_cdf(t = t_s, 
+                                                                             alpha = posterior_samples[i, idx[j], 4],
+                                                                             beta = posterior_samples[i, idx[j], 5])
+                    if model == 'angle' or model == 'angle2':
+                        b = np.maximum(posterior_samples[i, idx[j], 1] + bf.angle(t = t_s, 
+                                                                                  theta = posterior_samples[i, idx[j], 4]), 0)
+                    if model == 'ddm':
+                        b = posterior_samples[i, idx[j], 1] * np.ones(t_s.shape[0])
+
+
+                    start_point_tmp = - posterior_samples[i, idx[j], 1] + \
+                                      (2 * posterior_samples[i, idx[j], 1] * posterior_samples[i, idx[j], 2])
+
+                    slope_tmp = posterior_samples[i, idx[j], 0]
+
+                    if rows > 1 and cols > 1:
+                        ax[row_tmp, col_tmp].plot(t_s + posterior_samples[i, idx[j], 3], b, 'black',
+                                                  t_s + posterior_samples[i, idx[j], 3], - b, 'black', 
+                                                  alpha = 0.05,
+                                                  zorder = 1000)
+                    elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
+                        ax[i].plot(t_s + posterior_samples[i, idx[j], 3], b, 'black',
+                                   t_s + posterior_samples[i, idx[j], 3], - b, 'black', 
+                                   alpha = 0.05,
+                                   zorder = 1000)
+                    else:
+                        ax.plot(t_s + posterior_samples[i, idx[j], 3], b, 'black',
+                                t_s + posterior_samples[i, idx[j], 3], - b, 'black', 
+                                alpha = 0.05,
+                                zorder = 1000)
+                    
+
+                    for m in range(len(t_s)):
+                        if (start_point_tmp + (slope_tmp * t_s[m])) > b[m] or (start_point_tmp + (slope_tmp * t_s[m])) < -b[m]:
+                            maxid = m
+                            break
+                        maxid = m
+
+                    if rows > 1 and cols > 1:
+                        ax[row_tmp, col_tmp].plot(t_s[:maxid] + posterior_samples[i, idx[j], 3],
+                                                  start_point_tmp + slope_tmp * t_s[:maxid], 
+                                                  'black', 
+                                                  alpha = 0.05,
+                                                  zorder = 1000)
+                        if j == (n_post_params - 1):
+                            ax[row_tmp, col_tmp].plot(t_s[:maxid] + posterior_samples[i, idx[j], 3],
+                                                      start_point_tmp + slope_tmp * t_s[:maxid], 
+                                                      'black', 
+                                                      alpha = 0.05,
+                                                      zorder = 1000,
+                                                      label = 'Model Samples')
+                    elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
+                        ax[i].plot(t_s[:maxid] + posterior_samples[i, idx[j], 3],
+                                   start_point_tmp + slope_tmp * t_s[:maxid], 
+                                   'black', 
+                                   alpha = 0.05,
+                                   zorder = 1000)
+                        if j == (n_post_params - 1):
+                            ax[i].plot(t_s[:maxid] + posterior_samples[i, idx[j], 3],
+                                       start_point_tmp + slope_tmp * t_s[:maxid], 
+                                       'black', 
+                                       alpha = 0.05,
+                                       zorder = 1000,
+                                       label = 'Model Samples')
+
+                    else:
+                        ax.plot(t_s[:maxid] + posterior_samples[i, idx[j], 3],
+                                start_point_tmp + slope_tmp * t_s[:maxid], 
+                                'black', 
+                                alpha = 0.05,
+                                zorder = 1000)
+                        if j ==(n_post_params - 1):
+                            ax.plot(t_s[:maxid] + posterior_samples[i, idx[j], 3],
+                                    start_point_tmp + slope_tmp * t_s[:maxid], 
+                                    'black', 
+                                    alpha = 0.05,
+                                    zorder = 1000,
+                                    label = 'Model Samples')
+                            
+                            
+                    if rows > 1 and cols > 1:
+                        ax[row_tmp, col_tmp].axvline(x = posterior_samples[i, idx[j], 3], 
+                                                     ymin = - 2, 
+                                                     ymax = 2, 
+                                                     c = 'black', 
+                                                     linestyle = '--',
+                                                     alpha = 0.05)
+                        
+                    elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
+                        ax[i].axvline(x = posterior_samples[i, idx[j], 3],
+                                                     ymin = - 2,
+                                                     ymax = 2,
+                                                     c = 'black',
+                                                     linestyle = '--',
+                                                     alpha = 0.05)
+                    else:
+                        ax.axvline(x = posterior_samples[i, idx[j], 3], 
+                                   ymin = -2, 
+                                   ymax = 2, 
+                                   c = 'black', 
+                                   linestyle = '--',
+                                   alpha = 0.05)
+                            
+        # Plot ground_truths bounds
+        if show_model:
+            if model == 'weibull_cdf' or model == 'weibull_cdf2':
+                b = ground_truths[i, 1] * bf.weibull_cdf(t = t_s,
+                                                         alpha = ground_truths[i, 4],
+                                                         beta = ground_truths[i, 5])
+
+            if model == 'angle' or model == 'angle2':
+                b = np.maximum(ground_truths[i, 1] + bf.angle(t = t_s, theta = ground_truths[i, 4]), 0)
+
+            if model == 'ddm':
+                b = ground_truths[i, 1] * np.ones(t_s.shape[0])
+
+            start_point_tmp = - ground_truths[i, 1] + \
+                              (2 * ground_truths[i, 1] * ground_truths[i, 2])
+            slope_tmp = ground_truths[i, 0]
+
+            if rows > 1 and cols > 1:
+                if row_tmp == 0 and col_tmp == 0:
+                    ax[row_tmp, col_tmp].plot(t_s + ground_truths[i, 3], b, 'red', 
+                                              alpha = 1, 
+                                              linewidth = 3, 
+                                              zorder = 1000)
+                    ax[row_tmp, col_tmp].plot(t_s + ground_truths[i, 3], -b, 'red', 
+                                              alpha = 1,
+                                              linewidth = 3,
+                                              zorder = 1000, 
+                                              label = 'Grund Truth Model')
+                    ax[row_tmp, col_tmp].legend(loc = 'upper right')
+                else:
+                    ax[row_tmp, col_tmp].plot(t_s + ground_truths[i, 3], b, 'red', 
+                              t_s + ground_truths[i, 3], -b, 'red', 
+                              alpha = 1,
+                              linewidth = 3,
+                              zorder = 1000)
+                    
+            elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
+                if row_tmp == 0 and col_tmp == 0:
+                    ax[i].plot(t_s + ground_truths[i, 3], b, 'red', 
+                                              alpha = 1, 
+                                              linewidth = 3, 
+                                              zorder = 1000)
+                    ax[i].plot(t_s + ground_truths[i, 3], -b, 'red', 
+                                              alpha = 1,
+                                              linewidth = 3,
+                                              zorder = 1000, 
+                                              label = 'Grund Truth Model')
+                    ax[i].legend(loc = 'upper right')
+                else:
+                    ax[i].plot(t_s + ground_truths[i, 3], b, 'red', 
+                              t_s + ground_truths[i, 3], -b, 'red', 
+                              alpha = 1,
+                              linewidth = 3,
+                              zorder = 1000)
+            else:
+                ax.plot(t_s + ground_truths[i, 3], b, 'red', 
+                        alpha = 1, 
+                        linewidth = 3, 
+                        zorder = 1000)
+                ax.plot(t_s + ground_truths[i, 3], -b, 'red', 
+                        alpha = 1,
+                        linewidth = 3,
+                        zorder = 1000,
+                        label = 'Ground Truth Model')
+                print('passed through legend part')
+                print(row_tmp)
+                print(col_tmp)
+                ax.legend(loc = 'upper right')
+
+            # Ground truth slope:
+            # TODO: Can skip for weibull but can also make faster in general
+            for m in range(len(t_s)):
+                if (start_point_tmp + (slope_tmp * t_s[m])) > b[m] or (start_point_tmp + (slope_tmp * t_s[m])) < -b[m]:
+                    maxid = m
+                    break
+                maxid = m
+
+            # print('maxid', maxid)
+            if rows > 1 and cols > 1:
+                ax[row_tmp, col_tmp].plot(t_s[:maxid] + ground_truths[i, 3], 
+                                          start_point_tmp + slope_tmp * t_s[:maxid], 
+                                          'red', 
+                                          alpha = 1, 
+                                          linewidth = 3, 
+                                          zorder = 1000)
+
+                ax[row_tmp, col_tmp].set_zorder(ax_tmp.get_zorder() + 1)
+                ax[row_tmp, col_tmp].patch.set_visible(False)
+            elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
+                ax[i].plot(t_s[:maxid] + ground_truths[i, 3], 
+                                          start_point_tmp + slope_tmp * t_s[:maxid], 
+                                          'red', 
+                                          alpha = 1, 
+                                          linewidth = 3, 
+                                          zorder = 1000)
+
+                ax[i].set_zorder(ax_tmp.get_zorder() + 1)
+                ax[i].patch.set_visible(False)
+            else:
+                ax.plot(t_s[:maxid] + ground_truths[i, 3], 
+                        start_point_tmp + slope_tmp * t_s[:maxid], 
+                        'red', 
+                        alpha = 1, 
+                        linewidth = 3, 
+                        zorder = 1000)
+
+                ax.set_zorder(ax_tmp.get_zorder() + 1)
+                ax.patch.set_visible(False)
+               
+        # Set plot title
+        title_tmp = ''
+        for k in range(len(ax_titles)):
+            title_tmp += ax_titles[k] + ': '
+            title_tmp += str(round(ground_truths[i, k], 2)) + ', ' 
+
+        if rows > 1 and cols > 1:
+            if row_tmp == rows:
+                ax[row_tmp, col_tmp].set_xlabel('rt', 
+                                                 fontsize = 20);
+            ax[row_tmp, col_tmp].set_ylabel('', 
+                                            fontsize = 20);
+
+
+            ax[row_tmp, col_tmp].set_title(title_tmp,
+                                           fontsize = 24)
+            ax[row_tmp, col_tmp].tick_params(axis = 'y', size = 20)
+            ax[row_tmp, col_tmp].tick_params(axis = 'x', size = 20)
+
+            # Some extra styling:
+            ax[row_tmp, col_tmp].axvline(x = ground_truths[i, 3], ymin = -2, ymax = 2, c = 'red', linestyle = '--')
+            ax[row_tmp, col_tmp].axhline(y = 0, xmin = 0, xmax = ground_truths[i, 3] / max_t, c = 'red',  linestyle = '--')
+        
+        elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
+            if row_tmp == rows:
+                ax[i].set_xlabel('rt', 
+                                                 fontsize = 20);
+            ax[i].set_ylabel('', 
+                                            fontsize = 20);
+
+
+            ax[i].set_title(title_tmp,
+                                           fontsize = 24)
+            ax[i].tick_params(axis = 'y', size = 20)
+            ax[i].tick_params(axis = 'x', size = 20)
+
+            # Some extra styling:
+            ax[i].axvline(x = ground_truths[i, 3], ymin = -2, ymax = 2, c = 'red', linestyle = '--')
+            ax[i].axhline(y = 0, xmin = 0, xmax = ground_truths[i, 3] / max_t, c = 'red',  linestyle = '--')
+        
+        else:
+            if row_tmp == rows:
+                ax.set_xlabel('rt', 
+                              fontsize = 20);
+            ax.set_ylabel('', 
+                          fontsize = 20);
+
+            ax.set_title(title_tmp,
+                         fontsize = 24)
+
+            ax.tick_params(axis = 'y', size = 20)
+            ax.tick_params(axis = 'x', size = 20)
+
+            # Some extra styling:
+            ax.axvline(x = ground_truths[i, 3], ymin = -2, ymax = 2, c = 'red', linestyle = '--')
+            ax.axhline(y = 0, xmin = 0, xmax = ground_truths[i, 3] / max_t, c = 'red',  linestyle = '--')
+
+    
+    if rows > 1 and cols > 1:
+        for i in range(n_plots, rows * cols, 1):
+            row_tmp = int(np.floor(i / cols))
+            col_tmp = i - (cols * row_tmp)
+            ax[row_tmp, col_tmp].axis('off')
+
+    plt.tight_layout(rect = [0, 0.03, 1, 0.9])
+     
+        #plt.setp(ax, yticks = [])
+    if save == True:
+        if machine == 'home':
+            if show_model:
+                fig_dir = "/users/afengler/OneDrive/git_repos/nn_likelihoods/figures/" + method + "/model_uncertainty_alt"
+                figure_name = 'model_uncertainty_alt_'
+            else:
+                fig_dir = "/users/afengler/OneDrive/git_repos/nn_likelihoods/figures/" + method + "/posterior_predictive_alt"
+                figure_name = 'posterior_predictive_alt_'
+            
+            
+        if not os.path.isdir(fig_dir):
+            os.mkdir(fig_dir) 
+        #plt.tight_layout()
+        plt.subplots_adjust(top = 0.9)
+        plt.subplots_adjust(hspace = 0.3, wspace = 0.3)
+        plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300) #  bbox_inches = 'tight')
+        plt.close()
+    if show:
+        return plt.show(block = False)
+    return
+
+
+
 # Plot bound
 # Mean posterior predictives
 def boundary_posterior_plot(ax_titles = ['hi-hi', 'hi-lo', 'hi-mid', 'lo-hi', 'lo-mid'], 
@@ -1173,6 +1967,8 @@ def boundary_posterior_plot(ax_titles = ['hi-hi', 'hi-lo', 'hi-mid', 'lo-hi', 'l
                             save = False,
                             machine = 'home',
                             method = 'cnn'):
+    
+    tmp_simulator = partial(simulator, model = model, delta_t = 0.001, max_t = 20, bin_dim = None)
     
     rows = int(np.ceil(len(ax_titles) / cols))
     sub_idx = np.random.choice(posterior_samples.shape[1], size = n_post_params)
@@ -1203,48 +1999,51 @@ def boundary_posterior_plot(ax_titles = ['hi-hi', 'hi-lo', 'hi-mid', 'lo-hi', 'l
         
         # Run simulations and add histograms
         # True params
-        if model == 'angle' or model == 'angle2':
-            out = cds.ddm_flexbound(v = ground_truths[i, 0],
-                                    a = ground_truths[i, 1],
-                                    w = ground_truths[i, 2],
-                                    ndt = ground_truths[i, 3],
-                                    s = 1,
-                                    delta_t = 0.01, 
-                                    max_t = 20,
-                                    n_samples = 10000,
-                                    print_info = False,
-                                    boundary_fun = bf.angle,
-                                    boundary_multiplicative = False,
-                                    boundary_params = {'theta': ground_truths[i, 4]})
-            
-        if model == 'weibull_cdf' or model == 'weibull_cdf2':
-            out = cds.ddm_flexbound(v = ground_truths[i, 0],
-                                    a = ground_truths[i, 1],
-                                    w = ground_truths[i, 2],
-                                    ndt = ground_truths[i, 3],
-                                    s = 1,
-                                    delta_t = 0.01, 
-                                    max_t = 20,
-                                    n_samples = 10000,
-                                    print_info = False,
-                                    boundary_fun = bf.weibull_cdf,
-                                    boundary_multiplicative = True,
-                                    boundary_params = {'alpha': ground_truths[i, 4],
-                                                       'beta': ground_truths[i, 5]})
         
-        if model == 'ddm':
-            out = cds.ddm_flexbound(v = ground_truths[i, 0],
-                                    a = ground_truths[i, 1],
-                                    w = ground_truths[i, 2],
-                                    ndt = ground_truths[i, 3],
-                                    s = 1,
-                                    delta_t = 0.01,
-                                    max_t = 20, 
-                                    n_samples = 10000,
-                                    print_info = False,
-                                    boundary_fun = bf.constant,
-                                    boundary_multiplicative = True,
-                                    boundary_params = {})
+        out = tmp_simulator(theta = ground_truths[i, :],
+                            n_samples = 20000)
+#         if model == 'angle' or model == 'angle2':
+#             out = cds.ddm_flexbound(v = ground_truths[i, 0],
+#                                     a = ground_truths[i, 1],
+#                                     w = ground_truths[i, 2],
+#                                     ndt = ground_truths[i, 3],
+#                                     s = 1,
+#                                     delta_t = 0.01, 
+#                                     max_t = 20,
+#                                     n_samples = 10000,
+#                                     print_info = False,
+#                                     boundary_fun = bf.angle,
+#                                     boundary_multiplicative = False,
+#                                     boundary_params = {'theta': ground_truths[i, 4]})
+            
+#         if model == 'weibull_cdf' or model == 'weibull_cdf2':
+#             out = cds.ddm_flexbound(v = ground_truths[i, 0],
+#                                     a = ground_truths[i, 1],
+#                                     w = ground_truths[i, 2],
+#                                     ndt = ground_truths[i, 3],
+#                                     s = 1,
+#                                     delta_t = 0.01, 
+#                                     max_t = 20,
+#                                     n_samples = 10000,
+#                                     print_info = False,
+#                                     boundary_fun = bf.weibull_cdf,
+#                                     boundary_multiplicative = True,
+#                                     boundary_params = {'alpha': ground_truths[i, 4],
+#                                                        'beta': ground_truths[i, 5]})
+        
+#         if model == 'ddm':
+#             out = cds.ddm_flexbound(v = ground_truths[i, 0],
+#                                     a = ground_truths[i, 1],
+#                                     w = ground_truths[i, 2],
+#                                     ndt = ground_truths[i, 3],
+#                                     s = 1,
+#                                     delta_t = 0.01,
+#                                     max_t = 20, 
+#                                     n_samples = 10000,
+#                                     print_info = False,
+#                                     boundary_fun = bf.constant,
+#                                     boundary_multiplicative = True,
+#                                     boundary_params = {})
             
         
         tmp_true = np.concatenate([out[0], out[1]], axis = 1)
@@ -1253,48 +2052,51 @@ def boundary_posterior_plot(ax_titles = ['hi-hi', 'hi-lo', 'hi-mid', 'lo-hi', 'l
         # Run Model simulations for posterior samples
         tmp_post = np.zeros((n_post_params*samples_by_param, 2))
         for j in range(n_post_params):
-            if model == 'angle' or model == 'angle2':
-                out = cds.ddm_flexbound(v = posterior_samples[i, idx[j], 0],
-                                        a = posterior_samples[i, idx[j], 1],
-                                        w = posterior_samples[i, idx[j], 2],
-                                        ndt = posterior_samples[i, idx[j], 3],
-                                        s = 1,
-                                        delta_t = 0.01, 
-                                        max_t = 20,
-                                        n_samples = samples_by_param,
-                                        print_info = False,
-                                        boundary_fun = bf.angle,
-                                        boundary_multiplicative = False,
-                                        boundary_params = {'theta': posterior_samples[i, idx[j], 4]})
+            out = tmp_simulator(theta = posterior_sampels[i, idx[j], :],
+                                n_samples = samples_by_param)
             
-            if model == 'weibull_cdf' or model == 'weibull_cdf2':
-                out = cds.ddm_flexbound(v = posterior_samples[i, idx[j], 0],
-                                        a = posterior_samples[i, idx[j], 1],
-                                        w = posterior_samples[i, idx[j], 2],
-                                        ndt = posterior_samples[i, idx[j], 3],
-                                        s = 1,
-                                        delta_t = 0.01, 
-                                        max_t = 20,
-                                        n_samples = samples_by_param,
-                                        print_info = False,
-                                        boundary_fun = bf.weibull_cdf,
-                                        boundary_multiplicative = True,
-                                        boundary_params = {'alpha': posterior_samples[i, idx[j], 4],
-                                                           'beta': posterior_samples[i, idx[j], 5]})
+#             if model == 'angle' or model == 'angle2':
+#                 out = cds.ddm_flexbound(v = posterior_samples[i, idx[j], 0],
+#                                         a = posterior_samples[i, idx[j], 1],
+#                                         w = posterior_samples[i, idx[j], 2],
+#                                         ndt = posterior_samples[i, idx[j], 3],
+#                                         s = 1,
+#                                         delta_t = 0.01, 
+#                                         max_t = 20,
+#                                         n_samples = samples_by_param,
+#                                         print_info = False,
+#                                         boundary_fun = bf.angle,
+#                                         boundary_multiplicative = False,
+#                                         boundary_params = {'theta': posterior_samples[i, idx[j], 4]})
+            
+#             if model == 'weibull_cdf' or model == 'weibull_cdf2':
+#                 out = cds.ddm_flexbound(v = posterior_samples[i, idx[j], 0],
+#                                         a = posterior_samples[i, idx[j], 1],
+#                                         w = posterior_samples[i, idx[j], 2],
+#                                         ndt = posterior_samples[i, idx[j], 3],
+#                                         s = 1,
+#                                         delta_t = 0.01, 
+#                                         max_t = 20,
+#                                         n_samples = samples_by_param,
+#                                         print_info = False,
+#                                         boundary_fun = bf.weibull_cdf,
+#                                         boundary_multiplicative = True,
+#                                         boundary_params = {'alpha': posterior_samples[i, idx[j], 4],
+#                                                            'beta': posterior_samples[i, idx[j], 5]})
                 
-            if model == 'ddm':
-                out = cds.ddm_flexbound(v = posterior_samples[i, idx[j], 0],
-                                        a = posterior_samples[i, idx[j], 1],
-                                        w = posterior_samples[i, idx[j], 2],
-                                        ndt = posterior_samples[i, idx[j], 3],
-                                        s = 1,
-                                        delta_t = 0.01,
-                                        max_t = 20, 
-                                        n_samples = samples_by_param,
-                                        print_info = False,
-                                        boundary_fun = bf.constant,
-                                        boundary_multiplicative = True,
-                                        boundary_params = {})
+#             if model == 'ddm':
+#                 out = cds.ddm_flexbound(v = posterior_samples[i, idx[j], 0],
+#                                         a = posterior_samples[i, idx[j], 1],
+#                                         w = posterior_samples[i, idx[j], 2],
+#                                         ndt = posterior_samples[i, idx[j], 3],
+#                                         s = 1,
+#                                         delta_t = 0.01,
+#                                         max_t = 20, 
+#                                         n_samples = samples_by_param,
+#                                         print_info = False,
+#                                         boundary_fun = bf.constant,
+#                                         boundary_multiplicative = True,
+#                                         boundary_params = {})
             
             tmp_post[(10 * j):(10 * (j + 1)), :] = np.concatenate([out[0], out[1]], axis = 1)
         
@@ -1475,6 +2277,172 @@ def boundary_posterior_plot(ax_titles = ['hi-hi', 'hi-lo', 'hi-mid', 'lo-hi', 'l
     if show:
         return #plt.show(block = False)
     
+# Posterior Pair Plot
+def make_posterior_pair_grid_alt(posterior_samples = [],
+                                 axes_limits = 'model', # 'model', 'samples'
+                                 height = 10,
+                                 aspect = 1,
+                                 n_subsample = 1000,
+                                 data_signature = None,
+                                 gt_available = False,
+                                 gt = [],
+                                 model = None,
+                                 machine = 'home',
+                                 method = 'cnn',
+                                 save = True,
+                                 title_signature = None,
+                                 train_data_type = ''):
+    
+    #sns.set(font_scale = 1.5)
+    if 'weibull_cdf' in model:
+        model = 'weibull_cdf'
+    if 'angle' in model:
+        model = 'angle'
+    
+    # some preprocessing (HDDM)
+    #posterior_samples = posterior_samples.get_traces().copy()
+    #posterior_samples['z'] = 1 / ( 1 + np.exp(- posterior_samples['z_trans']))
+    #posterior_samples = posterior_samples.drop('z_trans', axis = 1)
+
+    g = sns.PairGrid(posterior_samples.sample(n_subsample), 
+                     height = height / len(list(posterior_samples.keys())),
+                     aspect = 1,
+                     diag_sharey = False)
+    g = g.map_diag(sns.kdeplot, color = 'black', shade = False) # shade = True, 
+    g = g.map_lower(sns.kdeplot, 
+                    shade_lowest = False,
+                    n_levels = 50,
+                    shade = False,
+                    cmap = 'Purples_d') # 'Greys'
+    
+    for i, j in zip(*np.triu_indices_from(g.axes, 1)):
+        g.axes[i, j].set_visible(False)
+    
+    
+    if axes_limits == 'model':
+        xlabels,ylabels = [],[]
+
+        for ax in g.axes[-1, :]:
+            xlabel = ax.xaxis.get_label_text()
+            #ax.set_xlabel(fontsize = 20)
+            xlabels.append(xlabel)
+
+        for ax in g.axes[:, 0]:
+            ylabel = ax.yaxis.get_label_text()
+            #ax.set_ylabel(fontsize = 20)
+            ylabels.append(ylabel)
+
+        for i in range(len(xlabels)):
+            for j in range(len(ylabels)):
+                g.axes[j,i].set_xlim(config[model]['param_bounds'][0][config[model]['params'].index(xlabels[i])], 
+                                     config[model]['param_bounds'][1][config[model]['params'].index(xlabels[i])])
+                g.axes[j,i].set_ylim(config[model]['param_bounds'][0][config[model]['params'].index(ylabels[j])], 
+                                     config[model]['param_bounds'][1][config[model]['params'].index(ylabels[j])])
+
+    
+    for ax in g.axes.flat:
+        plt.setp(ax.get_xticklabels(), rotation = 45)
+
+    my_suptitle = g.fig.suptitle(model.upper() + ': Posterior Pair Plot', 
+                                 y = 1.03, 
+                                 fontsize = 24)
+    
+    # If ground truth is available add it in:
+    if gt_available:
+        for i in range(g.axes.shape[0]):
+            for j in range(i + 1, g.axes.shape[0], 1):
+                g.axes[j,i].plot(gt[config[model]['params'].index(xlabels[i])], 
+                                 gt[config[model]['params'].index(ylabels[j])], 
+                                 '.', 
+                                 color = 'red',
+                                 markersize = 7)
+
+        for i in range(g.axes.shape[0]):
+            g.axes[i,i].plot(gt[i],
+                             g.axes[i,i].get_ylim()[0], 
+                             '.', 
+                             color = 'red',
+                             markersize = 7)
+              
+    if save == True:
+        if machine == 'home':
+            fig_dir = "/users/afengler/OneDrive/git_repos/nn_likelihoods/figures/" + method + "/posterior_covariance_alt"
+        if not os.path.isdir(fig_dir):
+            os.mkdir(fig_dir)
+
+    plt.savefig(fig_dir + '/' + 'cov_' + model + data_signature + '_' + train_data_type + '.png', 
+                dpi = 300, 
+                transparent = False,
+                bbox_inches = 'tight',
+                bbox_extra_artists = [my_suptitle])
+    plt.close()
+
+    # Show
+    return #plt.show(block = False)
+
+def caterpillar_plot(posterior_samples = [],
+                     ground_truths = [],
+                     model = None,
+                     data_signature = '',
+                     train_data_type = '',
+                     machine = 'home',
+                     method = 'cnn',
+                     save = True):
+    
+    sns.set(style = "white", 
+            palette = "muted", 
+            color_codes = True,
+            font_scale = 2)
+
+    fig, ax = plt.subplots(1, 1, 
+                           figsize = (10, 10), 
+                           sharex = False, 
+                           sharey = False)
+    
+    my_suptitle = fig.suptitle('Caterpillar plot: ' + model.upper(), 
+                               fontsize = 40)
+    
+    sns.despine(right = True)
+           
+    ecdfs = {}
+    plot_vals = {} # [0.01, 0.9], [0.01, 0.99], [mean]
+    
+    for k in config[model]['params']:
+        ecdfs[k] = ECDF(posterior_samples[:, config[model]['params'].index(k)])
+        tmp_sorted = sorted(trace[k])
+        _p01 =  tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.01) - 1]
+        _p99 = tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.99) - 1]
+        _p1 = tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.1) - 1]
+        _p9 = tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.9) - 1]
+        _pmean = trace[k].mean()
+        plot_vals[k] = [[_p01, _p99], [_p1, _p9], _pmean]
+        
+    x = [plot_vals[k][2] for k in plot_vals.keys()]
+    ax.scatter(x, plot_vals.keys(), c = 'black', marker = 's', alpha = 0)
+    
+    for k in plot_vals.keys():
+        ax.plot(plot_vals[k][1], [k, k], c = 'grey', zorder = -1, linewidth = 5)
+        ax.plot(plot_vals[k][0] , [k, k], c = 'black', zorder = -1)
+        ax.scatter(ground_truths[config[model]['params'].index(k)], k,  c = 'red', marker = "|")
+                                 
+    if save == True:
+        if machine == 'home':
+            fig_dir = "/users/afengler/OneDrive/git_repos/nn_likelihoods/figures/" + method + "/caterpillar"
+            if not os.path.isdir(fig_dir):
+                os.mkdir(fig_dir)
+
+        plt.savefig(fig_dir + '/' + 'caterpillar_' + model + data_signature + '_' + train_data_type + '.png', 
+                    dpi = 300, 
+                    transparent = False,
+                    bbox_inches = 'tight',
+                    bbox_extra_artists = [my_suptitle])
+        plt.close()
+    # Show
+    return #plt.show(block = False)
+
+    return plt.show()
+
+    
 def make_posterior_pair_grid(posterior_samples = [],
                              height = 10,
                              aspect = 1,
@@ -1537,7 +2505,7 @@ def make_posterior_pair_grid(posterior_samples = [],
             if not os.path.isdir(fig_dir):
                 os.mkdir(fig_dir)
                 
-        plt.savefig(fig_dir + '/' + 'cov_' + model + data_signature + '_' + train_data_type + '.png', 
+        plt.savefig(fig_dir + '/' + 'covalt_' + model + data_signature + '_' + train_data_type + '.png', 
                     dpi = 300, 
                     transparent = False,
                     bbox_inches = 'tight',
@@ -1648,19 +2616,40 @@ if __name__ == "__main__":
         summary_file = '/users/afengler/OneDrive/project_nn_likelihoods/eLIFE_exps/summaries/IS_summary_' + model + '_N_' + str(n) + '.pickle'
     elif method == 'sbi':
         if model == 'ddm':
-            summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/ddm_bindim_64_abcmethod_SNPE_nsimruns_1000_nsamples_100.pickle'
+            if n == 1000:
+                summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/'
+            if n == 2000:
+                summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/'
         if model == 'angle':
-            summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/angle_bindim_64_abcmethod_SNPE_nsimruns_1000_nsamples_100.pickle'
+            if n == 1000:
+                summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/collapsed_angle_bindim_64_abcmethod_SNPE_nsimruns_100000_nsamplesl_1000_nsamplesh_50000_nobs_1000.pickle'
+            if n == 2000:
+                summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/collapsed_angle_bindim_64_abcmethod_SNPE_nsimruns_100000_nsamplesl_1000_nsamplesh_50000_nobs_2000.pickle'
         if model == 'full_ddm':
-            summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/full_ddm_bindim_64_abcmethod_SNPE_nsimruns_1000_nsamples_100.pickle'
+            if n == 1000:
+                summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/collapsed_full_ddm_bindim_64_abcmethod_SNPE_nsimruns_100000_nsamplesl_1000_nsamplesh_50000_nobs_1000.pickle'
+            if n == 2000:
+                summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/collapsed_full_ddm_bindim_64_abcmethod_SNPE_nsimruns_100000_nsamplesl_1000_nsamplesh_50000_nobs_2000.pickle'
         if model == 'levy':
-            summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/levy_bindim_64_abcmethod_SNPE_nsimruns_1000_nsamples_100.pickle'
+            if n == 1000:
+                summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/collapsed_levy_bindim_64_abcmethod_SNPE_nsimruns_100000_nsamplesl_1000_nsamplesh_50000_nobs_1000.pickle'
+            if n == 2000:
+                summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/collapsed_levy_bindim_64_abcmethod_SNPE_nsimruns_100000_nsamplesl_1000_nsamplesh_50000_nobs_2000.pickle'
         if model == 'ornstein':
-            summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/ornstein_uhlenbeck_bindim_64_abcmethod_SNPE_nsimruns_1000_nsamples_100.pickle'
+            if n == 1000:
+                summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/collapsed_ornstein_bindim_64_abcmethod_SNPE_nsimruns_100000_nsamplesl_1000_nsamplesh_50000_nobs_1000.pickle'
+            if n == 2000:
+                summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/collapsed_ornstein_bindim_64_abcmethod_SNPE_nsimruns_100000_nsamplesl_1000_nsamplesh_50000_nobs_2000.pickle'
         if model == 'weibull_cdf':
-            summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/weibull_cdf_bindim_64_abcmethod_SNPE_nsimruns_1000_nsamples_100.pickle'
+            if n == 1000:
+                summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/collapsed_weibull_cdf_bindim_64_abcmethod_SNPE_nsimruns_100000_nsamplesl_1000_nsamplesh_50000_nobs_1000.pickle'
+            if n == 2000:
+                summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/collapsed_weibull_cdf_bindim_64_abcmethod_SNPE_nsimruns_100000_nsamplesl_1000_nsamplesh_50000_nobs_2000.pickle'
         if model == 'ddm_sdv':
-            summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/ddm_sdv_bindim_64_abcmethod_SNPE_nsimruns_1000_nsamples_100.pickle'
+            if n == 1000:
+                summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/collapsed_ddm_sdv_bindim_64_abcmethod_SNPE_nsimruns_100000_nsamplesl_1000_nsamplesh_50000_nobs_1000.pickle'
+            if n == 2000:
+                summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/collapsed_ddm_sdv_bindim_64_abcmethod_SNPE_nsimruns_100000_nsamplesl_1000_nsamplesh_50000_nobs_2000.pickle'
 
 
 
@@ -1717,9 +2706,68 @@ if __name__ == "__main__":
                  method = mcmc_dict['method'],
                  train_data_type = traindattype)
         
+    if 'a_of_t' in args.plots:
+        print('Data preparation for a_of_t plot')
+        mcmc_dict['a_of_t_dist_in'], mcmc_dict['a_of_t_dist_out'], mcmc_dict['a_of_t_gt_in'], mcmc_dict['a_of_t_gt_out'], mcmc_dict['a_of_t_post_in'], mcmc_dict['a_of_t_post_out'] = a_of_t_data_prep(mcmc_dict = mcmc_dict,
+                                                                                                                                                                                                       model = model,
+                                                                                                                                                                                                       n_eval_points = 1000,
+                                                                                                                                                                                                       max_t = 20,
+                                                                                                                                                                                                       p_lims = [0.05, 0.95],
+                                                                                                                                                                                                       n_posterior_subsample = 10,
+                                                                                                                                                                                                       split_ecdf = False,
+                                                                                                                                                                                                       bnd_epsilon = 0.05)
+        
+        print('Making a_of_t plot')
+        a_of_t_panel(mcmc_dict = mcmc_dict,
+                     model = model,
+                     save = True,
+                     data_signature = '_n_' + str(n) + '_' + now,
+                     train_data_type = traindattype,
+                     method = mcmc_dict['method'])
+
+        
+        
+                                 
+    if 'caterpillar' in args.plots:
+                                 
+        
+        print('Making caterpillar plots ...')
+
+        idx_vecs = [mcmc_dict['euc_dist_means_gt_sorted_id'][:10], 
+                    mcmc_dict['euc_dist_means_gt_sorted_id'][np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - 5), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + 5), 1)],
+                    mcmc_dict['euc_dist_means_gt_sorted_id'][-10:],
+                    np.random.choice(mcmc_dict['gt'].shape[0], size = npostpair)]
+
+        data_signatures = ['_n_' + str(n) + '_euc_dist_mean_low_idx_',
+                          '_n_' + str(n) + '_euc_dist_mean_medium_idx_',
+                          '_n_' + str(n) + '_euc_dist_mean_high_idx_',
+                          '_n_' + str(n) + '_euc_dist_mean_random_idx_']
+
+        title_signatures = [', ' + str(n) + ', Recovery Good',
+                  ', ' + str(n) + ', Reocvery Medium',
+                  ', ' + str(n) + ', Reocvery Bad',
+                   ', ' + str(n) + ', Random ID']
+
+        cnt = 0
+        tot_cnt = 0
+        for idx_vec in idx_vecs:
+            tot_cnt = 0
+            for idx in idx_vec:
+                print('Making Caterpillar plots: ', title_signatures[cnt])
+                caterpillar_plot(posterior_samples = mcmc_dict['posterior_samples'][idx, :, :],
+                                 ground_truths = mcmc_dict['gt'][idx, :],
+                                 model = model,
+                                 data_signature = data_signatures[cnt] + '_' + str(tot_cnt) + '_idx_' + str(idx),
+                                 train_data_type = traindattype,
+                                 machine = 'home',
+                                 method = mcmc_dict['method'],
+                                 save = True)
+                tot_cnt += 1
+            cnt += 1
+
     # PARAMETER RECOVERY PLOTS: KDE MLP
     if "parameter_recovery_scatter" in args.plots:
-        print('Making Parameter Recovery Plot...')
+        print('Making Parameter Recovery Plot ...')
         parameter_recovery_plot(ax_titles = ax_titles,
                                 title = 'Parameter Recovery: ' + model,
                                 ground_truths = mcmc_dict['gt'],
@@ -1804,8 +2852,46 @@ if __name__ == "__main__":
                                          train_data_type = traindattype)
                 tot_cnt += 1
             cnt += 1
+    
+    if "posterior_pair_alt" in args.plots:
+        print('Making Posterior Pair Plots...')
+        idx_vecs = [mcmc_dict['euc_dist_means_gt_sorted_id'][:10], 
+                    mcmc_dict['euc_dist_means_gt_sorted_id'][np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - 5), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + 5), 1)],
+                    mcmc_dict['euc_dist_means_gt_sorted_id'][-10:],
+                    np.random.choice(mcmc_dict['gt'].shape[0], size = npostpair)]
 
-        
+        data_signatures = ['_n_' + str(n) + '_euc_dist_mean_low_idx_',
+                           '_n_' + str(n) + '_euc_dist_mean_medium_idx_',
+                           '_n_' + str(n) + '_euc_dist_mean_high_idx_',
+                           '_n_' + str(n) + '_euc_dist_mean_random_idx_']
+
+        title_signatures = [', ' + str(n) + ', Recovery Good',
+                            ', ' + str(n) + ', Reocvery Medium',
+                            ', ' + str(n) + ', Reocvery Bad',
+                            ', ' + str(n) + ', Random ID']
+
+        cnt = 0
+        tot_cnt = 0
+        for idx_vec in idx_vecs:
+            tot_cnt = 0
+            for idx in idx_vec:
+                print('Making Posterior Pair Plot: ', title_signatures[cnt])
+                make_posterior_pair_grid_alt(posterior_samples =  pd.DataFrame(mcmc_dict['posterior_samples'][idx, :, :],
+                                                                               columns = ax_titles),
+                                             gt =  mcmc_dict['gt'][idx, :],
+                                             height = 8,
+                                             aspect = 1,
+                                             n_subsample = 2000,
+                                             data_signature = data_signatures[cnt] + '_' + str(tot_cnt) + '_idx_' + str(idx),
+                                             title_signature = title_signatures[cnt],
+                                             gt_available = True,
+                                             save = True,
+                                             model = model,
+                                             method = mcmc_dict['method'],
+                                             train_data_type = traindattype)
+                tot_cnt += 1
+            cnt += 1
+    
     # MODEL UNCERTAINTY PLOTS
     if "model_uncertainty" in args.plots:
         if model == 'angle' or model == 'weibull_cdf' or model == 'angle2' or model == 'ddm' or model == 'weibull_cdf2':
@@ -1837,7 +2923,8 @@ if __name__ == "__main__":
                                         train_data_type = traindattype)
                 cnt += 1
             
-            
+    
+
     # POSTERIOR PREDICTIVE PLOTS
     if "posterior_predictive" in args.plots:
         print('Making Posterior Predictive Plots...')
@@ -1883,4 +2970,126 @@ if __name__ == "__main__":
                                           save = True,
                                           method = mcmc_dict['method'],
                                           train_data_type = traindattype)
-            cnt += 1
+            cnt += 1                             
+                                 
+                                 
+                                 
+                                 
+    # MODEL UNCERTAINTY PLOTS
+    if "model_uncertainty" in args.plots:
+        if model == 'angle' or model == 'weibull_cdf' or model == 'angle2' or model == 'ddm' or model == 'weibull_cdf2':
+            print('Making Model Uncertainty Plots...')
+            idx_vecs = [mcmc_dict['euc_dist_means_gt_sorted_id'][:npostpred], 
+                        mcmc_dict['euc_dist_means_gt_sorted_id'][np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - 5), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + 5), 1)],
+                        mcmc_dict['euc_dist_means_gt_sorted_id'][-npostpred:]]
+
+            data_signatures = ['_n_' + str(n) + '_euc_dist_mean_low_',
+                               '_n_' + str(n) + '_euc_dist_mean_medium_',
+                               '_n_' + str(n) + '_euc_dist_mean_high_',]
+
+            cnt = 0
+            for idx_vec in idx_vecs:
+                print('Making Model Uncertainty Plots... sets: ', cnt)
+                boundary_posterior_plot(ax_titles = [str(i) for i in idx_vec], 
+                                        title = 'Model Uncertainty: ',
+                                        posterior_samples = mcmc_dict['posterior_samples'][idx_vec, :, :], # dat_total[1][bottom_idx, 5000:, :],
+                                        ground_truths = mcmc_dict['gt'][idx_vec, :], #dat_total[0][bottom_idx, :],
+                                        cols = 3,
+                                        model = model, # 'weibull_cdf',
+                                        data_signature = data_signatures[cnt],
+                                        n_post_params = 2000,
+                                        samples_by_param = 10,
+                                        max_t = 10,
+                                        show = True,
+                                        save = True,
+                                        method = mcmc_dict['method'],
+                                        train_data_type = traindattype)
+                cnt += 1
+                                 
+                                 
+    # POSTERIOR PREDICTIVE PLOTS
+    if "posterior_predictive_alt" in args.plots:
+        print('Making Posterior Predictive Plots...')
+        idx_vecs = [mcmc_dict['euc_dist_means_gt_sorted_id'][:10], 
+                    mcmc_dict['euc_dist_means_gt_sorted_id'][np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - 5), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + 5), 1)],
+                    mcmc_dict['euc_dist_means_gt_sorted_id'][-10:]]
+
+        data_signatures = ['_n_' + str(n) + '_euc_dist_mean_low_',
+                           '_n_' + str(n) + '_euc_dist_mean_medium_',
+                           '_n_' + str(n) + '_euc_dist_mean_high_',]
+
+        cnt = 0
+        for idx_vec in idx_vecs:
+            print('Making Posterior Predictive Plots... set: ', cnt)
+            if 'race' in model or 'lca' in model:
+                if cnt != 0 or 'race' in model:
+                    posterior_predictive_plot_race_lca(ax_titles = [str(i) for i in idx_vec], 
+                                                    title = 'Posterior Predictive',
+                                                    x_labels = [],
+                                                    posterior_samples = mcmc_dict['posterior_samples'][idx_vec, :, :],
+                                                    ground_truths = mcmc_dict['gt'][idx_vec, :],
+                                                    cols = 3,
+                                                    model = model,
+                                                    data_signature = data_signatures[cnt],
+                                                    n_post_params = 2000,
+                                                    samples_by_param = 10,
+                                                    show = True,
+                                                    save = True, 
+                                                    method = mcmc_dict['method'],
+                                                    train_data_type = traindattype)
+                                                                
+            else:
+                model_plot(posterior_samples = mcmc_dict['posterior_samples'][idx_vec, :, :],
+                          ground_truths = mcmc_dict['gt'][idx_vec, :, :],
+                          cols = 3,
+                          model = model,
+                          n_post_params = 2000,
+                          n_plots = 9,
+                          samples_by_param = 10,
+                          max_t = 5,
+                          input_hddm_trace = False,
+                          #datatype = 'single_subject', # 'hierarchical', 'single_subject', 'condition'
+                          show_model = False,
+                          save = True,
+                          machine = 'home',
+                          data_signature = data_signatures[cnt],
+                          train_data_type = traindattype,
+                          method = mcmc_dict['method'])
+            cnt += 1  
+                                 
+                                 
+    # MODEL UNCERTAINTY PLOTS
+    if "model_uncertainty_alt" in args.plots:
+        if model == 'angle' or model == 'weibull_cdf' or model == 'angle2' or model == 'ddm' or model == 'weibull_cdf2':
+            print('Making Model Uncertainty Plots...')
+            idx_vecs = [mcmc_dict['euc_dist_means_gt_sorted_id'][:npostpred], 
+                        mcmc_dict['euc_dist_means_gt_sorted_id'][np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - 5), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + 5), 1)],
+                        mcmc_dict['euc_dist_means_gt_sorted_id'][-npostpred:]]
+
+            data_signatures = ['_n_' + str(n) + '_euc_dist_mean_low_',
+                               '_n_' + str(n) + '_euc_dist_mean_medium_',
+                               '_n_' + str(n) + '_euc_dist_mean_high_',]
+
+            cnt = 0
+            for idx_vec in idx_vecs:
+                print('Making Model Uncertainty Plots... sets: ', cnt)
+                                                 
+                model_plot(posterior_samples = mcmc_dict['posterior_samples'][idx_vec, :, :],
+                          ground_truths = mcmc_dict['gt'][idx_vec, :],
+                          cols = 2,
+                          model = model,
+                          n_post_params = 500,
+                          n_plots = 6,
+                          samples_by_param = 10,
+                          max_t = 5,
+                          input_hddm_trace = False,
+                          #datatype = 'single_subject', # 'hierarchical', 'single_subject', 'condition'
+                          show_model = True,
+                          show = False,
+                          save = True,
+                          machine = 'home',
+                          data_signature = data_signatures[cnt],
+                          train_data_type = traindattype,
+                          method = mcmc_dict['method'])
+
+                cnt += 1

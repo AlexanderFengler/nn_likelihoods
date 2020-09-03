@@ -20,14 +20,14 @@
 # --------------------------------------------------------------------
 
 # INITIALIZATIONS ----------------------------------------------------
-declare -a dgps=( "ddm" "angle" "weibull_cdf")
-n_samples=( 50 100 1000 2000 ) 
+declare -a dgps=( "ddm_tutorial" "angle_tutorial" "weibull_cdf_tutorial")
+n_samples=( 1000 ) 
 n_choices=( 2 ) # 3 4 5 6 ) #4 5 6 )
 n_parameter_sets=10  #20000
-n_subjects=( 5 10 20 )
+n_subjects=( 5 )
 n_bins=( 0 )
 binned=0
-mode='mlp'
+mode='test'
 datatype='parameter_recovery_hierarchical'
 machine='other' # 'home' (alex laptop), 'ccv' (oscar), 'x7' (serrelab), 'other' (makes folders in this repo)
 maxt=20

@@ -3,7 +3,8 @@
 
 # plotlist=( "hdi_p" "hdi_coverage" "parameter_recovery_scatter" "model_uncertainty" "posterior_predictive" "posterior_pair") #( "posterior_variance" "hdi_coverage" "hdi_p" "parameter_recovery_scatter" "parameter_recovery_hist" "posterior_pair" "model_uncertainty" "posterior_predictive" )
 #plotlist=( "posterior_pair" "model_uncertainty" )
-plotlist=( "parameter_recovery_scatter" )
+plotlist=( "parameter_recovery_scatter" )  #( "posterior_pair_alt" "model_uncertainty_alt" "a_of_t") #  "a_of_t" ) # "posterior_pair_alt" ) # ( "a_of_t" ) #, 'model_uncertainty' )
+
 # CNN
 
 # # DDM -----------------------------------------------
@@ -127,24 +128,24 @@ plotlist=( "parameter_recovery_scatter" )
 # # # -----------------------------------------------------------
 
 # # # WEIBULL CDF 2 ---------------------------------------------------
-# model="weibull_cdf"
-# machine="home"
-# method="cnn"
-# traindattype="binned"
-# networkidx=-1
-# n=( 1024 4096 )
-# analytic=0
-# rhatcutoff=1.1
-# npostpred=9
-# npostpair=9
-# datafilter='none'
+model="weibull_cdf"
+machine="home"
+method="cnn"
+traindattype="binned"
+networkidx=-1
+n=( 1024 4096 )
+analytic=0
+rhatcutoff=1.1
+npostpred=9
+npostpair=9
+datafilter='none'
 
-# for n_tmp in "${n[@]}"
-# do
-#     python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
-# done
+for n_tmp in "${n[@]}"
+do
+    python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
+done
 
-# # -----------------------------------------------------------
+# -----------------------------------------------------------
 
 
 # # # RACE 3 ---------------------------------------------------
@@ -187,8 +188,7 @@ plotlist=( "parameter_recovery_scatter" )
 
 # # -----------------------------------------------------------
 
-
-# # # LCA 3 ---------------------------------------------------
+# # # # LCA 3 ---------------------------------------------------
 # model="lca_3"
 # machine="home"
 # method="cnn"
@@ -206,8 +206,7 @@ plotlist=( "parameter_recovery_scatter" )
 #     python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
 # done
 
-# # -----------------------------------------------------------
-
+# # # -----------------------------------------------------------
 
 # # LCA 4 ---------------------------------------------------
 # model="lca_4"
@@ -229,10 +228,7 @@ plotlist=( "parameter_recovery_scatter" )
 
 # # -----------------------------------------------------------
 
-
-
 # MLP
-
 # # DDM -----------------------------------------------
 # model="ddm"
 # machine="home"
@@ -412,7 +408,7 @@ plotlist=( "parameter_recovery_scatter" )
 # # # -----------------------------------------------------------
 
 
-# # # WEIBULL CDF 2 ---------------------------------------------------
+# # # # # WEIBULL CDF 2 ---------------------------------------------------
 # model="weibull_cdf2"
 # machine="home"
 # method="mlp"
@@ -428,8 +424,7 @@ plotlist=( "parameter_recovery_scatter" )
 # do
 #     python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]}
 # done
-
-# # -----------------------------------------------------------
+# # # # -----------------------------------------------------------
 
 # # LEVY ------------------------------------------------------------
 # model="levy"
@@ -450,154 +445,139 @@ plotlist=( "parameter_recovery_scatter" )
 # done
 # # # -----------------------------------------------------------
 
-
-
-
 # SBI 
 
-# DDM -----------------------------------------------
-model="ddm"
-machine="home"
-method="sbi"
-traindattype="binned" # 'kde', 'analytic', 'binned'
-networkidx=8
-n=( 1000 )
-analytic=0
-rhatcutoff=1.1
-npostpred=9
-npostpair=9
-datafilter='none'
+# # DDM -----------------------------------------------
+# model="ddm"
+# machine="home"
+# method="sbi"
+# traindattype="binned" # 'kde', 'analytic', 'binned'
+# networkidx=8
+# n=( 1000 )
+# analytic=0
+# rhatcutoff=1.1
+# npostpred=9
+# npostpair=9
+# datafilter='none'
 
-for n_tmp in "${n[@]}"
-do
-    python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
-done
----------------------------------------------------
-
-# Angle -----------------------------------------------
-model="angle"
-machine="home"
-method="sbi"
-traindattype="binned" # 'kde', 'analytic', 'binned'
-networkidx=8
-n=( 1000 )
-analytic=0
-rhatcutoff=1.1
-npostpred=9
-npostpair=9
-datafilter='none'
-
-for n_tmp in "${n[@]}"
-do
-    python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
-done
+# for n_tmp in "${n[@]}"
+# do
+#     python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
+# done
 # ---------------------------------------------------
 
+# # Angle -----------------------------------------------
+# model="angle"
+# machine="home"
+# method="sbi"
+# traindattype="binned" # 'kde', 'analytic', 'binned'
+# networkidx=8
+# n=( 1000 2000 )
+# analytic=0
+# rhatcutoff=1.1
+# npostpred=9
+# npostpair=9
+# datafilter='none'
 
-# Weibull CDF -----------------------------------------------
-model="weibull_cdf"
-machine="home"
-method="sbi"
-traindattype="binned" # 'kde', 'analytic', 'binned'
-networkidx=8
-n=( 1000 )
-analytic=0
-rhatcutoff=1.1
-npostpred=9
-npostpair=9
-datafilter='none'
-
-for n_tmp in "${n[@]}"
-do
-    python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
-done
-# ---------------------------------------------------
-
-
-# Levy -----------------------------------------------
-model="levy"
-machine="home"
-method="sbi"
-traindattype="binned" # 'kde', 'analytic', 'binned'
-networkidx=8
-n=( 1000 )
-analytic=0
-rhatcutoff=1.1
-npostpred=9
-npostpair=9
-datafilter='none'
-
-for n_tmp in "${n[@]}"
-do
-    python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
-done
-# ---------------------------------------------------
-
-# Levy -----------------------------------------------
-model="ornstein"
-machine="home"
-method="sbi"
-traindattype="binned" # 'kde', 'analytic', 'binned'
-networkidx=8
-n=( 1000 )
-analytic=0
-rhatcutoff=1.1
-npostpred=9
-npostpair=9
-datafilter='none'
-
-for n_tmp in "${n[@]}"
-do
-    python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
-done
-# ---------------------------------------------------
-
-# Full-DDM -----------------------------------------------
-model="full_ddm"
-machine="home"
-method="sbi"
-traindattype="binned" # 'kde', 'analytic', 'binned'
-networkidx=8
-n=( 1000 )
-analytic=0
-rhatcutoff=1.1
-npostpred=9
-npostpair=9
-datafilter='none'
-
-for n_tmp in "${n[@]}"
-do
-    python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
-done
-# ---------------------------------------------------
+# for n_tmp in "${n[@]}"
+# do
+#     python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
+# done
+# # ---------------------------------------------------
 
 
+# # Weibull CDF -----------------------------------------------
+# model="weibull_cdf"
+# machine="home"
+# method="sbi"
+# traindattype="binned" # 'kde', 'analytic', 'binned'
+# networkidx=8
+# n=( 1000 2000 )
+# analytic=0
+# rhatcutoff=1.1
+# npostpred=9
+# npostpair=9
+# datafilter='none'
 
-# DDM_SDV -----------------------------------------------
-model="ddm_sdv"
-machine="home"
-method="sbi"
-traindattype="binned" # 'kde', 'analytic', 'binned'
-networkidx=8
-n=( 1000 )
-analytic=0
-rhatcutoff=1.1
-npostpred=9
-npostpair=9
-datafilter='none'
-
-for n_tmp in "${n[@]}"
-do
-    python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
-done
-# ---------------------------------------------------
-
+# for n_tmp in "${n[@]}"
+# do
+#     python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
+# done
+# # ---------------------------------------------------
 
 
+# # Levy -----------------------------------------------
+# model="levy"
+# machine="home"
+# method="sbi"
+# traindattype="binned" # 'kde', 'analytic', 'binned'
+# networkidx=8
+# n=( 1000 2000 )
+# analytic=0
+# rhatcutoff=1.1
+# npostpred=9
+# npostpair=9
+# datafilter='none'
 
+# for n_tmp in "${n[@]}"
+# do
+#     python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
+# done
+# # ---------------------------------------------------
 
+# # Levy -----------------------------------------------
+# model="ornstein"
+# machine="home"
+# method="sbi"
+# traindattype="binned" # 'kde', 'analytic', 'binned'
+# networkidx=8
+# n=( 1000 2000 )
+# analytic=0
+# rhatcutoff=1.1
+# npostpred=9
+# npostpair=9
+# datafilter='none'
 
+# for n_tmp in "${n[@]}"
+# do
+#     python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
+# done
+# # ---------------------------------------------------
 
+# # Full-DDM -----------------------------------------------
+# model="full_ddm"
+# machine="home"
+# method="sbi"
+# traindattype="binned" # 'kde', 'analytic', 'binned'
+# networkidx=8
+# n=( 1000 2000 )
+# analytic=0
+# rhatcutoff=1.1
+# npostpred=9
+# npostpair=9
+# datafilter='none'
 
+# for n_tmp in "${n[@]}"
+# do
+#     python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
+# done
+# # ---------------------------------------------------
 
+# # DDM_SDV -----------------------------------------------
+# model="ddm_sdv"
+# machine="home"
+# method="sbi"
+# traindattype="binned" # 'kde', 'analytic', 'binned'
+# networkidx=8
+# n=( 1000 2000 )
+# analytic=0
+# rhatcutoff=1.1
+# npostpred=9
+# npostpair=9
+# datafilter='none'
 
+# for n_tmp in "${n[@]}"
+# do
+#     python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
+# done
+# # ---------------------------------------------------
