@@ -29,9 +29,9 @@
 # conda deactivate
 # conda activate tf-cpu
 
-source /users/afengler/.bashrc
-conda deactivate
-conda activate tf-gpu-py37
+# source /users/afengler/.bashrc
+# conda deactivate
+# conda activate tf-gpu-py37
 
 # NNBATCH RUNS
 
