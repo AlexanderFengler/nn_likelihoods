@@ -278,6 +278,7 @@ if __name__ == "__main__":
     elif data_type == 'parameter_recovery':
         data = pickle.load(open(method_folder + file_ , 'rb'))
         param_grid = data[0]
+        print(param_grid)
         data_grid = np.squeeze(data[1], axis = 0)
 
         # subset data according to array id so that we  run the sampler only for those datasets
