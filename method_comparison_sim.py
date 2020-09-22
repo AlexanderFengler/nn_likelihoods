@@ -367,6 +367,14 @@ if __name__ == "__main__":
                                  target = mlp_target, 
                                  w = .4 / 1024, 
                                  p = 8)
+            
+            model.sample(data = args[0],
+                         num_samples = nmcmcsamples,
+                         init = args[1],
+                         active_dims = active_dims,
+                         frozen_dim_vals = frozen_dims)
+            
+            return (model.samples, model.lp, 0)
 
         if sampler == 'diffevo':
             model = DifferentialEvolutionSequential(bounds = args[2],
@@ -375,15 +383,15 @@ if __name__ == "__main__":
                                                     gamma = 'auto',
                                                     crp = 0.3)
         
-        (samples, lps, gelman_rubin_r_hat) = model.sample(data = args[0],
-                                                          max_samples = nmcmcsamples,
-                                                          min_samples = 2000,
-                                                          n_burn_in = 1000,
-                                                          init = args[1],
-                                                          active_dims = active_dims,
-                                                          frozen_dim_vals = frozen_dims,
-                                                          gelman_rubin_force_stop = True)
-        return (samples, lps, gelman_rubin_r_hat) # random_seed) # random seed was just to check that we are not passing the same everytime
+            (samples, lps, gelman_rubin_r_hat) = model.sample(data = args[0],
+                                                              max_samples = nmcmcsamples,
+                                                              min_samples = 2000,
+                                                              n_burn_in = 1000,
+                                                              init = args[1],
+                                                              active_dims = active_dims,
+                                                              frozen_dim_vals = frozen_dims,
+                                                              gelman_rubin_force_stop = True)
+            return (samples, lps, gelman_rubin_r_hat) # random_seed) # random seed was just to check that we are not passing the same everytime
 
     # Test navarro-fuss
     def nf_posterior(args): # TODO add active and frozen dim vals
