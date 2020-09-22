@@ -38,7 +38,7 @@ conda activate tf-gpu-py37
 nmcmcsamples=25000
 nbyarrayjob=2
 ncpus=1
-nsamples=( 4096 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
+nsamples=( 1024 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
 method="weibull_cdf2" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
 ids=( -1 )
 machine='ccv'
@@ -58,7 +58,7 @@ do
                                            --datatype parameter_recovery \
                                            --sampler diffevo \
                                            --infileid 1  \
-                                           --outfileid 0  \
+                                           --outfileid 1  \
                                            --activedims 0 1 2 3 4 5 6 \
                                            --samplerinit $samplerinit \
                                            --ncpus $ncpus \
@@ -69,4 +69,4 @@ do
     done
 done
 
-#$SLURM_ARRAY_TASK_ID \
+# --outfileid $SLURM_ARRAY_TASK_ID

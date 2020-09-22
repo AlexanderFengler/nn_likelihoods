@@ -280,6 +280,7 @@ if __name__ == "__main__":
         param_grid = data[0]
         print('param grid')
         print(param_grid)
+        print(param_grid.shape)
         data_grid = np.squeeze(data[1], axis = 0)
 
         # subset data according to array id so that we  run the sampler only for those datasets
