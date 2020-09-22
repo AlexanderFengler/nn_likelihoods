@@ -1,7 +1,5 @@
 # IMPORTS --------------------------------------------------------------------
 # We are not importing tensorflow or keras here
-# import tensorflow as tf
-# from tensorflow import keras
 import os
 import time
 import re
@@ -30,6 +28,7 @@ from scipy.optimize import differential_evolution
 # Sampler
 from samplers import SliceSampler
 from samplers import DifferentialEvolutionSequential
+
 # Analytical Likelihood for ddm
 from cdwiener import batch_fptd
 
@@ -41,7 +40,6 @@ import clba
 import ckeras_to_numpy as ktnp
 
 import keras_to_numpy_class as ktnpc
-
 
 # Tensorflow 
 import tensorflow as tf
@@ -79,7 +77,7 @@ def make_parameter_bounds_for_sampler(method_params = []):
     else: 
         return np.array(param_bounds)
 # -----------------------------------------------------------------------------
-    
+  
 # INITIALIZATIONS -------------------------------------------------------------
 if __name__ == "__main__":
     CLI = argparse.ArgumentParser()
@@ -221,14 +219,10 @@ if __name__ == "__main__":
             print('Loading network from: ')
             print(network_path)
             
-#             global keras_model
+#           Global keras_model
             keras_model = keras.models.load_model(network_path + '/model_final.h5', compile = False)
             
-            
-    if data_type == 'perturbation_experiment':
-        file_ = 'base_data_perturbation_experiment_nexp_1_n_' + str(n_samples) + '_' + infile_id + '.pickle'
-        out_file_signature = 'post_samp_perturbation_experiment_nexp_1_n_' + str(n_samples) + '_' + infile_id                                                                      
-    
+
     if data_type == 'parameter_recovery':
         file_ = 'parameter_recovery_data_binned_0_nbins_0_n_' + str(n_samples) + '/' + method + '_nchoices_2_parameter_recovery_binned_0_nbins_0_nreps_1_n_' + str(n_samples) + '.pickle'
         
@@ -239,7 +233,7 @@ if __name__ == "__main__":
             if not os.path.exists(output_folder + network_id):
                 os.makedirs(output_folder + network_id)
         
-        out_file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' +  str(n_samples) + '_init_' + samplerinit + '_' + infile_id
+        out_file_signature = out_file_signature + 'post_samp_data_param_recov_unif_reps_1_n_' +  str(n_samples) + '_init_' + samplerinit + '_' + infile_id
     
     if data_type == 'real':                                                                        
         file_ = args.infileid
@@ -286,26 +280,24 @@ if __name__ == "__main__":
         param_grid = data[0]
         data_grid = np.squeeze(data[1], axis = 0)
 
-        # subset data according to array id so that we  
+        # subset data according to array id so that we  run the sampler only for those datasets
         data_grid = data_grid[((int(out_file_id) - 1) * n_by_arrayjob) : (int(out_file_id) * n_by_arrayjob), :, :]
         param_grid = param_grid[((int(out_file_id) - 1) * n_by_arrayjob) : (int(out_file_id) * n_by_arrayjob), :]
-
-    elif data_type == 'perturbation_experiment':
-        data = pickle.load(open(output_folder + file_ , 'rb'))
-        param_grid = data[0]
-        data_grid = data[1]
     else:
         print('Unknown Datatype, results will likely not make sense')   
     
-    # 
+    # Sampler initialization
+
+    n_sampler_runs = data_grid.shape[0]
+
     if samplerinit == 'random':
-        init_grid = ['random' for i in range(data_grid.shape[0])]
+        init_grid = ['random' for i in range(n_sampler_runs)]
     elif samplerinit == 'true':
         if not (data_type == 'parameter_recovery' or data_type == 'perturbation_experiment'):
             print('You cannot initialize true parameters if we are dealing with real data....')
         init_grid = data[0]
     elif samplerinit == 'mle':
-        init_grid = ['mle' for i in range(data_grid.shape[0])]
+        init_grid = ['mle' for i in range(n_sampler_runs)]
     
     # Parameter bounds to pass to sampler    
     sampler_param_bounds = make_parameter_bounds_for_sampler(method_params = method_params)
@@ -315,7 +307,7 @@ if __name__ == "__main__":
     sampler_param_bounds[:, 0] = sampler_param_bounds[:, 0] + epsilon_bound_correction
     sampler_param_bounds[:, 1] = sampler_param_bounds[:, 1] - epsilon_bound_correction
 
-    sampler_param_bounds = [sampler_param_bounds for i in range(data_grid.shape[0])]
+    sampler_param_bounds = [sampler_param_bounds for i in range(sampler_param_bounds)]
     
     print('sampler_params_bounds: ' , sampler_param_bounds)
     print('shape sampler param bounds: ', sampler_param_bounds[0].shape)
@@ -345,7 +337,6 @@ if __name__ == "__main__":
         #return np.sum(np.core.umath.maximum(ktnp.predict(mlp_input_batch, weights, biases, activations, n_layers), ll_min))
         return np.sum(np.core.umath.maximum(keras_model.predict_on_batch(mlp_input_batch), ll_min))
 
-
     # NAVARRO FUSS (DDM)
     if 'sdv' in method:
         def nf_target(params, data, likelihood_min = 1e-10):
@@ -365,16 +356,6 @@ if __name__ == "__main__":
                                                        params[3])),
                                                        np.log(likelihood_min)))
 
-    # LBA ANALYTIC 
-    def lba_target(params, data): # TODO add active and frozen dim vals
-        return clba.batch_dlba2(rt = data[:, 0],
-                                choice = data[:, 1],
-                                v = params[:2],
-                                A = params[2],
-                                b = params[3], 
-                                s = params[4],
-                                ndt = params[5])
-
     # Define posterior samplers for respective likelihood functions
     def mlp_posterior(args): # args = (data, true_params)
         scp.random.seed()
@@ -391,15 +372,15 @@ if __name__ == "__main__":
                                                     gamma = 'auto',
                                                     crp = 0.3)
         
-        (samples, lps, gelman_rubin_r_hat, random_seed) = model.sample(data = args[0],
-                                                                       max_samples = nmcmcsamples,
-                                                                       min_samples = 2000,
-                                                                       n_burn_in = 1000,
-                                                                       init = args[1],
-                                                                       active_dims = active_dims,
-                                                                       frozen_dim_vals = frozen_dims,
-                                                                       gelman_rubin_force_stop = True)
-        return (samples, lps, gelman_rubin_r_hat, random_seed)
+        (samples, lps, gelman_rubin_r_hat) = model.sample(data = args[0],
+                                                          max_samples = nmcmcsamples,
+                                                          min_samples = 2000,
+                                                          n_burn_in = 1000,
+                                                          init = args[1],
+                                                          active_dims = active_dims,
+                                                          frozen_dim_vals = frozen_dims,
+                                                          gelman_rubin_force_stop = True)
+        return (samples, lps, gelman_rubin_r_hat) # random_seed) # random seed was just to check that we are not passing the same everytime
 
     # Test navarro-fuss
     def nf_posterior(args): # TODO add active and frozen dim vals
@@ -417,26 +398,16 @@ if __name__ == "__main__":
                                                     gamma = 'auto',
                                                     crp = 0.3)
         
-        (samples, lps, gelman_rubin_r_hat, random_seed) = model.sample(data = args[0],
-                                                                       max_samples = nmcmcsamples,
-                                                                       min_samples = 2000,
-                                                                       n_burn_in = 1000,
-                                                                       init = args[1],
-                                                                       active_dims = active_dims,
-                                                                       frozen_dim_vals = frozen_dims,
-                                                                       gelman_rubin_force_stop = True)
+        (samples, lps, gelman_rubin_r_hat) = model.sample(data = args[0],
+                                                          max_samples = nmcmcsamples,
+                                                          min_samples = 2000,
+                                                          n_burn_in = 1000,
+                                                          init = args[1],
+                                                          active_dims = active_dims,
+                                                          frozen_dim_vals = frozen_dims,
+                                                          gelman_rubin_force_stop = True)
        
-        return (samples, lps, gelman_rubin_r_hat, random_seed)
-
-    def lba_posterior(args):
-        scp.random.seed()
-        model = SliceSampler(bounds = args[2],
-                             target = lba_target,
-                             w = .4 / 1024,
-                             p = 8)
-        
-        model.sample(args[0], max_samples = nmcmcsamples, init = args[1])
-        return model.samples
+        return (samples, lps, gelman_rubin_r_hat) # random_seed)
 
     # Make available the specified amount of cpus
     if n_cpus == 'all':
@@ -445,9 +416,8 @@ if __name__ == "__main__":
         p = mp.Pool(n_cpus)
 
     # Subset parameter and data grid
-    
+    timings = []
     # Run the sampler with correct target as specified above
-    start_time = time.time()
     if n_cpus != 1:
         if method == 'lba_analytic':
             posterior_samples = np.array(p.map(lba_posterior, zip(data_grid,
@@ -464,8 +434,10 @@ if __name__ == "__main__":
     else:
         posterior_samples = ()
         for i in range(n_by_arrayjob):
+            start_time = time.time()
             print('Starting job: ', i)
             print('Ground truth parameters for job: ', param_grid[i, :])
+            
             if analytic and 'ddm' in method:
                 posterior_samples += ((nf_posterior((data_grid[i],
                                                      init_grid[i],
@@ -474,18 +446,40 @@ if __name__ == "__main__":
                 posterior_samples += ((mlp_posterior((data_grid[i],
                                                       init_grid[i],
                                                       sampler_param_bounds[i]))), )
-    end_time = time.time()
-    exec_time = end_time - start_time
-    print('Execution Time: ', exec_time)
+    
+            end_time = time.time()
+            exec_time = end_time - start_time
+            timings.append(exec_time)
+            print('Execution Time: ', exec_time)
     
     # Store files
     print('saving to file')
     if analytic:
-        pickle.dump((param_grid, data_grid, posterior_samples, exec_time),
+        pickle.dump((param_grid, data_grid, posterior_samples, np.array(timings)),
                     open(output_folder + 'analytic/' + out_file_signature + '_' + out_file_id + '.pickle', 'wb'))
         print(output_folder +  out_file_signature + '_' + out_file_id + ".pickle")
-
     else:
         print(output_folder + network_id + out_file_signature + '_' + out_file_id + ".pickle")
-        pickle.dump((param_grid, data_grid, posterior_samples, exec_time), 
+        pickle.dump((param_grid, data_grid, posterior_samples, np.array(timings)), 
                     open(output_folder + network_id + out_file_signature + '_' + out_file_id + ".pickle", "wb"))
+
+# ----------------------------------------------------------
+# # LBA ANALYTIC 
+# def lba_target(params, data): # TODO add active and frozen dim vals
+#     return clba.batch_dlba2(rt = data[:, 0],
+#                             choice = data[:, 1],
+#                             v = params[:2],
+#                             A = params[2],
+#                             b = params[3], 
+#                             s = params[4],
+#                             ndt = params[5])
+# def lba_posterior(args):
+#     scp.random.seed()
+#     model = SliceSampler(bounds = args[2],
+#                             target = lba_target,
+#                             w = .4 / 1024,
+#                             p = 8)
+    
+#     model.sample(args[0], max_samples = nmcmcsamples, init = args[1])
+#     return model.samples
+# ----------------------------------------------------------
