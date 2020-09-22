@@ -35,7 +35,7 @@ conda activate tf-gpu-py37
 
 # NNBATCH RUNS
 
-nmcmcsamples=25000
+nmcmcsamples=2000
 nbyarrayjob=2
 ncpus=1
 nsamples=( 1024 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
@@ -56,7 +56,7 @@ do
                                            --nsamples $n \
                                            --nmcmcsamples $nmcmcsamples \
                                            --datatype parameter_recovery \
-                                           --sampler diffevo \
+                                           --sampler slice \
                                            --infileid 1  \
                                            --outfileid 1  \
                                            --activedims 0 1 2 3 4 5 6 \
