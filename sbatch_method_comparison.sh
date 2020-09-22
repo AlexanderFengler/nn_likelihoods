@@ -58,7 +58,7 @@ do
                                            --datatype parameter_recovery \
                                            --sampler diffevo \
                                            --infileid 1  \
-                                           --outfileid 0  \  #$SLURM_ARRAY_TASK_ID \
+                                           --outfileid 0  \
                                            --activedims 0 1 2 3 4 5 6 \
                                            --samplerinit $samplerinit \
                                            --ncpus $ncpus \
@@ -68,3 +68,5 @@ do
                                            --outfilesig $outfilesignature
     done
 done
+
+#$SLURM_ARRAY_TASK_ID \
