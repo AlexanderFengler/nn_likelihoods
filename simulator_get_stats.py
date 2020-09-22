@@ -76,11 +76,3 @@ if __name__ == "__main__":
     end_time = time.time()
     exec_time = end_time - start_time
     print('Time elapsed: ', exec_time)
-# unused ---------------------------------------------------------------
-    # DDM ANGLE NDT
-#     param_ranges = {'v': [-2.0, 2.0],
-#                     'a': [0.5, 2],
-#                     'w': [0.3, 0.7],
-#                     'ndt': [0, 1],
-#                     'theta': [0, np.pi/2 - 0.2]
-#                     }  

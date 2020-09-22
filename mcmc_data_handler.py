@@ -31,6 +31,7 @@ def collect_datasets_diff_evo(in_files = [],
     orig_params = np.zeros((n_param_sets, n_params))
     orig_data = np.zeros((n_param_sets, n_data, n_choices))
     r_hat_last = np.zeros((n_param_sets))
+    timings = np.zeros((n_param_sets))
     posterior_subsamples = np.zeros((n_param_sets, n_post_samples_by_param, n_params))
     posterior_subsamples_ll = np.zeros((n_param_sets, n_post_samples_by_param))
 
@@ -43,7 +44,8 @@ def collect_datasets_diff_evo(in_files = [],
             # Extract samples and log likelihood sequences
             tmp_samples = np.reshape(tmp_data[2][i][0][:, :, :], (-1, n_params))
             tmp_log_l = np.reshape(tmp_data[2][i][1][:, :], (-1))        
-            
+            tmp_timing = tmp_data[3][i]
+
             # Fill in return datastructures
             posterior_subsamples[(n_param_sets_file * file_cnt) + i, :, :] = tmp_samples[np.random.choice(tmp_samples.shape[0], size = n_post_samples_by_param), :]
             posterior_subsamples_ll[(n_param_sets_file * file_cnt) + i, :] = tmp_log_l[np.random.choice(tmp_log_l.shape[0], size = n_post_samples_by_param)]
@@ -52,11 +54,19 @@ def collect_datasets_diff_evo(in_files = [],
             orig_params[(n_param_sets_file * file_cnt) + i, :] = tmp_data[0][i, :]
             orig_data[(n_param_sets_file * file_cnt) + i, :, :] = tmp_data[1][i, :, :]
             r_hat_last[(n_param_sets_file * file_cnt) + i] = tmp_data[2][i][2][-1]
-            
+            timings[(n_param_sets_file * file_cnt) + i] = tmp_timing
+
         print(file_cnt)
         file_cnt += 1
     
-    out_dict = {'means': means, 'maps': maps, 'gt': orig_params, 'r_hats': r_hat_last, 'posterior_samples': posterior_subsamples, 'posterior_ll': posterior_subsamples_ll, 'data': orig_data}
+    out_dict = {'means': means, 
+                'maps': maps, 
+                'gt': orig_params, 
+                'r_hats': r_hat_last, 
+                'posterior_samples': posterior_subsamples, 
+                'posterior_ll': posterior_subsamples_ll, 
+                'data': orig_data,
+                'timings': timings}
     
     if save == True:
         print('writing to file to ' + out_file)

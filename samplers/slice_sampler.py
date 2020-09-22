@@ -11,6 +11,7 @@ class SliceSampler:
                  p = 8,
                  m = 50,
                  print_interval = 1): # max doubling allowed
+        
         self.optimizer = scp_opt.differential_evolution
         #self.dims = bounds.shape[0]
         self.dims = np.array([i for i in range(len(bounds))])

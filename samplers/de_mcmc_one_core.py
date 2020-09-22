@@ -349,4 +349,4 @@ class DifferentialEvolutionSequential():
             # Here I need to adjust samples so that the final datastructure doesn't have 0 elements
             print( 'Stopped due to max sampler, NOT converged' )
         
-        return (self.samples[:, self.n_burn_in:i, :], self.lps[:, self.n_burn_in:i], self.gelman_rubin_r_hat, self.random_seed)
+        return (self.samples[:, self.n_burn_in:i, :], self.lps[:, self.n_burn_in:i], self.gelman_rubin_r_hat) #, self.random_seed)

@@ -1,6 +1,7 @@
 import os
 import pickle
 import numpy as np
+import math
 import matplotlib
 import matplotlib.pyplot as plt
 import re
@@ -68,6 +69,7 @@ def hdi_eval(posterior_samples = [],
     # Get calibration statistics
     prop_covered_by_param = []
     for i in range(vec.shape[1]):
+        print(vec[:, i])
         prop_covered_by_param.append(np.sum((vec[:, i] > 0.01) * (vec[:, i] < 0.99)) / vec[:, :].shape[0])
     
     prop_covered_all = (vec[:, 0] > 0.01) * (vec[:, 0] < 0.99)
@@ -110,7 +112,7 @@ def clean_mcmc_dict(mcmc_dict = {},
     ok_ids = np.zeros(n_params, dtype = np.bool)
     
     if filter_ == 'choice_p':
-        if method == 'mlp':
+        if method == 'mlp' or method == 'navarro':
             for i in range(n_params):
                 ok_ids[i] = (np.sum(mcmc_dict['data'][i, :, 1] == test_choice) < (n_data * choice_p_lim) and (np.sum(mcmc_dict['data'][i, :, 1] == test_choice) > (n_data * (1 - choice_p_lim))))
         if method == 'cnn':
@@ -186,95 +188,6 @@ def clean_mcmc_dict(mcmc_dict = {},
     mcmc_dict['method'] = method
     
     return mcmc_dict
-
-# def a_of_t_data_prep(mcmc_dict = None,
-#                      model = 'weibull_cdf',
-#                      n_eval_points = 1000,
-#                      max_t = 20,
-#                      p_lims = [0.2, 0.8],
-#                      n_posterior_subsample = 100,
-#                      split_ecdf = False,
-#                      bnd_epsilon = 0.2):
-    
-#     n_posterior_samples = x['posterior_samples'].shape[1]
-#     n_param_sets = x['gt'].shape[0]
-#     n_choices = 2
-#     cdf_list = []
-#     eval_points = np.linspace(0, max_t, n_eval_points)
-    
-#     # boundary_evals = 
-#     dist_in = np.zeros(n_param_sets)
-#     dist_out = np.zeros(n_param_sets)
-    
-#     for i in range(n_param_sets):
-#         if (i % 10) == 0:
-#             print(i)
-#         if model == 'weibull_cdf':
-#             out = cds.ddm_flexbound(v = mcmc_dict['gt'][i, 0],
-#                         a = mcmc_dict['gt'][i, 1],
-#                         w = mcmc_dict['gt'][i, 2],
-#                         ndt = mcmc_dict['gt'][i, 3],
-#                         delta_t = 0.001, 
-#                         s = 1,
-#                         max_t = 20, 
-#                         n_samples = 20000,
-#                         boundary_fun = bf.weibull_cdf,
-#                         boundary_multiplicative = True,
-#                         boundary_params = {'alpha': mcmc_dict['gt'][i, 4],
-#                                            'beta': mcmc_dict['gt'][i, 5]})
-            
-#             in_ = np.zeros(n_eval_points, dtype = np.bool)
-#             if split_ecdf:
-                
-#                 bin_c = [0, 0]
-#                 if np.sum(out[1] == - 1) > 0:
-#                     bin_c[0] = 1
-#                     out_cdf_0 = ECDF(out[0][out[1] == - 1])
-#                     out_cdf_0_eval = out_cdf_0(eval_points)
-#                 if np.sum(out[1] == 1) > 0:
-#                     bin_c[1] = 1
-#                     out_cdf_1 = ECDF(out[0][out[1] == 1])
-#                     out_cdf_1_eval = out_cdf_1(eval_points)
-
-#                 cnt = 0
-# #                 in_ = np.zeros(n_eval_points, dtype = np.bool)
-
-#                 for c in bin_c:
-#                     if c == 1:
-#                         if cnt == 0:
-#                             in_ += ((out_cdf_0_eval > p_lims[0]) * (out_cdf_0_eval < p_lims[1]))
-#                         if cnt == 1:
-#                             in_ += ((out_cdf_1_eval > p_lims[0]) * (out_cdf_1_eval < p_lims[1]))
-#                     cnt += 0
-                 
-#             else:
-#                 out_cdf = ECDF(out[0][:, 0])
-#                 out_cdf_eval = out_cdf(eval_points)
-#                 in_ = ((out_cdf_eval > p_lims[0]) * (out_cdf_eval < p_lims[1]))
-                
-#             out_ = np.invert(in_)
-#             gt_bnd = mcmc_dict['gt'][i, 1] * bf.weibull_cdf(eval_points, 
-#                                                             alpha = mcmc_dict['gt'][i, 4],
-#                                                             beta = mcmc_dict['gt'][i, 5])
-            
-#             tmp_in = np.zeros(n_posterior_subsample)
-#             tmp_out = np.zeros(n_posterior_subsample)
-            
-#             for j in range(n_posterior_subsample):
-#                 idx = np.random.choice(n_posterior_samples)
-#                 post_bnd_tmp = mcmc_dict['posterior_samples'][i, idx, 1] * bf.weibull_cdf(eval_points,
-#                                                                                           alpha = mcmc_dict['posterior_samples'][i, idx , 4],
-#                                                                                           beta = mcmc_dict['posterior_samples'][i, idx , 5])
-                
-                
-#                 #np.mean(  np.square( np.maximum(gt_bnd[in_], 0) - np.maximum(post_bnd_tmp[in_], 0) ) )
-                
-#                 tmp_in[j] = np.mean(  np.square( np.maximum(gt_bnd[in_], 0) - np.maximum(post_bnd_tmp[in_], 0) ) [(gt_bnd[in_] > bnd_epsilon) * (post_bnd_tmp[in_] > bnd_epsilon)] )
-#                 tmp_out[j] = np.mean(  np.square( np.maximum(gt_bnd[out_], 0) - np.maximum(post_bnd_tmp[out_], 0) ) [(gt_bnd[out_] > bnd_epsilon) * (post_bnd_tmp[out_] > bnd_epsilon)] )
-            
-#             dist_in[i] = np.mean(tmp_in)
-#             dist_out[i] = np.mean(tmp_out)
-#     return dist_in, dist_out     
 
 def a_of_t_data_prep(mcmc_dict = {},
                      model = 'weibull_cdf',
@@ -450,9 +363,10 @@ def parameter_recovery_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
                             method = 'cnn',
                             statistic = 'mean',
                             data_signature = '',
-                            train_data_type = ''): # color_param 'none' 
+                            train_data_type = '',
+                            plot_format = 'svg'): # color_param 'none' 
     
-    #matplotlib.rcParams['text.usetex'] = True
+    matplotlib.rcParams['text.usetex'] = True
     #matplotlib.rcParams['pdf.fonttype'] = 42
     matplotlib.rcParams['svg.fonttype'] = 'none'
     
@@ -493,8 +407,6 @@ def parameter_recovery_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
         unity_coords = np.linspace(*ax[row_tmp, col_tmp].get_xlim())
         ax[row_tmp, col_tmp].plot(unity_coords, unity_coords, color = 'red')
         
-        # ax.plot(x, x)
-
         ax[row_tmp, col_tmp].text(0.6, 0.1, '$R^2$: ' + r2_vec[i], 
                                   transform = ax[row_tmp, col_tmp].transAxes, 
                                   fontsize = 22)
@@ -521,9 +433,13 @@ def parameter_recovery_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
         figure_name = 'parameter_recovery_plot_' + statistic + '_'
         plt.subplots_adjust(top = 0.9)
         plt.subplots_adjust(hspace = 0.3, wspace = 0.3)
-        #plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300, )
-        #plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.svg', format = 'svg', transparent = True, frameon = False) #dpi = 300, )
-        plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.pdf', format = 'pdf', transparent = True, frameon = False) #dpi = 300, )
+        if plot_format == 'png':
+            plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300)
+        if plot_format == 'svg':
+            plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.svg', 
+                        format = 'svg', 
+                        transparent = True,
+                        frameon = False)
         plt.close()
     return #plt.show(block = False)
 
@@ -538,7 +454,13 @@ def parameter_recovery_hist(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
                             posterior_stat = 'mean', # can be 'mean' or 'map'
                             data_signature = '',
                             train_data_type = '',
-                            method = 'cnn'): # color_param 'none' 
+                            method = 'cnn',
+                            plot_format = 'svg'): # color_param 'none' 
+    
+    
+    matplotlib.rcParams['text.usetex'] = True
+    #matplotlib.rcParams['pdf.fonttype'] = 42
+    matplotlib.rcParams['svg.fonttype'] = 'none'
     
     rows = int(np.ceil(len(ax_titles) / cols))
     sns.set(style = "white", 
@@ -562,9 +484,12 @@ def parameter_recovery_hist(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
                      color = 'black',
                      bins = 50,
                      kde = False,
-                     rug = True,
+                     rug = False,
                      rug_kws = {'alpha': 0.2, 'color': 'grey'},
-                     hist_kws = {'alpha': 1, 'range': (-0.5, 0.5), 'edgecolor': 'black'},
+                     hist_kws = {'alpha': 1, 
+                                 'range': (-0.5, 0.5), 
+                                 'edgecolor': 'black',
+                                 'histtype': 'step'},
                      ax = ax[row_tmp, col_tmp])
         
         ax[row_tmp, col_tmp].axvline(x = 0, linestyle = '--', color = 'red', label = 'ground truth') # ymin=0, ymax=1)
@@ -595,7 +520,15 @@ def parameter_recovery_hist(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
         figure_name = 'parameter_recovery_hist_'
         plt.subplots_adjust(top = 0.9)
         plt.subplots_adjust(hspace = 0.3, wspace = 0.3)
-        plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300)
+        
+        if plot_format == 'svg':
+            plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.svg',
+                        format = 'svg', 
+                        transparent = True,
+                        frameon = False)
+        if plot_format == 'png':
+            plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png',
+                        dpi = 300)
         plt.close()
     return #plt.show(block=False)
 
@@ -607,7 +540,12 @@ def posterior_variance_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
                             train_data_type = '',
                             model = '',
                             method = 'cnn',
-                            range_max = 0.4):
+                            range_max = 0.4,
+                            plot_format = 'svg'):
+    
+    matplotlib.rcParams['text.usetex'] = True
+    #matplotlib.rcParams['pdf.fonttype'] = 42
+    matplotlib.rcParams['svg.fonttype'] = 'none'
 
     rows = int(np.ceil(len(ax_titles) / cols))
     sns.set(style = "white", 
@@ -632,8 +570,11 @@ def posterior_variance_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
                      bins = 50,
                      kde = False,
                      rug = True,
-                     rug_kws = {'alpha': 0.2, 'color': 'grey'},
-                     hist_kws = {'alpha': 1, 'range': (0, range_max), 'edgecolor': 'black'},
+                     rug_kws = {'alpha': 0.2, 'color': 'black'},
+                     hist_kws = {'alpha': 1, 
+                                 'range': (0, range_max), 
+                                 'edgecolor': 'black',
+                                 'histtype:': 'step'},
                      ax = ax[row_tmp, col_tmp])
         
         ax[row_tmp, col_tmp].set_xlabel(ax_titles[i], 
@@ -659,7 +600,14 @@ def posterior_variance_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
         figure_name = 'posterior_variance_plot_'
         plt.subplots_adjust(top = 0.9)
         plt.subplots_adjust(hspace = 0.3, wspace = 0.3)
-        plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300, )
+        
+        if plot_format == 'png':
+            plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300, )
+        if plot_format == 'svg':
+            plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.svg',
+                        format = 'svg', 
+                        transparent = True,
+                        frameon = False)
         plt.close()
     return #plt.show(block = False)
 
@@ -671,7 +619,12 @@ def hdi_p_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
                model = '',
                data_signature = '',
                train_data_type = '',
-               method = 'cnn'):
+               method = 'cnn',
+               plot_format = 'svg'):
+    
+    matplotlib.rcParams['text.usetex'] = True
+    #matplotlib.rcParams['pdf.fonttype'] = 42
+    matplotlib.rcParams['svg.fonttype'] = 'none'
 
     rows = int(np.ceil(len(ax_titles) / cols))
     sns.set(style = "white", 
@@ -697,7 +650,9 @@ def hdi_p_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
                      kde = False,
                      rug = False,
                      rug_kws = {'alpha': 0.2, 'color': 'grey'},
-                     hist_kws = {'alpha': 1, 'edgecolor': 'black'},
+                     hist_kws = {'alpha': 1, 
+                                 'edgecolor': 'black',
+                                 'histtype': 'step'},
                      ax = ax[row_tmp, col_tmp])
         
         ax[row_tmp, col_tmp].set_xlabel(ax_titles[i], 
@@ -722,7 +677,15 @@ def hdi_p_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
         figure_name = 'hdi_p_plot_'
         plt.subplots_adjust(top = 0.9)
         plt.subplots_adjust(hspace = 0.3, wspace = 0.3)
-        plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300, )
+        
+        if plot_format == 'png':
+            plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300, )
+        if plot_format == 'svg':
+            plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.svg',
+                        format = 'svg', 
+                        transparent = True,
+                        frameon = False)
+        
         plt.close()
     return #plt.show(block = False)
 
@@ -734,6 +697,10 @@ def sbc_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
              data_signature = '',
              train_data_type = '',
              method = 'cnn'):
+    
+    matplotlib.rcParams['text.usetex'] = True
+    #matplotlib.rcParams['pdf.fonttype'] = 42
+    matplotlib.rcParams['svg.fonttype'] = 'none'
 
     rows = int(np.ceil(len(ax_titles) / cols))
     sns.set(style = "white", 
@@ -785,7 +752,14 @@ def sbc_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
         plt.subplots_adjust(top = 0.9)
         plt.subplots_adjust(hspace = 0.3, 
                             wspace = 0.3)
-        plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300, )
+        
+        if plot_format == 'png':
+            plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300, )
+        if plot_format == 'svg':
+            plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.svg',
+                        format = 'svg', 
+                        transparent = True,
+                        frameon = False)
         plt.close()
     return #plt.show(block = False)
 
@@ -795,7 +769,12 @@ def hdi_coverage_plot(ax_titles = [],
                       model = '',
                       data_signature = '',
                       train_data_type = '',
-                      method = 'cnn'):
+                      method = 'cnn',
+                      plot_format = 'svg'):
+    
+    matplotlib.rcParams['text.usetex'] = True
+    #matplotlib.rcParams['pdf.fonttype'] = 42
+    matplotlib.rcParams['svg.fonttype'] = 'none'
     
     plt.bar(ax_titles, 
             coverage_probabilities,
@@ -814,7 +793,14 @@ def hdi_coverage_plot(ax_titles = [],
                 os.mkdir(fig_dir)
         
         figure_name = 'hdi_coverage_plot_'
-        plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300, )
+        if plot_format == 'png':
+            plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300, )
+        if plot_format == 'svg':
+            plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.svg',
+                        format = 'svg', 
+                        transparent = True,
+                        frameon = False)
+        
         plt.close()
     return #plt.show(block = False)
 
@@ -860,7 +846,12 @@ def a_of_t_panel(mcmc_dict = None,
                  data_signature = '',
                  train_data_type = '',
                  method = 'mlp',
-                 z_score_xy = (0.14, 30)):
+                 z_score_xy = (0.14, 30),
+                 plot_format = 'svg'):
+    
+    matplotlib.rcParams['text.usetex'] = True
+    #matplotlib.rcParams['pdf.fonttype'] = 42
+    matplotlib.rcParams['svg.fonttype'] = 'none'
 
     # Basic plot hyperparameters
     fig, ax = plt.subplots(2, 
@@ -994,7 +985,13 @@ def a_of_t_panel(mcmc_dict = None,
                 os.mkdir(fig_dir)
             
             figure_name = 'a_of_t_plot_'
-            plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300)
+            if plot_format == 'png':
+                plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300)
+            if plot_format == 'svg':
+                plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.svg',
+                            format = 'svg', 
+                            transparent = True,
+                            frameon = False)
             plt.close()
 
     return
@@ -1013,7 +1010,12 @@ def posterior_predictive_plot(ax_titles = [],
                               save = False,
                               show = False,
                               machine = 'home',
-                              method = 'cnn'):
+                              method = 'cnn',
+                              plot_format = 'svg'):
+    
+    matplotlib.rcParams['text.usetex'] = True
+    #matplotlib.rcParams['pdf.fonttype'] = 42
+    matplotlib.rcParams['svg.fonttype'] = 'none'
     
     rows = int(np.ceil(len(ax_titles) / cols))
     sns.set(style = "white", 
@@ -1098,7 +1100,13 @@ def posterior_predictive_plot(ax_titles = [],
         #plt.tight_layout()
         plt.subplots_adjust(top = 0.9)
         plt.subplots_adjust(hspace = 0.3, wspace = 0.3)
-        plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300) #  bbox_inches = 'tight')
+        if plot_format == 'png':
+            plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300) #  bbox_inches = 'tight')
+        if plot_format == 'svg':
+            plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.svg',
+                            format = 'svg', 
+                            transparent = True,
+                            frameon = False)
         plt.close()
     if show:
         return #plt.show(block = False)
@@ -1123,7 +1131,12 @@ def posterior_predictive_plot_race_lca(ax_titles = ['hiconf_go_stnhi.txt',
                                         save = False,
                                         max_t = 10,
                                         method = [],
-                                        train_data_type = ''):
+                                        train_data_type = '',
+                                        plot_format = 'svg'):
+    
+    matplotlib.rcParams['text.usetex'] = True
+    #matplotlib.rcParams['pdf.fonttype'] = 42
+    matplotlib.rcParams['svg.fonttype'] = 'none'
 
     rows = int(np.ceil(len(ax_titles) / cols))
     print('nrows: ', rows)
@@ -1398,7 +1411,13 @@ def posterior_predictive_plot_race_lca(ax_titles = ['hiconf_go_stnhi.txt',
         #plt.tight_layout()
         plt.subplots_adjust(top = 0.9)
         plt.subplots_adjust(hspace = 0.3, wspace = 0.3)
-        plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300) #  bbox_inches = 'tight')
+        if plot_format == 'png':
+            plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300) #  bbox_inches = 'tight')
+        if plot_format == 'svg':
+            plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.svg',
+                            format = 'svg', 
+                            transparent = True,
+                            frameon = False)
         plt.close()
     if show:
         return #plt.show(block = False)
@@ -1423,7 +1442,12 @@ def model_plot(posterior_samples = None,
                machine = 'home',
                data_signature = '',
                train_data_type = '',
-               method = 'cnn'):
+               method = 'cnn',
+               plot_format = 'svg'):
+    
+    matplotlib.rcParams['text.usetex'] = True
+    #matplotlib.rcParams['pdf.fonttype'] = 42
+    matplotlib.rcParams['svg.fonttype'] = 'none'
     
     if 'weibull_cdf' in model:
         model = 'weibull_cdf'
@@ -1942,7 +1966,14 @@ def model_plot(posterior_samples = None,
         #plt.tight_layout()
         plt.subplots_adjust(top = 0.9)
         plt.subplots_adjust(hspace = 0.3, wspace = 0.3)
-        plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300) #  bbox_inches = 'tight')
+        
+        if plot_format == 'png':
+            plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.png', dpi = 300) #  bbox_inches = 'tight')
+        if plot_format == 'svg':
+            plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.svg',
+                            format = 'svg', 
+                            transparent = True,
+                            frameon = False)
         plt.close()
     if show:
         return plt.show(block = False)
@@ -1966,7 +1997,12 @@ def boundary_posterior_plot(ax_titles = ['hi-hi', 'hi-lo', 'hi-mid', 'lo-hi', 'l
                             show = True,
                             save = False,
                             machine = 'home',
-                            method = 'cnn'):
+                            method = 'cnn',
+                            plot_format = 'svg'):
+    
+    matplotlib.rcParams['text.usetex'] = True
+    #matplotlib.rcParams['pdf.fonttype'] = 42
+    matplotlib.rcParams['svg.fonttype'] = 'none'
     
     tmp_simulator = partial(simulator, model = model, delta_t = 0.001, max_t = 20, bin_dim = None)
     
@@ -2291,7 +2327,12 @@ def make_posterior_pair_grid_alt(posterior_samples = [],
                                  method = 'cnn',
                                  save = True,
                                  title_signature = None,
-                                 train_data_type = ''):
+                                 train_data_type = '',
+                                 plot_format = 'svg'):
+    
+    matplotlib.rcParams['text.usetex'] = True
+    #matplotlib.rcParams['pdf.fonttype'] = 42
+    matplotlib.rcParams['svg.fonttype'] = 'none'
     
     #sns.set(font_scale = 1.5)
     if 'weibull_cdf' in model:
@@ -2369,12 +2410,20 @@ def make_posterior_pair_grid_alt(posterior_samples = [],
             fig_dir = "/users/afengler/OneDrive/git_repos/nn_likelihoods/figures/" + method + "/posterior_covariance_alt"
         if not os.path.isdir(fig_dir):
             os.mkdir(fig_dir)
-
-    plt.savefig(fig_dir + '/' + 'cov_' + model + data_signature + '_' + train_data_type + '.png', 
-                dpi = 300, 
-                transparent = False,
-                bbox_inches = 'tight',
-                bbox_extra_artists = [my_suptitle])
+    
+    if plot_format == 'png':
+        plt.savefig(fig_dir + '/' + 'cov_' + model + data_signature + '_' + train_data_type + '.png', 
+                    dpi = 300, 
+                    transparent = False,
+                    bbox_inches = 'tight',
+                    bbox_extra_artists = [my_suptitle])
+    if plot_format == 'svg':
+        plt.savefig(fig_dir + '/' + 'cov_' + model + data_signature + '_' + train_data_type + '.svg',
+                    format = 'svg', 
+                    transparent = True,
+                    bbox_inches = 'tight',
+                    bbox_extra_artists = [my_suptitle],
+                    frameon = False)
     plt.close()
 
     # Show
@@ -2387,7 +2436,12 @@ def caterpillar_plot(posterior_samples = [],
                      train_data_type = '',
                      machine = 'home',
                      method = 'cnn',
-                     save = True):
+                     save = True,
+                     plot_format = 'svg'):
+    
+    matplotlib.rcParams['text.usetex'] = True
+    #matplotlib.rcParams['pdf.fonttype'] = 42
+    matplotlib.rcParams['svg.fonttype'] = 'none'
     
     sns.set(style = "white", 
             palette = "muted", 
@@ -2430,12 +2484,21 @@ def caterpillar_plot(posterior_samples = [],
             fig_dir = "/users/afengler/OneDrive/git_repos/nn_likelihoods/figures/" + method + "/caterpillar"
             if not os.path.isdir(fig_dir):
                 os.mkdir(fig_dir)
-
-        plt.savefig(fig_dir + '/' + 'caterpillar_' + model + data_signature + '_' + train_data_type + '.png', 
-                    dpi = 300, 
-                    transparent = False,
-                    bbox_inches = 'tight',
-                    bbox_extra_artists = [my_suptitle])
+        
+        if plot_format == 'png':
+            plt.savefig(fig_dir + '/' + 'caterpillar_' + model + data_signature + '_' + train_data_type + '.png', 
+                        dpi = 300, 
+                        transparent = False,
+                        bbox_inches = 'tight',
+                        bbox_extra_artists = [my_suptitle])
+        if plot_format == 'svg':
+            plt.savefig(fig_dir + '/' + 'caterpillar_' + model + data_signature + '_' + train_data_type + '.svg',
+                            format = 'svg', 
+                            transparent = True,
+                            bbox_inches = 'tight',
+                            bbox_extra_artists = [my_suptitle],
+                            frameon = False)
+        
         plt.close()
     # Show
     return #plt.show(block = False)
@@ -2456,7 +2519,12 @@ def make_posterior_pair_grid(posterior_samples = [],
                              save = True,
                              model = None,
                              machine = 'home',
-                             method = 'cnn'):
+                             method = 'cnn',
+                             plot_format = 'svg'):
+    
+    matplotlib.rcParams['text.usetex'] = True
+    #matplotlib.rcParams['pdf.fonttype'] = 42
+    matplotlib.rcParams['svg.fonttype'] = 'none'
     
     g = sns.PairGrid(posterior_samples.sample(n_subsample), 
                      height = height / len(list(posterior_samples.keys())),
@@ -2504,12 +2572,20 @@ def make_posterior_pair_grid(posterior_samples = [],
             fig_dir = "/users/afengler/OneDrive/git_repos/nn_likelihoods/figures/" + method + "/posterior_covariance"
             if not os.path.isdir(fig_dir):
                 os.mkdir(fig_dir)
-                
-        plt.savefig(fig_dir + '/' + 'covalt_' + model + data_signature + '_' + train_data_type + '.png', 
-                    dpi = 300, 
-                    transparent = False,
-                    bbox_inches = 'tight',
-                    bbox_extra_artists = [my_suptitle])
+        
+        if plot_format == 'png':
+            plt.savefig(fig_dir + '/' + 'covalt_' + model + data_signature + '_' + train_data_type + '.png', 
+                        dpi = 300, 
+                        transparent = False,
+                        bbox_inches = 'tight',
+                        bbox_extra_artists = [my_suptitle])
+        if plot_format == 'svg':
+            plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.svg',
+                        format = 'svg', 
+                        transparent = True,
+                        bbox_inches = 'tight',
+                        bbox_extra_artists = [my_suptitle],
+                        frameon = False)
         plt.close()
     # Show
     return #plt.show(block = False)
@@ -2555,7 +2631,6 @@ if __name__ == "__main__":
                      type = str,
                      default = 'choice_p')
     
-    
     args = CLI.parse_args()
     print(args)
     print(args.plots)
@@ -2571,6 +2646,10 @@ if __name__ == "__main__":
     npostpred = args.npostpred
     npostpair = args.npostpair
     datafilter = args.datafilter
+    
+    matplotlib.rcParams['text.usetex'] = True
+    #matplotlib.rcParams['pdf.fonttype'] = 42
+    matplotlib.rcParams['svg.fonttype'] = 'none'
 
 # Folder data 
 # model = 'ddm_sdv'
@@ -2651,16 +2730,18 @@ if __name__ == "__main__":
             if n == 2000:
                 summary_file = '/users/afengler/OneDrive/project_sbi_experiments/posterior_samples/collapsed_ddm_sdv_bindim_64_abcmethod_SNPE_nsimruns_100000_nsamplesl_1000_nsamplesh_50000_nobs_2000.pickle'
 
-
-
     # READ IN SUMMARY FILE
     mcmc_dict = pickle.load(open(summary_file, 'rb'))
+    
+    print(mcmc_dict.keys())
+    print(mcmc_dict['posterior_samples'].shape)
+    
     mcmc_dict = clean_mcmc_dict(mcmc_dict = mcmc_dict,
                                 filter_ = datafilter,
                                 method = method)
     
-    # GENERATE PLOTS:
-    # POSTERIOR VARIANCE PLOT MLP
+#     GENERATE PLOTS:
+#     POSTERIOR VARIANCE PLOT MLP
     if "posterior_variance" in args.plots:
         print('Making Posterior Variance Plot...')
         posterior_variance_plot(ax_titles = ax_titles, 
@@ -2724,18 +2805,14 @@ if __name__ == "__main__":
                      data_signature = '_n_' + str(n) + '_' + now,
                      train_data_type = traindattype,
                      method = mcmc_dict['method'])
-
-        
-        
-                                 
+                           
     if 'caterpillar' in args.plots:
                                  
-        
         print('Making caterpillar plots ...')
 
-        idx_vecs = [mcmc_dict['euc_dist_means_gt_sorted_id'][:10], 
-                    mcmc_dict['euc_dist_means_gt_sorted_id'][np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - 5), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + 5), 1)],
-                    mcmc_dict['euc_dist_means_gt_sorted_id'][-10:],
+        idx_vecs = [mcmc_dict['euc_dist_means_gt_sorted_id'][:npostpair], 
+                    mcmc_dict['euc_dist_means_gt_sorted_id'][np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - math.ceil(npostpair / 2)), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + math.ceil(npostpair / 2)), 1)],
+                    mcmc_dict['euc_dist_means_gt_sorted_id'][-npostpair:],
                     np.random.choice(mcmc_dict['gt'].shape[0], size = npostpair)]
 
         data_signatures = ['_n_' + str(n) + '_euc_dist_mean_low_idx_',
@@ -2817,9 +2894,9 @@ if __name__ == "__main__":
     # random_idx = np.random.choice(mcmc_dict['gt'][mcmc_dict['r_hats'] < r_hat_cutoff, 0].shape[0], size = n_plots)
     if "posterior_pair" in args.plots:
         print('Making Posterior Pair Plots...')
-        idx_vecs = [mcmc_dict['euc_dist_means_gt_sorted_id'][:10], 
-                    mcmc_dict['euc_dist_means_gt_sorted_id'][np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - 5), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + 5), 1)],
-                    mcmc_dict['euc_dist_means_gt_sorted_id'][-10:],
+        idx_vecs = [mcmc_dict['euc_dist_means_gt_sorted_id'][:npostpair], 
+                    mcmc_dict['euc_dist_means_gt_sorted_id'][np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - math.ceil(npostpair / 2)), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + math.ceil(npostpair / 2)), 1)],
+                    mcmc_dict['euc_dist_means_gt_sorted_id'][-npostpair:],
                     np.random.choice(mcmc_dict['gt'].shape[0], size = npostpair)]
 
         data_signatures = ['_n_' + str(n) + '_euc_dist_mean_low_idx_',
@@ -2855,9 +2932,9 @@ if __name__ == "__main__":
     
     if "posterior_pair_alt" in args.plots:
         print('Making Posterior Pair Plots...')
-        idx_vecs = [mcmc_dict['euc_dist_means_gt_sorted_id'][:10], 
-                    mcmc_dict['euc_dist_means_gt_sorted_id'][np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - 5), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + 5), 1)],
-                    mcmc_dict['euc_dist_means_gt_sorted_id'][-10:],
+        idx_vecs = [mcmc_dict['euc_dist_means_gt_sorted_id'][:npostpair], 
+                    mcmc_dict['euc_dist_means_gt_sorted_id'][np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - math.ceil(npostpair / 2)), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + math.ceil(npostpair / 2)), 1)],
+                    mcmc_dict['euc_dist_means_gt_sorted_id'][-npostpair:],
                     np.random.choice(mcmc_dict['gt'].shape[0], size = npostpair)]
 
         data_signatures = ['_n_' + str(n) + '_euc_dist_mean_low_idx_',
@@ -2897,7 +2974,7 @@ if __name__ == "__main__":
         if model == 'angle' or model == 'weibull_cdf' or model == 'angle2' or model == 'ddm' or model == 'weibull_cdf2':
             print('Making Model Uncertainty Plots...')
             idx_vecs = [mcmc_dict['euc_dist_means_gt_sorted_id'][:npostpred], 
-                        mcmc_dict['euc_dist_means_gt_sorted_id'][np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - 5), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + 5), 1)],
+                        mcmc_dict['euc_dist_means_gt_sorted_id'][np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - math.ceil(npostpred / 2)), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + math.ceil(npostpred / 2)), 1)],
                         mcmc_dict['euc_dist_means_gt_sorted_id'][-npostpred:]]
 
             data_signatures = ['_n_' + str(n) + '_euc_dist_mean_low_',
@@ -2924,13 +3001,12 @@ if __name__ == "__main__":
                 cnt += 1
             
     
-
     # POSTERIOR PREDICTIVE PLOTS
     if "posterior_predictive" in args.plots:
         print('Making Posterior Predictive Plots...')
-        idx_vecs = [mcmc_dict['euc_dist_means_gt_sorted_id'][:10], 
-                    mcmc_dict['euc_dist_means_gt_sorted_id'][np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - 5), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + 5), 1)],
-                    mcmc_dict['euc_dist_means_gt_sorted_id'][-10:]]
+        idx_vecs = [mcmc_dict['euc_dist_means_gt_sorted_id'][:npostpred], 
+                    mcmc_dict['euc_dist_means_gt_sorted_id'][np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - math.ceil(npostpred / 2)), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + math.ceil(npostpred / 2)), 1)],
+                    mcmc_dict['euc_dist_means_gt_sorted_id'][-npostpred:]]
 
         data_signatures = ['_n_' + str(n) + '_euc_dist_mean_low_',
                            '_n_' + str(n) + '_euc_dist_mean_medium_',
@@ -2971,48 +3047,14 @@ if __name__ == "__main__":
                                           method = mcmc_dict['method'],
                                           train_data_type = traindattype)
             cnt += 1                             
-                                 
-                                 
-                                 
-                                 
-    # MODEL UNCERTAINTY PLOTS
-    if "model_uncertainty" in args.plots:
-        if model == 'angle' or model == 'weibull_cdf' or model == 'angle2' or model == 'ddm' or model == 'weibull_cdf2':
-            print('Making Model Uncertainty Plots...')
-            idx_vecs = [mcmc_dict['euc_dist_means_gt_sorted_id'][:npostpred], 
-                        mcmc_dict['euc_dist_means_gt_sorted_id'][np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - 5), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + 5), 1)],
-                        mcmc_dict['euc_dist_means_gt_sorted_id'][-npostpred:]]
-
-            data_signatures = ['_n_' + str(n) + '_euc_dist_mean_low_',
-                               '_n_' + str(n) + '_euc_dist_mean_medium_',
-                               '_n_' + str(n) + '_euc_dist_mean_high_',]
-
-            cnt = 0
-            for idx_vec in idx_vecs:
-                print('Making Model Uncertainty Plots... sets: ', cnt)
-                boundary_posterior_plot(ax_titles = [str(i) for i in idx_vec], 
-                                        title = 'Model Uncertainty: ',
-                                        posterior_samples = mcmc_dict['posterior_samples'][idx_vec, :, :], # dat_total[1][bottom_idx, 5000:, :],
-                                        ground_truths = mcmc_dict['gt'][idx_vec, :], #dat_total[0][bottom_idx, :],
-                                        cols = 3,
-                                        model = model, # 'weibull_cdf',
-                                        data_signature = data_signatures[cnt],
-                                        n_post_params = 2000,
-                                        samples_by_param = 10,
-                                        max_t = 10,
-                                        show = True,
-                                        save = True,
-                                        method = mcmc_dict['method'],
-                                        train_data_type = traindattype)
-                cnt += 1
-                                 
+                                            
                                  
     # POSTERIOR PREDICTIVE PLOTS
     if "posterior_predictive_alt" in args.plots:
         print('Making Posterior Predictive Plots...')
-        idx_vecs = [mcmc_dict['euc_dist_means_gt_sorted_id'][:10], 
-                    mcmc_dict['euc_dist_means_gt_sorted_id'][np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - 5), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + 5), 1)],
-                    mcmc_dict['euc_dist_means_gt_sorted_id'][-10:]]
+        idx_vecs = [mcmc_dict['euc_dist_means_gt_sorted_id'][:npostpred], 
+                    mcmc_dict['euc_dist_means_gt_sorted_id'][np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - math.ceil(npostpred / 2)), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + math.ceil(npostpred / 2)), 1)],
+                    mcmc_dict['euc_dist_means_gt_sorted_id'][-npostpred:]]
 
         data_signatures = ['_n_' + str(n) + '_euc_dist_mean_low_',
                            '_n_' + str(n) + '_euc_dist_mean_medium_',
@@ -3044,7 +3086,7 @@ if __name__ == "__main__":
                           cols = 3,
                           model = model,
                           n_post_params = 2000,
-                          n_plots = 9,
+                          n_plots = npostpred,
                           samples_by_param = 10,
                           max_t = 5,
                           input_hddm_trace = False,
@@ -3063,7 +3105,7 @@ if __name__ == "__main__":
         if model == 'angle' or model == 'weibull_cdf' or model == 'angle2' or model == 'ddm' or model == 'weibull_cdf2':
             print('Making Model Uncertainty Plots...')
             idx_vecs = [mcmc_dict['euc_dist_means_gt_sorted_id'][:npostpred], 
-                        mcmc_dict['euc_dist_means_gt_sorted_id'][np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - 5), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + 5), 1)],
+                        mcmc_dict['euc_dist_means_gt_sorted_id'][np.arange(int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 - math.ceil(npostpred / 2)), int(len(mcmc_dict['euc_dist_means_gt_sorted_id']) / 2 + math.ceil(npostpred / 2)), 1)],
                         mcmc_dict['euc_dist_means_gt_sorted_id'][-npostpred:]]
 
             data_signatures = ['_n_' + str(n) + '_euc_dist_mean_low_',
@@ -3076,10 +3118,10 @@ if __name__ == "__main__":
                                                  
                 model_plot(posterior_samples = mcmc_dict['posterior_samples'][idx_vec, :, :],
                           ground_truths = mcmc_dict['gt'][idx_vec, :],
-                          cols = 2,
+                          cols = 3,
                           model = model,
-                          n_post_params = 500,
-                          n_plots = 6,
+                          n_post_params = 1000,
+                          n_plots = npostpred,
                           samples_by_param = 10,
                           max_t = 5,
                           input_hddm_trace = False,
