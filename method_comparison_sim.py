@@ -45,6 +45,10 @@ import ckeras_to_numpy as ktnp
 import tensorflow as tf
 from tensorflow import keras
 
+if tf.__version__[0] == '2':
+    print('DISABLING EAGER EXECUTION')
+    tf.compat.v1.disable_eager_execution()
+
 print('Tensorflow version: ', tf.__version__)
 # -----------------------------------------------------------------------------
 
