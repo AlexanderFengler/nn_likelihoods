@@ -36,7 +36,7 @@ conda activate tf-gpu-py37
 # NNBATCH RUNS
 
 nmcmcsamples=25000
-nbyarrayjob=10
+nbyarrayjob=2
 ncpus=1
 nsamples=( 4096 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
 method="weibull_cdf2" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"

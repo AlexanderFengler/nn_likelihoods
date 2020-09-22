@@ -39,7 +39,7 @@ import clba
 #import keras_to_numpy as ktnp
 import ckeras_to_numpy as ktnp
 
-import keras_to_numpy_class as ktnpc
+#import keras_to_numpy_class as ktnpc
 
 # Tensorflow 
 import tensorflow as tf
@@ -322,8 +322,8 @@ if __name__ == "__main__":
    # MLP TARGET
     n_params = sampler_param_bounds[0].shape[0]
     
-    if not analytic:
-        mlpt = ktnpc.mlp_target(weights = weights, biases = biases, activations = activations, n_datapoints = data_grid.shape[1])
+#     if not analytic:
+#         mlpt = ktnpc.mlp_target(weights = weights, biases = biases, activations = activations, n_datapoints = data_grid.shape[1])
     
     # Can probably cache this function with good defaults...
     def mlp_target(params, 
