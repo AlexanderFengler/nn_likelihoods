@@ -150,7 +150,7 @@ class SliceSampler:
     # Sampling wrapper
     def sample(self,
                data, 
-               num_samples = 1000, 
+               num_samples = 1000,
                add = False,
                method = 'doubling', 
                init = 'random',
