@@ -307,7 +307,7 @@ if __name__ == "__main__":
     sampler_param_bounds[:, 0] = sampler_param_bounds[:, 0] + epsilon_bound_correction
     sampler_param_bounds[:, 1] = sampler_param_bounds[:, 1] - epsilon_bound_correction
 
-    sampler_param_bounds = [sampler_param_bounds for i in range(sampler_param_bounds)]
+    sampler_param_bounds = [sampler_param_bounds for i in range(sampler_param_bounds.shape[0])]
     
     print('sampler_params_bounds: ' , sampler_param_bounds)
     print('shape sampler param bounds: ', sampler_param_bounds[0].shape)
@@ -331,7 +331,7 @@ if __name__ == "__main__":
                    ll_min = -16.11809 # corresponds to 1e-7
                    ): 
         
-        mlp_input_batch = np.zeros((data_grid.shape[1], sampler_param_bounds[0].shape[0] + 2), dtype = np.float32)
+        mlp_input_batch = np.zeros((data_grid.shape[1], n_params + 2), dtype = np.float32)
         mlp_input_batch[:, :n_params] = params
         mlp_input_batch[:, n_params:] = data
         #return np.sum(np.core.umath.maximum(ktnp.predict(mlp_input_batch, weights, biases, activations, n_layers), ll_min))
