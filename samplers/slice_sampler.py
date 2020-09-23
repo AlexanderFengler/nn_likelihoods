@@ -258,6 +258,7 @@ class SliceSampler:
         i = id_start
         
         sample_time_start = time.time()
+        continue_ = 1
         while i < final_n_samples:
             if method == 'doubling':
                 self.samples[i], self.lp[i] = self._slice_sample_doubling(self.samples[i - 1], 
@@ -268,14 +269,15 @@ class SliceSampler:
                 
             if i % self.print_interval == 0:
                 print("Iteration {}".format(i))
-                continue_, z_scores = mcmcdiag.get_geweke_diags(chains = self.samples,
-                                                                split = 0.3,
-                                                                skip = 0.5)
-                print('Geweke z-scores: ')
-                print(z_scores)
+                if i >= 1000:
+                    continue_, z_scores = mcmcdiag.get_geweke_diags(chains = self.samples,
+                                                                    split = 0.3,
+                                                                    skip = 0.5)
+                    print('Geweke z-scores: ')
+                    print(z_scores)
                 
-                if not continue_:
-                    break
+            if not continue_:
+                break
             
             i += 1
             
