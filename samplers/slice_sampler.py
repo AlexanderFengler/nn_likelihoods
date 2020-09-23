@@ -159,7 +159,8 @@ class SliceSampler:
     # Sampling wrapper
     def sample(self,
                data, 
-               num_samples = 1000,
+               min_samples = 2000,
+               max_samples = 10000,
                add = False,
                method = 'doubling', 
                init = 'random',
@@ -186,7 +187,7 @@ class SliceSampler:
             id_start = 1
             
             # Initialize sample storage
-            self.samples = np.zeros((num_samples, len(self.bounds))) # samples
+            self.samples = np.zeros((max_samples, len(self.bounds))) # samples
             self.lp = np.zeros(num_samples) # sample log likelihoods
 
             # Taking care of initialization
@@ -267,18 +268,22 @@ class SliceSampler:
                 
             if i % self.print_interval == 0:
                 print("Iteration {}".format(i))
+                continue_, z_scores = mcmcdiag.get_geweke_diags(chains = self.samples,
+                                                                split = 0.3,
+                                                                skip = 0.5)
+                print('Geweke z-scores: ')
+                print(z_scores)
+                
+                if not continue_:
+                    break
             
             i += 1
             
         sample_time_end = time.time()
         self.sample_time = sample_time_end - sample_time_start
         
-        continue_, z_scores = mcmcdiag.get_geweke_diags(chains = self.samples,
-                                                        split = 0.3, 
-                                                        skip = 0.5)
-        print('Geweke Diagnostics')
-        print(continue_)
-        print(z_scores)
+        # Adjust size of sample data frame
+        self.samples = self.samples[:i, :]
         
         
 # ------------------------------- UNUSED ---------------------------------------           

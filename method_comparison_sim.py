@@ -374,7 +374,8 @@ if __name__ == "__main__":
                                  print_interval = 100)
             
             model.sample(data = args[0],
-                         num_samples = nmcmcsamples,
+                         min_samples = nmcmcsamples,
+                         max_samples = 10000,
                          init = args[1],
                          active_dims = active_dims,
                          frozen_dim_vals = frozen_dims)
@@ -409,7 +410,8 @@ if __name__ == "__main__":
                                  p = 8)
             
             model.sample(data = args[0],
-                         num_samples = nmcmcsamples,
+                         min_samples = nmcmcsamples,
+                         max_samples = 10000,
                          init = args[1],
                          active_dims = active_dims,
                          frozen_dim_vals = frozen_dims)

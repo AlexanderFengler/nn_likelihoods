@@ -16,7 +16,6 @@ from scipy.stats import truncnorm
 import boundary_functions as bf
 import multiprocessing as mp
 import cddm_data_simulation as cd
-import kde_info
 #from cdwiener import batch_fptd
 #import clba
 
