@@ -269,7 +269,7 @@ class SliceSampler:
                 
             if i % self.print_interval == 0:
                 print("Iteration {}".format(i))
-                if i >= 1000:
+                if i >= min_samples:
                     continue_, z_scores = mcmcdiag.get_geweke_diags(chains = self.samples[:i, :],
                                                                     split = 0.3,
                                                                     skip = 0.5)
