@@ -188,7 +188,7 @@ class SliceSampler:
             
             # Initialize sample storage
             self.samples = np.zeros((max_samples, len(self.bounds))) # samples
-            self.lp = np.zeros(num_samples) # sample log likelihoods
+            self.lp = np.zeros(max_samples) # sample log likelihoods
 
             # Taking care of initialization
             if init[0] == 'r':
@@ -241,11 +241,11 @@ class SliceSampler:
             id_start = self.samples.shape[0]
             
             # Increase size so sample container
-            tmp_samples = np.zeros((self.samples.shape[0] + num_samples, len(self.bounds)))
+            tmp_samples = np.zeros((self.samples.shape[0] + max_samples, len(self.bounds)))
             tmp_samples[:self.samples.shape[0], :] = self.samples
             self.samples = tmp_samples
             
-            tmp_lp = np.zeros(self.lp.shape[0] + num_samples)
+            tmp_lp = np.zeros(self.lp.shape[0] + max_samples)
             tmp_lp[:self.lp.shape[0]] = self.lp
             self.lp = tmp_lp
             
@@ -284,7 +284,7 @@ class SliceSampler:
         
         # Adjust size of sample data frame
         self.samples = self.samples[:i, :]
-        
+        self.lp = self.lp[:i]
         
 # ------------------------------- UNUSED ---------------------------------------           
     def sample_old(self, data, num_samples = 1000):
