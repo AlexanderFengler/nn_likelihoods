@@ -202,7 +202,7 @@ class SliceSampler:
                     for fdim in frozen_dim_vals:
                         bounds_tmp[fdim[0]] = (fdim[1], fdim[1])
                         
-                out = self.optimizer(self.target, 
+                out = self.optimizer(self.opt_target, 
                                      bounds = bounds_tmp, 
                                      args = (self.data,), 
                                      popsize = mle_popsize,
