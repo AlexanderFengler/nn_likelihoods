@@ -1,6 +1,7 @@
 import numpy as np
 import scipy as scpy
 import scipy.optimize as scp_opt
+import samplers.diagnostics as mcmcdiag
 import time
 #from scipy.optimize import differential_evolution
 
@@ -268,8 +269,18 @@ class SliceSampler:
                 print("Iteration {}".format(i))
             
             i += 1
+            
         sample_time_end = time.time()
         self.sample_time = sample_time_end - sample_time_start
+        
+        continue_, z_scores = mcmcdiag.get_geweke_diags(chains = self.samples,
+                                                        split = 0.3, 
+                                                        skip = 0.5)
+        print('Geweke Diagnostics')
+        print(continue_)
+        print(z_scores)
+        
+        
 # ------------------------------- UNUSED ---------------------------------------           
     def sample_old(self, data, num_samples = 1000):
         # Initialize data
