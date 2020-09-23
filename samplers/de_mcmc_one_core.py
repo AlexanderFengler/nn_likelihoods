@@ -3,6 +3,7 @@ import scipy
 import scipy.optimize as scp_opt
 import scipy.stats as scp_stat
 import samplers.diagnostics as mcmcdiag
+import time
 
 class DifferentialEvolutionSequential():
     
@@ -62,6 +63,9 @@ class DifferentialEvolutionSequential():
         self.gelman_rubin_r_hat = []
         np.random.seed()
         self.random_seed = np.random.get_state()
+        
+        self.optim_time = -1
+        self.sample_time = -1
         
         # variables to carry around
         #self.tmp_prop = np.zeros(self.sample)
@@ -197,6 +201,7 @@ class DifferentialEvolutionSequential():
                     self.lps[pop, 0] = self.target(temp[pop, :], self.data)
             
             elif init == 'mle':
+                optim_time_start = time.time()
                 # Make bounds for mle optimizer
                 bounds_tmp = [tuple(b) for b in self.bounds]
                 
@@ -234,6 +239,9 @@ class DifferentialEvolutionSequential():
                     
                     pop += 1
                 
+                optim_time_end = time.time()
+                self.optim_time = optim_time_end - optim_time_start
+                
             elif init == 'groundtruth':
                 for pop in range(self.NP):
                     temp[pop, :] = groundtruth + np.random.normal(loc = 0, scale = 0.05, size = len(init))
@@ -267,6 +275,7 @@ class DifferentialEvolutionSequential():
         adaptation_start = int(self.n_burn_in / 2)
         i = id_start
         continue_ = 1
+        sample_time_start = time.time()
         while i < n_samples_final:
             
             # Print iteration number periodically
@@ -347,6 +356,12 @@ class DifferentialEvolutionSequential():
         
         if continue_:
             # Here I need to adjust samples so that the final datastructure doesn't have 0 elements
-            print( 'Stopped due to max sampler, NOT converged' )
+            print( 'Stopped due to max samplers reach, NOT converged' )
+        sample_time_end = time.time()
+        self.sample_time = sample_time_end - sample_time_start
         
-        return (self.samples[:, self.n_burn_in:i, :], self.lps[:, self.n_burn_in:i], self.gelman_rubin_r_hat) #, self.random_seed)
+        return (self.samples[:, self.n_burn_in:i, :], 
+                self.lps[:, self.n_burn_in:i], 
+                self.gelman_rubin_r_hat,
+                self.sample_time,
+                self.optim_time) #, self.random_seed)

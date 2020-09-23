@@ -36,7 +36,7 @@
 # NNBATCH RUNS
 
 nmcmcsamples=2000
-nbyarrayjob=2
+nbyarrayjob=10
 ncpus=1
 nsamples=( 1024 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
 method="weibull_cdf2" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"

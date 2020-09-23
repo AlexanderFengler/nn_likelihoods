@@ -1,6 +1,7 @@
 import numpy as np
 import scipy as scpy
 import scipy.optimize as scp_opt
+import time
 #from scipy.optimize import differential_evolution
 
 class SliceSampler:
@@ -11,6 +12,7 @@ class SliceSampler:
                  p = 8,
                  m = 50,
                  print_interval = 1): # max doubling allowed
+        
         self.optimizer = scp_opt.differential_evolution
         #self.dims = bounds.shape[0]
         self.dims = np.array([i for i in range(len(bounds))])
@@ -20,6 +22,8 @@ class SliceSampler:
         self.p = p
         self.m = m
         self.print_interval = print_interval
+        self.optim_time = -1
+        self.sample_time = -1
         #self.active_dims = active_dims
 
     # Doubling procedue for finding intervals
@@ -149,7 +153,7 @@ class SliceSampler:
     # Sampling wrapper
     def sample(self,
                data, 
-               num_samples = 1000, 
+               num_samples = 1000,
                add = False,
                method = 'doubling', 
                init = 'random',
@@ -186,6 +190,7 @@ class SliceSampler:
                     tmp[dim] = np.random.uniform(self.bounds[dim][0],
                                                  self.bounds[dim][1])
             elif init[:3] == 'mle':
+                optim_time_start = time.time()
                 # Make bounds for mle optimizer
                 bounds_tmp = [tuple(b) for b in self.bounds]
                 if not frozen_dim_vals == 'none':
@@ -201,6 +206,8 @@ class SliceSampler:
                                      maxiter = mle_maxiter)
                 print('MLE vector: ', out.x)
                 tmp = out.x
+                optim_time_end = time.time()
+                self.optim_time = optim_time_end - optim_time_start
             else:
                 tmp = init
             
@@ -241,6 +248,7 @@ class SliceSampler:
         final_n_samples = self.samples.shape[0]
         i = id_start
         
+        sample_time_start = time.time()
         while i < final_n_samples:
             if method == 'doubling':
                 self.samples[i], self.lp[i] = self._slice_sample_doubling(self.samples[i - 1], 
@@ -253,6 +261,8 @@ class SliceSampler:
                 print("Iteration {}".format(i))
             
             i += 1
+        sample_time_end = time.time()
+        self.sample_time = sample_time_end - sample_time_start
 # ------------------------------- UNUSED ---------------------------------------           
     def sample_old(self, data, num_samples = 1000):
         # Initialize data

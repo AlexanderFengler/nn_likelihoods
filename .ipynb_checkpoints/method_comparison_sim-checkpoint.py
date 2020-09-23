@@ -370,7 +370,8 @@ if __name__ == "__main__":
             model = SliceSampler(bounds = args[2], 
                                  target = mlp_target, 
                                  w = .4 / 1024, 
-                                 p = 8)
+                                 p = 8,
+                                 print_interval = 100)
             
             model.sample(data = args[0],
                          num_samples = nmcmcsamples,
@@ -413,7 +414,7 @@ if __name__ == "__main__":
                          active_dims = active_dims,
                          frozen_dim_vals = frozen_dims)
             
-            return (model.samples, model.lp, 0)
+            return (model.samples, model.lp, 1.0, self.sample_time, self.optim_time)
             
         if sampler == 'diffevo':
             model = DifferentialEvolutionSequential(bounds = args[2],
