@@ -13,11 +13,11 @@
 #SBATCH --output /users/afengler/batch_job_out/tpl_1_%A_%a.out
 
 # Request runtime, memory, cores
-#SBATCH --time=18:00:00
+#SBATCH --time=6:00:00
 #SBATCH --mem=128G
 #SBATCH -c 12
 #SBATCH -N 1
-#SBATCH --array=1-10
+#SBATCH --array=1-20
 
 # --------------------------------------------------------------------------------------
 # Sequentially run different kind of models
@@ -26,7 +26,7 @@
 declare -a dgps=( "ddm_sdv_elife" )  # ( "angle2" )  #( "weibull_cdf" ) # ( "ddm_seq2_angle" "ddm_mic2_angle" "ddm_par2_angle" )
 n_samples=( 100000 )   # ( 128 256 512 1024 2048 4096 8192 50000 100000 200000 400000 )
 n_choices=( 2 ) #( 4 5 6 )
-n_parameter_sets=2500   #20000
+n_parameter_sets=5000   #20000
 n_bins=( 0 )
 binned=0
 machine="ccv" #"ccv"
