@@ -379,7 +379,7 @@ if __name__ == "__main__":
                          active_dims = active_dims,
                          frozen_dim_vals = frozen_dims)
             
-            return (model.samples, model.lp, 0, self.sample_time, self.optim_time)
+            return (model.samples, model.lp, 0, model.sample_time, model.optim_time)
 
         if sampler == 'diffevo':
             model = DifferentialEvolutionSequential(bounds = args[2],
@@ -414,7 +414,7 @@ if __name__ == "__main__":
                          active_dims = active_dims,
                          frozen_dim_vals = frozen_dims)
             
-            return (model.samples, model.lp, 1.0, self.sample_time, self.optim_time)
+            return (model.samples, model.lp, 1.0, model.sample_time, model.optim_time)
             
         if sampler == 'diffevo':
             model = DifferentialEvolutionSequential(bounds = args[2],
