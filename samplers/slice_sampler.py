@@ -25,6 +25,11 @@ class SliceSampler:
         self.optim_time = -1
         self.sample_time = -1
         #self.active_dims = active_dims
+        
+        def opt_target(params, data):
+            return - self.target(params, data)
+        
+        self.opt_target = opt_target
 
     # Doubling procedue for finding intervals
     def _find_interval_doubling(self, z, prev, dim):
@@ -203,7 +208,9 @@ class SliceSampler:
                                      popsize = mle_popsize,
                                      polish = mle_polish,
                                      disp = mle_disp,
-                                     maxiter = mle_maxiter)
+                                     maxiter = mle_maxiter,
+                                     workers = 1)
+                
                 print('MLE vector: ', out.x)
                 tmp = out.x
                 optim_time_end = time.time()
