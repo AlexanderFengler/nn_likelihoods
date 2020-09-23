@@ -37,7 +37,7 @@ conda activate tf-cpu
 # NNBATCH RUNS
 
 nmcmcsamples=25000
-nbyarrayjob=10
+nbyarrayjob=5
 ncpus=1
 nsamples=( 1024 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
 method="ornstein_pos"   #'ddm_sdv_analytic'  #"full_ddm2"

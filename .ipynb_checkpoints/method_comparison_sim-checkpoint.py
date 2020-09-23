@@ -314,9 +314,9 @@ if __name__ == "__main__":
     sampler_param_bounds[:, 0] = sampler_param_bounds[:, 0] + epsilon_bound_correction
     sampler_param_bounds[:, 1] = sampler_param_bounds[:, 1] - epsilon_bound_correction
 
-    sampler_param_bounds = [sampler_param_bounds for i in range(sampler_param_bounds.shape[0])]
+    sampler_param_bounds = [sampler_param_bounds for i in range(n_by_arrayjob)]
     
-    print('sampler_params_bounds: ' , sampler_param_bounds)
+    print('sampler_param_bounds: ' , sampler_param_bounds)
     print('shape sampler param bounds: ', sampler_param_bounds[0].shape)
     #print('active dims: ', active_dims)
     #print('frozen_dims: ', frozen_dims)
