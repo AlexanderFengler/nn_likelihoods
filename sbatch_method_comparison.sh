@@ -36,14 +36,14 @@
 # NNBATCH RUNS
 
 nmcmcsamples=2000
-nbyarrayjob=100
+nbyarrayjob=5
 ncpus=1
 nsamples=( 1024 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
-method="angle2" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
+method="ddm" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
 ids=( -1 )
 machine='x7'
 samplerinit='mle'
-outfilesignature='elife_'
+outfilesignature='elife_slice_'
 analytic=0
 #SLURM_ARRAY_TASK_ID=1
 
@@ -59,7 +59,7 @@ do
                                            --sampler slice \
                                            --infileid 1  \
                                            --outfileid 1  \
-                                           --activedims 0 1 2 3 4 5 6 \
+                                           --activedims 0 1 2 3 \
                                            --samplerinit $samplerinit \
                                            --ncpus $ncpus \
                                            --nbyarrayjob $nbyarrayjob \

@@ -39,10 +39,11 @@ full_ddm: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/full_ddm/kera
 levy: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/levy/keras_models/dnnregressor_levy_03_28_20_13_53_14/
 ornstein: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/ornstein/keras_models/dnnregressor_ornstein_03_30_20_16_03_04/
 weibull_cdf: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/weibull_cdf/keras_models/dnnregressor_weibull_cdf_04_03_20_02_11_43/
+
 # Question mark around model path for angle2 
 angle2: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/angle2/keras_models/dnnregressor_angle2_05_07_20_04_23_32/
-full_ddm2: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/full_ddm2/keras_models/dnnregressor_full_ddm2_05_01_20_01_55_17/
 
+full_ddm2: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/full_ddm2/keras_models/dnnregressor_full_ddm2_05_01_20_01_55_17/
 
 weibull_cdf2: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/weibull_cdf2/keras_models/dnnregressor_weibull_cdf2_06_11_20_03_30_02/
 
