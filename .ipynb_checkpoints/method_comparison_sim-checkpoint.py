@@ -22,8 +22,6 @@ from scipy.optimize import differential_evolution
 # import tensorflow as tf
 # from tensorflow import keras
 # from tensorflow.keras.models import load_model
-# os.environ["CUDA_DEVICE_ORDER"]= "PCI_BUS_ID"   # see issue #152
-# os.environ["CUDA_VISIBLE_DEVICES"] = '1'
 
 # Sampler
 from samplers import SliceSampler
@@ -162,6 +160,12 @@ if __name__ == "__main__":
     nnbatchid = args.nnbatchid
     analytic = args.analytic
     samplerinit = args.samplerinit
+    
+    
+    if machine == 'x7':
+        os.environ["CUDA_DEVICE_ORDER"]= "PCI_BUS_ID"   # see issue #152
+        os.environ["CUDA_VISIBLE_DEVICES"] = '1'
+        tf.test.is_gpu_available()
     
     global keras_model
 
