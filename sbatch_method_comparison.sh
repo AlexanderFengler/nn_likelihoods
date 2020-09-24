@@ -59,7 +59,7 @@ do
                                            --sampler slice \
                                            --infileid 1  \
                                            --outfileid 1  \
-                                           --activedims 0 1 2 3 \
+                                           --activedims 0 1 2 3 4 \
                                            --samplerinit $samplerinit \
                                            --ncpus $ncpus \
                                            --nbyarrayjob $nbyarrayjob \
