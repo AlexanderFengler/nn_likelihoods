@@ -577,7 +577,7 @@ def kde_from_simulations_fast(base_simulation_folder = '',
         pickle.dump(tmp_sim_data, open(target_folder + '/meta_data.pickle', 'wb') )
 
     return data
-                                       
+
 
 def kde_load_data_new(path = '',
                       file_id_list = '',

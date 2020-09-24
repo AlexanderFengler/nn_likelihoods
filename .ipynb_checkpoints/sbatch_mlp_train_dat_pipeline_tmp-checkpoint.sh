@@ -17,7 +17,7 @@
 #SBATCH --mem=128G
 #SBATCH -c 12
 #SBATCH -N 1
-#SBATCH --array=1-20
+#SBATCH --array=20-200
 
 # --------------------------------------------------------------------------------------
 # Sequentially run different kind of models
