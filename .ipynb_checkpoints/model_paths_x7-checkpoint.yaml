@@ -9,3 +9,5 @@ full_ddm: /media/data_cifs/afengler/data/kde/full_ddm/keras_models/dnnregressor_
 levy: /media/data_cifs/afengler/data/kde/levy/keras_models/dnnregressor_levy_03_28_20_13_53_14/
 ornstein: /media/data_cifs/afengler/data/kde/ornstein/keras_models/dnnregressor_ornstein_03_30_20_16_03_04/
 weibull_cdf: /media/data_cifs/afengler/data/kde/weibull_cdf/keras_models/dnnregressor_weibull_cdf_04_03_20_02_11_43/
+weibull_cdf2: /media/data_cifs/afengler/data/kde/weibull_cdf2/keras_models/dnnregressor_weibull_cdf2_06_11_20_03_30_02/
+ddm_sdv: /media/data_cifs/afengler/data/kde/ddm_sdv/keras_models/dnnregressor_ddm_sdv_05_23_20_03_16_07/
