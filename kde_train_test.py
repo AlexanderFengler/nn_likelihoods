@@ -73,9 +73,6 @@ if __name__ == "__main__":
     if not os.path.isdir(method_folder + args.outfolder + '/'):
         os.mkdir(method_folder + args.outfolder + '/')
     
-    
-    
-    
 # STANDARD VERSION ----------------------------------------------------------------------------------------
     
     # Main function 

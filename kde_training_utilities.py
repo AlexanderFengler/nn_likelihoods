@@ -567,7 +567,6 @@ def kde_from_simulations_fast(base_simulation_folder = '',
     # Store data
     print('writing data to file: ', target_folder + '/data_' + str(file_id) + '.pickle')
     pickle.dump(data.values, open(target_folder + '/data_' + str(file_id) + '.pickle', 'wb'), protocol = 4)
-    #data.to_pickle(target_folder + '/data_' + str(file_id) + '.pickle' , protocol = 4)
 
     # Write metafile if it doesn't exist already
     # Hack for now: Just copy one of the base simulations files over
@@ -575,9 +574,7 @@ def kde_from_simulations_fast(base_simulation_folder = '',
         pass
     else:
         pickle.dump(tmp_sim_data, open(target_folder + '/meta_data.pickle', 'wb') )
-
     return data
-
 
 def kde_load_data_new(path = '',
                       file_id_list = '',
@@ -590,14 +587,7 @@ def kde_load_data_new(path = '',
     
     # Read in two datasets to get meta data for the subsequent
     print('Reading in initial dataset')
-    #tmp_data = np.load(path + 'data_' + str(file_id_list[0]) + '.pickle', allow_pickle = True)
     tmp_data = np.load(path + file_id_list[0], allow_pickle = True)
-    
-#     features_init = np.load(path + 'feed_features_' + str(file_id_list[0]) + '.npy')
-#     labels_init = np.load(path + 'feed_labels_' + str(file_id_list[0]) + '.npy')
-    
-#     features_init = tmp_data[]
-#     labels_init = np.load(path + 'feed_labels_' + str(file_id_list[0]) + '.npy')
     
     # Collect some meta data 
     n_files = len(file_id_list)
@@ -616,17 +606,11 @@ def kde_load_data_new(path = '',
     
     # Read in remaining files into preallocated np.array
     for i in range(1, n_files, 1):
-        #tmp_data = np.load(path + 'data_' + str(file_id_list[i]) + '.pickle', allow_pickle = True)
         tmp_data = np.load(path + file_id_list[i], allow_pickle = True)
         n_rows_tmp = tmp_data.shape[0]
         features[(cnt_samples): (cnt_samples + n_rows_tmp), :] = tmp_data[:, :-1]
         labels[(cnt_samples): (cnt_samples + n_rows_tmp), 0] = tmp_data[:, -1]
         cnt_samples += n_rows_tmp
-        
-        #features[(i * n_samples_by_dataset): ((i + 1) * (n_samples_by_dataset)), :] = np.load(path + 'feed_features_' + \
-          #                                                                                    str(file_id_list[i]) + '.npy', allow_pickle = True)
-        #labels[(i * n_samples_by_dataset): ((i + 1) * (n_samples_by_dataset)), :] = np.load(path + 'feed_labels_' + \
-         #                                                                                  str(file_id_list[i]) + '.npy', allow_pickle = True)
         print(i, ' files processed')
         
     features.resize((cnt_samples, features.shape[1]), refcheck = False)
@@ -639,12 +623,10 @@ def kde_load_data_new(path = '',
         labels[labels < np.log(prelog_cutoff_low)] = np.log(prelog_cutoff_low)
     if prelog_cutoff_high != 'none':    
         labels[labels > np.log(prelog_cutoff_high)] = np.log(prelog_cutoff_high)
-        
-        
+           
     if return_log == False:
         labels = np.exp(labels)
         
-
     if make_split:
         # Making train test split
         print('Making train test split...')

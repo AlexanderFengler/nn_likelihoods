@@ -75,10 +75,8 @@ if __name__ == "__main__":
 
 
     if machine == 'x7':
-        #data_folder = stats["data_folder_x7"]
         model_path = stats["model_folder_x7"]
     else:
-        #data_folder = stats["data_folder"]
         model_path = stats["model_folder"]
 
     if not warm_start:
@@ -105,11 +103,7 @@ if __name__ == "__main__":
 
     # Load the training data
     print('loading data.... ')
-
-    # X, y, X_val, y_val = kde_load_data(folder = data_folder, 
-    #                                    return_log = True, # Dont take log if you want to train on actual likelihoods
-    #                                    prelog_cutoff = 1e-7 # cut out data with likelihood lower than 1e-7
-    #                                   
+                                
     folder_list = os.listdir(data_folder)
     data_file_names = []
     
@@ -120,9 +114,7 @@ if __name__ == "__main__":
     data_file_names = list(np.random.choice(data_file_names, replace = False, size = n_training_datasets_to_load))
     
     dataset = kde_load_data_new(path = data_folder,
-                                #file_id_list = list(1 + np.random.choice(maxidfiles, replace = False, size = n_training_datasets_to_load)),
                                 file_id_list = data_file_names,
-                                # file_id_list = [i for i in range(1, n_training_datasets_to_load + 1, 1)],
                                 return_log = True,
                                 prelog_cutoff_low = 1e-7,
                                 prelog_cutoff_high = 100,
@@ -135,7 +127,6 @@ if __name__ == "__main__":
     print('Setting up keras model')
 
     if not warm_start:
-        #input_shape = X.shape[1]
         input_shape = dataset[0][0].shape[1]
         model = keras.Sequential()
 
@@ -209,16 +200,14 @@ if __name__ == "__main__":
                                                   min_delta = 0.0001,
                                                   min_lr = 0.0000001)
 
-    history = model.fit(dataset[0][0], dataset[0][1],  
-                        #validation_split = 0.01,
+    history = model.fit(dataset[0][0], dataset[0][1],
                         epochs = dnn_params["n_epochs"],
                         batch_size = dnn_params["batch_size"],
                         shuffle = True,
                         validation_data = dataset[1],
                         callbacks = [checkpoint, reduce_lr, earlystopping], 
                         verbose = 2,
-                        #validation_data = (X_val, y_val)
-                       )
+                        )
     # ---------------------------------------------------------------------------
 
     # SAVING --------------------------------------------------------------------
@@ -230,7 +219,9 @@ if __name__ == "__main__":
     model.save(model_path + "model_final.h5")
 
     # Extract model architecture as numpy arrays and save in model path
-    __, ___, ____, = ktnp.extract_architecture(model, save = True, save_path = model_path)
+    __, ___, ____, = ktnp.extract_architecture(model, 
+                                               save = True, 
+                                               save_path = model_path)
 
     # Update model paths in model_path.yaml
     if machine == 'x7':

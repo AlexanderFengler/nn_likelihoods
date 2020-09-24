@@ -1,35 +1,9 @@
-#angle: /media/data_cifs/afengler/data/kde/angle/keras_models/dnnregressor_angle_ndt_09_28_19_18_05_42/
-#angle_100: /media/data_cifs/afengler/data/kde/angle/keras_models/dnnregressor_angle_12_15_19_23_39_15/
-#ddm: /media/data_cifs/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_ndt_09_27_19_19_02_40/
 ddm_analytic: /not/a/real/path
-fcn_angle_ndt: /media/data_cifs/afengler/data/kde/angle/keras_models/deep_inference_10_12_19_11_58_42/
-fcn_ddm: /media/data_cifs/afengler/data/kde/ddm/keras_models/deep_inference_10_12_19_00_12_58/
-fcn_ddm_1000: /media/data_cifs/afengler/data/kde/ddm/keras_models/deep_inference_1000_11_12_19_01_10_54
-fcn_ddm_10000: /media/data_cifs/afengler/data/kde/ddm/keras_models/deep_inference_10000_11_12_19_01_18_28
-fcn_ddm_2500: /media/data_cifs/afengler/data/kde/ddm/keras_models/deep_inference_2500_11_12_19_01_14_31
-fcn_ddm_5000: /media/data_cifs/afengler/data/kde/ddm/keras_models/deep_inference_5000_11_12_19_01_16_31
-fcn_ddm_ndt_100: /media/data_cifs/afengler/data/kde/ddm/keras_models/deep_inference_100_10_22_19_18_52_56
-fcn_ddm_ndt_1000: /media/data_cifs/afengler/data/kde/ddm/keras_models/deep_inference_1000_10_22_19_18_55_14
-fcn_ddm_ndt_20000: /media/data_cifs/afengler/data/kde/ddm/keras_models/deep_inference_20000_10_23_19_13_59_23
-fcn_ddm_ndt_250: /media/data_cifs/afengler/data/kde/ddm/keras_models/deep_inference_250_10_22_19_18_54_36
-fcn_ddm_ndt_2500: /media/data_cifs/afengler/data/kde/ddm/keras_models/deep_inference_2500_10_23_19_14_00_38
-fcn_weibull_cdf_2000: /media/data_cifs/afengler/data/kde/weibull_cdf/keras_models/deep_inference_2000_11_18_19_23_56_06
-fcn_weibull_cdf_3000: /media/data_cifs/afengler/data/kde/weibull_cdf/keras_models/deep_inference_3000_11_19_19_01_52_39
-#full: /media/data_cifs/afengler/data/kde/full_ddm/keras_models/dnnregressor_full_08_17_19_16_27_27/
-lba: /media/data_cifs/afengler/data/kde/lba/keras_models/dnnregressor_analytic_lba_08_21_19_12_01_09/
-#linear_collapse: /media/data_cifs/afengler/data/kde/linear_collapse/keras_models/dnnregressor_ddm_08_08_19_19_05_39/
-# ornstein: /media/data_cifs/afengler/data/kde/ornstein_uhlenbeck/keras_models/dnnregressor_ornstein_08_15_19_16_36_05/
 
-#ornstein: /media/data_cifs/afengler/data/kde/ornstein/keras_models/dnnregressor_ornstein_12_16_19_17_44_25/
-
-#ornstein_100: /media/data_cifs/afengler/data/kde/ornstein/keras_models/dnnregressor_ornstein_12_16_19_17_44_25/
-#ornstein_2: /media/data_cifs/afengler/data/kde/ornstein/keras_models/dnnregressor_ornstein_12_16_19_17_37_30/
-#weibull_cdf: /media/data_cifs/afengler/data/kde/weibull_cdf/keras_models/dnnregressor_weibull_cdf_ndt_10_31_19_16_34_43/
-#weibull_cdf_100: /media/data_cifs/afengler/data/kde/weibull_cdf/keras_models/dnnregressor_weibull_cdf_12_15_19_21_41_21/
-#weibull_cdf_2: /media/data_cifs/afengler/data/kde/weibull_cdf/keras_models/dnnregressor_weibull_cdf_12_15_19_21_32_02/
 
 # NEW MODELS 150 DATASETS
 angle: /media/data_cifs/afengler/data/kde/angle/keras_models/dnnregressor_angle_04_01_20_02_48_15/
+angle2: /media/data_cifs/afengler/data/kde/angle2/keras_models/dnnregressor_angle2_05_07_20_04_23_32/
 ddm: /media/data_cifs/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_03_29_20_17_38_58/
 full_ddm: /media/data_cifs/afengler/data/kde/full_ddm/keras_models/dnnregressor_full_ddm_04_02_20_15_32_21/
 levy: /media/data_cifs/afengler/data/kde/levy/keras_models/dnnregressor_levy_03_28_20_13_53_14/

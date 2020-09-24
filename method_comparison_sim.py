@@ -177,6 +177,7 @@ if __name__ == "__main__":
         method_params = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))[method]
         output_folder = method_params['output_folder_x7']
         method_folder = method_params['method_folder_x7']
+        
         with open("model_paths_x7.yaml") as tmp_file:
             if nnbatchid == -1:
                 network_path = yaml.load(tmp_file)[method]
@@ -193,6 +194,7 @@ if __name__ == "__main__":
         method_params = pickle.load(open("/users/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))[method]
         output_folder = method_params['output_folder']
         method_folder = method_params['method_folder']
+        
         with open("model_paths.yaml") as tmp_file:
             if nnbatchid == -1:
                 network_path = yaml.load(tmp_file)[method]
@@ -211,6 +213,7 @@ if __name__ == "__main__":
         method_params = pickle.load(open("/users/afengler/OneDrive/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))[method]
         output_folder = method_params['output_folder_home']
         method_folder = method_params['method_folder_home']
+        
         with open("model_paths_home.yaml") as tmp_file:
             if nnbatchid == -1:
                 network_path = yaml.load(tmp_file)[method]
@@ -226,9 +229,9 @@ if __name__ == "__main__":
 #           Global keras_model
             keras_model = keras.models.load_model(network_path + '/model_final.h5', compile = False)
             
-
     if data_type == 'parameter_recovery':
-        file_ = 'parameter_recovery_data_binned_0_nbins_0_n_' + str(n_samples) + '/' + method + '_nchoices_2_parameter_recovery_binned_0_nbins_0_nreps_1_n_' + str(n_samples) + '.pickle'
+        file_ = 'parameter_recovery_data_binned_0_nbins_0_n_' + str(n_samples) + '/' + method + \
+                '_nchoices_2_parameter_recovery_binned_0_nbins_0_nreps_1_n_' + str(n_samples) + '.pickle'
         
         if analytic:
             if not os.path.exists(output_folder + '/analytic'):
@@ -237,7 +240,8 @@ if __name__ == "__main__":
             if not os.path.exists(output_folder + network_id):
                 os.makedirs(output_folder + network_id)
         
-        out_file_signature = out_file_signature + 'post_samp_data_param_recov_unif_reps_1_n_' +  str(n_samples) + '_init_' + samplerinit + '_' + infile_id
+        out_file_signature = out_file_signature + 'post_samp_data_param_recov_unif_reps_1_n_' + \
+                             str(n_samples) + '_init_' + samplerinit + '_' + infile_id
     
     if data_type == 'real':                                                                        
         file_ = args.infileid
@@ -380,7 +384,7 @@ if __name__ == "__main__":
                          active_dims = active_dims,
                          frozen_dim_vals = frozen_dims)
             
-            return (model.samples, model.lp, 0, model.sample_time, model.optim_time)
+            return (model.samples, model.lp, -1, model.sample_time, model.optim_time)
 
         if sampler == 'diffevo':
             model = DifferentialEvolutionSequential(bounds = args[2],
@@ -390,13 +394,13 @@ if __name__ == "__main__":
                                                     crp = 0.3)
         
             (samples, lps, gelman_rubin_r_hat, sample_time, optim_time) = model.sample(data = args[0],
-                                                              max_samples = nmcmcsamples,
-                                                              min_samples = 2000,
-                                                              n_burn_in = 1000,
-                                                              init = args[1],
-                                                              active_dims = active_dims,
-                                                              frozen_dim_vals = frozen_dims,
-                                                              gelman_rubin_force_stop = True)
+                                                                                       max_samples = nmcmcsamples,
+                                                                                       min_samples = 2000,
+                                                                                       n_burn_in = 1000,
+                                                                                       init = args[1],
+                                                                                       active_dims = active_dims,
+                                                                                       frozen_dim_vals = frozen_dims,
+                                                                                       gelman_rubin_force_stop = True)
             return (samples, lps, gelman_rubin_r_hat, sample_time, optim_time) # random_seed) # random seed was just to check that we are not passing the same everytime
 
     # Test navarro-fuss
@@ -416,7 +420,7 @@ if __name__ == "__main__":
                          active_dims = active_dims,
                          frozen_dim_vals = frozen_dims)
             
-            return (model.samples, model.lp, 1.0, model.sample_time, model.optim_time)
+            return (model.samples, model.lp, -1, model.sample_time, model.optim_time)
             
         if sampler == 'diffevo':
             model = DifferentialEvolutionSequential(bounds = args[2],
