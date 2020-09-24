@@ -189,6 +189,7 @@ if __name__ == "__main__":
             print('Loading network from: ')
             print(network_path)
             # model = load_model(network_path + 'model_final.h5', custom_objects = {"huber_loss": tf.losses.huber_loss})
+            keras_model = keras.models.load_model(network_path + '/model_final.h5', compile = False)
 
     if machine == 'ccv':
         method_params = pickle.load(open("/users/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))[method]
