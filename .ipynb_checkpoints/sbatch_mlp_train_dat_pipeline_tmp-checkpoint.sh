@@ -14,7 +14,7 @@
 
 # Request runtime, memory, cores
 #SBATCH --time=6:00:00
-#SBATCH --mem=128G
+#SBATCH --mem=96G
 #SBATCH -c 12
 #SBATCH -N 1
 #SBATCH --array=1-200
