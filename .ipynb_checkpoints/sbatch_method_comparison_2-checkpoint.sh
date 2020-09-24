@@ -39,11 +39,11 @@ nmcmcsamples=2000
 nbyarrayjob=100
 ncpus=1
 nsamples=( 1024 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
-method="angle2" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
+method="ddm_sdv" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
 ids=( -1 )
 machine='x7'
 samplerinit='mle'
-outfilesignature='elife__diffevo'
+outfilesignature='elife_slice_'
 analytic=0
 #SLURM_ARRAY_TASK_ID=1
 
