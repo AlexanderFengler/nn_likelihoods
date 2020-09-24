@@ -39,7 +39,7 @@ nmcmcsamples=2000
 nbyarrayjob=100
 ncpus=1
 nsamples=( 1024 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
-method="weibull_cdf2" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
+method="ornstein" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
 ids=( -1 )
 machine='x7'
 samplerinit='mle'
@@ -59,7 +59,7 @@ do
                                            --sampler slice \
                                            --infileid 1  \
                                            --outfileid 1  \
-                                           --activedims 0 1 2 3 4 5 \
+                                           --activedims 0 1 2 3 4 \
                                            --samplerinit $samplerinit \
                                            --ncpus $ncpus \
                                            --nbyarrayjob $nbyarrayjob \
