@@ -35,7 +35,7 @@
 
 # NNBATCH RUNS
 
-nmcmcsamples=200
+nmcmcsamples=2000
 nbyarrayjob=100
 ncpus=1
 nsamples=( 1024 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
