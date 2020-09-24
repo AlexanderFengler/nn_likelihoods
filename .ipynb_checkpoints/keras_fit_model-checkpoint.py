@@ -1,6 +1,3 @@
-import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras.models import load_model
 import numpy as np
 #from cdwiener import array_fptd
 import os
@@ -96,7 +93,11 @@ if __name__ == "__main__":
     # set up gpu to use
     if machine == 'x7':
         os.environ["CUDA_DEVICE_ORDER"]= "PCI_BUS_ID"   # see issue #152
-        os.environ["CUDA_VISIBLE_DEVICES"] = dnn_params['gpu_x7'] 
+        os.environ["CUDA_VISIBLE_DEVICES"] = dnn_params['gpu_x7']
+    else:
+        import tensorflow as tf
+        from tensorflow import keras
+        from tensorflow.keras.models import load_model
 
     from tensorflow.python.client import device_lib
     print(device_lib.list_local_devices())

@@ -40,14 +40,7 @@ import ckeras_to_numpy as ktnp
 #import keras_to_numpy_class as ktnpc
 
 # Tensorflow 
-import tensorflow as tf
-from tensorflow import keras
 
-if tf.__version__[0] == '2':
-    print('DISABLING EAGER EXECUTION')
-    tf.compat.v1.disable_eager_execution()
-
-print('Tensorflow version: ', tf.__version__)
 # -----------------------------------------------------------------------------
 
 # SUPPORT FUNCTIONS -----------------------------------------------------------
@@ -164,9 +157,27 @@ if __name__ == "__main__":
     
     if machine == 'x7':
         os.environ["CUDA_DEVICE_ORDER"]= "PCI_BUS_ID"   # see issue #152
-        os.environ["CUDA_VISIBLE_DEVICES"] = '1'
+        os.environ["CUDA_VISIBLE_DEVICES"] = '2'
+        import tensorflow as tf
+        from tensorflow import keras
+
+        if tf.__version__[0] == '2':
+            print('DISABLING EAGER EXECUTION')
+            tf.compat.v1.disable_eager_execution()
+
+        print('Tensorflow version: ', tf.__version__)
         tf.test.is_gpu_available()
-    
+    else:
+        import tensorflow as tf
+        from tensorflow import keras
+
+        if tf.__version__[0] == '2':
+            print('DISABLING EAGER EXECUTION')
+            tf.compat.v1.disable_eager_execution()
+
+        print('Tensorflow version: ', tf.__version__)
+        tf.test.is_gpu_available()
+        
     global keras_model
 
     # Initialize the frozen dimensions
