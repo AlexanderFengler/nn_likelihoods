@@ -31,7 +31,7 @@ from samplers import DifferentialEvolutionSequential
 from cdwiener import batch_fptd
 
 # Analytical Likelihood for lba
-import clba
+#import clba
 
 # Network converter
 #import keras_to_numpy as ktnp
@@ -389,7 +389,7 @@ if __name__ == "__main__":
         if sampler == 'slice':
             model = SliceSampler(bounds = args[2], 
                                  target = mlp_target, 
-                                 w = .4 / 1024, 
+                                 w = 1 / 256, #w = .4 / 1024, 
                                  p = 8,
                                  print_interval = 100)
             
@@ -426,7 +426,7 @@ if __name__ == "__main__":
         if sampler == 'slice':
             model = SliceSampler(bounds = args[2], 
                                  target = nf_target, 
-                                 w = .4 / 1024, 
+                                 w = 1 / 256, #w = .4 / 1024, 
                                  p = 8)
             
             model.sample(data = args[0],

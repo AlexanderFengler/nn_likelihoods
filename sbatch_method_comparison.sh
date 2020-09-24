@@ -35,13 +35,13 @@
 
 # NNBATCH RUNS
 
-nmcmcsamples=2000
+nmcmcsamples=200
 nbyarrayjob=100
 ncpus=1
 nsamples=( 1024 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
-method="ornstein" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
+method="levy" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
 ids=( -1 )
-machine='x7'
+machine='home'
 samplerinit='mle'
 outfilesignature='elife_slice_'
 analytic=0
@@ -51,7 +51,7 @@ for n in "${nsamples[@]}"
 do
     for id in "${ids[@]}"
     do 
-        python -u method_comparison_sim.py --machine $machine \
+        python -m cProfile -s cumulative method_comparison_sim.py --machine $machine \
                                            --method $method \
                                            --nsamples $n \
                                            --nmcmcsamples $nmcmcsamples \
