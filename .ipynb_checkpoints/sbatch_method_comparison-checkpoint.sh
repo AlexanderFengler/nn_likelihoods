@@ -41,7 +41,7 @@ ncpus=1
 nsamples=( 1024 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
 method="levy" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
 ids=( -1 )
-machine='home'
+machine='x7'
 samplerinit='mle'
 outfilesignature='elife_slice_'
 analytic=0
@@ -51,21 +51,21 @@ for n in "${nsamples[@]}"
 do
     for id in "${ids[@]}"
     do 
-        python -m cProfile -s cumulative method_comparison_sim.py --machine $machine \
-                                           --method $method \
-                                           --nsamples $n \
-                                           --nmcmcsamples $nmcmcsamples \
-                                           --datatype parameter_recovery \
-                                           --sampler slice \
-                                           --infileid 1  \
-                                           --outfileid 1  \
-                                           --activedims 0 1 2 3 4 \
-                                           --samplerinit $samplerinit \
-                                           --ncpus $ncpus \
-                                           --nbyarrayjob $nbyarrayjob \
-                                           --nnbatchid $id \
-                                           --analytic $analytic \
-                                           --outfilesig $outfilesignature
+        python -u method_comparison_sim.py --machine $machine \
+                                                      --method $method \
+                                                      --nsamples $n \
+                                                      --nmcmcsamples $nmcmcsamples \
+                                                      --datatype parameter_recovery \
+                                                      --sampler slice \
+                                                      --infileid 1  \
+                                                      --outfileid 1  \
+                                                      --activedims 0 1 2 3 4 \
+                                                      --samplerinit $samplerinit \
+                                                      --ncpus $ncpus \
+                                                      --nbyarrayjob $nbyarrayjob \
+                                                      --nnbatchid $id \
+                                                      --analytic $analytic \
+                                                      --outfilesig $outfilesignature
     done
 done
 
