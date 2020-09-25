@@ -150,7 +150,7 @@ class data_generator():
         return out.astype(np.float)
     
     def _get_processed_data_for_theta(self,
-                                      )
+                                      theta)
     
         keep = 0
         while not keep:
@@ -163,10 +163,15 @@ class data_generator():
                                                           'mode_cnt_rel': 0.5  # < (checking that mode does not receive more than a proportion of samples for each choice)
                                                           }
                                                )
-            
         
+        data = self._make_kde_data(simulations = simulations,
+                                   theta = theta,
+                                   n_kde = 800,
+                                   n_unif_up = 100,
+                                   n_unif_down = 100)
         
-        
+        return data
+             
     def _get_ncpus(self):
         
         # Sepfic
@@ -192,6 +197,59 @@ class data_generator():
             return np.concatenate([out[0], out[1]], axis = 1)
         else:
             return out
+        
+    def generate_full_data_uniform(self, 
+                                   save = False):
+        
+        # Make parameters
+        theta_list = [np.float32((np.random.uniform(low = self.config['param_bounds'][0], 
+                                                    high = self.config['param_bounds'][1])) for i in range(self.config['nparamsets']))]
+        
+        # Get simulations
+        with Pool(processes = self.config['n_cpus']) as pool:
+            data_grid = np.array(pool.starmap(self._get_processed_data_for_theta, theta_list))
+        return data_grid
+         
+#         if save:
+#             training_data_folder = self.config['method_folder'] + \
+#                       'training_data_binned_' + \
+#                       str(int(self.config['binned'])) + \
+#                       '_nbins_' + str(self.config['nbins']) + \
+#                       '_n_' + str(self.config['nsamples'])
+#             pickle.dump()
+
+
+
+#         # Save to correct destination
+#         if save:
+            
+#             # -----
+
+#             if not os.path.exists(training_data_folder):
+#                 os.makedirs(training_data_folder)
+
+#             full_file_name = training_data_folder + '/' + \
+#                             self.config['method'] + \
+#                             '_nchoices_' + str(self.config['nchoices']) + \
+#                             '_train_data_binned_' + \
+#                             str(int(self.config['binned'])) + \
+#                             '_nbins_' + str(self.config['nbins']) + \
+#                             '_n_' + str(self.config['nsamples']) + \
+#                             '_' + self.file_id + '.pickle'
+            
+#             print('Writing to file: ', full_file_name)
+            
+#             pickle.dump((np.float32(np.stack(theta_list)), 
+#                          np.float32(np.expand_dims(data_grid, axis = 0)), 
+#                          self.config['meta']), 
+#                         open(full_file_name, 'wb'), 
+#                         protocol = self.config['pickleprotocol'])
+            
+#             return 'Dataset completed'
+        
+#         # Or else return the data
+#         else:
+#             return np.float32(np.stack(theta_list)), np.float32(np.expand_dims(data_grid, axis = 0)) 
                                                              
     def generate_data_uniform(self, save = False):
         
@@ -476,6 +534,14 @@ if __name__ == "__main__":
         
     if args.datatype == 'parameter_recovery_hierarchical':
         dg.generate_data_hierarchical(save = args.save)
+        
+    if args.datatype == 'full':
+        x = dg.generate_full_data_uniform(save = False)
+        print(type(x))
+        print(len(x))
+        print(x)
+    
+        
         
     finish_t = datetime.now()
     print('Time elapsed: ', finish_t - start_t)

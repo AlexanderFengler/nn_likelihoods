@@ -22,14 +22,14 @@
 
 # --------------------------------------------------------------------------------------
 # Sequentially run different kind of models
-declare -a dgps=( "ornstein_pos" ) # "race_model" "lca" ) #"ddm_sdv_analytic" "ddm_sdv_red_analytic" ) #( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "levy" )  #( "ddm_mic2_angle" "ddm_par2_angle" ) # ( "ddm_seq2_angle" )
-n_samples=( 1024 4096 )   # ( 128 256 512 1024 2048 4096 8192 50000 100000 200000 400000 )
+declare -a dgps=( "ddm" ) # "race_model" "lca" ) #"ddm_sdv_analytic" "ddm_sdv_red_analytic" ) #( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "levy" )  #( "ddm_mic2_angle" "ddm_par2_angle" ) # ( "ddm_seq2_angle" )
+n_samples=( 10000 )   # ( 128 256 512 1024 2048 4096 8192 50000 100000 200000 400000 )
 n_choices=( 2 ) #( 4 5 6 )
-n_parameter_sets=1000  # cnn 20000 but 150 array   # mlp 10000 but 300 array # KRISHN: 10
+n_parameter_sets=10  # cnn 20000 but 150 array   # mlp 10000 but 300 array # KRISHN: 10
 n_bins=( 0 ) # KRISHN: n_bins=0
 binned=0 # KRISHN: binned=0
-machine="ccv" #"ccv" "home" "x7"
-datatype="parameter_recovery" #"parameter_recovery" #"parameter_recovery" #"parameter_recovery_hierarchical" "parameter_recovery" "cnn_train" # KRISHN: 'parameter_recovery'
+machine="home" #"ccv" "home" "x7"
+datatype="full" #"parameter_recovery" #"parameter_recovery" #"parameter_recovery_hierarchical" "parameter_recovery" "cnn_train" # KRISHN: 'parameter_recovery'
 nsubjects=1 #10
 mode="test" # "test" #"test"  #'mlp' 'cnn' # KRISHN: 'test'
 maxt=20 # 20 for mlp # KRISHN: 20
@@ -47,12 +47,40 @@ do
                     do
                        echo "$dgp"
                        echo $n_c
-                       python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype $datatype --nsubjects $nsubjects --nreps 1 --binned $binned --nbins $bins --maxt $maxt --nchoices $n_c --nsamples $n --mode $mode --nparamsets $n_parameter_sets --save 1 --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID 
+                       python -u dataset_generator.py --machine $machine \
+                                                      --dgplist $dgp \
+                                                      --datatype $datatype \
+                                                      --nsubjects $nsubjects \
+                                                      --nreps 1 \
+                                                      --binned $binned \
+                                                      --nbins $bins \
+                                                      --maxt $maxt \
+                                                      --nchoices $n_c \
+                                                      --nsamples $n \
+                                                      --mode $mode \
+                                                      --nparamsets $n_parameter_sets \
+                                                      --save 1 \
+                                                      --deltat 0.001 \
+                                                      --fileid 999 #$SLURM_ARRAY_TASK_ID 
                 done
             else
                  echo "$dgp"
                  #echo $n_c
-                 python -u dataset_generator.py --machine $machine --dgplist $dgp --nsubjects $nsubjects --datatype $datatype --nreps 1 --binned $binned --nbins $bins --maxt $maxt --nchoices ${n_choices[0]} --nsamples $n --mode $mode --nparamsets $n_parameter_sets --save 1  --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID
+                 python -u dataset_generator.py --machine $machine \
+                                                --dgplist $dgp \
+                                                --nsubjects $nsubjects \
+                                                --datatype $datatype \
+                                                --nreps 1 \
+                                                --binned $binned \
+                                                --nbins $bins \
+                                                --maxt $maxt \
+                                                --nchoices ${n_choices[0]} \
+                                                --nsamples $n \
+                                                --mode $mode \
+                                                --nparamsets $n_parameter_sets \
+                                                --save 1  \
+                                                --deltat 0.001 \
+                                                --fileid 999 # $SLURM_ARRAY_TASK_ID
                 
             fi
         done
@@ -60,42 +88,3 @@ do
     done
 done
 #---------------------------------------------------------------------------------------
-
-# ---------------------------------------------------------------------------------------
-# Run rdgp
-# n_parameter_sets=20000
-# bins=256
-# n_c=2
-
-# python -u dataset_generator.py --machine ccv --dgplist angle --datatype r_dgp --nreps 1 --binned 1 
-# --nbins $bins --maxt 10 --nchoices $n_c --nsimbnds 100 100000 --mode cnn --nparamsets $n_parameter_sets --save 1 --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID 
-
-# ---------------------------------------------------------------------------------------
-
-# ---------------------------------------------------------------------------------------
-# Base data for mlp
-# n_parameter_sets=10000
-# n_c=2
-# method='ornstein'
-
-# python -u dataset_generator.py --machine ccv --dgplist $method --datatype cnn_train --nreps 1 --binned 0 --nbins 0 --maxt 20 --nchoices $n_c --nsamples 20000 --mode mlp --nparamsets $n_parameter_sets --save 1 --deltat 0.001 --fileid $SLURM_ARRAY_TASK_ID
-
-#---------------------------------------------------------------------------------------
-
-# python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv ornstein 2 100000 1 $SLURM_ARRAY_TASK_ID base_simulations 10000 0
-
-# python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv lca 3 100000 1 $SLURM_ARRAY_TASK_ID base_simulations 10000 0
-
-# python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv lca 4 100000 1 $SLURM_ARRAY_TASK_ID base_simulations 10000 0
-
-# python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv lca 5 100000 1 $SLURM_ARRAY_TASK_ID base_simulations 10000 0
-
-# python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv lca 6 100000 1 $SLURM_ARRAY_TASK_ID base_simulations 10000 0
-
-#python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv race_model 3 100000 1 $SLURM_ARRAY_TASK_ID 1000 0
-
-#python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv race_model 5 100000 1 $SLURM_ARRAY_TASK_ID
-
-#python -u /users/afengler/git_repos/nn_likelihoods/kde_base_simulations.py ccv race_model 6 100000 1 $SLURM_ARRAY_TASK_ID
-
-# declare -a dgps=( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "levy" ) # "lca" "race_model" "ddm_seq2" "ddm_par2" "ddm_mic2" "ddm_seq2_angle" "ddm_par2_angle" "ddm_mic2_angle")

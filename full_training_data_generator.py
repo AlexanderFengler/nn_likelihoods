@@ -208,43 +208,48 @@ class data_generator():
         # Get simulations
         with Pool(processes = self.config['n_cpus']) as pool:
             data_grid = np.array(pool.starmap(self._get_processed_data_for_theta, theta_list))
+        return data_grid
          
-        
-        # Save to correct destination
-        if save:
-            
-            # -----
-            training_data_folder = self.config['method_folder'] + \
-                                  'training_data_binned_' + \
-                                  str(int(self.config['binned'])) + \
-                                  '_nbins_' + str(self.config['nbins']) + \
-                                  '_n_' + str(self.config['nsamples'])
+#         if save:
+#             training_data_folder = self.config['method_folder'] + \
+#                       'training_data_binned_' + \
+#                       str(int(self.config['binned'])) + \
+#                       '_nbins_' + str(self.config['nbins']) + \
+#                       '_n_' + str(self.config['nsamples'])
+#             pickle.dump()
 
-            if not os.path.exists(training_data_folder):
-                os.makedirs(training_data_folder)
 
-            full_file_name = training_data_folder + '/' + \
-                            self.config['method'] + \
-                            '_nchoices_' + str(self.config['nchoices']) + \
-                            '_train_data_binned_' + \
-                            str(int(self.config['binned'])) + \
-                            '_nbins_' + str(self.config['nbins']) + \
-                            '_n_' + str(self.config['nsamples']) + \
-                            '_' + self.file_id + '.pickle'
+
+#         # Save to correct destination
+#         if save:
             
-            print('Writing to file: ', full_file_name)
+#             # -----
+
+#             if not os.path.exists(training_data_folder):
+#                 os.makedirs(training_data_folder)
+
+#             full_file_name = training_data_folder + '/' + \
+#                             self.config['method'] + \
+#                             '_nchoices_' + str(self.config['nchoices']) + \
+#                             '_train_data_binned_' + \
+#                             str(int(self.config['binned'])) + \
+#                             '_nbins_' + str(self.config['nbins']) + \
+#                             '_n_' + str(self.config['nsamples']) + \
+#                             '_' + self.file_id + '.pickle'
             
-            pickle.dump((np.float32(np.stack(theta_list)), 
-                         np.float32(np.expand_dims(data_grid, axis = 0)), 
-                         self.config['meta']), 
-                        open(full_file_name, 'wb'), 
-                        protocol = self.config['pickleprotocol'])
+#             print('Writing to file: ', full_file_name)
             
-            return 'Dataset completed'
+#             pickle.dump((np.float32(np.stack(theta_list)), 
+#                          np.float32(np.expand_dims(data_grid, axis = 0)), 
+#                          self.config['meta']), 
+#                         open(full_file_name, 'wb'), 
+#                         protocol = self.config['pickleprotocol'])
+            
+#             return 'Dataset completed'
         
-        # Or else return the data
-        else:
-            return np.float32(np.stack(theta_list)), np.float32(np.expand_dims(data_grid, axis = 0)) 
+#         # Or else return the data
+#         else:
+#             return np.float32(np.stack(theta_list)), np.float32(np.expand_dims(data_grid, axis = 0)) 
                                                              
     def generate_data_uniform(self, save = False):
         
@@ -529,6 +534,14 @@ if __name__ == "__main__":
         
     if args.datatype == 'parameter_recovery_hierarchical':
         dg.generate_data_hierarchical(save = args.save)
+        
+    if args.datatype == 'full':
+        x = dg.generate_full_data_uniform(save = False)
+        print(type(x))
+        print(len(x))
+        print(x)
+    
+        
         
     finish_t = datetime.now()
     print('Time elapsed: ', finish_t - start_t)
