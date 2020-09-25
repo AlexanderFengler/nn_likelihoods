@@ -8,7 +8,7 @@ import argparse
 from datetime import datetime
 import pickle
 import yaml
-#import keras_to_numpy as ktnp
+import keras_to_numpy as ktnp
 
 #from kde_training_utilities import kde_load_data
 from kde_training_utilities import kde_load_data_new
@@ -70,7 +70,6 @@ if __name__ == "__main__":
         stats = pickle.load(open("/users/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))[method]
         dnn_params = yaml.load(open("/users/afengler/git_repos/nn_likelihoods/hyperparameters.yaml"))
 
-
     if machine == 'x7':
         model_path = stats["model_folder_x7"]
     else:
@@ -98,6 +97,10 @@ if __name__ == "__main__":
         import tensorflow as tf
         from tensorflow import keras
         from tensorflow.keras.models import load_model
+        
+    if tf.__version__[0] == '2':
+        print('DISABLING EAGER EXECUTION')
+        tf.compat.v1.disable_eager_execution()
 
     from tensorflow.python.client import device_lib
     print(device_lib.list_local_devices())
@@ -120,7 +123,6 @@ if __name__ == "__main__":
                                 prelog_cutoff_low = 1e-7,
                                 prelog_cutoff_high = 100,
                                 make_split = True)
-
 
     # --------------------------------------------------------------------------------
 
