@@ -432,6 +432,7 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
     #data.values[: , -3:] = result.reshape((-1, 3))
     
     data.values[:, -3:] = np.concatenate(results)
+    
     # Filling in training data frame ---------------------------------------------------
     cnt = 0
     tmp_sim_data_ok = 0
