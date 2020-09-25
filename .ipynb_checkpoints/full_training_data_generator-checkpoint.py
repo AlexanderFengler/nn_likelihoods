@@ -48,111 +48,60 @@ class data_generator():
     def _get_training_data_theta(self, theta):
         out = self.get_simulations(theta)
     
-    def filter_simulations_fast(self,
-                                simulations = None,
-                                filters = {'mode': 20, # != (checking if mode is max_rt)
+    def _filter_simulations_fast(self,
+                                 simulations = None,
+                                 filters = {'mode': 20, # != (checking if mode is max_rt)
                                            'choice_cnt': 0, # > (checking that each choice receive at least 10 samples in simulator)
                                            'mean_rt': 15, # < (checking that mean_rt is smaller than specified value
                                            'std': 0, # > (checking that std is positive for each choice)
                                            'mode_cnt_rel': 0.5  # < (checking that mode does not receive more than a proportion of samples for each choice)
-                                          }
+                                           }
                                 ):
 
-    #sim_stat_data = [None] * n_datasets
-    max_t = simulations[2]['max_t']
-    tmp_max_rt_ = simulations[0].max().round(2)
-    #max_rts[i] = (file_[1][i, :, 0].max().round(2))
-    #max_ts[i] = max_t
-    #max_ts[i] = (file_[1][i][2]['max_t'])
-    # Standard deviation of reaction times
-    
-    choice_cnt_ = 0
-    for choice_tmp in simulations[2]['possible_choices']:
-        tmp_rts = simulations[0][simulations[1] == choice_tmp]
-        tmp_n_c = len(tmp_rts)
-        
-        if n_c > 0:
-            mode_, mode_cnt_ = mode(tmp_rts)
-            std_ = np.std(tmp_rts)
-            mean_ = np.mean(tmp_rts)
-        else:
-            mode_ = -1
-            mode_cnt_ = 0
-            mean_ = -1
-            std_ = -1
-        choice_cnt += 1
-        
-    keep = (1) & \
-           (mode_ != filters['mode']) & \
-           (choice_cnt > filters['choice_cnt']) & \
-           (mean_ < filters['mean_rt']) & \
-           (std_ > filters['std']) & \
-           ()
+        max_t = simulations[2]['max_t']
+        tmp_max_rt_ = simulations[0].max().round(2)
 
-    # Compute some more columns
-    for i in range(0, n_choices, 1):
-        sim_stat_data['mean_rt_' + str(i)] = mean_rts[:, i]
-        sim_stat_data['std_' + str(i)] = stds[:, i]
-        sim_stat_data['choice_cnt_' + str(i)] = choice_cnts[:,i]
-        sim_stat_data['mode_' + str(i)] = modes[:, i]
-        sim_stat_data['mode_cnt_' + str(i)] = mode_cnts[:, i]
+        keep = 1
+        for choice_tmp in simulations[2]['possible_choices']:
+            tmp_rts = simulations[0][simulations[1] == choice_tmp]
+            tmp_n_c = len(tmp_rts)
 
-        # Derived Columns
-        sim_stat_data['choice_prop_' + str(i)] = sim_stat_data['choice_cnt_' + str(i)] / n_simulations
-        sim_stat_data['mode_cnt_rel_' + str(i)] = sim_stat_data['mode_cnt_' + str(i)] / sim_stat_data['choice_cnt_' + str(i)]
-
-    # Clean-up
-    sim_stat_data = sim_stat_data.round(decimals = 2)
-    sim_stat_data = sim_stat_data.fillna(value = 0)
-
-    # check that max_t is consistently the same value across simulations
-    #assert len(np.unique(max_ts)) == 1
-
-    # Now filtering
-
-    # FILTER 1: PARAMETER RANGES
-    if param_ranges == 'none':
-            keep = sim_stat_data['max_t'] >= 0 # should return a vector of all true's
-    else:
-        cnt = 0
-        for param in param_ranges.keys():
-            if cnt == 0:
-                keep = (sim_stat_data[param] >= param_ranges[param][0]) & (sim_stat_data[param] <= param_ranges[param][1])
+            if n_c > 0:
+                mode_, mode_cnt_ = mode(tmp_rts)
+                std_ = np.std(tmp_rts)
+                mean_ = np.mean(tmp_rts)
             else:
-                keep = (keep) & \
-                       (sim_stat_data[param] >= param_ranges[param][0]) & (sim_stat_data[param] <= param_ranges[param][1])
-            cnt += 1
+                mode_ = -1
+                mode_cnt_ = 0
+                mean_ = -1
+                std_ = -1
 
-    # FILTER 2: SANITY CHECKS (Filter-bank)
-    for i in range(0, n_choices, 1):
-        keep = (keep) & \
-               (sim_stat_data['mode_' + str(i)] != filters['mode']) & \
-               (sim_stat_data['choice_cnt_' + str(i)] > filters['choice_cnt']) & \
-               (sim_stat_data['mean_rt_' + str(i)] < filters['mean_rt']) & \
-               (sim_stat_data['std_' + str(i)] > filters['std']) & \
-               (sim_stat_data['mode_cnt_rel_' + str(i)] < filters['mode_cnt_rel'])
+            mode_cnt_rel_ = mode_cnt_ / tmp_n_c
+            choice_prop_  = tmp_n_c / simulations[2]['n_samples']  
 
-    # Add keep_file column to
-    sim_stat_data['keep_file'] = keep
-
-    # Write files:
-    #pickle.dump(list(sim_stat_data.loc[keep, 'file']), open(base_simulation_folder + '/keep_files.pickle', 'wb'))
-    pickle.dump(sim_stat_data, 
-                open(base_simulation_folder + '/simulator_statistics' + '_' + str(file_id) + '.pickle', 'wb'))
-                     
-    return sim_stat_data 
-            
-            
+            keep = keep & \
+                   (mode_ != filters['mode']) & \
+                   (choice_cnt > filters['choice_cnt']) & \
+                   (mean_ < filters['mean_rt']) & \
+                   (std_ > filters['std']) & \
+                   (mode_cnt_rel < filters['mode_cnt_rel']) & \
+                   (tmp_n_c > filters['choice_cnt'])
+        return keep
+             
     def _make_kde_data(self,
-                       simulator_data = None, 
+                       simulations = None, 
+                       theta = None
                        n_kde = 800, 
                        n_unif_up = 100, 
                        n_unif_down = 100):
         
-        out = np.zeros((n_kde + n_unif_up + n_unif_down, 3))
-        tmp_kde = kde_class.logkde((simulator_data[0],
-                                    simulator_data[1], 
-                                    simulator_data[2]))
+        out = np.zeros((n_kde + n_unif_up + n_unif_down, 
+                        3 + len(theta)))
+        out[:len(theta), :] = np.tile(theta, (n_kde + n_unif_up + n_unif_down, 1) )
+        
+        tmp_kde = kde_class.logkde((simulations[0],
+                                    simulations[1], 
+                                    simulations[2]))
 
         # Get kde part
         samples_kde = tmp_kde.kde_sample(n_samples = n_kde)
@@ -191,15 +140,32 @@ class data_generator():
                                    high = 0.0001,
                                    size = n_unif_down)
 
-        out[(n_kde + n_unif_up):, 0] = rt_tmp
-        out[(n_kde + n_unif_up):, 1] = choice_tmp
-        out[(n_kde + n_unif_up):, 2] = -66.77497
+        out[(n_kde + n_unif_up):, -3] = rt_tmp
+        out[(n_kde + n_unif_up):, -2] = choice_tmp
+        out[(n_kde + n_unif_up):, -1] = -66.77497
 
         if idx % 10 == 0:
             print(idx)
 
         return out.astype(np.float)
-
+    
+    def _get_processed_data_for_theta(self,
+                                      )
+    
+        keep = 0
+        while not keep:
+            simulations = self.get_simulations()
+            keep = self.filter_simulations_fast(simulations,
+                                                filters = {'mode': 20, # != (checking if mode is max_rt)
+                                                           'choice_cnt': 0, # > (checking that each choice receive at least 10 samples in simulator)
+                                                           'mean_rt': 15, # < (checking that mean_rt is smaller than specified value
+                                                           'std': 0, # > (checking that std is positive for each choice)
+                                                          'mode_cnt_rel': 0.5  # < (checking that mode does not receive more than a proportion of samples for each choice)
+                                                          }
+                                               )
+            
+        
+        
         
     def _get_ncpus(self):
         
