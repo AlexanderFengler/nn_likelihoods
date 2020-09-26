@@ -38,8 +38,8 @@
 nmcmcsamples=2000
 nbyarrayjob=100
 ncpus=1
-nsamples=( 1024 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
-method="full_ddm2" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
+nsamples=( 4096 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
+method="levy" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
 ids=( -1 )
 machine='x7'
 samplerinit='mle'
