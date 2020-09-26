@@ -91,7 +91,7 @@ def simulator(theta,
                           boundary_fun = bf.constant,
                           boundary_multiplicative = True)
     
-    if model == 'angle':
+    if model == 'angle' or model == 'angle2':
         x = ddm_flexbound(v = theta[0], 
                           a = theta[1],
                           w = theta[2], 
@@ -102,7 +102,7 @@ def simulator(theta,
                           delta_t = delta_t,
                           n_samples = n_samples)
     
-    if model == 'weibull_cdf':
+    if model == 'weibull_cdf' or model == 'weibull_cdf2':
         x = ddm_flexbound(v = theta[0], 
                           a = theta[1], 
                           w = theta[2], 
@@ -125,7 +125,7 @@ def simulator(theta,
                            delta_t = delta_t,
                            n_samples = n_samples)
     
-    if model == 'full_ddm':
+    if model == 'full_ddm' or model == 'full_ddm2':
         x = full_ddm(v = theta[0],
                      a = theta[1],
                      w = theta[2], 
@@ -151,7 +151,7 @@ def simulator(theta,
                     delta_t = delta_t,
                     n_samples = n_samples)
         
-    if model == 'ornstein_uhlenbeck':
+    if model == 'ornstein':
         x = ornstein_uhlenbeck(v = theta[0], 
                                a = theta[1], 
                                w = theta[2], 

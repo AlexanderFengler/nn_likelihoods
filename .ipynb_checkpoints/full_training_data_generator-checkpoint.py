@@ -55,7 +55,7 @@ class data_generator():
     def _filter_simulations_fast(self,
                                  simulations = None,
                                  filters = {'mode': 20, # != (checking if mode is max_rt)
-                                           'choice_cnt': 0, # > (checking that each choice receive at least 10 samples in simulator)
+                                           'choice_cnt': 10, # > (checking that each choice receive at least 10 samples in simulator)
                                            'mean_rt': 15, # < (checking that mean_rt is smaller than specified value
                                            'std': 0, # > (checking that std is positive for each choice)
                                            'mode_cnt_rel': 0.5  # < (checking that mode does not receive more than a proportion of samples for each choice)
@@ -113,9 +113,9 @@ class data_generator():
         samples_kde = tmp_kde.kde_sample(n_samples = n_kde)
         likelihoods_kde = tmp_kde.kde_eval(data = samples_kde).ravel()
 
-        out[:n_kde, 0] = samples_kde[0].ravel()
-        out[:n_kde, 1] = samples_kde[1].ravel()
-        out[:n_kde, 2] = likelihoods_kde
+        out[:n_kde, -3] = samples_kde[0].ravel()
+        out[:n_kde, -2] = samples_kde[1].ravel()
+        out[:n_kde, -1] = likelihoods_kde
 
         # Get positive uniform part:
         choice_tmp = np.random.choice(simulations[2]['possible_choices'],
@@ -133,9 +133,9 @@ class data_generator():
         likelihoods_unif = tmp_kde.kde_eval(data = (rt_tmp, choice_tmp)).ravel()
 
 
-        out[n_kde:(n_kde + n_unif_up), 0] = rt_tmp
-        out[n_kde:(n_kde + n_unif_up), 1] = choice_tmp
-        out[n_kde:(n_kde + n_unif_up), 2] = likelihoods_unif
+        out[n_kde:(n_kde + n_unif_up), -3] = rt_tmp
+        out[n_kde:(n_kde + n_unif_up), -2] = choice_tmp
+        out[n_kde:(n_kde + n_unif_up), -1] = likelihoods_unif
 
 
         # Get negative uniform part:
@@ -154,23 +154,27 @@ class data_generator():
     
     def _get_processed_data_for_theta(self,
                                       theta):
-         
+        
+        
         keep = 0
         while not keep:
             simulations = self.get_simulations(theta = theta)
             keep, stats = self._filter_simulations_fast(simulations,
                                                 filters = {'mode': 20, # != (checking if mode is max_rt)
-                                                           'choice_cnt': 0, # > (checking that each choice receive at least 10 samples in simulator)
+                                                           'choice_cnt': 10, # > (checking that each choice receive at least 10 samples in simulator)
                                                            'mean_rt': 15, # < (checking that mean_rt is smaller than specified value
                                                            'std': 0, # > (checking that std is positive for each choice)
                                                            'mode_cnt_rel': 0.5  # < (checking that mode does not receive more than a proportion of samples for each choice)
                                                           }
                                                )
+            
             if keep == 0:
                 print('simulation rejected')
                 print('stats: ', stats)
                 print('theta', theta)
-                print()
+                theta = np.float32(np.random.uniform(low = self.config['param_bounds'][0], 
+                                                     high = self.config['param_bounds'][1]))
+                
             if keep == 1:
                 print('simulations accepted')
         
