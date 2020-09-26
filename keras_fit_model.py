@@ -8,7 +8,7 @@ import argparse
 from datetime import datetime
 import pickle
 import yaml
-import keras_to_numpy as ktnp
+#import keras_to_numpy as ktnp
 
 #from kde_training_utilities import kde_load_data
 from kde_training_utilities import kde_load_data_new
@@ -222,9 +222,9 @@ if __name__ == "__main__":
     model.save(model_path + "model_final.h5")
 
     # Extract model architecture as numpy arrays and save in model path
-    __, ___, ____, = ktnp.extract_architecture(model, 
-                                               save = True, 
-                                               save_path = model_path)
+#     __, ___, ____, = ktnp.extract_architecture(model, 
+#                                                save = True, 
+#                                                save_path = model_path)
 
     # Update model paths in model_path.yaml
     if machine == 'x7':

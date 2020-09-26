@@ -79,7 +79,7 @@ class data_generator():
         
         # Get simulations
         with Pool(processes = self.config['n_cpus']) as pool:
-            data_grid = np.array(pool.starmap(self.get_simulations, theta_list))
+            data_grid = np.array(pool.map(self.get_simulations, theta_list))
          
         
         # Save to correct destination

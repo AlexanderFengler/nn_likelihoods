@@ -79,7 +79,7 @@ class data_generator():
         
         # Get simulations
         with Pool(processes = self.config['n_cpus']) as pool:
-            data_grid = np.array(pool.starmap(self.get_simulations, theta_list))
+            data_grid = np.array(pool.map(self.get_simulations, theta_list))
          
         
         # Save to correct destination
@@ -202,7 +202,6 @@ class data_generator():
                 subject_param_grid[n, i, :] = np.float32(global_means[n] + truncnorm.rvs(a, b, size = global_stds.shape[1]) * global_stds[n])
 
         return subject_param_grid, global_stds, global_means
-    
    # ----------------------------------------------------
  
 # -------------------------------------------------------------------------------------
