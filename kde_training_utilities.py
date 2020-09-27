@@ -617,6 +617,8 @@ def kde_load_data_new(path = '',
     features.resize((cnt_samples, features.shape[1]), refcheck = False)
     labels.resize((cnt_samples, labels.shape[1]), refcheck = False)
     
+    
+    
     print('new n rows features: ', features.shape[0])
     print('new n rows labels: ', labels.shape[0])
     

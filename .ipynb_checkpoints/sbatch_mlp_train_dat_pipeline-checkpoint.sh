@@ -3,34 +3,30 @@
 # Default resources are 1 core with 2.8GB of memory per core.
 
 # job name:
-#SBATCH -J tpl_ddm
-
-#SBATCH --mail-user=alexander_fengler@brown.edu 
-#SBATCH --mail-type=ALL
-
+#SBATCH -J train_dat
 
 # priority
 ##SBATCH --account=bibs-frankmj-condo
 #SBATCH --account=carney-frankmj-condo
 
 # output file
-#SBATCH --output /users/afengler/batch_job_out/tpl_ddm_%A_%a.out
+#SBATCH --output /users/afengler/batch_job_out/tpl_1_%A_%a.out
 
 # Request runtime, memory, cores
-#SBATCH --time=18:00:00
-#SBATCH --mem=64G
-#SBATCH -c 11
+#SBATCH --time=6:00:00
+#SBATCH --mem=128G
+#SBATCH -c 12
 #SBATCH -N 1
-#SBATCH --array=1-750
+#SBATCH --array=1-200
 
 # --------------------------------------------------------------------------------------
 # Sequentially run different kind of models
 
 #declare -a dgps=( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "lca" "race_model" "ddm_seq2" "ddm_par2" "ddm_mic2" "ddm_seq2_angle" "ddm_par2_angle" "ddm_mic2_angle") 
-declare -a dgps=( "ddm" )  # ( "angle2" )  #( "weibull_cdf" ) # ( "ddm_seq2_angle" "ddm_mic2_angle" "ddm_par2_angle" )
+declare -a dgps=( "angle2" )  # ( "angle2" )  #( "weibull_cdf" ) # ( "ddm_seq2_angle" "ddm_mic2_angle" "ddm_par2_angle" )
 n_samples=( 100000 )   # ( 128 256 512 1024 2048 4096 8192 50000 100000 200000 400000 )
 n_choices=( 2 ) #( 4 5 6 )
-n_parameter_sets=2000   #20000
+n_parameter_sets=5000   #20000
 n_bins=( 0 )
 binned=0
 machine="ccv" #"ccv"
@@ -38,8 +34,7 @@ datatype="cnn_train" #"cnn_train" # "parameter_recovery"
 mode="mlp"
 analytic=0
 maxt=20
-nproc=10
-pickleprotocol=4
+nproc=12
 
 # params concerning training data generation
 nbyparam=1000

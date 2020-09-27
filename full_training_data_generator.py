@@ -49,185 +49,10 @@ class data_generator():
             self._build_simulator()
             self._get_ncpus()
             
-    def _get_training_data_theta(self, theta):
-        out = self.get_simulations(theta)
-    
-    def _filter_simulations_fast(self,
-                                 simulations = None,
-                                 filters = {'mode': 20, # != (checking if mode is max_rt)
-                                           'choice_cnt': 10, # > (checking that each choice receive at least 10 samples in simulator)
-                                           'mean_rt': 15, # < (checking that mean_rt is smaller than specified value
-                                           'std': 0, # > (checking that std is positive for each choice)
-                                           'mode_cnt_rel': 0.5  # < (checking that mode does not receive more than a proportion of samples for each choice)
-                                           }
-                                ):
-
-        max_t = simulations[2]['max_t']
-        tmp_max_rt_ = simulations[0].max().round(2)
-
-        keep = 1
-        for choice_tmp in simulations[2]['possible_choices']:
-            tmp_rts = simulations[0][simulations[1] == choice_tmp]
-            tmp_n_c = len(tmp_rts)
-
-            if tmp_n_c > 0:
-                mode_, mode_cnt_ = mode(tmp_rts)
-                std_ = np.std(tmp_rts)
-                mean_ = np.mean(tmp_rts)
-                mode_cnt_rel_ = mode_cnt_ / tmp_n_c
-                choice_prop_  = tmp_n_c / simulations[2]['n_samples']
-            else:
-                mode_ = -1
-                mode_cnt_ = 0
-                mean_ = -1
-                std_ = -1
-                mode_cnt_rel_ = 1
-                choice_prop_  = 0
-
-            
-
-            keep = keep & \
-                   (mode_ != filters['mode']) & \
-                   (mean_ < filters['mean_rt']) & \
-                   (std_ > filters['std']) & \
-                   (mode_cnt_rel_ < filters['mode_cnt_rel']) & \
-                   (tmp_n_c > filters['choice_cnt'])
-        return keep, np.array([mode_, mean_, std_, mode_cnt_rel_, tmp_n_c])
-             
-    def _make_kde_data(self,
-                       simulations = None, 
-                       theta = None,
-                       n_kde = 800, 
-                       n_unif_up = 100, 
-                       n_unif_down = 100):
-        
-        out = np.zeros((n_kde + n_unif_up + n_unif_down, 
-                        3 + len(theta)))
-        out[:, :len(theta)] = np.tile(theta, (n_kde + n_unif_up + n_unif_down, 1) )
-        
-        tmp_kde = kde_class.logkde((simulations[0],
-                                    simulations[1], 
-                                    simulations[2]))
-
-        # Get kde part
-        samples_kde = tmp_kde.kde_sample(n_samples = n_kde)
-        likelihoods_kde = tmp_kde.kde_eval(data = samples_kde).ravel()
-
-        out[:n_kde, -3] = samples_kde[0].ravel()
-        out[:n_kde, -2] = samples_kde[1].ravel()
-        out[:n_kde, -1] = likelihoods_kde
-
-        # Get positive uniform part:
-        choice_tmp = np.random.choice(simulations[2]['possible_choices'],
-                                      size = n_unif_up)
-
-        if simulations[2]['max_t'] < 100:
-            rt_tmp = np.random.uniform(low = 0.0001,
-                                       high = simulations[2]['max_t'],
-                                       size = n_unif_up)
-        else: 
-            rt_tmp = np.random.uniform(low = 0.0001, 
-                                       high = 100,
-                                       size = n_unif_up)
-
-        likelihoods_unif = tmp_kde.kde_eval(data = (rt_tmp, choice_tmp)).ravel()
-
-
-        out[n_kde:(n_kde + n_unif_up), -3] = rt_tmp
-        out[n_kde:(n_kde + n_unif_up), -2] = choice_tmp
-        out[n_kde:(n_kde + n_unif_up), -1] = likelihoods_unif
-
-
-        # Get negative uniform part:
-        choice_tmp = np.random.choice(simulations[2]['possible_choices'],
-                                      size = n_unif_down)
-
-        rt_tmp = np.random.uniform(low = - 1.0,
-                                   high = 0.0001,
-                                   size = n_unif_down)
-
-        out[(n_kde + n_unif_up):, -3] = rt_tmp
-        out[(n_kde + n_unif_up):, -2] = choice_tmp
-        out[(n_kde + n_unif_up):, -1] = -66.77497
-
-        return out.astype(np.float)
-    
-    def _get_processed_data_for_theta(self,
-                                      theta):
-        
-        
-        keep = 0
-        while not keep:
-            simulations = self.get_simulations(theta = theta)
-            keep, stats = self._filter_simulations_fast(simulations,
-                                                filters = {'mode': 20, # != (checking if mode is max_rt)
-                                                           'choice_cnt': 10, # > (checking that each choice receive at least 10 samples in simulator)
-                                                           'mean_rt': 15, # < (checking that mean_rt is smaller than specified value
-                                                           'std': 0, # > (checking that std is positive for each choice)
-                                                           'mode_cnt_rel': 0.5  # < (checking that mode does not receive more than a proportion of samples for each choice)
-                                                          }
-                                               )
-            
-            if keep == 0:
-                print('simulation rejected')
-                print('stats: ', stats)
-                print('theta', theta)
-                theta = np.float32(np.random.uniform(low = self.config['param_bounds'][0], 
-                                                     high = self.config['param_bounds'][1]))
-                
-            if keep == 1:
-                print('simulations accepted')
-        
-        data = self._make_kde_data(simulations = simulations,
-                                   theta = theta,
-                                   n_kde = 800,
-                                   n_unif_up = 100,
-                                   n_unif_down = 100)
-        
-        return data
-             
-    def _get_ncpus(self):
-        
-        # Sepfic
-        if self.config['n_cpus'] == 'all':
-            n_cpus = psutil.cpu_count(logical = False)
-            print('n_cpus: ', n_cpus)
-        else:
-            n_cpus = self.config['n_cpus']
-        
-        self.config['n_cpus'] = n_cpus
-        
-    def _build_simulator(self):
-        self.simulator = partial(bs.simulator, 
-                                 n_samples = self.config['n_samples'],
-                                 max_t = self.config['max_t'],
-                                 bin_dim = self.config['nbins'],
-                                 delta_t = self.config['delta_t'])
-                                 
-    def get_simulations(self, theta = None):
-        out = self.simulator(theta, 
-                             self.config['method'])
-        # TODO: Add 
-        if self.config['nbins'] is not None:
-            return np.concatenate([out[0], out[1]], axis = 1)
-        else:
-            return out
-        
-    def generate_full_data_uniform(self, 
-                                   save = False):
-        
-        # Make parameters
-        theta_list = [np.float32(np.random.uniform(low = self.config['param_bounds'][0], 
-                                                    high = self.config['param_bounds'][1])) for i in range(self.config['nparamsets'])]
-        #theta_list = tuple(theta_list)
-        print(theta_list)
-        print('now data generator is called')
-        # Get simulations
-        with Pool(processes = self.config['n_cpus']) as pool:
-            data_grid = np.array(pool.map(self._get_processed_data_for_theta, theta_list))
-        return data_grid
-         
-#         if save:
+    def _saver(self, 
+               data):
+        pass
+        #         if save:
 #             training_data_folder = self.config['method_folder'] + \
 #                       'training_data_binned_' + \
 #                       str(int(self.config['binned'])) + \
@@ -267,7 +92,221 @@ class data_generator():
 #         # Or else return the data
 #         else:
 #             return np.float32(np.stack(theta_list)), np.float32(np.expand_dims(data_grid, axis = 0)) 
-                                                             
+        
+            
+    def _get_training_data_theta(self, theta):
+        out = self.get_simulations(theta)
+    
+    def _filter_simulations_fast(self,
+                                 simulations = None,
+                                ):
+
+        max_t = simulations[2]['max_t']
+        tmp_max_rt_ = simulations[0].max().round(2)
+
+        keep = 1
+        for choice_tmp in simulations[2]['possible_choices']:
+            tmp_rts = simulations[0][simulations[1] == choice_tmp]
+            tmp_n_c = len(tmp_rts)
+
+            if tmp_n_c > 0:
+                mode_, mode_cnt_ = mode(tmp_rts)
+                std_ = np.std(tmp_rts)
+                mean_ = np.mean(tmp_rts)
+                mode_cnt_rel_ = mode_cnt_ / tmp_n_c
+                choice_prop_  = tmp_n_c / simulations[2]['n_samples']
+            else:
+                mode_ = -1
+                mode_cnt_ = 0
+                mean_ = -1
+                std_ = -1
+                mode_cnt_rel_ = 1
+                choice_prop_  = 0
+
+            keep = keep & \
+                   (mode_ != self.config['filter']['mode']) & \
+                   (mean_ < self.config['filter']['mean_rt']) & \
+                   (std_ > self.config['filter']['std']) & \
+                   (mode_cnt_rel_ < self.config['filter']['mode_cnt_rel']) & \
+                   (tmp_n_c > self.config['filter']['choice_cnt'])
+        
+        return keep, np.array([mode_, mean_, std_, mode_cnt_rel_, tmp_n_c])
+             
+    def _make_kde_data(self,
+                       simulations = None, 
+                       theta = None):
+        
+        
+        n = self.config['n_by_param']
+        p = self.config['mixture_probabilities']
+        n_kde = int(n * p[0])
+        n_unif_up = int(n * p[1])
+        n_unif_down = int(n * p[2])
+                    
+        out = np.zeros((n_kde + n_unif_up + n_unif_down, 
+                        3 + len(theta)))
+        out[:, :len(theta)] = np.tile(theta, (n_kde + n_unif_up + n_unif_down, 1) )
+        
+        tmp_kde = kde_class.logkde((simulations[0],
+                                    simulations[1], 
+                                    simulations[2]))
+
+        # Get kde part
+        samples_kde = tmp_kde.kde_sample(n_samples = n_kde)
+        likelihoods_kde = tmp_kde.kde_eval(data = samples_kde).ravel()
+
+        out[:n_kde, -3] = samples_kde[0].ravel()
+        out[:n_kde, -2] = samples_kde[1].ravel()
+        out[:n_kde, -1] = likelihoods_kde
+
+        # Get positive uniform part:
+        choice_tmp = np.random.choice(simulations[2]['possible_choices'],
+                                      size = n_unif_up)
+
+        if simulations[2]['max_t'] < 100:
+            rt_tmp = np.random.uniform(low = 0.0001,
+                                       high = simulations[2]['max_t'],
+                                       size = n_unif_up)
+        else: 
+            rt_tmp = np.random.uniform(low = 0.0001, 
+                                       high = 100,
+                                       size = n_unif_up)
+
+        likelihoods_unif = tmp_kde.kde_eval(data = (rt_tmp, choice_tmp)).ravel()
+
+        out[n_kde:(n_kde + n_unif_up), -3] = rt_tmp
+        out[n_kde:(n_kde + n_unif_up), -2] = choice_tmp
+        out[n_kde:(n_kde + n_unif_up), -1] = likelihoods_unif
+
+        # Get negative uniform part:
+        choice_tmp = np.random.choice(simulations[2]['possible_choices'],
+                                      size = n_unif_down)
+
+        rt_tmp = np.random.uniform(low = - 1.0,
+                                   high = 0.0001,
+                                   size = n_unif_down)
+
+        out[(n_kde + n_unif_up):, -3] = rt_tmp
+        out[(n_kde + n_unif_up):, -2] = choice_tmp
+        out[(n_kde + n_unif_up):, -1] = -66.77497
+
+        return out.astype(np.float)
+    
+    def _get_processed_data_for_theta(self,
+                                      random_seed):
+        np.random.seed(random_seed)
+        keep = 0
+        while not keep:
+            theta = np.float32(np.random.uniform(low = self.config['param_bounds'][0], 
+                                                     high = self.config['param_bounds'][1]))
+            
+            simulations = self.get_simulations(theta = theta)
+            keep, stats = self._filter_simulations_fast(simulations)
+
+        data = self._make_kde_data(simulations = simulations,
+                                   theta = theta)
+        return data
+
+    def _get_rejected_parameter_setups(self,
+                                       random_seed):
+        
+        rejected_thetas = []
+        keep = 0
+        
+        while not keep:
+            theta = np.float32(np.random.uniform(low = self.config['param_bounds'][0], 
+                                                     high = self.config['param_bounds'][1]))
+            
+            simulations = self.get_simulations(theta = theta)
+            
+            keep, stats = self._filter_simulations_fast(simulations)
+            
+            if keep == 0:
+                print('simulation rejected')
+                print('stats: ', stats)
+                print('theta', theta)
+                rejected_thetas.append(theta)
+                
+            if keep == 1:
+                print('simulations accepted')
+        
+        return rejected_thetas
+             
+    def _get_ncpus(self):
+        
+        # Sepfic
+        if self.config['n_cpus'] == 'all':
+            n_cpus = psutil.cpu_count(logical = False)
+            print('n_cpus: ', n_cpus)
+        else:
+            n_cpus = self.config['n_cpus']
+        
+        self.config['n_cpus'] = n_cpus
+        
+    def _build_simulator(self):
+        self.simulator = partial(bs.simulator, 
+                                 n_samples = self.config['n_samples'],
+                                 max_t = self.config['max_t'],
+                                 bin_dim = self.config['nbins'],
+                                 delta_t = self.config['delta_t'])
+                                 
+    def get_simulations(self, theta = None):
+        out = self.simulator(theta, 
+                             self.config['method'])
+        # TODO: Add 
+        if self.config['nbins'] is not None:
+            return np.concatenate([out[0], out[1]], axis = 1)
+        else:
+            return out
+        
+    def generate_full_data_uniform(self, 
+                                   save = False,):
+        
+        seeds = np.random.choice(400000000, size = self.config['nparamsets'])
+        
+        # Inits
+        data_grid = np.zeros((int(self.config['nparamsets'] * 1000), 
+                              len(self.config['param_bounds'][0]) + 3))
+        subrun_n = self.config['nparamsets'] // self.config['printsplit']
+        
+        # Get Simulations 
+        # TODO: binned version should also work here....
+        for i in range(self.config['printsplit']):
+            print('simulation round:', i + 1 , ' of', self.config['printsplit'])
+            with Pool(processes = self.config['n_cpus']) as pool:
+                data_grid[(i * subrun_n * 1000):((i + 1) * subrun_n * 1000), :] = np.concatenate(pool.map(self._get_processed_data_for_theta, 
+                                                                                                          [j for j in seeds[(i * subrun_n):((i + 1) * subrun_n)]]))
+        if save:
+            if self.config['mode'] == 'test':
+                
+                
+                
+            else:   
+                training_data_folder = self.config['method_folder'] + \
+                                                   'parameter_recovery_data_binned_' + \
+                                                   str(int(self.config['binned'])) + \
+                                                   '_nbins_' + str(self.config['nbins']) + \
+                                                   '_n_' + str(self.config['nsamples'])
+
+                if not os.path.exists(training_data_folder):
+                    os.makedirs(training_data_folder)
+
+                full_file_name = training_data_folder + '/' + \
+                                 'data_' + \
+                                 self.file_id + '.pickle'
+
+                print('Writing to file: ', full_file_name)
+
+                pickle.dump(np.float32(data_grid),
+                            self.config['meta']),
+                            open(full_file_name, 'wb'), 
+                            protocol = self.config['pickleprotocol'])
+
+                return 'Dataset completed'
+        
+        else:
+            return data_grid
+         
     def generate_data_uniform(self, save = False):
         
         # Make parameters
@@ -276,7 +315,7 @@ class data_generator():
         
         # Get simulations
         with Pool(processes = self.config['n_cpus']) as pool:
-            data_grid = np.array(pool.starmap(self.get_simulations, theta_list))
+            data_grid = np.array(pool.map(self.get_simulations, theta_list))
          
         
         # Save to correct destination
@@ -461,6 +500,12 @@ if __name__ == "__main__":
     CLI.add_argument("--pickleprotocol",
                      type = int,
                      default = 4)
+    CLI.add_argument("--printsplit",
+                     type = int,
+                     default = 10)
+    CLI.add_argument("--nbyparam",
+                     type = int,
+                     default = 1000)
     
     args = CLI.parse_args()
     print('Arguments passed: ')
@@ -501,6 +546,15 @@ if __name__ == "__main__":
     config['n_samples'] = args.nsamples
     config['max_t'] = args.maxt
     config['delta_t'] = args.deltat
+    config['printsplit'] = args.printsplit
+    config['n_by_param'] = args.nbyparam
+    config['mixture_probabilities'] = [0.8, 0.1, 0.1]
+    config['filter'] =  {'mode': 20, # != (if mode is max_rt)
+                         'choice_cnt': 10, # > (each choice receive at least 10 samples in simulator)
+                         'mean_rt': 15, # < (mean_rt is smaller than specified value
+                         'std': 0, # > (std is positive for each choice)
+                         'mode_cnt_rel': 0.5  # < (mode does not receive more than a proportion of samples for each choice)
+                        }
     
     # Make parameter bounds
     if args.mode == 'train' and config['binned']:
@@ -557,9 +611,8 @@ if __name__ == "__main__":
         x = dg.generate_full_data_uniform(save = False)
         print(type(x))
         print(len(x))
+        print(x.shape)
         print(x)
-    
-        
         
     finish_t = datetime.now()
     print('Time elapsed: ', finish_t - start_t)

@@ -23,7 +23,7 @@
 # Sequentially run different kind of models
 
 #declare -a dgps=( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "lca" "race_model" "ddm_seq2" "ddm_par2" "ddm_mic2" "ddm_seq2_angle" "ddm_par2_angle" "ddm_mic2_angle") 
-declare -a dgps=( "levy" )  # ( "angle2" )  #( "weibull_cdf" ) # ( "ddm_seq2_angle" "ddm_mic2_angle" "ddm_par2_angle" )
+declare -a dgps=( "ornstein" )  # ( "angle2" )  #( "weibull_cdf" ) # ( "ddm_seq2_angle" "ddm_mic2_angle" "ddm_par2_angle" )
 n_samples=( 100000 )   # ( 128 256 512 1024 2048 4096 8192 50000 100000 200000 400000 )
 n_choices=( 2 ) #( 4 5 6 )
 n_parameter_sets=5000   #20000
