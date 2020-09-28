@@ -71,7 +71,7 @@ class data_generator():
         out = self.simulator(theta, 
                              self.config['method'])
 
-        if self.config['nbins'] is not None:
+        if self.config['nbins'] > 0:
             return self._bin_simulator_output(simulations = out)
         else:
             return out
@@ -209,7 +209,7 @@ class data_generator():
                                           random_seed):
         np.random.seed(random_seed)
         theta = np.float32(np.random.uniform(low = self.config['param_bounds'][0], 
-                                                     high = self.config['param_bounds'][1]))
+                                             high = self.config['param_bounds'][1]))
         return self.get_simulations(theta = theta)
              
     def _get_rejected_parameter_setups(self,
@@ -231,6 +231,7 @@ class data_generator():
                 print('stats: ', stats)
                 print('theta', theta)
                 rejected_thetas.append(theta)
+                break
 
             rej_cnt += 1
         
@@ -268,7 +269,7 @@ class data_generator():
         # Inits
         subrun_n = self.config['nparamsets'] // self.config['printsplit']
         
-        if self.config['nbins'] == None:
+        if self.config['nbins'] == 0:
             data_grid = np.zeros((int(self.config['nparamsets'] * 1000), 
                               len(self.config['param_bounds'][0]) + 3))
 
@@ -299,7 +300,7 @@ class data_generator():
 
             full_file_name = training_data_folder + '/' + \
                              'data_' + \
-                             self.file_id + '.pickle'
+                             self.config['file_id'] + '.pickle'
 
             print('Writing to file: ', full_file_name)
 
@@ -365,7 +366,7 @@ class data_generator():
                                 str(int(self.config['binned'])) + \
                                 '_nbins_' + str(self.config['nbins']) + \
                                 '_n_' + str(self.config['nsamples']) + \
-                                '_' + self.file_id + '.pickle'
+                                '_' + self.config['file_id'] + '.pickle'
             
             print('Writing to file: ', full_file_name)
             
@@ -422,40 +423,40 @@ class data_generator():
             return ([subject_param_grid, global_stds, global_means], data_grid, meta)
 
     def generate_rejected_parameterizations(self, 
-                                   save = False):
+                                            save = False):
 
-    seeds = np.random.choice(400000000, size = self.config['nparamsetsrej'])
+        seeds = np.random.choice(400000000, size = self.config['nparamsetsrej'])
 
-    # Get Simulations 
-    with Pool(processes = self.config['n_cpus']) as pool:
-        rejected_parameterization_list = pool.map(self._get_rejected_parameter_setups, 
-                                                  seeds)
-    rejected_parameterization_list = np.concatenate([l for l in rejected_parameterization_list if len(l) > 0])
+        # Get Simulations 
+        with Pool(processes = self.config['n_cpus']) as pool:
+            rejected_parameterization_list = pool.map(self._get_rejected_parameter_setups, 
+                                                      seeds)
+        rejected_parameterization_list = np.concatenate([l for l in rejected_parameterization_list if len(l) > 0])
 
-    if save:
-        training_data_folder = self.config['method_folder'] + \
-                              'training_data_binned_' + \
-                              str(int(self.config['binned'])) + \
-                              '_nbins_' + str(self.config['nbins']) + \
-                              '_n_' + str(self.config['nsamples'])
+        if save:
+            training_data_folder = self.config['method_folder'] + \
+                                  'training_data_binned_' + \
+                                  str(int(self.config['binned'])) + \
+                                  '_nbins_' + str(self.config['nbins']) + \
+                                  '_n_' + str(self.config['nsamples'])
 
-        if not os.path.exists(training_data_folder):
-            os.makedirs(training_data_folder)
+            if not os.path.exists(training_data_folder):
+                os.makedirs(training_data_folder)
 
-        full_file_name = training_data_folder + '/' + \
-                         'rejected_parameterizations_' + \
-                         self.file_id + '.pickle'
+            full_file_name = training_data_folder + '/' + \
+                             'rejected_parameterizations_' + \
+                             self.config['file_id'] + '.pickle'
 
-        print('Writing to file: ', full_file_name)
+            print('Writing to file: ', full_file_name)
 
-        pickle.dump(np.float32(rejected_parameterization_list),
-                    open(full_file_name, 'wb'), 
-                    protocol = self.config['pickleprotocol'])
+            pickle.dump(np.float32(rejected_parameterization_list),
+                        open(full_file_name, 'wb'), 
+                        protocol = self.config['pickleprotocol'])
 
-        return 'Dataset completed'
+            return 'Dataset completed'
 
-    else:
-        return data_grid
+        else:
+            return data_grid
 
    # ----------------------------------------------------
  
@@ -487,7 +488,7 @@ if __name__ == "__main__":
                      default = 1)
     CLI.add_argument("--nbins",
                      type = int,
-                     default = None)
+                     default = 0)
     CLI.add_argument("--nsamples",
                      type = int,
                      default = 20000)
@@ -545,16 +546,14 @@ if __name__ == "__main__":
     config['mode'] = args.mode
     config['file_id'] = args.fileid
     config['nsamples'] = args.nsamples
-    if args.nbins is not None:
+
+    config['nbins'] = args.nbins
+        
+    if args.nbins > 0:
         config['binned'] = 1
     else:
         config['binned'] = 0
-        
-    if args.nbins == 0:
-        config['nbins'] = None
-    else:
-        config['nbins'] = args.nbins
-        
+    
     config['datatype'] = args.datatype
     config['nchoices'] = args.nchoices
     config['nparamsets'] = args.nparamsets
@@ -587,7 +586,7 @@ if __name__ == "__main__":
     config['param_bounds'] = np.array([[i[0] for i in bounds_tmp], [i[1] for i in bounds_tmp]])
     config['nparams'] = config['param_bounds'][0].shape[0]
     
-    config['meta'] = kde_info.temp[config['method']]['dgp_hyperparameters']
+    config['meta'] = dict(kde_info.temp[config['method']]['dgp_hyperparameters'])
     config['meta']['n_samples'] = config['n_samples']
     config['meta']['delta_t'] = config['delta_t']
     

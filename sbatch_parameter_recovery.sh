@@ -20,16 +20,16 @@
 # --------------------------------------------------------------------
 
 # INITIALIZATIONS ----------------------------------------------------
-declare -a dgps=( "ddm_tutorial" "angle_tutorial" "weibull_cdf_tutorial")
-n_samples=( 1000 ) 
+declare -a dgps=( "ddm_sdv_elife" )      #( "ddm_tutorial" "angle_tutorial" "weibull_cdf_tutorial")
+n_samples=( 1024 4096 )
 n_choices=( 2 ) # 3 4 5 6 ) #4 5 6 )
-n_parameter_sets=10  #20000
-n_subjects=( 5 )
+n_parameter_sets=1000  #20000
+n_subjects=( 1 )
 n_bins=( 0 )
 binned=0
 mode='test'
-datatype='parameter_recovery_hierarchical'
-machine='other' # 'home' (alex laptop), 'ccv' (oscar), 'x7' (serrelab), 'other' (makes folders in this repo)
+datatype='parameter_recovery'  #'parameter_recovery_hierarchical'
+machine='home' # 'home' (alex laptop), 'ccv' (oscar), 'x7' (serrelab), 'other' (makes folders in this repo)
 maxt=20
 # ---------------------------------------------------------------------
 

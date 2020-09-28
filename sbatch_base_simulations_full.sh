@@ -25,7 +25,8 @@
 declare -a dgps=( "ddm" ) # "race_model" "lca" ) #"ddm_sdv_analytic" "ddm_sdv_red_analytic" ) #( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "levy" )  #( "ddm_mic2_angle" "ddm_par2_angle" ) # ( "ddm_seq2_angle" )
 n_samples=( 100000 )   # ( 128 256 512 1024 2048 4096 8192 50000 100000 200000 400000 )
 n_choices=( 2 ) #( 4 5 6 )
-n_parameter_sets=20  # cnn 20000 but 150 array   # mlp 10000 but 300 array # KRISHN: 10
+nparamsets=20
+nparamsetsrej=20 # cnn 20000 but 150 array   # mlp 10000 but 300 array # KRISHN: 10
 n_bins=( 0 ) # KRISHN: n_bins=0
 machine="home" #"ccv" "home" "x7"
 datatype="rej"  #"parameter_recovery" "training" "parameter_recovery_hierarchical"
@@ -58,7 +59,8 @@ do
                                                                  --nchoices $n_c \
                                                                  --nsamples $n \
                                                                  --mode $mode \
-                                                                 --nparamsets $n_parameter_sets \
+                                                                 --nparamsets $nparamsets \
+                                                                 --nparamsetsrej $nparamsetsrej \
                                                                  --save $save_output \
                                                                  --deltat 0.001 \
                                                                  --fileid 999 #$SLURM_ARRAY_TASK_ID 
@@ -76,7 +78,8 @@ do
                                                               --nchoices ${n_choices[0]} \
                                                               --nsamples $n \
                                                               --mode $mode \
-                                                              --nparamsets $n_parameter_sets \
+                                                              --nparamsets $nparamsets \
+                                                              --nparamsetsrej $nparamsetsrej \
                                                               --save $save_output  \
                                                               --deltat 0.001 \
                                                               --fileid 999 #$SLURM_ARRAY_TASK_ID
