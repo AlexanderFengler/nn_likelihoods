@@ -35,7 +35,7 @@ module load cudnn/7.6
 nfiles=200
 method='ornstein'
 analytic=0
-machine='x7'
+machine='ccv'
 maxidfiles=200
 
 

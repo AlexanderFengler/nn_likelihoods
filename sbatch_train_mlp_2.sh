@@ -33,7 +33,7 @@ module load cuda/10.0.130
 module load cudnn/7.6 
 
 nfiles=200
-method='full_'
+method='full_ddm2'
 analytic=0
 machine='ccv'
 maxidfiles=200
