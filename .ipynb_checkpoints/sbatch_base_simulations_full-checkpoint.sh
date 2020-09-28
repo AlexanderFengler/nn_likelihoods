@@ -22,17 +22,18 @@
 
 # --------------------------------------------------------------------------------------
 # Sequentially run different kind of models
-declare -a dgps=( "full_ddm2" ) # "race_model" "lca" ) #"ddm_sdv_analytic" "ddm_sdv_red_analytic" ) #( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "levy" )  #( "ddm_mic2_angle" "ddm_par2_angle" ) # ( "ddm_seq2_angle" )
+declare -a dgps=( "ddm" ) # "race_model" "lca" ) #"ddm_sdv_analytic" "ddm_sdv_red_analytic" ) #( "ddm" "full_ddm" "angle" "weibull_cdf" "ornstein" "levy" )  #( "ddm_mic2_angle" "ddm_par2_angle" ) # ( "ddm_seq2_angle" )
 n_samples=( 100000 )   # ( 128 256 512 1024 2048 4096 8192 50000 100000 200000 400000 )
 n_choices=( 2 ) #( 4 5 6 )
 n_parameter_sets=20  # cnn 20000 but 150 array   # mlp 10000 but 300 array # KRISHN: 10
 n_bins=( 0 ) # KRISHN: n_bins=0
 binned=0 # KRISHN: binned=0
 machine="home" #"ccv" "home" "x7"
-datatype="full" #"parameter_recovery" #"parameter_recovery" #"parameter_recovery_hierarchical" "parameter_recovery" "cnn_train" # KRISHN: 'parameter_recovery'
+datatype="rej" #"parameter_recovery" #"parameter_recovery" #"parameter_recovery_hierarchical" "parameter_recovery" "cnn_train" # KRISHN: 'parameter_recovery'
 nsubjects=1 #10
 mode="test" # "test" #"test"  #'mlp' 'cnn' # KRISHN: 'test'
 maxt=20 # 20 for mlp # KRISHN: 20
+save_output=0
 # outer -------------------------------------
 for bins in "${n_bins[@]}"
 do
@@ -59,7 +60,7 @@ do
                                                                  --nsamples $n \
                                                                  --mode $mode \
                                                                  --nparamsets $n_parameter_sets \
-                                                                 --save 1 \
+                                                                 --save $save_output \
                                                                  --deltat 0.001 \
                                                                  --fileid 999 #$SLURM_ARRAY_TASK_ID 
                 done
@@ -77,7 +78,7 @@ do
                                                               --nsamples $n \
                                                               --mode $mode \
                                                               --nparamsets $n_parameter_sets \
-                                                              --save 1  \
+                                                              --save $save_output  \
                                                               --deltat 0.001 \
                                                               --fileid 999 #$SLURM_ARRAY_TASK_ID
 

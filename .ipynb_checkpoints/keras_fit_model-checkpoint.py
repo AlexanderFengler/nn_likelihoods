@@ -11,8 +11,71 @@ import yaml
 #import keras_to_numpy as ktnp
 
 #from kde_training_utilities import kde_load_data
-from kde_training_utilities import kde_load_data_new
+#from kde_training_utilities import kde_load_data_new
 #from kde_training_utilities import kde_make_train_test_split
+
+
+# SUPPORT FUNCTIONS ----------------------------
+def kde_load_data_new(path = '',
+                      file_id_list = '',
+                      prelog_cutoff_low = 1e-29,
+                      prelog_cutoff_high = 100,
+                      n_samples_by_dataset = 10000000,
+                      return_log = True,
+                      make_split = True,
+                      val_p = 0.01):
+    
+    # Read in two datasets to get meta data for the subsequent
+    print('Reading in initial dataset')
+    tmp_data = np.load(path + file_id_list[0], allow_pickle = True)
+    
+    # Collect some meta data 
+    n_files = len(file_id_list)
+    print('n_files: ', n_files)
+    print('n_samples_by_dataset: ', n_samples_by_dataset)
+    
+    # Allocate memory for data  
+    print('Allocating data arrays')
+    features = np.zeros((n_files * n_samples_by_dataset, tmp_data.shape[1] - 1))
+    labels = np.zeros((n_files * n_samples_by_dataset, 1))
+    
+    # Read in data of initialization files
+    cnt_samples = tmp_data.shape[0]
+    features[:cnt_samples, :] = tmp_data[:, :-1]
+    labels[:cnt_samples, 0] = tmp_data[:, -1]
+    
+    # Read in remaining files into preallocated np.array
+    for i in range(1, n_files, 1):
+        tmp_data = np.load(path + file_id_list[i], allow_pickle = True)
+        n_rows_tmp = tmp_data.shape[0]
+        features[(cnt_samples): (cnt_samples + n_rows_tmp), :] = tmp_data[:, :-1]
+        labels[(cnt_samples): (cnt_samples + n_rows_tmp), 0] = tmp_data[:, -1]
+        cnt_samples += n_rows_tmp
+        print(i, ' files processed')
+        
+    features.resize((cnt_samples, features.shape[1]), refcheck = False)
+    labels.resize((cnt_samples, labels.shape[1]), refcheck = False)
+    
+    print('new n rows features: ', features.shape[0])
+    print('new n rows labels: ', labels.shape[0])
+    
+    if prelog_cutoff_low != 'none':
+        labels[labels < np.log(prelog_cutoff_low)] = np.log(prelog_cutoff_low)
+    if prelog_cutoff_high != 'none':    
+        labels[labels > np.log(prelog_cutoff_high)] = np.log(prelog_cutoff_high)
+           
+    if return_log == False:
+        labels = np.exp(labels)
+        
+    if make_split:
+        # Making train test split
+        print('Making train test split...')
+        train_idx = np.random.choice(a = [False, True], size = cnt_samples, p = [val_p, 1 - val_p])
+        test_idx = np.invert(train_idx)
+        return ((features[train_idx, :], labels[train_idx, :]), (features[test_idx, :], labels[test_idx, :]))
+    else: 
+        return features, labels
+# ---------------------------------------------------
 
 if __name__ == "__main__":
     

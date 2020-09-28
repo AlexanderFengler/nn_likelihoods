@@ -48,54 +48,52 @@ class data_generator():
             self.config = config
             self._build_simulator()
             self._get_ncpus()
-            
-    def _saver(self, 
-               data):
-        pass
-        #         if save:
-#             training_data_folder = self.config['method_folder'] + \
-#                       'training_data_binned_' + \
-#                       str(int(self.config['binned'])) + \
-#                       '_nbins_' + str(self.config['nbins']) + \
-#                       '_n_' + str(self.config['nsamples'])
-#             pickle.dump()
+    
+    def _get_ncpus(self):
 
+        # Sepfic
+        if self.config['n_cpus'] == 'all':
+            n_cpus = psutil.cpu_count(logical = False)
+            print('n_cpus: ', n_cpus)
+        else:
+            n_cpus = self.config['n_cpus']
 
+        self.config['n_cpus'] = n_cpus
+             
+    def _build_simulator(self):
+        self.simulator = partial(bs.simulator, 
+                                 n_samples = self.config['n_samples'],
+                                 max_t = self.config['max_t'],
+                                 bin_dim = self.config['nbins'],
+                                 delta_t = self.config['delta_t'])
+                                 
+    def get_simulations(self, theta = None):
+        out = self.simulator(theta, 
+                             self.config['method'])
 
-#         # Save to correct destination
-#         if save:
-            
-#             # -----
-
-#             if not os.path.exists(training_data_folder):
-#                 os.makedirs(training_data_folder)
-
-#             full_file_name = training_data_folder + '/' + \
-#                             self.config['method'] + \
-#                             '_nchoices_' + str(self.config['nchoices']) + \
-#                             '_train_data_binned_' + \
-#                             str(int(self.config['binned'])) + \
-#                             '_nbins_' + str(self.config['nbins']) + \
-#                             '_n_' + str(self.config['nsamples']) + \
-#                             '_' + self.file_id + '.pickle'
-            
-#             print('Writing to file: ', full_file_name)
-            
-#             pickle.dump((np.float32(np.stack(theta_list)), 
-#                          np.float32(np.expand_dims(data_grid, axis = 0)), 
-#                          self.config['meta']), 
-#                         open(full_file_name, 'wb'), 
-#                         protocol = self.config['pickleprotocol'])
-            
-#             return 'Dataset completed'
-        
-#         # Or else return the data
-#         else:
-#             return np.float32(np.stack(theta_list)), np.float32(np.expand_dims(data_grid, axis = 0)) 
-        
-            
+        if self.config['nbins'] is not None:
+            return self._bin_simulator_output(simulations = out)
+        else:
+            return out
+    
     def _get_training_data_theta(self, theta):
         out = self.get_simulations(theta)
+        
+    def _bin_simulator_output(self, 
+                              simulations = None): # ['v', 'a', 'w', 'ndt', 'angle']
+        
+        # Generate bins 
+        bins = np.zeros(self.config['nbins'] + 1)
+        bins[:self.config['nbins']] = np.linspace(0, simulations[2]['max_t'], self.config['nbins'])
+        bins[self.config['nbins']] = np.inf
+
+        # Make Choice Histogram
+        cnt = 0
+        counts = np.zeros( (self.config['nbins'], len(simulations[2]['possible_choices']) ) )
+        for choice in simulations[2]['possible_choices']:
+            counts[:, cnt] = np.histogram(simulations[0][simulations[1] == choice], bins = bins)[0] / simulations[2]['n_samples']
+            cnt += 1
+        return counts
     
     def _filter_simulations_fast(self,
                                  simulations = None,
@@ -192,7 +190,7 @@ class data_generator():
 
         return out.astype(np.float)
     
-    def _get_processed_data_for_theta(self,
+    def _mlp_get_processed_data_for_theta(self,
                                       random_seed):
         np.random.seed(random_seed)
         keep = 0
@@ -206,14 +204,21 @@ class data_generator():
         data = self._make_kde_data(simulations = simulations,
                                    theta = theta)
         return data
-
+                     
+    def _cnn_get_processed_data_for_theta(self,
+                                          random_seed):
+        np.random.seed(random_seed)
+        theta = np.float32(np.random.uniform(low = self.config['param_bounds'][0], 
+                                                     high = self.config['param_bounds'][1]))
+        return self.get_simulations(theta = theta)
+             
     def _get_rejected_parameter_setups(self,
                                        random_seed):
-        
+        np.random.seed(random_seed)
         rejected_thetas = []
-        keep = 0
-        
-        while not keep:
+        keep = 1
+        rej_cnt = 0
+        while keep and rej_cnt < 100:
             theta = np.float32(np.random.uniform(low = self.config['param_bounds'][0], 
                                                      high = self.config['param_bounds'][1]))
             
@@ -226,88 +231,89 @@ class data_generator():
                 print('stats: ', stats)
                 print('theta', theta)
                 rejected_thetas.append(theta)
-                
-            if keep == 1:
-                print('simulations accepted')
+
+            rej_cnt += 1
         
         return rejected_thetas
-             
-    def _get_ncpus(self):
+  
+    def _make_param_grid_hierarchical(self):
         
-        # Sepfic
-        if self.config['n_cpus'] == 'all':
-            n_cpus = psutil.cpu_count(logical = False)
-            print('n_cpus: ', n_cpus)
-        else:
-            n_cpus = self.config['n_cpus']
+        # Initialize global parameters
+        params_ranges_half = (np.array(self.config['param_bounds'][1]) - np.array(self.config['param_bounds'][0])) / 2
         
-        self.config['n_cpus'] = n_cpus
+        # Sample global parameters from cushioned parameter space
+        global_stds = np.random.uniform(low = 0.001,
+                                        high = params_ranges_half / 10,
+                                        size = (self.config['nparamsets'], self.config['nparams']))
+        global_means = np.random.uniform(low = self.config['param_bounds'][0] + (params_ranges_half / 5),
+                                         high = self.config['param_bounds'][1] - (params_ranges_half / 5),
+                                         size = (self.config['nparamsets'], self.config['nparams']))
+
+        # Initialize local parameters (by condition)
+        subject_param_grid = np.float32(np.zeros((self.config['nparamsets'], self.config['nsubjects'], self.config['nparams'])))
         
-    def _build_simulator(self):
-        self.simulator = partial(bs.simulator, 
-                                 n_samples = self.config['n_samples'],
-                                 max_t = self.config['max_t'],
-                                 bin_dim = self.config['nbins'],
-                                 delta_t = self.config['delta_t'])
-                                 
-    def get_simulations(self, theta = None):
-        out = self.simulator(theta, 
-                             self.config['method'])
-        # TODO: Add 
-        if self.config['nbins'] is not None:
-            return np.concatenate([out[0], out[1]], axis = 1)
-        else:
-            return out
-        
-    def generate_full_data_uniform(self, 
-                                   save = False,):
+        # Sample by subject parameters from global setup (truncate to never go out of allowed parameter space)
+        for n in range(self.config['nparamsets']):
+            for i in range(self.config['nsubjects']):
+                a, b = (self.config['param_bounds'][0] - global_means[n]) / global_stds[n], (self.config['param_bounds'][1] - global_means[n]) / global_stds[n]
+                subject_param_grid[n, i, :] = np.float32(global_means[n] + truncnorm.rvs(a, b, size = global_stds.shape[1]) * global_stds[n])
+
+        return subject_param_grid, global_stds, global_means
+                 
+    def generate_data_training_uniform(self, 
+                                       save = False):
         
         seeds = np.random.choice(400000000, size = self.config['nparamsets'])
         
         # Inits
-        data_grid = np.zeros((int(self.config['nparamsets'] * 1000), 
-                              len(self.config['param_bounds'][0]) + 3))
         subrun_n = self.config['nparamsets'] // self.config['printsplit']
         
+        if self.config['nbins'] == None:
+            data_grid = np.zeros((int(self.config['nparamsets'] * 1000), 
+                              len(self.config['param_bounds'][0]) + 3))
+
         # Get Simulations 
-        # TODO: binned version should also work here....
-        for i in range(self.config['printsplit']):
-            print('simulation round:', i + 1 , ' of', self.config['printsplit'])
-            with Pool(processes = self.config['n_cpus']) as pool:
-                data_grid[(i * subrun_n * 1000):((i + 1) * subrun_n * 1000), :] = np.concatenate(pool.map(self._get_processed_data_for_theta, 
-                                                                                                          [j for j in seeds[(i * subrun_n):((i + 1) * subrun_n)]]))
+            for i in range(self.config['printsplit']):
+                print('simulation round:', i + 1 , ' of', self.config['printsplit'])
+                with Pool(processes = self.config['n_cpus']) as pool:
+                    data_grid[(i * subrun_n * 1000):((i + 1) * subrun_n * 1000), :] = np.concatenate(pool.map(self._mlp_get_processed_data_for_theta, 
+                                                                                                              [j for j in seeds[(i * subrun_n):((i + 1) * subrun_n)]]))
+        else:
+            data_grid = np.zeros((int(self.config['nparamsets'], self.config['nbins'], self.config['nchoices'])))
+            
+            for i in range(self.config['printsplit']):
+                print('simulation round: ', i + 1, ' of', self.config['printsplit'])
+                with Pool(processes = self.config['n_cpus']) as pool:
+                    data_grid[(i * subrun_n): ((i + 1) * subrun_n), :, :] = np.concatenate(pool.map(self._cnn_get_processed_data_for_theta,
+                                                                                                    [j for j in seeds[(i * subrun_n):((i + 1) * subrun_n)]]))
+        
         if save:
-            if self.config['mode'] == 'test':
-                
-                
-                
-            else:   
-                training_data_folder = self.config['method_folder'] + \
-                                                   'parameter_recovery_data_binned_' + \
-                                                   str(int(self.config['binned'])) + \
-                                                   '_nbins_' + str(self.config['nbins']) + \
-                                                   '_n_' + str(self.config['nsamples'])
+            training_data_folder = self.config['method_folder'] + \
+                                  'training_data_binned_' + \
+                                  str(int(self.config['binned'])) + \
+                                  '_nbins_' + str(self.config['nbins']) + \
+                                  '_n_' + str(self.config['nsamples'])
 
-                if not os.path.exists(training_data_folder):
-                    os.makedirs(training_data_folder)
+            if not os.path.exists(training_data_folder):
+                os.makedirs(training_data_folder)
 
-                full_file_name = training_data_folder + '/' + \
-                                 'data_' + \
-                                 self.file_id + '.pickle'
+            full_file_name = training_data_folder + '/' + \
+                             'data_' + \
+                             self.file_id + '.pickle'
 
-                print('Writing to file: ', full_file_name)
+            print('Writing to file: ', full_file_name)
 
-                pickle.dump(np.float32(data_grid),
-                            self.config['meta']),
-                            open(full_file_name, 'wb'), 
-                            protocol = self.config['pickleprotocol'])
+            pickle.dump(np.float32(data_grid),
+                        open(full_file_name, 'wb'), 
+                        protocol = self.config['pickleprotocol'])
+            
 
-                return 'Dataset completed'
+            return 'Dataset completed'
         
         else:
             return data_grid
-         
-    def generate_data_uniform(self, save = False):
+                 
+    def generate_data_parameter_recovery(self, save = False):
         
         # Make parameters
         theta_list = [np.float32((np.random.uniform(low = self.config['param_bounds'][0], 
@@ -414,30 +420,43 @@ class data_generator():
             return 'Dataset completed'
         else:
             return ([subject_param_grid, global_stds, global_means], data_grid, meta)
-  
-    def _make_param_grid_hierarchical(self):
-        # Initialize global parameters
 
-        params_ranges_half = (np.array(self.config['param_bounds'][1]) - np.array(self.config['param_bounds'][0])) / 2
-        
-        # Sample global parameters from cushioned parameter space
-        global_stds = np.random.uniform(low = 0.001,
-                                        high = params_ranges_half / 10,
-                                        size = (self.config['nparamsets'], self.config['nparams']))
-        global_means = np.random.uniform(low = self.config['param_bounds'][0] + (params_ranges_half / 5),
-                                         high = self.config['param_bounds'][1] - (params_ranges_half / 5),
-                                         size = (self.config['nparamsets'], self.config['nparams']))
+    def generate_rejected_parameterizations(self, 
+                                   save = False):
 
-        # Initialize local parameters (by condition)
-        subject_param_grid = np.float32(np.zeros((self.config['nparamsets'], self.config['nsubjects'], self.config['nparams'])))
-        
-        # Sample by subject parameters from global setup (truncate to never go out of allowed parameter space)
-        for n in range(self.config['nparamsets']):
-            for i in range(self.config['nsubjects']):
-                a, b = (self.config['param_bounds'][0] - global_means[n]) / global_stds[n], (self.config['param_bounds'][1] - global_means[n]) / global_stds[n]
-                subject_param_grid[n, i, :] = np.float32(global_means[n] + truncnorm.rvs(a, b, size = global_stds.shape[1]) * global_stds[n])
+    seeds = np.random.choice(400000000, size = self.config['nparamsetsrej'])
 
-        return subject_param_grid, global_stds, global_means
+    # Get Simulations 
+    with Pool(processes = self.config['n_cpus']) as pool:
+        rejected_parameterization_list = pool.map(self._get_rejected_parameter_setups, 
+                                                  seeds)
+    rejected_parameterization_list = np.concatenate([l for l in rejected_parameterization_list if len(l) > 0])
+
+    if save:
+        training_data_folder = self.config['method_folder'] + \
+                              'training_data_binned_' + \
+                              str(int(self.config['binned'])) + \
+                              '_nbins_' + str(self.config['nbins']) + \
+                              '_n_' + str(self.config['nsamples'])
+
+        if not os.path.exists(training_data_folder):
+            os.makedirs(training_data_folder)
+
+        full_file_name = training_data_folder + '/' + \
+                         'rejected_parameterizations_' + \
+                         self.file_id + '.pickle'
+
+        print('Writing to file: ', full_file_name)
+
+        pickle.dump(np.float32(rejected_parameterization_list),
+                    open(full_file_name, 'wb'), 
+                    protocol = self.config['pickleprotocol'])
+
+        return 'Dataset completed'
+
+    else:
+        return data_grid
+
    # ----------------------------------------------------
  
 # -------------------------------------------------------------------------------------
@@ -475,9 +494,6 @@ if __name__ == "__main__":
     CLI.add_argument("--nchoices",
                      type = int,
                      default = 2)
-#     CLI.add_argument("--mode",
-#                      type = str,
-#                      default = 'mlp') # train, test, cnn
     CLI.add_argument("--nsimbnds",
                      nargs = '*',
                      type = int,
@@ -506,6 +522,9 @@ if __name__ == "__main__":
     CLI.add_argument("--nbyparam",
                      type = int,
                      default = 1000)
+    CLI.add_argument("--nparamsetsrej",
+                     type = int,
+                     default = 100)
     
     args = CLI.parse_args()
     print('Arguments passed: ')
@@ -548,6 +567,7 @@ if __name__ == "__main__":
     config['delta_t'] = args.deltat
     config['printsplit'] = args.printsplit
     config['n_by_param'] = args.nbyparam
+    config['nparamsetsrej'] = args.nparamsetsrej
     config['mixture_probabilities'] = [0.8, 0.1, 0.1]
     config['filter'] =  {'mode': 20, # != (if mode is max_rt)
                          'choice_cnt': 10, # > (each choice receive at least 10 samples in simulator)
@@ -557,19 +577,19 @@ if __name__ == "__main__":
                         }
     
     # Make parameter bounds
-    if args.mode == 'train' and config['binned']:
+    if args.datatype == 'training' and config['binned']:
         bounds_tmp = kde_info.temp[config['method']]['param_bounds_cnn'] + kde_info.temp[config['method']]['boundary_param_bounds_cnn']
-    elif args.mode == 'train' and not config['binned']:
+    elif args.datatype == 'training' and not config['binned']:
         bounds_tmp = kde_info.temp[config['method']]['param_bounds_network'] + kde_info.temp[config['method']]['boundary_param_bounds_network']
-    elif args.mode == 'test' and config['binned']:
-        bounds_tmp = kde_info.temp[config['method']]['param_bounds_sampler'] + kde_info.temp[config['method']]['boundary_param_bounds_sampler']
-    elif args.mode == 'test' and not config['binned']:
+    else:
         bounds_tmp = kde_info.temp[config['method']]['param_bounds_sampler'] + kde_info.temp[config['method']]['boundary_param_bounds_sampler']
 
     config['param_bounds'] = np.array([[i[0] for i in bounds_tmp], [i[1] for i in bounds_tmp]])
     config['nparams'] = config['param_bounds'][0].shape[0]
     
     config['meta'] = kde_info.temp[config['method']]['dgp_hyperparameters']
+    config['meta']['n_samples'] = config['n_samples']
+    config['meta']['delta_t'] = config['delta_t']
     
     # Add some machine dependent folder structure
     if args.machine == 'x7':
@@ -600,20 +620,18 @@ if __name__ == "__main__":
     
     dg = data_generator(config = config)
     
-    if args.datatype == 'parameter_recovery' or args.datatype == 'training':
-        dg.generate_data_uniform(save = args.save)
+    if args.datatype == 'parameter_recovery':
+        dg.generate_data_parameter_recovery(save = args.save)
         
     if args.datatype == 'parameter_recovery_hierarchical':
         dg.generate_data_hierarchical(save = args.save)
         
-    if args.datatype == 'full':
-        print('loading class')
-        x = dg.generate_full_data_uniform(save = False)
-        print(type(x))
-        print(len(x))
-        print(x.shape)
-        print(x)
-        
+    if args.datatype == 'training':
+        dg.generate_data_training_uniform(save = args.save)
+    
+    if args.datatype == 'rej':
+        dg.generate_rejected_parameterizations(save = args.save)
+
     finish_t = datetime.now()
     print('Time elapsed: ', finish_t - start_t)
     print('Finished')
