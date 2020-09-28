@@ -33,7 +33,7 @@ module load cuda/10.0.130
 module load cudnn/7.6 
 
 nfiles=200
-method='full_ddm2'
+method='ornstein'
 analytic=0
 machine='x7'
 maxidfiles=200

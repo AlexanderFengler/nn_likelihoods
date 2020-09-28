@@ -33,7 +33,7 @@ module load cuda/10.0.130
 module load cudnn/7.6 
 
 nfiles=200
-method='ornstein'
+method='weibull_cdf2'
 analytic=0
 machine='ccv'
 maxidfiles=200
