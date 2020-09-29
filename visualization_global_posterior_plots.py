@@ -2463,7 +2463,7 @@ def caterpillar_plot(posterior_samples = [],
     
     for k in config[model]['params']:
         ecdfs[k] = ECDF(posterior_samples[:, config[model]['params'].index(k)])
-        tmp_sorted = sorted(trace[k])
+        tmp_sorted = sorted(posterior_samples[:, config[model]['params'].index(k)])
         _p01 =  tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.01) - 1]
         _p99 = tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.99) - 1]
         _p1 = tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.1) - 1]
