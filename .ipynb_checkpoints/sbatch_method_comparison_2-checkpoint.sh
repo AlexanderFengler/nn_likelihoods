@@ -50,7 +50,7 @@ analytic=0
 for n in "${nsamples[@]}"
 do
     for id in "${ids[@]}"
-    do 
+    do
         python -u method_comparison_sim.py --machine $machine \
                                            --method $method \
                                            --nsamples $n \
