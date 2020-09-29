@@ -47,7 +47,7 @@ if [ $analytic -eq 1 ]; then
                                                                              --method $method \
                                                                              --nfiles $nfiles \
                                                                              --maxidfiles $maxidfiles \
-                                                                             --datafolder /users/afengler/data/analytic/${method}/training_data_binned_0_nbins_0_n_100000/ \
+                                                                             --datafolder /users/afengler/data/analytic/${method}/training_data_binned_0_nbins_0_n_20000/ \
                                                                              --warmstart 0 \
                                                                              --analytic $analytic
     done
@@ -59,7 +59,7 @@ else
                                                                              --method $method \
                                                                              --nfiles $nfiles \
                                                                              --maxidfiles $maxidfiles \
-                                                                             --datafolder /users/afengler/data/kde/${method}/training_data_binned_0_nbins_0_n_100000/ \
+                                                                             --datafolder /users/afengler/data/kde/${method}/training_data_binned_0_nbins_0_n_20000/ \
                                                                              --warmstart 0 \
                                                                              --analytic $analytic
     done
