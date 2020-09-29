@@ -32,11 +32,11 @@ conda activate tf-gpu-py37
 module load cuda/10.0.130 
 module load cudnn/7.6 
 
-nfiles=200
+nfiles=150
 method='full_ddm2'
 analytic=0
 machine='ccv'
-maxidfiles=200
+maxidfiles=300
 
 
 if [ $analytic -eq 1 ]; then
@@ -47,7 +47,7 @@ if [ $analytic -eq 1 ]; then
                                                                              --method $method \
                                                                              --nfiles $nfiles \
                                                                              --maxidfiles $maxidfiles \
-                                                                             --datafolder /users/afengler/data/analytic/${method}/training_data_binned_0_nbins_0_n_20000/ \
+                                                                             --datafolder /users/afengler/data/analytic/${method}/training_data_binned_0_nbins_0_n_100000/ \
                                                                              --warmstart 0 \
                                                                              --analytic $analytic
     done
@@ -59,7 +59,7 @@ else
                                                                              --method $method \
                                                                              --nfiles $nfiles \
                                                                              --maxidfiles $maxidfiles \
-                                                                             --datafolder /users/afengler/data/kde/${method}/training_data_binned_0_nbins_0_n_20000/ \
+                                                                             --datafolder /users/afengler/data/kde/${method}/training_data_binned_0_nbins_0_n_100000/ \
                                                                              --warmstart 0 \
                                                                              --analytic $analytic
     done
