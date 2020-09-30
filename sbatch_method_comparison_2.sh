@@ -47,6 +47,7 @@ samplerinit='mle'
 outfilesignature='elife_slice_'
 infilesignature='elife_'
 analytic=0
+sampler='slice'
 #SLURM_ARRAY_TASK_ID=1
 
 for n in "${nsamples[@]}"
