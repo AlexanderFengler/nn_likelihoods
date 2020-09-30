@@ -56,7 +56,7 @@ do
     do 
         python -u method_comparison_sim.py --machine $machine \
                                                       --method $method \
-                                                      --modelidentifier $model_identifier \
+                                                      --modelidentifier $modelidentifier \
                                                       --nsamples $n \
                                                       --nmcmcsamples $nmcmcsamples \
                                                       --datatype parameter_recovery \
