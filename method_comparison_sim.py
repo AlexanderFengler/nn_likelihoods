@@ -307,7 +307,7 @@ if __name__ == "__main__":
         data = pickle.load(open(data_folder + file_ , 'rb'))
         data_grid = data[0]
     elif data_type == 'parameter_recovery':
-        print('We are reading in: ', data_folder + file_)
+        print('We are reading in: ', method_folder + file_)
         data = pickle.load(open(method_folder + file_ , 'rb'))
         param_grid = data[0]
         print('param grid')
