@@ -97,7 +97,7 @@ if __name__ == "__main__":
     CLI.add_argument("--outfileid",
                      type = str,
                      default = 'TEST')
-    CLI.add_argument("--infileid",
+    CLI.add_argument("--infilesignature",
                      type = str,
                      default = '')
     CLI.add_argument("--outfilesig",
@@ -148,7 +148,7 @@ if __name__ == "__main__":
     data_type = args.datatype
     n_samples = args.nsamples
     nmcmcsamples = args.nmcmcsamples
-    infileid = args.infileid
+    infilesignature = args.infilesignature
     outfileid = args.outfileid
     outfilesignature = args.outfilesig
     n_cpus = args.ncpus
@@ -156,7 +156,10 @@ if __name__ == "__main__":
     nnbatchid = args.nnbatchid
     analytic = args.analytic
     samplerinit = args.samplerinit
-    modelidentifier = args.modelidentifier
+    if args.modelidentifier == None or args.modelidentifier == 'None':
+        modelidentifier = ''
+    else:
+        modelidentifier = args.modelidentifier
     
     
     if machine == 'x7':
@@ -250,7 +253,7 @@ if __name__ == "__main__":
             keras_model = keras.models.load_model(network_path + '/model_final.h5', compile = False)
             
     if data_type == 'parameter_recovery':
-        file_ = 'parameter_recovery_data_binned_0_nbins_0_n_' + str(n_samples) + '/' + infileid + method + \
+        file_ = 'parameter_recovery_data_binned_0_nbins_0_n_' + str(n_samples) + '/' + infilesignature + method + \
                 '_nchoices_2_parameter_recovery_binned_0_nbins_0_nreps_1_n_' + str(n_samples) + '.pickle'
         
         if analytic:
@@ -261,10 +264,10 @@ if __name__ == "__main__":
                 os.makedirs(output_folder + network_id)
         
         outfilesignature = outfilesignature + 'post_samp_data_param_recov_unif_reps_1_n_' + \
-                             str(n_samples) + '_init_' + samplerinit + '_' + infileid
+                             str(n_samples) + '_init_' + samplerinit + '_' + infilesignature
     
     if data_type == 'real':                                                                        
-        file_ = args.infileid
+        file_ = args.infilesignature
         if machine == 'x7':
             data_folder = '/media/data_cifs/afengler/data/real/'
         if machine == 'ccv':

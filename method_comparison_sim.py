@@ -156,7 +156,10 @@ if __name__ == "__main__":
     nnbatchid = args.nnbatchid
     analytic = args.analytic
     samplerinit = args.samplerinit
-    modelidentifier = args.modelidentifier
+    if args.modelidentifier == None or args.modelidentifier == 'None':
+        modelidentifier = ''
+    else:
+        modelidentifier = args.modelidentifier
     
     
     if machine == 'x7':
