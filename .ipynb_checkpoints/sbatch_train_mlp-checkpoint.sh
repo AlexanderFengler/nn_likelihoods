@@ -32,7 +32,7 @@ conda activate tf-gpu-py37
 module load cuda/10.0.130 
 module load cudnn/7.6 
 
-nfiles=150
+nfiles=100
 method='full_ddm2'
 analytic=0
 machine='ccv'

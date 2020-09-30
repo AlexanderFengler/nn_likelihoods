@@ -128,7 +128,7 @@ if __name__ == "__main__":
     # INITIALIZATIONS ----------------------------------------------------------------
     if machine == 'x7':
         stats = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))[method]
-        dnn_params = yaml.load(open("/meia/data_cifs/afengler/git_repos/nn_likelihoods/hyperparameters.yaml"))
+        dnn_params = yaml.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/hyperparameters.yaml"))
     else:
         stats = pickle.load(open("/users/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))[method]
         dnn_params = yaml.load(open("/users/afengler/git_repos/nn_likelihoods/hyperparameters.yaml"))
@@ -178,7 +178,9 @@ if __name__ == "__main__":
         if 'data_' == file_[:5]:
             data_file_names.append(file_)
             
-    data_file_names = list(np.random.choice(data_file_names, replace = False, size = n_training_datasets_to_load))
+    data_file_names = list(np.random.choice(data_file_names, 
+                                            replace = False, 
+                                            size = n_training_datasets_to_load))
     
     dataset = kde_load_data_new(path = data_folder,
                                 file_id_list = data_file_names,
@@ -266,7 +268,8 @@ if __name__ == "__main__":
                                                   min_delta = 0.0001,
                                                   min_lr = 0.0000001)
 
-    history = model.fit(dataset[0][0], dataset[0][1],
+    history = model.fit(dataset[0][0], 
+                        dataset[0][1],
                         epochs = dnn_params["n_epochs"],
                         batch_size = dnn_params["batch_size"],
                         shuffle = True,
