@@ -133,6 +133,9 @@ if __name__ == "__main__":
     CLI.add_argument("--analytic",
                      type = int,
                      default = 0)
+    CLI.add_argument("--modelidentifier",
+                     type = str,
+                     default = None)
     
     args = CLI.parse_args()
     print(args)
@@ -145,14 +148,15 @@ if __name__ == "__main__":
     data_type = args.datatype
     n_samples = args.nsamples
     nmcmcsamples = args.nmcmcsamples
-    infile_id = args.infileid
-    out_file_id = args.outfileid
-    out_file_signature = args.outfilesig
+    infileid = args.infileid
+    outfileid = args.outfileid
+    outfilesignature = args.outfilesig
     n_cpus = args.ncpus
     n_by_arrayjob = args.nbyarrayjob
     nnbatchid = args.nnbatchid
     analytic = args.analytic
     samplerinit = args.samplerinit
+    modelidentifier = args.modelidentifier
     
     
     if machine == 'x7':
@@ -195,10 +199,10 @@ if __name__ == "__main__":
         
         with open("model_paths_x7.yaml") as tmp_file:
             if nnbatchid == -1:
-                network_path = yaml.load(tmp_file)[method]
+                network_path = yaml.load(tmp_file)[method + modelidentifier]
                 network_id = network_path[list(re.finditer('/', network_path))[-2].end():]
             else:
-                network_path = yaml.load(tmp_file)[method + '_batch'][nnbatchid]
+                network_path = yaml.load(tmp_file)[method + '_batch' + modelidentifier][nnbatchid]
                 network_id = network_path[list(re.finditer('/', network_path))[-2].end():]
 
             print('Loading network from: ')
@@ -213,11 +217,11 @@ if __name__ == "__main__":
         
         with open("model_paths.yaml") as tmp_file:
             if nnbatchid == -1:
-                network_path = yaml.load(tmp_file)[method]
+                network_path = yaml.load(tmp_file)[method + modelidentifier]
                 network_id = network_path[list(re.finditer('/', network_path))[-2].end():]
 
             else:
-                network_path = yaml.load(tmp_file)[method + '_batch'][nnbatchid]
+                network_path = yaml.load(tmp_file)[method + '_batch' + modelidentifier][nnbatchid]
                 network_id = network_path[list(re.finditer('/', network_path))[-2].end():]
                 
             print('Loading network from: ')
@@ -232,11 +236,11 @@ if __name__ == "__main__":
         
         with open("model_paths_home.yaml") as tmp_file:
             if nnbatchid == -1:
-                network_path = yaml.load(tmp_file)[method]
+                network_path = yaml.load(tmp_file)[method + modelidentifier]
                 network_id = network_path[list(re.finditer('/', network_path))[-2].end():]
 
             else:
-                network_path = yaml.load(tmp_file)[method + '_batch'][nnbatchid]
+                network_path = yaml.load(tmp_file)[method + '_batch' + modelidentifier][nnbatchid]
                 network_id = network_path[list(re.finditer('/', network_path))[-2].end():]
                 
             print('Loading network from: ')
@@ -246,7 +250,7 @@ if __name__ == "__main__":
             keras_model = keras.models.load_model(network_path + '/model_final.h5', compile = False)
             
     if data_type == 'parameter_recovery':
-        file_ = 'parameter_recovery_data_binned_0_nbins_0_n_' + str(n_samples) + '/' + method + \
+        file_ = 'parameter_recovery_data_binned_0_nbins_0_n_' + str(n_samples) + '/' + infileid + method + \
                 '_nchoices_2_parameter_recovery_binned_0_nbins_0_nreps_1_n_' + str(n_samples) + '.pickle'
         
         if analytic:
@@ -256,8 +260,8 @@ if __name__ == "__main__":
             if not os.path.exists(output_folder + network_id):
                 os.makedirs(output_folder + network_id)
         
-        out_file_signature = out_file_signature + 'post_samp_data_param_recov_unif_reps_1_n_' + \
-                             str(n_samples) + '_init_' + samplerinit + '_' + infile_id
+        outfilesignature = outfilesignature + 'post_samp_data_param_recov_unif_reps_1_n_' + \
+                             str(n_samples) + '_init_' + samplerinit + '_' + infileid
     
     if data_type == 'real':                                                                        
         file_ = args.infileid
@@ -300,6 +304,7 @@ if __name__ == "__main__":
         data = pickle.load(open(data_folder + file_ , 'rb'))
         data_grid = data[0]
     elif data_type == 'parameter_recovery':
+        print('We are reading in: ', data_folder + file_)
         data = pickle.load(open(method_folder + file_ , 'rb'))
         param_grid = data[0]
         print('param grid')
@@ -308,8 +313,8 @@ if __name__ == "__main__":
         data_grid = np.squeeze(data[1], axis = 0)
 
         # subset data according to array id so that we  run the sampler only for those datasets
-        data_grid = data_grid[((int(out_file_id) - 1) * n_by_arrayjob) : (int(out_file_id) * n_by_arrayjob), :, :]
-        param_grid = param_grid[((int(out_file_id) - 1) * n_by_arrayjob) : (int(out_file_id) * n_by_arrayjob), :]
+        data_grid = data_grid[((int(outfileid) - 1) * n_by_arrayjob) : (int(outfileid) * n_by_arrayjob), :, :]
+        param_grid = param_grid[((int(outfileid) - 1) * n_by_arrayjob) : (int(outfileid) * n_by_arrayjob), :]
     else:
         print('Unknown Datatype, results will likely not make sense')   
     
@@ -476,7 +481,8 @@ if __name__ == "__main__":
                                                         sampler_param_bounds))
             
         else:
-            posterior_samples = p.map(mlp_posterior, zip(data_grid, init_grid, 
+            posterior_samples = p.map(mlp_posterior, zip(data_grid, 
+                                                         init_grid, 
                                                          sampler_param_bounds))
     else:
         posterior_samples = ()
@@ -503,12 +509,12 @@ if __name__ == "__main__":
     print('saving to file')
     if analytic:
         pickle.dump((param_grid, data_grid, posterior_samples, np.array(timings)),
-                    open(output_folder + 'analytic/' + out_file_signature + '_' + out_file_id + '.pickle', 'wb'))
-        print(output_folder +  out_file_signature + '_' + out_file_id + ".pickle")
+                    open(output_folder + 'analytic/' + outfilesignature + '_' + outfileid + '.pickle', 'wb'))
+        print(output_folder +  outfilesignature + '_' + outfileid + ".pickle")
     else:
-        print(output_folder + network_id + out_file_signature + '_' + out_file_id + ".pickle")
+        print(output_folder + network_id + outfilesignature + '_' + outfileid + ".pickle")
         pickle.dump((param_grid, data_grid, posterior_samples, np.array(timings)), 
-                    open(output_folder + network_id + out_file_signature + '_' + out_file_id + ".pickle", "wb"))
+                    open(output_folder + network_id + outfilesignature + '_' + outfileid + ".pickle", "wb"))
 
 # ----------------------------------------------------------
 # # LBA ANALYTIC 

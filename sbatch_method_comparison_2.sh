@@ -14,20 +14,20 @@
 #SBATCH --output /users/afengler/batch_job_out/mc_ddm_a_a_4_%A_%a.out
 
 # Request runtime, memory, cores:
-#SBATCH --time=36:00:00
-#SBATCH --mem=64G
-#SBATCH -c 10
+#SBATCH --time=24:00:00
+#SBATCH --mem=32G
+#SBATCH -c 20
 #SBATCH -N 1
-#SBATCH -p gpu --gres=gpu:1
+##SBATCH -p gpu --gres=gpu:1
 #SBATCH --array=1-20
 
 # Run a command
 #source /users/afengler/miniconda3/etc/profile.d/conda.sh
 #conda activate tony
 
-# source /users/afengler/.bashrc
-# conda deactivate
-# conda activate tf-cpu
+source /users/afengler/.bashrc
+conda deactivate
+conda activate tf-cpu
 
 # source /users/afengler/.bashrc
 # conda deactivate
@@ -36,36 +36,39 @@
 # NNBATCH RUNS
 
 nmcmcsamples=2000
-nbyarrayjob=100
-ncpus=1
-nsamples=( 1024 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
-method="weibull_cdf2" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
+nbyarrayjob=50
+ncpus='all'
+nsamples=( 4096 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
+method="ddm" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
+modelidentifier=""
 ids=( -1 )
-machine='x7'
+machine='ccv'
 samplerinit='mle'
 outfilesignature='elife_slice_'
+infilesignature='elife_'
 analytic=0
 #SLURM_ARRAY_TASK_ID=1
 
 for n in "${nsamples[@]}"
 do
     for id in "${ids[@]}"
-    do
+    do 
         python -u method_comparison_sim.py --machine $machine \
-                                           --method $method \
-                                           --nsamples $n \
-                                           --nmcmcsamples $nmcmcsamples \
-                                           --datatype parameter_recovery \
-                                           --sampler slice \
-                                           --infileid 1  \
-                                           --outfileid 1  \
-                                           --activedims 0 1 2 3 4 5 6 \
-                                           --samplerinit $samplerinit \
-                                           --ncpus $ncpus \
-                                           --nbyarrayjob $nbyarrayjob \
-                                           --nnbatchid $id \
-                                           --analytic $analytic \
-                                           --outfilesig $outfilesignature
+                                                      --method $method \
+                                                      --modelidentifier $model_identifier \
+                                                      --nsamples $n \
+                                                      --nmcmcsamples $nmcmcsamples \
+                                                      --datatype parameter_recovery \
+                                                      --sampler $sampler \
+                                                      --infilesignature $infilesignature  \
+                                                      --outfileid $SLURM_ARRAY_TASK_ID \
+                                                      --activedims 0 1 2 3 4 5 6 \
+                                                      --samplerinit $samplerinit \
+                                                      --ncpus $ncpus \
+                                                      --nbyarrayjob $nbyarrayjob \
+                                                      --nnbatchid $id \
+                                                      --analytic $analytic \
+                                                      --outfilesig $outfilesignature
     done
 done
 
