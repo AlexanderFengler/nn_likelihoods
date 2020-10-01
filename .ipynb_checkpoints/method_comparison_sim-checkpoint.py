@@ -281,18 +281,19 @@ if __name__ == "__main__":
     if analytic:
         pass
     else:
-        with open(network_path + "weights.pickle", "rb") as tmp_file:
-            weights = pickle.load(tmp_file)
-            #print(weights)
-            for weight in weights:
-                print(weight.shape)
-        with open(network_path + 'biases.pickle', 'rb') as tmp_file:
-            biases = pickle.load(tmp_file)
-            #print(biases)
-        with open(network_path + 'activations.pickle', 'rb') as tmp_file:
-            activations = pickle.load(tmp_file)
-            #print(activations)
-        n_layers = int(len(weights))
+        pass
+#         with open(network_path + "weights.pickle", "rb") as tmp_file:
+#             weights = pickle.load(tmp_file)
+#             #print(weights)
+#             for weight in weights:
+#                 print(weight.shape)
+#         with open(network_path + 'biases.pickle', 'rb') as tmp_file:
+#             biases = pickle.load(tmp_file)
+#             #print(biases)
+#         with open(network_path + 'activations.pickle', 'rb') as tmp_file:
+#             activations = pickle.load(tmp_file)
+#             #print(activations)
+#         n_layers = int(len(weights))
 # ----------------------------------------------------------------
 
 # DEFINE TARGET LIKELIHOODS FOR CORRESPONDING MODELS -------------------------------------------------
