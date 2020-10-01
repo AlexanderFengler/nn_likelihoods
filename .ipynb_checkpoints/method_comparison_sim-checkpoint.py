@@ -257,8 +257,8 @@ if __name__ == "__main__":
                 '_nchoices_2_parameter_recovery_binned_0_nbins_0_nreps_1_n_' + str(n_samples) + '.pickle'
         
         if analytic:
-            if not os.path.exists(output_folder + '/analytic'):
-                os.makedirs(output_folder + '/analytic')
+            if not os.path.exists(output_folder + 'analytic'):
+                os.makedirs(output_folder + 'analytic')
         else:  
             if not os.path.exists(output_folder + network_id):
                 os.makedirs(output_folder + network_id)
