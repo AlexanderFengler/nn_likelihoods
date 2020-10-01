@@ -19,7 +19,7 @@
 #SBATCH -c 1
 #SBATCH -N 1
 ##SBATCH -p gpu --gres=gpu:1
-#SBATCH --array=37,38,39,40
+#SBATCH --array=1-100
 
 # Run a command
 #source /users/afengler/miniconda3/etc/profile.d/conda.sh
@@ -39,8 +39,8 @@ nmcmcsamples=2000
 nbyarrayjob=10
 ncpus=1
 nsamples=( 1024 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
-method="ddm_analytic" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
-modelidentifier=None
+method="ddm" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
+modelidentifier='_100k'
 ids=( -1 )
 machine='ccv'
 samplerinit='mle'

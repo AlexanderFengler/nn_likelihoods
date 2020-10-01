@@ -69,7 +69,7 @@ do
                                                       --nbyarrayjob $nbyarrayjob \
                                                       --nnbatchid $id \
                                                       --analytic $analytic \
-                                                      --outfilesig $outfilesignature
+                                                      --outfilesignature $outfilesignature
     done
 done
 

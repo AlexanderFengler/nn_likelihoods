@@ -46,7 +46,7 @@ machine='ccv'
 samplerinit='mle'
 outfilesignature='elife_slice_'
 infilesignature='elife_'
-analytic=1
+analytic=0
 sampler='slice'
 #SLURM_ARRAY_TASK_ID=1
 

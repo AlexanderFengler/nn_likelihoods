@@ -443,7 +443,8 @@ if __name__ == "__main__":
             model = SliceSampler(bounds = args[2], 
                                  target = nf_target, 
                                  w = .4 / 1024, #w = .4 / 1024, 
-                                 p = 8)
+                                 p = 8,
+                                 print_interval = 100)
             
             model.sample(data = args[0],
                          min_samples = nmcmcsamples,
