@@ -32,7 +32,8 @@ levy: /users/afengler/data/kde/levy/keras_models/dnnregressor_levy_03_28_20_13_5
 ornstein: /users/afengler/data/kde/ornstein/keras_models/dnnregressor_ornstein_03_30_20_16_03_04/
 weibull_cdf: /users/afengler/data/kde/weibull_cdf/keras_models/dnnregressor_weibull_cdf_04_03_20_02_11_43/
 angle2: /users/afengler/data/kde/angle2/keras_models/dnnregressor_angle2_05_07_20_04_23_32/
-full_ddm2: /users/afengler/data/kde/full_ddm2/keras_models/dnnregressor_full_ddm2_05_01_20_01_55_17/
+# full_ddm2: /users/afengler/data/kde/full_ddm2/keras_models/dnnregressor_full_ddm2_05_01_20_01_55_17/ this is old version
+full_ddm2: /users/afengler/data/kde/full_ddm2/keras_models/dnnregressor_full_ddm2_09_30_20_07_05_42/
 
 # Models trained on 100k data
 angle2_100k: /users/afengler/data/kde/angle2/keras_models/dnnregressor_angle2_09_29_20_08_11_12/
@@ -41,6 +42,7 @@ ddm_sdv_100k: /users/afengler/data/kde/ddm_sdv/keras_models/dnnregressor_ddm_sdv
 levy_100k: /users/afengler/data/kde/levy/keras_models/dnnregressor_levy_09_29_20_09_40_31/
 ornstein_100k: /users/afengler/data/kde/ornstein/keras_models/dnnregressor_ornstein_09_29_20_06_55_47/
 weibull_cdf2_100k: /users/afengler/data/kde/weibull_cdf2/keras_models/dnnregressor_weibull_cdf2_09_29_20_05_06_38/
+full_ddm2_100k: /users/afengler/data/kde/weibull_cdf2/keras_models/dnnregressor_full_ddm2_09_30_20_01_43_20
 
 # Within model network repitions 150 DATASETS
 ddm_batch: ['/users/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_03_29_20_17_38_58/', 
