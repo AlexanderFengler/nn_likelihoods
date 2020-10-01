@@ -38,9 +38,9 @@ conda activate tf-cpu
 nmcmcsamples=2000
 nbyarrayjob=10
 ncpus=1
-nsamples=( 4096 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
+nsamples=( 1024 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
 method="ddm_sdv" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
-modelidentifier=None
+modelidentifier='_100k'
 ids=( -1 )
 machine='ccv'
 samplerinit='mle'
