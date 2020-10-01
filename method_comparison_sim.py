@@ -154,6 +154,7 @@ if __name__ == "__main__":
     
     outfileid = args.outfileid
     outfilesignature = args.outfilesignature
+    
     if outfilesignature == None or outfilesignature == 'None':
         outfilesignature = ''
     
@@ -167,7 +168,6 @@ if __name__ == "__main__":
         modelidentifier = ''
     else:
         modelidentifier = args.modelidentifier
-    
     
     if machine == 'x7':
         os.environ["CUDA_DEVICE_ORDER"]= "PCI_BUS_ID"   # see issue #152
