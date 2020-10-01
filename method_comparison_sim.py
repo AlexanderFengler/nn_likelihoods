@@ -100,7 +100,7 @@ if __name__ == "__main__":
     CLI.add_argument("--infilesignature",
                      type = str,
                      default = '')
-    CLI.add_argument("--outfilesig",
+    CLI.add_argument("--outfilesignature",
                      type = str,
                      default = 'signature')
     CLI.add_argument("--nchoices",
@@ -149,12 +149,12 @@ if __name__ == "__main__":
     n_samples = args.nsamples
     nmcmcsamples = args.nmcmcsamples
     infilesignature = args.infilesignature
-    if infilesignature == None:
+    if infilesignature == None or infilesignature == 'None':
         infilesignature = ''
     
     outfileid = args.outfileid
-    outfilesignature = args.outfilesig
-    if outfilesignature == None:
+    outfilesignature = args.outfilesignature
+    if outfilesignature == None or outfilesignature == 'None':
         outfilesignature = ''
     
     n_cpus = args.ncpus
