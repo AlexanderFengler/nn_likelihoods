@@ -149,13 +149,20 @@ if __name__ == "__main__":
     n_samples = args.nsamples
     nmcmcsamples = args.nmcmcsamples
     infilesignature = args.infilesignature
+    if infilesignature == None:
+        infilesignature = ''
+    
     outfileid = args.outfileid
     outfilesignature = args.outfilesig
+    if outfilesignature == None:
+        outfilesignature = ''
+    
     n_cpus = args.ncpus
     n_by_arrayjob = args.nbyarrayjob
     nnbatchid = args.nnbatchid
     analytic = args.analytic
     samplerinit = args.samplerinit
+    
     if args.modelidentifier == None or args.modelidentifier == 'None':
         modelidentifier = ''
     else:
