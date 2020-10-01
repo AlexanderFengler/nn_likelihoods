@@ -19,7 +19,7 @@
 #SBATCH -c 1
 #SBATCH -N 1
 ##SBATCH -p gpu --gres=gpu:1
-#SBATCH --array=1-100
+#SBATCH --array=1-8
 
 # Run a command
 #source /users/afengler/miniconda3/etc/profile.d/conda.sh
