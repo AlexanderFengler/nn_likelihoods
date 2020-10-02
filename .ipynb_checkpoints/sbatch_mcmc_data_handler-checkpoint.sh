@@ -217,7 +217,7 @@ do
                                                                                 --analytic $analytic \
                                                                                 --modelidentifier $modelidentifier \
                                                                                 --fileprefix $fileprefix \
-                                                                                --sampler $sampler \sbatch
+                                                                                --sampler $sampler \
     done
 done
 
