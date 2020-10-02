@@ -3,20 +3,20 @@
 # Default resources are 1 core with 2.8GB of memory per core.
 
 # job name:
-# SBATCH -J mcmc_data_handler
+#SBATCH -J mcmc_data_handler
 
 # priority
-# #SBATCH --account=carney-frankmj-condo
+#SBATCH --account=carney-frankmj-condo
 
 # output file
-# SBATCH --output /users/afengler/batch_job_out/data_handler
+#SBATCH --output /users/afengler/batch_job_out/data_handler
 
-# Request runtime, memory, cores:
-# SBATCH --time=36:00:00
-# SBATCH --mem=64G
-# SBATCH -c 10
-# SBATCH -N 1
-# SBATCH --array=1-1
+#Request runtime, memory, cores:
+#SBATCH --time=36:00:00
+#SBATCH --mem=64G
+#SBATCH -c 2
+#SBATCH -N 1
+#SBATCH --array=1-1
 
 # machine="ccv"
 # ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
