@@ -197,12 +197,12 @@ machine="ccv"
 ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
 ndata=( 1024 4096 ) #  4096 )
 method="ddm_sdv"
-analytic=1
+analytic=0
 sampler='slice'
 fileprefix='elife_slice_'
 initmode='mle'
 nsubsample=1500
-modelidentifier=None
+modelidentifier='_100k'
 
 for n in "${ndata[@]}"
 do
