@@ -42,7 +42,7 @@ ddm_sdv_100k: /users/afengler/data/kde/ddm_sdv/keras_models/dnnregressor_ddm_sdv
 levy_100k: /users/afengler/data/kde/levy/keras_models/dnnregressor_levy_09_29_20_09_40_31/
 ornstein_100k: /users/afengler/data/kde/ornstein/keras_models/dnnregressor_ornstein_09_29_20_06_55_47/
 weibull_cdf2_100k: /users/afengler/data/kde/weibull_cdf2/keras_models/dnnregressor_weibull_cdf2_09_29_20_05_06_38/
-full_ddm2_100k: /users/afengler/data/kde/full_ddm2/keras_models/dnnregressor_full_ddm2_09_30_20_01_43_20
+full_ddm2_100k: /users/afengler/data/kde/full_ddm2/keras_models/dnnregressor_full_ddm2_09_30_20_01_43_20/
 
 # Within model network repitions 150 DATASETS
 ddm_batch: ['/users/afengler/data/kde/ddm/keras_models/dnnregressor_ddm_03_29_20_17_38_58/', 

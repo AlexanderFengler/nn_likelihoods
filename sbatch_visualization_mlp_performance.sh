@@ -16,14 +16,21 @@
 
 model="ddm"
 machine="home"
-traindatanalytic=1
+traindatanalytic=0
 ngraphs=9
 trainfileidx=0
 networkidx=2
 mlekdereps=100
 manifoldlayers=100
 
-python -u visualization_mlp_performance.py --model $model --machine $machine --traindatanalytic $traindatanalytic --ngraphs $ngraphs --trainfileidx $trainfileidx --networkidx $networkidx --mlekdereps $mlekdereps --manifoldlayers $manifoldlayers
+python -u visualization_mlp_performance.py --model $model \
+                                           --machine $machine \
+                                           --traindatanalytic $traindatanalytic \
+                                           --ngraphs $ngraphs \
+                                           --trainfileidx $trainfileidx \
+                                           --networkidx $networkidx \
+                                           --mlekdereps $mlekdereps \
+                                           --manifoldlayers $manifoldlayers
 
 # -----------------------------------------------------
 
@@ -145,16 +152,16 @@ python -u visualization_mlp_performance.py --model $model --machine $machine --t
 
 # python -u visualization_mlp_performance.py --model $model --machine $machine --traindatanalytic $traindatanalytic --ngraphs $ngraphs --trainfileidx $trainfileidx --networkidx $networkidx --mlekdereps $mlekdereps --manifoldlayers $manifoldlayers
 
-model="ddm_sdv"
-machine="home"
-traindatanalytic=1
-ngraphs=9
-trainfileidx=0
-networkidx=2
-mlekdereps=100
-manifoldlayers=100
+# model="ddm_sdv"
+# machine="home"
+# traindatanalytic=1
+# ngraphs=9
+# trainfileidx=0
+# networkidx=2
+# mlekdereps=100
+# manifoldlayers=100
 
-python -u visualization_mlp_performance.py --model $model --machine $machine --traindatanalytic $traindatanalytic --ngraphs $ngraphs --trainfileidx $trainfileidx --networkidx $networkidx --mlekdereps $mlekdereps --manifoldlayers $manifoldlayers
+# python -u visualization_mlp_performance.py --model $model --machine $machine --traindatanalytic $traindatanalytic --ngraphs $ngraphs --trainfileidx $trainfileidx --networkidx $networkidx --mlekdereps $mlekdereps --manifoldlayers $manifoldlayers
 
 # # # -----------------------------------------------------
 

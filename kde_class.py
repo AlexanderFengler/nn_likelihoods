@@ -169,7 +169,7 @@ def bandwidth_silverman(sample = [0,0,0],
     # Deal with very small stds and n = 1 case
     if n > 1:
         if std < std_cutoff:
-            if std_prod == 'restrict':
+            if std_proc == 'restrict':
                 std = std_cutoff
             if std_proc == 'kill':
                 std = 0

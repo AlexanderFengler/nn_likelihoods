@@ -10,6 +10,7 @@ import uuid
 import seaborn as sns
 import os
 import cddm_data_simulation as cds
+import cdwiener as cdw
 import boundary_functions as bf
 import kde_training_utilities as kde_utils
 import kde_class as kdec
@@ -35,7 +36,12 @@ def kde_vs_mlp_likelihoods(ax_titles = [],
                            show = False,
                            machine = 'home',
                            method = 'mlp',
-                           traindatanalytic = 0):
+                           traindatanalytic = 0,
+                           plot_format = 'svg'):
+    
+    mpl.rcParams['text.usetex'] = True
+    #matplotlib.rcParams['pdf.fonttype'] = 42
+    mpl.rcParams['svg.fonttype'] = 'none'
     
     # Initialize rows and graph parameters
     rows = int(np.ceil(len(ax_titles) / cols))
@@ -74,139 +80,156 @@ def kde_vs_mlp_likelihoods(ax_titles = [],
         ll_out_keras = keras_model.predict(keras_input_batch, 
                                            batch_size = 100)
         
-        # Get predictions from simulations /kde
-        for j in range(nreps):
-            if model == 'ddm' or model == 'ddm_analytic':
-                out = cds.ddm_flexbound(v = parameter_matrix[i, 0],
-                                        a = parameter_matrix[i, 1],
-                                        w = parameter_matrix[i, 2],
-                                        ndt = parameter_matrix[i, 3],
-                                        s = 1,
-                                        delta_t = 0.001,
-                                        max_t = 20, 
-                                        n_samples = n_samples,
-                                        print_info = False,
-                                        boundary_fun = bf.constant,
-                                        boundary_multiplicative = True,
-                                        boundary_params = {})
-                
-            if model == 'ddm_sdv':
-                out = cds.ddm_sdv(v = parameter_matrix[i, 0],
-                                        a = parameter_matrix[i, 1],
-                                        w = parameter_matrix[i, 2],
-                                        ndt = parameter_matrix[i, 3],
-                                        sdv = parameter_matrix[i, 4],
-                                        s = 1,
-                                        delta_t = 0.001,
-                                        max_t = 20, 
-                                        n_samples = n_samples,
-                                        print_info = False,
-                                        boundary_fun = bf.constant,
-                                        boundary_multiplicative = True,
-                                        boundary_params = {})
-
-            if model == 'full_ddm':
-                out = cds.full_ddm(v = parameter_matrix[i, 0],
+        # Get prediction from navarro if traindatanalytic = 1
+        if traindatanalytic:
+            ll_out_gt = cdw.batch_fptd(plot_data[:, 0] * plot_data[:, 1], 
+                                   v = parameter_matrix[i, 0],
                                    a = parameter_matrix[i, 1],
                                    w = parameter_matrix[i, 2],
-                                   ndt = parameter_matrix[i, 3],
-                                   dw = parameter_matrix[i, 4],
-                                   sdv = parameter_matrix[i, 5],
-                                   dndt = parameter_matrix[i, 6],
-                                   s = 1,
-                                   delta_t = 0.001,
-                                   max_t = 20,
-                                   n_samples = n_samples,
-                                   print_info = False,
-                                   boundary_fun = bf.constant,
-                                   boundary_multiplicative = True,
-                                   boundary_params = {})
+                                   ndt = parameter_matrix[i, 3])
 
-            if model == 'angle' or model == 'angle2':
-                out = cds.ddm_flexbound(v = parameter_matrix[i, 0],
-                                        a = parameter_matrix[i, 1],
-                                        w = parameter_matrix[i, 2],
-                                        ndt = parameter_matrix[i, 3],
-                                        s = 1,
-                                        delta_t = 0.001, 
-                                        max_t = 20,
-                                        n_samples = n_samples,
-                                        print_info = False,
-                                        boundary_fun = bf.angle,
-                                        boundary_multiplicative = False,
-                                        boundary_params = {'theta': parameter_matrix[i, 4]})
+            sns.lineplot(plot_data[:, 0] * plot_data[:, 1], 
+                     ll_out_gt,
+                     color = 'black',
+                     alpha = 0.5,
+                     label = 'TRUE',
+                     ax = ax[row_tmp, col_tmp])
+        
+        # Get predictions from simulations /kde
+        
+        if not traindatanalytic:
+            for j in range(nreps):
+                if model == 'ddm' or model == 'ddm_analytic':
+                    out = cds.ddm_flexbound(v = parameter_matrix[i, 0],
+                                            a = parameter_matrix[i, 1],
+                                            w = parameter_matrix[i, 2],
+                                            ndt = parameter_matrix[i, 3],
+                                            s = 1,
+                                            delta_t = 0.001,
+                                            max_t = 20, 
+                                            n_samples = n_samples,
+                                            print_info = False,
+                                            boundary_fun = bf.constant,
+                                            boundary_multiplicative = True,
+                                            boundary_params = {})
 
-            if model == 'weibull_cdf' or model == 'weibull_cdf2':
-                out = cds.ddm_flexbound(v = parameter_matrix[i, 0],
-                                        a = parameter_matrix[i, 1],
-                                        w = parameter_matrix[i, 2],
-                                        ndt = parameter_matrix[i, 3],
-                                        s = 1,
-                                        delta_t = 0.001, 
-                                        max_t = 20,
-                                        n_samples = n_samples,
-                                        print_info = False,
-                                        boundary_fun = bf.weibull_cdf,
-                                        boundary_multiplicative = True,
-                                        boundary_params = {'alpha': parameter_matrix[i, 4],
-                                                           'beta': parameter_matrix[i, 5]})
-                
-            if model == 'levy':
-                out = cds.levy_flexbound(v = parameter_matrix[i, 0],
-                                         a = parameter_matrix[i, 1],
-                                         w = parameter_matrix[i, 2],
-                                         alpha_diff = parameter_matrix[i, 3],
-                                         ndt = parameter_matrix[i, 4],
-                                         s = 1,
-                                         delta_t = 0.001,
-                                         max_t = 20,
-                                         n_samples = n_samples,
-                                         print_info = False,
-                                         boundary_fun = bf.constant,
-                                         boundary_multiplicative = True, 
-                                         boundary_params = {})
+                if model == 'ddm_sdv':
+                    out = cds.ddm_sdv(v = parameter_matrix[i, 0],
+                                            a = parameter_matrix[i, 1],
+                                            w = parameter_matrix[i, 2],
+                                            ndt = parameter_matrix[i, 3],
+                                            sdv = parameter_matrix[i, 4],
+                                            s = 1,
+                                            delta_t = 0.001,
+                                            max_t = 20, 
+                                            n_samples = n_samples,
+                                            print_info = False,
+                                            boundary_fun = bf.constant,
+                                            boundary_multiplicative = True,
+                                            boundary_params = {})
 
-            if model == 'ornstein':
-                out = cds.ornstein_uhlenbeck(v = parameter_matrix[i, 0],
+                if model == 'full_ddm':
+                    out = cds.full_ddm(v = parameter_matrix[i, 0],
+                                       a = parameter_matrix[i, 1],
+                                       w = parameter_matrix[i, 2],
+                                       ndt = parameter_matrix[i, 3],
+                                       dw = parameter_matrix[i, 4],
+                                       sdv = parameter_matrix[i, 5],
+                                       dndt = parameter_matrix[i, 6],
+                                       s = 1,
+                                       delta_t = 0.001,
+                                       max_t = 20,
+                                       n_samples = n_samples,
+                                       print_info = False,
+                                       boundary_fun = bf.constant,
+                                       boundary_multiplicative = True,
+                                       boundary_params = {})
+
+                if model == 'angle' or model == 'angle2':
+                    out = cds.ddm_flexbound(v = parameter_matrix[i, 0],
+                                            a = parameter_matrix[i, 1],
+                                            w = parameter_matrix[i, 2],
+                                            ndt = parameter_matrix[i, 3],
+                                            s = 1,
+                                            delta_t = 0.001, 
+                                            max_t = 20,
+                                            n_samples = n_samples,
+                                            print_info = False,
+                                            boundary_fun = bf.angle,
+                                            boundary_multiplicative = False,
+                                            boundary_params = {'theta': parameter_matrix[i, 4]})
+
+                if model == 'weibull_cdf' or model == 'weibull_cdf2':
+                    out = cds.ddm_flexbound(v = parameter_matrix[i, 0],
+                                            a = parameter_matrix[i, 1],
+                                            w = parameter_matrix[i, 2],
+                                            ndt = parameter_matrix[i, 3],
+                                            s = 1,
+                                            delta_t = 0.001, 
+                                            max_t = 20,
+                                            n_samples = n_samples,
+                                            print_info = False,
+                                            boundary_fun = bf.weibull_cdf,
+                                            boundary_multiplicative = True,
+                                            boundary_params = {'alpha': parameter_matrix[i, 4],
+                                                               'beta': parameter_matrix[i, 5]})
+
+                if model == 'levy':
+                    out = cds.levy_flexbound(v = parameter_matrix[i, 0],
                                              a = parameter_matrix[i, 1],
                                              w = parameter_matrix[i, 2],
-                                             g = parameter_matrix[i, 3],
+                                             alpha_diff = parameter_matrix[i, 3],
                                              ndt = parameter_matrix[i, 4],
                                              s = 1,
-                                             delta_t = 0.001, 
+                                             delta_t = 0.001,
                                              max_t = 20,
                                              n_samples = n_samples,
                                              print_info = False,
                                              boundary_fun = bf.constant,
-                                             boundary_multiplicative = True,
-                                             boundary_params = {})      
-            
-            mykde = kdec.logkde((out[0], out[1], out[2]))
-            ll_out_kde = mykde.kde_eval((plot_data[:, 0], plot_data[:, 1]))
+                                             boundary_multiplicative = True, 
+                                             boundary_params = {})
 
-            # Plot kde predictions
-            if j == 0:
-                sns.lineplot(plot_data[:, 0] * plot_data[:, 1], 
-                             np.exp(ll_out_kde),
-                             color = 'black',
-                             alpha = 0.5,
-                             label = 'KDE',
-                             ax = ax[row_tmp, col_tmp])
-            else:
-                sns.lineplot(plot_data[:, 0] * plot_data[:, 1], 
-                             np.exp(ll_out_kde),
-                             color = 'black',
-                             alpha = 0.5,
-                             ax = ax[row_tmp, col_tmp])
-        
-        # Plot keras predictions
-        sns.lineplot(plot_data[:, 0] * plot_data[:, 1], 
-                     np.exp(ll_out_keras[:, 0]),
-                     color = 'green',
-                     label = 'MLP',
-                     alpha = 1,
-                     ax = ax[row_tmp, col_tmp])
-        
+                if model == 'ornstein':
+                    out = cds.ornstein_uhlenbeck(v = parameter_matrix[i, 0],
+                                                 a = parameter_matrix[i, 1],
+                                                 w = parameter_matrix[i, 2],
+                                                 g = parameter_matrix[i, 3],
+                                                 ndt = parameter_matrix[i, 4],
+                                                 s = 1,
+                                                 delta_t = 0.001, 
+                                                 max_t = 20,
+                                                 n_samples = n_samples,
+                                                 print_info = False,
+                                                 boundary_fun = bf.constant,
+                                                 boundary_multiplicative = True,
+                                                 boundary_params = {})      
+
+                mykde = kdec.logkde((out[0], out[1], out[2]))
+                ll_out_gt = mykde.kde_eval((plot_data[:, 0], plot_data[:, 1]))
+
+                # Plot kde predictions
+                if j == 0:
+                    sns.lineplot(plot_data[:, 0] * plot_data[:, 1], 
+                                 np.exp(ll_out_gt),
+                                 color = 'black',
+                                 alpha = 0.5,
+                                 label = 'KDE',
+                                 ax = ax[row_tmp, col_tmp])
+                elif j > 0:
+                    sns.lineplot(plot_data[:, 0] * plot_data[:, 1], 
+                                 np.exp(ll_out_gt),
+                                 color = 'black',
+                                 alpha = 0.5,
+                                 ax = ax[row_tmp, col_tmp])
+
+            # Plot keras predictions
+            sns.lineplot(plot_data[:, 0] * plot_data[:, 1], 
+                         np.exp(ll_out_keras[:, 0]),
+                         color = 'green',
+                         label = 'MLP',
+                         alpha = 1,
+                         ax = ax[row_tmp, col_tmp])
+
         # Legend adjustments
         if row_tmp == 0 and col_tmp == 0:
             ax[row_tmp, col_tmp].legend(loc = 'upper left', 
@@ -249,9 +272,25 @@ def kde_vs_mlp_likelihoods(ax_titles = [],
         plt.subplots_adjust(hspace = 0.3, wspace = 0.3)
         
         if traindatanalytic == 1:
-            plt.savefig(fig_dir + '/' + figure_name + model + '_analytic' + '.png', dpi = 300) #, bbox_inches = 'tight')
+            if plot_format == 'svg':
+                plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.svg', 
+                            format = 'svg', 
+                            transparent = True,
+                            frameon = False)
+            if plot_format == 'png':
+                plt.savefig(fig_dir + '/' + figure_name + model + '_analytic' + '.png', 
+                            dpi = 300) #, bbox_inches = 'tight')
+
         else:
-            plt.savefig(fig_dir + '/' + figure_name + model + '_kde' + '.png', dpi = 300) #, bbox_inches = 'tight')
+            if plot_format == 'svg':
+                plt.savefig(fig_dir + '/' + figure_name + model + '_kde' + '.svg', 
+                            format = 'svg', 
+                            transparent = True,
+                            frameon = False)
+                
+            if plot_format == 'png':
+                plt.savefig(fig_dir + '/' + figure_name + model + '_kde' + '.png', 
+                            dpi = 300) #, bbox_inches = 'tight')
         
     if show:
         return plt.show()
@@ -271,7 +310,12 @@ def mlp_manifold(params = [],
                  title = 'MLP Manifold',
                  model = 'ddm',
                  traindatanalytic = 0,
+                 plot_format = 'svg',
                 ):
+    
+    mpl.rcParams['text.usetex'] = True
+    #matplotlib.rcParams['pdf.fonttype'] = 42
+    mpl.rcParams['svg.fonttype'] = 'none'
     
     mpl.rcParams.update(mpl.rcParamsDefault)
     # Load Keras model and initialize batch container
@@ -343,13 +387,27 @@ def mlp_manifold(params = [],
     ax.w_zaxis.set_pane_color((1.0, 1.0, 1.0, 1.0))
    
     if traindatanalytic:
-        plt.savefig('./figures/mlp/manifolds/mlp_manifold_' + model + '_vary_' + vary_name +  '_analytic' + '.png', 
-                    bbox_inches = 'tight',
-                    dpi = 300)
+        if plot_format == 'svg':
+            plt.savefig('./figures/mlp/manifolds/mlp_manifold_' + model + '_vary_' + vary_name +  '_analytic' + '.svg',
+                        format = 'svg', 
+                        transparent = True,
+                        frameon = False)
+                        
+        if plot_format == 'png':
+            plt.savefig('./figures/mlp/manifolds/mlp_manifold_' + model + '_vary_' + vary_name +  '_analytic' + '.png', 
+                        bbox_inches = 'tight',
+                        dpi = 300)
     else:
-        plt.savefig('./figures/mlp/manifolds/mlp_manifold_' + model + '_vary_' + vary_name + '_kde' + '.png', 
-                    bbox_inches = 'tight',
-                    dpi = 300)
+        if plot_format == 'svg':
+            plt.savefig('./figures/mlp/manifolds/mlp_manifold_' + model + '_vary_' + vary_name + '_kde' + '.svg',
+                        format = 'svg', 
+                        transparent = True,
+                        frameon = False)
+                        
+        if plot_format == 'png':
+            plt.savefig('./figures/mlp/manifolds/mlp_manifold_' + model + '_vary_' + vary_name + '_kde' + '.png', 
+                        bbox_inches = 'tight',
+                        dpi = 300)
         
     if show:
         return plt.show()

@@ -36,7 +36,12 @@ def kde_vs_mlp_likelihoods(ax_titles = [],
                            show = False,
                            machine = 'home',
                            method = 'mlp',
-                           traindatanalytic = 0):
+                           traindatanalytic = 0,
+                           plot_format = 'svg'):
+    
+    mpl.rcParams['text.usetex'] = True
+    #matplotlib.rcParams['pdf.fonttype'] = 42
+    mpl.rcParams['svg.fonttype'] = 'none'
     
     # Initialize rows and graph parameters
     rows = int(np.ceil(len(ax_titles) / cols))
@@ -267,9 +272,25 @@ def kde_vs_mlp_likelihoods(ax_titles = [],
         plt.subplots_adjust(hspace = 0.3, wspace = 0.3)
         
         if traindatanalytic == 1:
-            plt.savefig(fig_dir + '/' + figure_name + model + '_analytic' + '.png', dpi = 300) #, bbox_inches = 'tight')
+            if plot_format == 'svg':
+                plt.savefig(fig_dir + '/' + figure_name + model + data_signature + '_' + train_data_type + '.svg', 
+                            format = 'svg', 
+                            transparent = True,
+                            frameon = False)
+            if plot_format == 'png':
+                plt.savefig(fig_dir + '/' + figure_name + model + '_analytic' + '.png', 
+                            dpi = 300) #, bbox_inches = 'tight')
+
         else:
-            plt.savefig(fig_dir + '/' + figure_name + model + '_kde' + '.png', dpi = 300) #, bbox_inches = 'tight')
+            if plot_format == 'svg':
+                plt.savefig(fig_dir + '/' + figure_name + model + '_kde' + '.svg', 
+                            format = 'svg', 
+                            transparent = True,
+                            frameon = False)
+                
+            if plot_format == 'png':
+                plt.savefig(fig_dir + '/' + figure_name + model + '_kde' + '.png', 
+                            dpi = 300) #, bbox_inches = 'tight')
         
     if show:
         return plt.show()
@@ -289,7 +310,12 @@ def mlp_manifold(params = [],
                  title = 'MLP Manifold',
                  model = 'ddm',
                  traindatanalytic = 0,
+                 plot_format = 'svg',
                 ):
+    
+    mpl.rcParams['text.usetex'] = True
+    #matplotlib.rcParams['pdf.fonttype'] = 42
+    mpl.rcParams['svg.fonttype'] = 'none'
     
     mpl.rcParams.update(mpl.rcParamsDefault)
     # Load Keras model and initialize batch container
@@ -361,13 +387,27 @@ def mlp_manifold(params = [],
     ax.w_zaxis.set_pane_color((1.0, 1.0, 1.0, 1.0))
    
     if traindatanalytic:
-        plt.savefig('./figures/mlp/manifolds/mlp_manifold_' + model + '_vary_' + vary_name +  '_analytic' + '.png', 
-                    bbox_inches = 'tight',
-                    dpi = 300)
+        if plot_format == 'svg':
+            plt.savefig('./figures/mlp/manifolds/mlp_manifold_' + model + '_vary_' + vary_name +  '_analytic' + '.svg',
+                        format = 'svg', 
+                        transparent = True,
+                        frameon = False)
+                        
+        if plot_format == 'png':
+            plt.savefig('./figures/mlp/manifolds/mlp_manifold_' + model + '_vary_' + vary_name +  '_analytic' + '.png', 
+                        bbox_inches = 'tight',
+                        dpi = 300)
     else:
-        plt.savefig('./figures/mlp/manifolds/mlp_manifold_' + model + '_vary_' + vary_name + '_kde' + '.png', 
-                    bbox_inches = 'tight',
-                    dpi = 300)
+        if plot_format == 'svg':
+            plt.savefig('./figures/mlp/manifolds/mlp_manifold_' + model + '_vary_' + vary_name + '_kde' + '.svg',
+                        format = 'svg', 
+                        transparent = True,
+                        frameon = False)
+                        
+        if plot_format == 'png':
+            plt.savefig('./figures/mlp/manifolds/mlp_manifold_' + model + '_vary_' + vary_name + '_kde' + '.png', 
+                        bbox_inches = 'tight',
+                        dpi = 300)
         
     if show:
         return plt.show()
