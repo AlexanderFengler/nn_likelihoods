@@ -202,7 +202,7 @@ sampler='slice'
 fileprefix='elife_'
 initmode='mle'
 nsubsample=1500
-modelidentifier=''
+modelidentifier=None
 
 for n in "${ndata[@]}"
 do
@@ -217,7 +217,7 @@ do
                                                                                 --analytic $analytic \
                                                                                 --modelidentifier $modelidentifier \
                                                                                 --fileprefix $fileprefix \
-                                                                                --sampler $sampler \
+                                                                                --sampler $sampler \sbatch
     done
 done
 
@@ -301,7 +301,6 @@ done
 #        python -u  /users/afengler/git_repos/nn_likelihoods/is_data_handler.py --machine $machine --method $method --ndata $n --nsubsample 20000
 #     done
 # done
-
 
 # machine="ccv"
 # ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
