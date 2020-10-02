@@ -119,7 +119,7 @@ def collect_datasets_slice(in_files = [],
             tmp_timing = tmp_data[3][i]
 
             # Fill in return datastructures
-            tmp_ids = np.random.choice(arange(n_burnin, tmp_samples.shape[0], 1), size = n_post_samples_by_param, replace = False)
+            tmp_ids = np.random.choice(np.arange(n_burnin, tmp_samples.shape[0], 1), size = n_post_samples_by_param, replace = False)
             posterior_subsamples[(n_param_sets_file * file_cnt) + i, :, :] = tmp_samples[tmp_ids, :]
             posterior_subsamples_ll[(n_param_sets_file * file_cnt) + i, :] = tmp_log_l[tmp_ids]
             means[(n_param_sets_file * file_cnt) + i, :] = np.mean(tmp_samples[n_burnin:, :], axis = 0)
