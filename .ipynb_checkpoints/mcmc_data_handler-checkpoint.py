@@ -179,6 +179,9 @@ if __name__ == "__main__":
     CLI.add_argument("--fileprefix",
                      type = str,
                      default = None)
+    CLI.add_argument("--modelidentifier",
+                     type = str,
+                     default = 'None')
     
     args = CLI.parse_args()
     print(args)
