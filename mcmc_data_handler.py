@@ -249,9 +249,9 @@ if __name__ == "__main__":
     print(network_path)
     
     if initmode == '':
-        file_signature = fileprefix + 'post_samp_data_param_recov_unif_reps_1_n_' + str(ndata) + '_1_'
+        file_signature = fileprefix + 'post_samp_data_param_recov_unif_reps_1_n_' + str(ndata) + '_' #+ '_1_'
     else:
-        file_signature = fileprefix + 'post_samp_data_param_recov_unif_reps_1_n_' + str(ndata) + '_init_' + initmode + '_1_'
+        file_signature = fileprefix + 'post_samp_data_param_recov_unif_reps_1_n_' + str(ndata) + '_init_' + initmode + '_' #'_1_'
         print('file_signature: ', file_signature)
     
     summary_file = method_comparison_folder + network_id + '/summary_' + file_signature[:-1] + '.pickle'
