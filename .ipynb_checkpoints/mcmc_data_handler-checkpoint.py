@@ -224,6 +224,8 @@ if __name__ == "__main__":
         
         if analytic:
             method_comparison_folder += 'analytic/'
+            network_path = ''
+            network_id = ''
         else:
             with open("/users/afengler/git_repos/nn_likelihoods/model_paths.yaml") as tmp_file:
                 if nnbatchid == -1:
