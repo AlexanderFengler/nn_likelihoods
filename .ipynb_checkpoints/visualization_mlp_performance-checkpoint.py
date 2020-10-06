@@ -313,11 +313,11 @@ def mlp_manifold(params = [],
                  plot_format = 'svg',
                 ):
     
+    mpl.rcParams.update(mpl.rcParamsDefault)
     mpl.rcParams['text.usetex'] = True
     #matplotlib.rcParams['pdf.fonttype'] = 42
     mpl.rcParams['svg.fonttype'] = 'none'
     
-    mpl.rcParams.update(mpl.rcParamsDefault)
     # Load Keras model and initialize batch container
     keras_model = keras.models.load_model(network_dir + 'model_final.h5')
 
@@ -588,18 +588,18 @@ if __name__ == "__main__":
         model2 = model
 
     print('Now Plotting KDE vs. MLP Likelihoods')
-    kde_vs_mlp_likelihoods(ax_titles = [str(i) for i in range(1, ngraphs + 1, 1)],
-                           parameter_matrix = parameter_matrix,
-                           network_dir = network_path,
-                           cols = 3,
-                           model = model2,
-                           n_samples = 20000,
-                           nreps = mlekdereps,
-                           save = True,
-                           show = False,
-                           machine = 'home',
-                           method = 'mlp',
-                           traindatanalytic = traindatanalytic)
+#     kde_vs_mlp_likelihoods(ax_titles = [str(i) for i in range(1, ngraphs + 1, 1)],
+#                            parameter_matrix = parameter_matrix,
+#                            network_dir = network_path,
+#                            cols = 3,
+#                            model = model2,
+#                            n_samples = 20000,
+#                            nreps = mlekdereps,
+#                            save = True,
+#                            show = False,
+#                            machine = 'home',
+#                            method = 'mlp',
+#                            traindatanalytic = traindatanalytic)
     
     
     # MANIFOLD PLOTS

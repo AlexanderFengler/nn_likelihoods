@@ -21,7 +21,7 @@ ngraphs=9
 trainfileidx=0
 networkidx=2
 mlekdereps=100
-manifoldlayers=100
+manifoldlayers=10
 
 python -u visualization_mlp_performance.py --model $model \
                                            --machine $machine \
