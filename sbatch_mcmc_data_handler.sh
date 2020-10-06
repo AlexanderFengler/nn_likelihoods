@@ -196,7 +196,7 @@
 machine="ccv"
 ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
 ndata=( 1024 4096 ) #  4096 )
-method="weibull_cdf2"
+method="full_ddm2"
 analytic=0
 sampler='slice'
 fileprefix='elife_slice_'
