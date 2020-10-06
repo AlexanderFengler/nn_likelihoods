@@ -30,7 +30,7 @@ config = {'ddm': {'params':['v', 'a', 'w', 'ndt'],
           'weibull_cdf':{'params': ['v', 'a', 'w', 'ndt', 'alpha', 'beta'],
                          'param_bounds': [[-2.7, 0.4, 0.3, 0.1, 0.5, 0.5], [2.7, 1.7, 0.7, 1.9, 4.5, 6.5]]
                         },
-          'levy':{'params':['v', 'a', 'w','alpha_diff', 'ndt'],
+          'levy':{'params':['v', 'a', 'w','alpha-diff', 'ndt'],
                   'param_bounds':[[-2.7, 0.4, 0.3, 1.1, 0.1], [2.7, 1.7, 0.7, 1.9, 1.9]]
                  },
           'ddm_sdv':{'params':['v', 'a', 'w', 'ndt', 'sdv'],
@@ -363,6 +363,7 @@ def parameter_recovery_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
                             method = 'cnn',
                             statistic = 'mean',
                             data_signature = '',
+                            fileidentifier = '',
                             train_data_type = '',
                             plot_format = 'svg'): # color_param 'none' 
     
@@ -430,7 +431,7 @@ def parameter_recovery_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
             if not os.path.isdir(fig_dir):
                 os.mkdir(fig_dir)
         
-        figure_name = 'parameter_recovery_plot_' + statistic + '_'
+        figure_name = 'parameter_recovery_plot_' + fileidentifier + '_' + statistic + '_'
         plt.subplots_adjust(top = 0.9)
         plt.subplots_adjust(hspace = 0.3, wspace = 0.3)
         if plot_format == 'png':
@@ -2463,7 +2464,7 @@ def caterpillar_plot(posterior_samples = [],
     
     for k in config[model]['params']:
         ecdfs[k] = ECDF(posterior_samples[:, config[model]['params'].index(k)])
-        tmp_sorted = sorted(trace[k])
+        tmp_sorted = sorted(posterior_samples[:, config[model]['params'].index(k)])
         _p01 =  tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.01) - 1]
         _p99 = tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.99) - 1]
         _p1 = tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.1) - 1]
@@ -2630,6 +2631,12 @@ if __name__ == "__main__":
     CLI.add_argument("--datafilter",
                      type = str,
                      default = 'choice_p')
+    CLI.add_argument("--fileidentifier",
+                     type = str,
+                     default = 'elife_slice_')
+    CLI.add_argument("--modelidentifier",
+                     type = str,
+                     default = 'None')
     
     args = CLI.parse_args()
     print(args)
@@ -2646,6 +2653,16 @@ if __name__ == "__main__":
     npostpred = args.npostpred
     npostpair = args.npostpair
     datafilter = args.datafilter
+    
+    if args.modelidentifier != 'None':
+        modelidentifier = args.modelidentifier
+    else:
+        modelidentifier = ''
+    
+    if args.fileidentifier != 'None':
+        fileidentifier = args.fileidentifier
+    else:
+        fileidentifier = ''
     
     matplotlib.rcParams['text.usetex'] = True
     #matplotlib.rcParams['pdf.fonttype'] = 42
@@ -2672,7 +2689,7 @@ if __name__ == "__main__":
         if method != 'navarro':
             with open("model_paths.yaml") as tmp_file:
                 if network_idx == -1:
-                    network_path = yaml.load(tmp_file)[model]
+                    network_path = yaml.load(tmp_file)[model + modelidentifier]
                     network_id = network_path[list(re.finditer('/', network_path))[-2].end():]
                 else:
                     if traindattype == 'analytic':
@@ -2689,8 +2706,12 @@ if __name__ == "__main__":
             method_comparison_folder = '/Users/afengler/OneDrive/project_nn_likelihoods/data/analytic/' + model + '/method_comparison/' + '/analytic/'
 
         # Get trained networks for model
-        file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + str(n) + '_init_mle_1_'
-        summary_file = method_comparison_folder + 'summary_' + file_signature[:-1] + '.pickle'
+        if fileidentifier == 'elife_slice_':
+            file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + str(n) + '_init_mle_'
+        else:
+            file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + str(n) + '_init_mle_1_'
+        
+        summary_file = method_comparison_folder +  'summary_' + fileidentifier + file_signature[:-1] + '.pickle'
     elif method == 'cnn':
         summary_file = '/users/afengler/OneDrive/project_nn_likelihoods/eLIFE_exps/summaries/IS_summary_' + model + '_N_' + str(n) + '.pickle'
     elif method == 'sbi':
@@ -2855,6 +2876,7 @@ if __name__ == "__main__":
                                 save = True,
                                 machine = 'home',
                                 data_signature = '_n_' + str(n) + '_' + now,
+                                fileidentifier = fileidentifier,
                                 method = mcmc_dict['method'],
                                 model = model,
                                 statistic = 'mean',
@@ -2870,6 +2892,7 @@ if __name__ == "__main__":
                                 save = True,
                                 machine = 'home',
                                 data_signature = '_n_' + str(n) + '_' + now,
+                                fileidentifier = fileidentifier,
                                 method = mcmc_dict['method'],
                                 model = model,
                                 statistic = 'maps',

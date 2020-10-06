@@ -60,7 +60,7 @@ temp = {
     "output_folder_home": "/Users/afengler/OneDrive/project_nn_likelihoods/data/kde/levy/method_comparison/",
     "model_folder": "/users/afengler/data/kde/levy/keras_models/",
     "model_folder_x7": "/media/data_cifs/afengler/data/kde/levy/keras_models/",
-    "param_names": ['v', 'a', 'w', 'alpha_diff', 'ndt'],
+    "param_names": ['v', 'a', 'w', 'alpha-diff', 'ndt'],
     "boundary_param_names": [],
     #"param_bounds_network": [[-2.0, 2.0], [0.5, 1.5], [0.3, 0.7], [0.0, 1.0]],  
     "param_bounds_network": [[-3.0, 3.0], [0.3, 2.0], [0.1, 0.9], [1.0, 2.0], [0.0, 2.0]],

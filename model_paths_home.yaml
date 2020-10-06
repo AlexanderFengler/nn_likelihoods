@@ -74,3 +74,12 @@ ddm_sdv_batch: ['/users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm_sd
 '/users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm_sdv/keras_models/dnnregressor_ddm_sdv_05_23_20_03_16_07/',
 '/users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm_sdv/keras_models/dnnregressor_ddm_sdv_05_23_20_04_50_37/',
 '/users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm_sdv/keras_models/dnnregressor_ddm_sdv_05_23_20_07_19_35/']
+
+# Models trained on 100k data
+angle2_100k: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/angle2/keras_models/dnnregressor_angle2_09_29_20_08_11_12/
+ddm_100k: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm/keras_models/dnnregressor_ddm_09_26_20_08_52_12/
+ddm_sdv_100k: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm_sdv/keras_models/dnnregressor_ddm_sdv_09_26_20_00_52_02/
+levy_100k: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/levy/keras_models/dnnregressor_levy_09_29_20_09_40_31/
+ornstein_100k: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/ornstein/keras_models/dnnregressor_ornstein_09_29_20_06_55_47/
+weibull_cdf2_100k: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/weibull_cdf2/keras_models/dnnregressor_weibull_cdf2_09_29_20_05_06_38/
+full_ddm2_100k: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/full_ddm2/keras_models/dnnregressor_full_ddm2_09_30_20_01_43_20/

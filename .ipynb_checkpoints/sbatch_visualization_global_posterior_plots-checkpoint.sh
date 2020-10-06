@@ -28,22 +28,22 @@ plotlist=( "parameter_recovery_scatter" ) #( "model_uncertainty_alt" "a_of_t" "p
 
 # DDM_SDV -------------------------------------------------
 
-model="ddm_sdv"
-machine="home"
-method="cnn"
-traindattype="binned"
-networkidx=2
-n=( 1024 )
-analytic=0
-rhatcutoff=1.1
-npostpred=9
-npostpair=9
-datafilter='none'
+# model="ddm_sdv"
+# machine="home"
+# method="cnn"
+# traindattype="binned"
+# networkidx=2
+# n=( 1024 )
+# analytic=0
+# rhatcutoff=1.1
+# npostpred=9
+# npostpair=9
+# datafilter='none'
 
-for n_tmp in "${n[@]}"
-do
-    python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
-done
+# for n_tmp in "${n[@]}"
+# do
+#     python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]} --datafilter $datafilter
+# done
 # ---------------------------------------------------
 
 # ANGLE2 ---------------------------------------------------
@@ -230,6 +230,40 @@ done
 
 # MLP
 # # DDM -----------------------------------------------
+
+model="ddm"
+machine="home"
+method="mlp"
+traindattype="kde"
+fileidentifier="elife_slice_"
+modelidentifier='_100k'
+networkidx=-1    # changed from 2
+n=( 1024 4096 )
+analytic=0
+rhatcutoff=1.1
+npostpred=9
+npostpair=9
+
+for n_tmp in "${n[@]}"
+do
+    python -u visualization_global_posterior_plots.py --model $model \
+                                                      --machine $machine \
+                                                      --method $method \
+                                                      --networkidx $networkidx \
+                                                      --traindattype $traindattype \
+                                                      --n $n_tmp \
+                                                      --analytic $analytic \
+                                                      --rhatcutoff $rhatcutoff \
+                                                      --npostpred $npostpred \
+                                                      --npostpair $npostpair \
+                                                      --plots ${plotlist[@]} \
+                                                      --fileidentifier $fileidentifier \
+                                                      --modelidentifier $modelidentifier
+done
+
+
+
+
 # model="ddm"
 # machine="home"
 # method="mlp"
@@ -284,55 +318,69 @@ done
 
 # # DDM_SDV -------------------------------------------------
 
-model="ddm_sdv"
-machine="home"
-method="mlp"
-traindattype="kde"
-networkidx=2
-n=( 1024 )
-analytic=0
-rhatcutoff=1.1
-npostpred=9
-npostpair=9
+# model="ddm_sdv"
+# machine="home"
+# method="mlp"
+# traindattype="kde"
+# fileidentifier="elife_slice_"
+# modelidentifier='_100k'
+# networkidx=-1    # changed from 2
+# n=( 1024 4096 )
+# analytic=0
+# rhatcutoff=1.1
+# npostpred=9
+# npostpair=9
 
-for n_tmp in "${n[@]}"
-do
-    python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]}
-done
-
-
-model="ddm_sdv"
-machine="home"
-method="mlp"
-traindattype="analytic"
-networkidx=2
-n=( 1024 )
-analytic=0
-rhatcutoff=1.1
-npostpred=9
-npostpair=9
-
-for n_tmp in "${n[@]}"
-do
-    python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]}
-done
+# for n_tmp in "${n[@]}"
+# do
+#     python -u visualization_global_posterior_plots.py --model $model \
+#                                                       --machine $machine \
+#                                                       --method $method \
+#                                                       --networkidx $networkidx \
+#                                                       --traindattype $traindattype \
+#                                                       --n $n_tmp \
+#                                                       --analytic $analytic \
+#                                                       --rhatcutoff $rhatcutoff \
+#                                                       --npostpred $npostpred \
+#                                                       --npostpair $npostpair \
+#                                                       --plots ${plotlist[@]} \
+#                                                       --fileidentifier $fileidentifier \
+#                                                       --modelidentifier $modelidentifier
+# done
 
 
-model="ddm_sdv"
-machine="home"
-method="navarro"
-traindattype="analytic"
-networkidx=2
-n=( 1024 )
-analytic=1
-rhatcutoff=1.1
-npostpred=9
-npostpair=9
+# model="ddm_sdv"
+# machine="home"
+# method="mlp"
+# traindattype="analytic"
+# networkidx=2
+# n=( 1024 )
+# analytic=0
+# rhatcutoff=1.1
+# npostpred=9
+# npostpair=9
 
-for n_tmp in "${n[@]}"
-do
-    python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]}
-done
+# for n_tmp in "${n[@]}"
+# do
+#     python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]}
+# done
+
+
+# model="ddm_sdv"
+# machine="home"
+# method="navarro"
+# traindattype="analytic"
+# networkidx=2
+# n=( 1024 )
+# analytic=1
+# rhatcutoff=1.1
+# npostpred=9
+# npostpair=9
+
+# for n_tmp in "${n[@]}"
+# do
+#     python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]}
+# done
 # ----------------------------------------------------------
 
 # # ANGLE2 ---------------------------------------------------
@@ -351,6 +399,37 @@ done
 # do
 #     python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]}
 # done
+
+# model="angle2"
+# machine="home"
+# method="mlp"
+# traindattype="kde"
+# fileidentifier="elife_slice_"
+# modelidentifier='_100k'
+# networkidx=-1    # changed from 2
+# n=( 1024 4096 )
+# analytic=0
+# rhatcutoff=1.1
+# npostpred=9
+# npostpair=9
+
+# for n_tmp in "${n[@]}"
+# do
+#     python -u visualization_global_posterior_plots.py --model $model \
+#                                                       --machine $machine \
+#                                                       --method $method \
+#                                                       --networkidx $networkidx \
+#                                                       --traindattype $traindattype \
+#                                                       --n $n_tmp \
+#                                                       --analytic $analytic \
+#                                                       --rhatcutoff $rhatcutoff \
+#                                                       --npostpred $npostpred \
+#                                                       --npostpair $npostpair \
+#                                                       --plots ${plotlist[@]} \
+#                                                       --fileidentifier $fileidentifier \
+#                                                       --modelidentifier $modelidentifier
+# done
+
 # # # -------------------------------------------------------------
 
 # # FULL_DDM2 ---------------------------------------------------
@@ -369,6 +448,37 @@ done
 # do
 #     python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]}
 # done
+
+
+# model="full_ddm2"
+# machine="home"
+# method="mlp"
+# traindattype="kde"
+# fileidentifier="elife_slice_"
+# modelidentifier='_100k'
+# networkidx=-1    # changed from 2
+# n=( 1024 4096 )
+# analytic=0
+# rhatcutoff=1.1
+# npostpred=9
+# npostpair=9
+
+# for n_tmp in "${n[@]}"
+# do
+#     python -u visualization_global_posterior_plots.py --model $model \
+#                                                       --machine $machine \
+#                                                       --method $method \
+#                                                       --networkidx $networkidx \
+#                                                       --traindattype $traindattype \
+#                                                       --n $n_tmp \
+#                                                       --analytic $analytic \
+#                                                       --rhatcutoff $rhatcutoff \
+#                                                       --npostpred $npostpred \
+#                                                       --npostpair $npostpair \
+#                                                       --plots ${plotlist[@]} \
+#                                                       --fileidentifier $fileidentifier \
+#                                                       --modelidentifier $modelidentifier
+# done
 # # -----------------------------------------------------------
 
 # # # ORNSTEIN ---------------------------------------------------
@@ -386,6 +496,36 @@ done
 # for n_tmp in "${n[@]}"
 # do
 #     python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]}
+# done
+
+# model="ornstein"
+# machine="home"
+# method="mlp"
+# traindattype="kde"
+# fileidentifier="elife_slice_"
+# modelidentifier='_100k'
+# networkidx=-1    # changed from 2
+# n=( 1024 4096 )
+# analytic=0
+# rhatcutoff=1.1
+# npostpred=9
+# npostpair=9
+
+# for n_tmp in "${n[@]}"
+# do
+#     python -u visualization_global_posterior_plots.py --model $model \
+#                                                       --machine $machine \
+#                                                       --method $method \
+#                                                       --networkidx $networkidx \
+#                                                       --traindattype $traindattype \
+#                                                       --n $n_tmp \
+#                                                       --analytic $analytic \
+#                                                       --rhatcutoff $rhatcutoff \
+#                                                       --npostpred $npostpred \
+#                                                       --npostpair $npostpair \
+#                                                       --plots ${plotlist[@]} \
+#                                                       --fileidentifier $fileidentifier \
+#                                                       --modelidentifier $modelidentifier
 # done
 # # # -----------------------------------------------------------
 
@@ -424,6 +564,36 @@ done
 # do
 #     python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]}
 # done
+
+# model="weibull_cdf2"
+# machine="home"
+# method="mlp"
+# traindattype="kde"
+# fileidentifier="elife_slice_"
+# modelidentifier='_100k'
+# networkidx=-1    # changed from 2
+# n=( 1024 4096 )
+# analytic=0
+# rhatcutoff=1.1
+# npostpred=9
+# npostpair=9
+
+# for n_tmp in "${n[@]}"
+# do
+#     python -u visualization_global_posterior_plots.py --model $model \
+#                                                       --machine $machine \
+#                                                       --method $method \
+#                                                       --networkidx $networkidx \
+#                                                       --traindattype $traindattype \
+#                                                       --n $n_tmp \
+#                                                       --analytic $analytic \
+#                                                       --rhatcutoff $rhatcutoff \
+#                                                       --npostpred $npostpred \
+#                                                       --npostpair $npostpair \
+#                                                       --plots ${plotlist[@]} \
+#                                                       --fileidentifier $fileidentifier \
+#                                                       --modelidentifier $modelidentifier
+# done
 # # # # -----------------------------------------------------------
 
 # # LEVY ------------------------------------------------------------
@@ -443,6 +613,36 @@ done
 # do
 #     python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]}
 # done
+
+model="levy"
+machine="home"
+method="mlp"
+traindattype="kde"
+fileidentifier="elife_slice_"
+modelidentifier='_100k'
+networkidx=-1    # changed from 2
+n=( 1024 4096 )
+analytic=0
+rhatcutoff=1.1
+npostpred=9
+npostpair=9
+
+for n_tmp in "${n[@]}"
+do
+    python -u visualization_global_posterior_plots.py --model $model \
+                                                      --machine $machine \
+                                                      --method $method \
+                                                      --networkidx $networkidx \
+                                                      --traindattype $traindattype \
+                                                      --n $n_tmp \
+                                                      --analytic $analytic \
+                                                      --rhatcutoff $rhatcutoff \
+                                                      --npostpred $npostpred \
+                                                      --npostpair $npostpair \
+                                                      --plots ${plotlist[@]} \
+                                                      --fileidentifier $fileidentifier \
+                                                      --modelidentifier $modelidentifier
+done
 # # # -----------------------------------------------------------
 
 # SBI 
