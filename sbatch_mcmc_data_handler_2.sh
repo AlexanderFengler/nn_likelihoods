@@ -222,21 +222,29 @@ for n in "${ndata[@]}"
 do
     for id in "${ids[@]}"
     do 
-       python -u  /users/afengler/git_repos/nn_likelihoods/is_data_handler.py --machine $machine --method $method --ndata $n --nsubsample 20000
+       python -u  /users/afengler/git_repos/nn_likelihoods/is_data_handler.py --machine $machine \
+                                                                              --method $method \
+                                                                              --ndata $n \
+                                                                              --nsubsample 20000 \
+                                                                              --isfolder 'results/time_benchmark_eLIFE_exps_round2'
     done
 done
 
 machine="ccv"
 ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
 ndata=( 1024 4096 ) #  4096 )
-method="angle"
+method="ddm"
 analytic=0
 
 for n in "${ndata[@]}"
 do
     for id in "${ids[@]}"
     do 
-       python -u  /users/afengler/git_repos/nn_likelihoods/is_data_handler.py --machine $machine --method $method --ndata $n --nsubsample 20000
+       python -u  /users/afengler/git_repos/nn_likelihoods/is_data_handler.py --machine $machine \
+                                                                              --method $method \
+                                                                              --ndata $n \
+                                                                              --nsubsample 20000 \
+                                                                              --isfolder 'results/time_benchmark_eLIFE_exps_round2'
     done
 done
 

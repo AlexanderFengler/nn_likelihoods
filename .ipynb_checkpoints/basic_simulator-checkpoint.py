@@ -11,6 +11,7 @@ from cddm_data_simulation import ornstein_uhlenbeck
 from cddm_data_simulation import full_ddm
 from cddm_data_simulation import ddm_sdv
 from cddm_data_simulation import ddm_flexbound_pre
+from cddm_data_simulation import race_model
 import cddm_data_simulation as cds
 import boundary_functions as bf
 
@@ -89,7 +90,8 @@ def simulator(theta,
                           delta_t = delta_t,
                           boundary_params = {},
                           boundary_fun = bf.constant,
-                          boundary_multiplicative = True)
+                          boundary_multiplicative = True,
+                          max_t = max_t)
     
     if model == 'angle' or model == 'angle2':
         x = ddm_flexbound(v = theta[0], 
@@ -100,7 +102,8 @@ def simulator(theta,
                           boundary_multiplicative = False,
                           boundary_params = {'theta': theta[4]}, 
                           delta_t = delta_t,
-                          n_samples = n_samples)
+                          n_samples = n_samples,
+                          max_t = max_t)
     
     if model == 'weibull_cdf' or model == 'weibull_cdf2':
         x = ddm_flexbound(v = theta[0], 
@@ -111,7 +114,8 @@ def simulator(theta,
                           boundary_multiplicative = True, 
                           boundary_params = {'alpha': theta[4], 'beta': theta[5]}, 
                           delta_t = delta_t,
-                          n_samples = n_samples)
+                          n_samples = n_samples,
+                          max_t = max_t)
     
     if model == 'levy':
         x = levy_flexbound(v = theta[0], 
@@ -123,7 +127,8 @@ def simulator(theta,
                            boundary_multiplicative = True, 
                            boundary_params = {},
                            delta_t = delta_t,
-                           n_samples = n_samples)
+                           n_samples = n_samples,
+                           max_t = max_t)
     
     if model == 'full_ddm' or model == 'full_ddm2':
         x = full_ddm(v = theta[0],
@@ -137,7 +142,8 @@ def simulator(theta,
                      boundary_multiplicative = True, 
                      boundary_params = {}, 
                      delta_t = delta_t,
-                     n_samples = n_samples)
+                     n_samples = n_samples,
+                     max_t = max_t)
 
     if model == 'ddm_sdv':
         x = ddm_sdv(v = theta[0], 
@@ -149,7 +155,8 @@ def simulator(theta,
                     boundary_multiplicative = True, 
                     boundary_params = {},
                     delta_t = delta_t,
-                    n_samples = n_samples)
+                    n_samples = n_samples,
+                    max_t = max_t)
         
     if model == 'ornstein':
         x = ornstein_uhlenbeck(v = theta[0], 
@@ -161,7 +168,8 @@ def simulator(theta,
                                boundary_multiplicative = True,
                                boundary_params = {},
                                delta_t = delta_t,
-                               n_samples = n_samples)
+                               n_samples = n_samples,
+                               max_t = max_t)
 
     if model == 'pre':
         x = ddm_flexbound_pre(v = theta[0],
@@ -172,9 +180,51 @@ def simulator(theta,
                               boundary_multiplicative = False,
                               boundary_params = {'theta': theta[4]},
                               delta_t = delta_t,
-                              n_samples = n_samples)
+                              n_samples = n_samples,
+                              max_t = max_t)
+        
+    if model == 'race_model_3':
+        x = race_model(v = theta[:3],
+                       a = theta[3],
+                       w = theta[4:7],
+                       ndt = theta[7],
+                       s = np.array([1, 1, 1], dtype = np.float32),
+                       boundary_fun = bf.constant,
+                       boundary_multiplicative = True,
+                       boundary_params = {},
+                       delta_t = delta_t,
+                       n_samples = n_samples,
+                       max_t = max_t)
+        
+    if model == 'race_model_4':
+        x = race_model(v = theta[:4],
+                       a = theta[4],
+                       w = theta[5:9],
+                       ndt = theta[9],
+                       s = np.aray([1, 1, 1, 1], dtype = np.float32),
+                       boundary_fun = bf.constant,
+                       boundary_multiplicative = True,
+                       boundary_params = {},
+                       delta_t = delta_t,
+                       n_samples = n_samples,
+                       max_t = max_t)
+        
+#         race_model(v = np.array([0, 0, 0], dtype = DTYPE), # np.array expected, one column of floats
+#                float a = 1, # initial boundary separation
+#                w = np.array([0, 0, 0], dtype = DTYPE), # np.array expected, one column of floats
+#                float ndt = 1, # for now we we don't allow ndt by choice
+#                #ndt = np.array([0.0, 0.0, 0.0], dtype = DTYPE),
+#                s = np.array([1, 1, 1], dtype = DTYPE), # np.array expected, one column of floats
+#                float delta_t = 0.001, # time increment step
+#                float max_t = 20, # maximum rt allowed
+#                int n_samples = 2000, 
+#                print_info = True,
+#                boundary_fun = None,
+#                boundary_multiplicative = True,
+#                boundary_params = {})       
+#     if model == 'race_model_4':
     
-    if bin_dim == None:
+    if bin_dim == 0:
         return x
     else:
         return bin_simulator_output(x, nbins = bin_dim)

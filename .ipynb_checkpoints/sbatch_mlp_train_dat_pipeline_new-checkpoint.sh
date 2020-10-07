@@ -53,7 +53,7 @@ do
                     do
                        echo "$dgp"
                        echo $n_c
-                       python -u dataset_generator_new.py --machine $machine \
+                       python -u dataset_generator.py --machine $machine \
                                                       --dgplist $dgp \
                                                       --datatype $datatype \
                                                       --nreps 1 \

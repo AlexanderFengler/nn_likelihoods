@@ -68,9 +68,10 @@ class data_generator():
                                  delta_t = self.config['delta_t'])
                                  
     def get_simulations(self, theta = None):
-        out = self.simulator(theta, 
-                             self.config['method'])
-
+        out = self.simulator(theta  = theta, 
+                             model = self.config['method'])
+        
+        print(self.config['nbins'])
         if self.config['nbins'] > 0:
             return self._bin_simulator_output(simulations = out)
         else:
@@ -97,10 +98,11 @@ class data_generator():
     
     def _filter_simulations_fast(self,
                                  simulations = None,
-                                ):
+                                 ):
+        print(simulations[2])
 
         max_t = simulations[2]['max_t']
-        tmp_max_rt_ = simulations[0].max().round(2)
+        #tmp_max_rt_ = simulations[0].max().round(2)
 
         keep = 1
         for choice_tmp in simulations[2]['possible_choices']:
@@ -196,9 +198,11 @@ class data_generator():
         keep = 0
         while not keep:
             theta = np.float32(np.random.uniform(low = self.config['param_bounds'][0], 
-                                                     high = self.config['param_bounds'][1]))
+                                                 high = self.config['param_bounds'][1]))
             
             simulations = self.get_simulations(theta = theta)
+            print(theta)
+            print(simulations)
             keep, stats = self._filter_simulations_fast(simulations)
 
         data = self._make_kde_data(simulations = simulations,
@@ -329,44 +333,44 @@ class data_generator():
         if save:
             
             # -----
-            if self.config['mode'] == 'test':
-                training_data_folder = self.config['method_folder'] + \
-                                       'parameter_recovery_data_binned_' + \
-                                       str(int(self.config['binned'])) + \
-                                       '_nbins_' + str(self.config['nbins']) + \
-                                       '_n_' + str(self.config['nsamples'])
-                
-                if not os.path.exists(training_data_folder):
-                    os.makedirs(training_data_folder)
+            #if self.config['mode'] == 'test':
+            training_data_folder = self.config['method_folder'] + \
+                                   'parameter_recovery_data_binned_' + \
+                                   str(int(self.config['binned'])) + \
+                                   '_nbins_' + str(self.config['nbins']) + \
+                                   '_n_' + str(self.config['nsamples'])
 
-                full_file_name = training_data_folder + '/' + \
-                                self.config['method'] + \
-                                '_nchoices_' + str(self.config['nchoices']) + \
-                                '_parameter_recovery_binned_' + \
-                                str(int(self.config['binned'])) + \
-                                '_nbins_' + str(self.config['nbins']) + \
-                                '_nreps_' + str(self.config['nreps']) + \
-                                '_n_' + str(self.config['nsamples']) + \
-                                '.pickle'
-            
-            else:
-                training_data_folder = self.config['method_folder'] + \
-                                      'training_data_binned_' + \
-                                      str(int(self.config['binned'])) + \
-                                      '_nbins_' + str(self.config['nbins']) + \
-                                      '_n_' + str(self.config['nsamples'])
-                
-                if not os.path.exists(training_data_folder):
-                    os.makedirs(training_data_folder)
+            if not os.path.exists(training_data_folder):
+                os.makedirs(training_data_folder)
 
-                full_file_name = training_data_folder + '/' + \
-                                self.config['method'] + \
-                                '_nchoices_' + str(self.config['nchoices']) + \
-                                '_train_data_binned_' + \
-                                str(int(self.config['binned'])) + \
-                                '_nbins_' + str(self.config['nbins']) + \
-                                '_n_' + str(self.config['nsamples']) + \
-                                '_' + self.config['file_id'] + '.pickle'
+            full_file_name = training_data_folder + '/' + \
+                            self.config['method'] + \
+                            '_nchoices_' + str(self.config['nchoices']) + \
+                            '_parameter_recovery_binned_' + \
+                            str(int(self.config['binned'])) + \
+                            '_nbins_' + str(self.config['nbins']) + \
+                            '_nreps_' + str(self.config['nreps']) + \
+                            '_n_' + str(self.config['nsamples']) + \
+                            '.pickle'
+
+#             else:
+#                 training_data_folder = self.config['method_folder'] + \
+#                                       'training_data_binned_' + \
+#                                       str(int(self.config['binned'])) + \
+#                                       '_nbins_' + str(self.config['nbins']) + \
+#                                       '_n_' + str(self.config['nsamples'])
+                
+#                 if not os.path.exists(training_data_folder):
+#                     os.makedirs(training_data_folder)
+
+#                 full_file_name = training_data_folder + '/' + \
+#                                 self.config['method'] + \
+#                                 '_nchoices_' + str(self.config['nchoices']) + \
+#                                 '_train_data_binned_' + \
+#                                 str(int(self.config['binned'])) + \
+#                                 '_nbins_' + str(self.config['nbins']) + \
+#                                 '_n_' + str(self.config['nsamples']) + \
+#                                 '_' + self.config['file_id'] + '.pickle'
             
             print('Writing to file: ', full_file_name)
             
@@ -457,7 +461,6 @@ class data_generator():
 
         else:
             return data_grid
-
    # ----------------------------------------------------
  
 # -------------------------------------------------------------------------------------
@@ -477,9 +480,9 @@ if __name__ == "__main__":
     CLI.add_argument("--datatype",
                      type = str,
                      default = 'uniform')
-    CLI.add_argument("--mode",
-                     type = str,
-                     default = 'test') # 'parameter_recovery, 'perturbation_experiment', 'r_sim', 'r_dgp', 'cnn_train', 'parameter_recovery_hierarchical'
+#     CLI.add_argument("--mode",
+#                      type = str,
+#                      default = 'test') # 'parameter_recovery, 'perturbation_experiment', 'r_sim', 'r_dgp', 'cnn_train', 'parameter_recovery_hierarchical'
     CLI.add_argument("--nsubjects",
                     type = int,
                     default = 5)
@@ -543,7 +546,7 @@ if __name__ == "__main__":
     else:
         config['method'] = args.dgplist[0]
         
-    config['mode'] = args.mode
+    # config['mode'] = args.mode
     config['file_id'] = args.fileid
     config['nsamples'] = args.nsamples
 

@@ -138,7 +138,7 @@ class data_generator():
             process_param_tuples = tuple(map(tuple, param_grid[:, :n_process_params]))
             print('passed through false')
         
-        elif self.config['nchoices'] >= 2 and (self.method == 'lba' or self.method == 'lca' or self.method == 'race_model'):
+        elif self.config['nchoices'] >= 2 and (self.method == 'lba' or self.method == 'lca_3' or self.method == 'lca_4' or self.method == 'race_model_3' or self.method == 'race_model_4'):
             print('passed through correct')
             process_param_tuples = tuple()
             for i in range(param_grid.shape[0]):

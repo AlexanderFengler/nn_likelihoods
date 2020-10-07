@@ -29,7 +29,7 @@ n_choices=( 3 ) #( 4 5 6 )
 n_parameter_sets=100   #20000
 n_bins=( 0 )
 binned=0
-machine="ccv" #"ccv"
+machine="home" #"ccv"
 datatype="cnn_train" #"cnn_train" # "parameter_recovery"
 mode="mlp"
 analytic=0
@@ -53,7 +53,7 @@ do
                     do
                        echo "$dgp"
                        echo $n_c
-                       python -u dataset_generator.py --machine $machine \
+                       python -u dataset_generator_new.py --machine $machine \
                                                       --dgplist $dgp \
                                                       --datatype $datatype \
                                                       --nreps 1 \
@@ -66,13 +66,13 @@ do
                                                       --nparamsets $n_parameter_sets \
                                                       --save 1 \
                                                       --deltat 0.001 \
-                                                      --fileid 'TEST' #$SLURM_ARRAY_TASK_ID 
+                                                      --fileid 'TEST'
                        
                        python -u simulator_get_stats.py --machine $machine \
                                                         --method $dgp \
                                                         --simfolder training_data_binned_${binned}_nbins_${bins}_n_${n} \
                                                         --fileprefix ${dgp}_nchoices_${n_c}_train_data_binned_${binned}_nbins_${bins}_n_${n} \
-                                                        --fileid 'TEST' #$SLURM_ARRAY_TASK_ID
+                                                        --fileid 'TEST'
                        
                        python -u kde_train_test.py --machine $machine \
                                                    --method $dgp \
@@ -81,9 +81,10 @@ do
                                                    --outfolder training_data_binned_${binned}_nbins_${bins}_n_${n} \
                                                    --nbyparam $nbyparam \
                                                    --mixture 0.8 0.1 0.1 \
-                                                   --fileid 'TEST' \ #$SLURM_ARRAY_TASK_ID \
+                                                   --fileid 'TEST' \ 
                                                    --nproc $nproc \
                                                    --analytic $analytic
+                    #--fileid $SLURM_ARRAY_TASK_ID \
            
                 done
             else
@@ -102,13 +103,13 @@ do
                                                 --nparamsets $n_parameter_sets \
                                                 --save 1 \
                                                 --deltat 0.001 \
-                                                --fileid 'TEST' # $SLURM_ARRAY_TASK_ID
+                                                --fileid 'TEST'
                                                 
                  python -u simulator_get_stats.py --machine $machine \
                                                   --method $dgp \
                                                   --simfolder training_data_binned_${binned}_nbins_${bins}_n_${n} \
                                                   --fileprefix ${dgp}_nchoices_${n_choices[0]}_train_data_binned_${binned}_nbins_${bins}_n_${n} \
-                                                  --fileid 'TEST' #$SLURM_ARRAY_TASK_ID
+                                                  --fileid 'TEST' 
                                                   
                  python -u kde_train_test.py --machine $machine \
                                              --method $dgp \
@@ -117,7 +118,7 @@ do
                                              --outfolder training_data_binned_${binned}_nbins_${bins}_n_${n} \
                                              --nbyparam $nbyparam \
                                              --mixture 0.8 0.1 0.1 \
-                                             --fileid 'TEST' \ # $SLURM_ARRAY_TASK_ID \
+                                             --fileid 'TEST' \
                                              --nproc $nproc \
                                              --analytic $analytic
             fi

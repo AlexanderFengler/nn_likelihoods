@@ -66,6 +66,11 @@ if __name__ == "__main__":
                                          "rb"))[args.method]
         method_folder = method_params['method_folder']
     
+    if args.machine == 'home':
+        method_parms = pickle.load(open("/Users/afengler/OneDrive/git_repos/nn_likelihoods/kde_stats.pickle",
+                                       "rb"))[args.method]
+        method_folder = method_params['method_folder_home']
+    
     # Speficy names of process parameters
     process_params = method_params['param_names'] + method_params['boundary_param_names']
     

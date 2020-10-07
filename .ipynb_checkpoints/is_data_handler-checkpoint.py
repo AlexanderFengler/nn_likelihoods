@@ -14,7 +14,7 @@ def collect_datasets_is(folder = [],
                         nsubsample = []):
     
     # Load in parameter recovery data
-    if model == 'weibull':
+    if model == 'weibull' or model == 'weibull2':
         param_recov_files = os.listdir('/users/afengler/data/kde/' + 'weibull_cdf' + '/parameter_recovery_data_binned_1_nbins_512_n_' + str(ndata) + '/')
         param_recov_dat = pickle.load(open('/users/afengler/data/kde/' + 'weibull_cdf' + '/parameter_recovery_data_binned_1_nbins_512_n_' + str(ndata) + '/' + param_recov_files[0], 'rb'))
     else:
@@ -131,7 +131,7 @@ if __name__ == "__main__":
             method = 'weibull'
     
     if machine == 'x7':
-        is_sample_folder = '/users/afengler/data/' + isfolder + '/'
+        is_sample_folder = '/media/data_cifs/projects/prj_approx-bayes/projectABC/' + isfolder + '/'
 
     print(is_sample_folder)
     print('Started processing model: ', method, ' with ndata: ', ndata)
