@@ -14,12 +14,19 @@ def collect_datasets_is(folder = [],
                         nsubsample = []):
     
     # Load in parameter recovery data
-    if model == 'weibull' or model == 'weibull2':
-        param_recov_files = os.listdir('/users/afengler/data/kde/' + 'weibull_cdf' + '/parameter_recovery_data_binned_1_nbins_512_n_' + str(ndata) + '/')
-        param_recov_dat = pickle.load(open('/users/afengler/data/kde/' + 'weibull_cdf' + '/parameter_recovery_data_binned_1_nbins_512_n_' + str(ndata) + '/' + param_recov_files[0], 'rb'))
-    else:
-        param_recov_files = os.listdir('/users/afengler/data/kde/' + model + '/parameter_recovery_data_binned_1_nbins_512_n_' + str(ndata) + '/')
-        param_recov_dat = pickle.load(open('/users/afengler/data/kde/' + model + '/parameter_recovery_data_binned_1_nbins_512_n_' + str(ndata) + '/' + param_recov_files[0], 'rb'))
+    if machine == 'ccv':
+        if model == 'weibull' or model == 'weibull2':
+                param_recov_files = os.listdir('/users/afengler/data/kde/' + 'weibull_cdf' + '/parameter_recovery_data_binned_1_nbins_512_n_' + str(ndata) + '/')
+                param_recov_dat = pickle.load(open('/users/afengler/data/kde/' + 'weibull_cdf' + '/parameter_recovery_data_binned_1_nbins_512_n_' + str(ndata) + '/' + param_recov_files[0], 'rb'))
+
+        else:
+                param_recov_files = os.listdir('/users/afengler/data/kde/' + model + '/parameter_recovery_data_binned_1_nbins_512_n_' + str(ndata) + '/')
+                param_recov_dat = pickle.load(open('/users/afengler/data/kde/' + model + '/parameter_recovery_data_binned_1_nbins_512_n_' + str(ndata) + '/' + param_recov_files[0], 'rb'))
+    
+    if machine == 'x7':       
+        param_recov_files = os.listdir('/media/data_cifs/projects/prj_approx-bayes/projectABC/data/' + model + '/parameter_recovery_data_binned_1_nbins_512_n_' + str(ndata) + '/')
+        param_recov_dat = pickle.load(open('/media/data_cifs/projects/prj_approx-bayes/projectABC/data/' + model + '/parameter_recovery_data_binned_1_nbins_512_n_' + str(ndata) + '/' + param_recov_files[0], 'rb'))
+            
     
     n_data_substring = 'N_' + str(ndata)
     
