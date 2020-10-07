@@ -212,7 +212,7 @@
 
 # CNN
 
-machine="ccv"
+machine="x7"
 ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
 ndata=( 1024 4096 ) #  4096 )
 method="ddm_sdv"
@@ -230,7 +230,7 @@ do
     done
 done
 
-machine="ccv"
+machine="x7"
 ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
 ndata=( 1024 4096 ) #  4096 )
 method="ddm"
