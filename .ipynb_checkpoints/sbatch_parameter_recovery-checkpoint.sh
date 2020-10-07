@@ -20,7 +20,7 @@
 # --------------------------------------------------------------------
 
 # INITIALIZATIONS ----------------------------------------------------
-declare -a dgps=( "ddm_sdv_elife" )      #( "ddm_tutorial" "angle_tutorial" "weibull_cdf_tutorial")
+declare -a dgps=( "full_ddm2" )      #( "ddm_tutorial" "angle_tutorial" "weibull_cdf_tutorial")
 n_samples=( 1024 4096 )
 n_choices=( 2 ) # 3 4 5 6 ) #4 5 6 )
 n_parameter_sets=1000  #20000
@@ -48,7 +48,8 @@ do
                     do
                        echo "$dgp"
                        echo $n_c
-                       python -u dataset_generator.py --machine $machine --dgplist $dgp --datatype $datatype --nreps 1 --binned $binned --nbins $bins --maxt $maxt --nchoices $n_c --nsamples $n --mode $mode --nparamsets $n_parameter_sets --save 1 --maxt $maxt --nsubjects $n_s
+                       python -u dataset_generator.py --machine $machine \
+                                                      --dgplist $dgp --datatype $datatype --nreps 1 --binned $binned --nbins $bins --maxt $maxt --nchoices $n_c --nsamples $n --mode $mode --nparamsets $n_parameter_sets --save 1 --maxt $maxt --nsubjects $n_s
                     done
             done
         done

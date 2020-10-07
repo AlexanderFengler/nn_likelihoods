@@ -19,7 +19,7 @@
 #SBATCH -c 1
 #SBATCH -N 1
 ##SBATCH -p gpu --gres=gpu:1
-#SBATCH --array=11,12
+#SBATCH --array=1-100
 
 # Run a command
 #source /users/afengler/miniconda3/etc/profile.d/conda.sh
@@ -35,19 +35,19 @@ conda activate tf-cpu
 
 # NNBATCH RUNS
 
-nmcmcsamples=2000
+nmcmcsamples=25000
 nbyarrayjob=10
 ncpus=1
-nsamples=( 4096 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
-method="ddm_sdv" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
+nsamples=( 1024 4096 ) #( 1024 2048 4096 ) # 2048 4096 ) #( 1024 2048 4096 )
+method="full_ddm2" #'ddm_sdv_analytic'   #'ddm_sdv_analytic'  #"full_ddm2"
 modelidentifier='_100k'
 ids=( -1 )
 machine='ccv'
 samplerinit='mle'
-outfilesignature='elife_slice_'
+outfilesignature='elife_diffevo_'
 infilesignature=None
 analytic=0
-sampler='slice'
+sampler='diffevo'
 #SLURM_ARRAY_TASK_ID=1
 
 for n in "${nsamples[@]}"
