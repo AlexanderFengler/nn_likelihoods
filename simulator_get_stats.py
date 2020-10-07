@@ -56,6 +56,10 @@ if __name__ == "__main__":
                                          "rb"))[args.method]
         base_simulation_folder = method_params['method_folder'] + args.simfolder + '/'
         
+    if args.machine == 'home':
+        method_params = pickle.load(open("/Users/afengler/OneDrive/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))[args.method]
+        base_simulation_folder = method_params['method_folder'] + args.simfolder + '/'
+        
     # FILTERS: GENERAL
     filters = {'mode': 20, # != 
                'choice_cnt': 10, # > 

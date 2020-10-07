@@ -56,6 +56,10 @@ if __name__ == "__main__":
                                          "rb"))[args.method]
         base_simulation_folder = method_params['method_folder'] + args.simfolder + '/'
         
+    if args.machine == 'home':
+        method_params = pickle.load(open("/Users/afengler/OneDrive/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))[args.method]
+        base_simulation_folder = method_params['method_folder'] + args.simfolder + '/'
+        
     # FILTERS: GENERAL
     filters = {'mode': 20, # != 
                'choice_cnt': 10, # > 
@@ -76,11 +80,3 @@ if __name__ == "__main__":
     end_time = time.time()
     exec_time = end_time - start_time
     print('Time elapsed: ', exec_time)
-# unused ---------------------------------------------------------------
-    # DDM ANGLE NDT
-#     param_ranges = {'v': [-2.0, 2.0],
-#                     'a': [0.5, 2],
-#                     'w': [0.3, 0.7],
-#                     'ndt': [0, 1],
-#                     'theta': [0, np.pi/2 - 0.2]
-#                     }  

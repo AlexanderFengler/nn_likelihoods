@@ -20,7 +20,7 @@
 # --------------------------------------------------------------------
 
 # INITIALIZATIONS ----------------------------------------------------
-declare -a dgps=( "angle" ) #"angle_tutorial" "weibull_cdf_tutorial" )
+declare -a dgps=( "race_3" ) #"angle_tutorial" "weibull_cdf_tutorial" )
 n_samples=( 1000 ) 
 n_choices=( 2 ) # 3 4 5 6 ) #4 5 6 )
 n_parameter_sets=100  #20000
