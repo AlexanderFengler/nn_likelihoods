@@ -97,10 +97,10 @@ def collect_datasets_is(folder = [],
             pickle.dump(is_dict, open('/users/afengler/data/eLIFE_exps/summaries/IS_summary_' + model + \
                              '_' + n_data_substring + '.pickle', 'wb'), protocol = 4)
     if machine == 'x7':
-        print('writing to file: ', '/media/data_cifs/projects/prj_approx-bayes/projectABC/' + is_folder + '/' + 'IS_summary_' + \
+        print('writing to file: ', '/media/data_cifs/projects/prj_approx-bayes/projectABC/' + isfolder + '/' + 'IS_summary_' + \
               model + '_' + n_data_substring + '.pickle')
 
-        pickle.dump(is_dict, open( '/media/data_cifs/projects/prj_approx-bayes/projectABC/' + is_folder + '/' + 'IS_summary_' + \
+        pickle.dump(is_dict, open( '/media/data_cifs/projects/prj_approx-bayes/projectABC/' + isfolder + '/' + 'IS_summary_' + \
               model + '_' + n_data_substring + '.pickle', 'wb'), protocol = 4)
     
     return is_dict
