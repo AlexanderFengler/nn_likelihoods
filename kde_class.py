@@ -76,7 +76,7 @@ class logkde():
             
             # Main step: Evaluate likelihood for rts corresponding to choice == c
             if self.base_kdes[self.data['choices'].index(c)] == 'no_base_data':
-                log_kde_eval[choice_idx_tmp] = -66.77497 # the number corresponds to log(1e-29)
+                log_kde_eval[choice_idx_tmp] = -66.77497 # the number corresponds to log(1e-29) # --> log(1 / n) + log(1 / 20)
             else:
                 log_kde_eval[choice_idx_tmp] = np.log(self.data['choice_proportions'][self.data['choices'].index(c)]) + \
                 self.base_kdes[self.data['choices'].index(c)].score_samples(np.expand_dims(log_rts[choice_idx_tmp], 1)) - \
