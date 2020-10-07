@@ -81,20 +81,27 @@ def collect_datasets_is(folder = [],
     is_dict['maps'] = np.stack(is_dict['maps'])
     is_dict['data'] = np.stack(is_dict['data'])
     
-    if model == 'weibull':
-        print('writing to file: ', '/users/afengler/data/eLIFE_exps/summaries/IS_summary_' + 'weibull_cdf' + \
-                         '_' + n_data_substring + '.pickle')
+    
+    if machine == 'ccv':
+        if model == 'weibull':
+            print('writing to file: ', '/users/afengler/data/eLIFE_exps/summaries/IS_summary_' + 'weibull_cdf' + \
+                             '_' + n_data_substring + '.pickle')
 
-        pickle.dump(is_dict, open('/users/afengler/data/eLIFE_exps/summaries/IS_summary_' + 'weibull_cdf' + \
-                         '_' + n_data_substring + '.pickle', 'wb'), protocol = 4)
-        
-    else:
-        print('writing to file: ', '/users/afengler/data/eLIFE_exps/summaries/IS_summary_' + model + \
-                         '_' + n_data_substring + '.pickle')
+            pickle.dump(is_dict, open('/users/afengler/data/eLIFE_exps/summaries/IS_summary_' + 'weibull_cdf' + \
+                             '_' + n_data_substring + '.pickle', 'wb'), protocol = 4)
 
-        pickle.dump(is_dict, open('/users/afengler/data/eLIFE_exps/summaries/IS_summary_' + model + \
-                         '_' + n_data_substring + '.pickle', 'wb'), protocol = 4)
-        
+        else:
+            print('writing to file: ', '/users/afengler/data/eLIFE_exps/summaries/IS_summary_' + model + \
+                             '_' + n_data_substring + '.pickle')
+
+            pickle.dump(is_dict, open('/users/afengler/data/eLIFE_exps/summaries/IS_summary_' + model + \
+                             '_' + n_data_substring + '.pickle', 'wb'), protocol = 4)
+    if machine == 'x7':
+        print('writing to file: ', '/media/data_cifs/projects/prj_approx-bayes/projectABC/' + is_folder + '/' + 'IS_summary_' + \
+              model + '_' + n_data_substring + '.pickle')
+
+        pickle.dump(is_dict, open( '/media/data_cifs/projects/prj_approx-bayes/projectABC/' + is_folder + '/' + 'IS_summary_' + \
+              model + '_' + n_data_substring + '.pickle', 'wb'), protocol = 4)
     
     return is_dict
 
