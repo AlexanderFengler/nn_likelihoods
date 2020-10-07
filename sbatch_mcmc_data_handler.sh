@@ -193,10 +193,38 @@
 #     done
 # done
 
+# machine="ccv"
+# ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
+# ndata=( 1024 4096 ) #  4096 )
+# method="levy"
+# analytic=0
+# sampler='diffevo'
+# fileprefix='elife_diffevo_'
+# initmode='mle'
+# nsubsample=10000
+# modelidentifier='_100k'
+
+# for n in "${ndata[@]}"
+# do
+#     for id in "${ids[@]}"
+#     do 
+#        python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine \
+#                                                                                 --method $method \
+#                                                                                 --initmode $initmode \
+#                                                                                 --ndata $n \
+#                                                                                 --nsubsample $nsubsample \
+#                                                                                 --nnbatchid $id \
+#                                                                                 --analytic $analytic \
+#                                                                                 --modelidentifier $modelidentifier \
+#                                                                                 --fileprefix $fileprefix \
+#                                                                                 --sampler $sampler
+#     done
+# done
+
 machine="ccv"
 ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
 ndata=( 1024 4096 ) #  4096 )
-method="levy"
+method="ornstein"
 analytic=0
 sampler='diffevo'
 fileprefix='elife_diffevo_'
@@ -221,6 +249,145 @@ do
     done
 done
 
+machine="ccv"
+ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
+ndata=( 1024 4096 ) #  4096 )
+method="full_ddm2"
+analytic=0
+sampler='diffevo'
+fileprefix='elife_diffevo_'
+initmode='mle'
+nsubsample=10000
+modelidentifier='_100k'
+
+for n in "${ndata[@]}"
+do
+    for id in "${ids[@]}"
+    do 
+       python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine \
+                                                                                --method $method \
+                                                                                --initmode $initmode \
+                                                                                --ndata $n \
+                                                                                --nsubsample $nsubsample \
+                                                                                --nnbatchid $id \
+                                                                                --analytic $analytic \
+                                                                                --modelidentifier $modelidentifier \
+                                                                                --fileprefix $fileprefix \
+                                                                                --sampler $sampler
+    done
+done
+
+machine="ccv"
+ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
+ndata=( 1024 4096 ) #  4096 )
+method="weibull_cdf2"
+analytic=0
+sampler='diffevo'
+fileprefix='elife_diffevo_'
+initmode='mle'
+nsubsample=10000
+modelidentifier='_100k'
+
+for n in "${ndata[@]}"
+do
+    for id in "${ids[@]}"
+    do 
+       python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine \
+                                                                                --method $method \
+                                                                                --initmode $initmode \
+                                                                                --ndata $n \
+                                                                                --nsubsample $nsubsample \
+                                                                                --nnbatchid $id \
+                                                                                --analytic $analytic \
+                                                                                --modelidentifier $modelidentifier \
+                                                                                --fileprefix $fileprefix \
+                                                                                --sampler $sampler
+    done
+done
+
+machine="ccv"
+ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
+ndata=( 1024 4096 ) #  4096 )
+method="angle2"
+analytic=0
+sampler='diffevo'
+fileprefix='elife_diffevo_'
+initmode='mle'
+nsubsample=10000
+modelidentifier='_100k'
+
+for n in "${ndata[@]}"
+do
+    for id in "${ids[@]}"
+    do 
+       python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine \
+                                                                                --method $method \
+                                                                                --initmode $initmode \
+                                                                                --ndata $n \
+                                                                                --nsubsample $nsubsample \
+                                                                                --nnbatchid $id \
+                                                                                --analytic $analytic \
+                                                                                --modelidentifier $modelidentifier \
+                                                                                --fileprefix $fileprefix \
+                                                                                --sampler $sampler
+    done
+done
+
+machine="ccv"
+ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
+ndata=( 1024 4096 ) #  4096 )
+method="ddm_sdv"
+analytic=0
+sampler='diffevo'
+fileprefix='elife_diffevo_'
+initmode='mle'
+nsubsample=10000
+modelidentifier='_100k'
+
+for n in "${ndata[@]}"
+do
+    for id in "${ids[@]}"
+    do 
+       python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine \
+                                                                                --method $method \
+                                                                                --initmode $initmode \
+                                                                                --ndata $n \
+                                                                                --nsubsample $nsubsample \
+                                                                                --nnbatchid $id \
+                                                                                --analytic $analytic \
+                                                                                --modelidentifier $modelidentifier \
+                                                                                --fileprefix $fileprefix \
+                                                                                --sampler $sampler
+    done
+done
+
+machine="ccv"
+ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
+ndata=( 1024 4096 ) #  4096 )
+method="ddm"
+analytic=0
+sampler='diffevo'
+fileprefix='elife_diffevo_'
+initmode='mle'
+nsubsample=10000
+modelidentifier='_100k'
+
+for n in "${ndata[@]}"
+do
+    for id in "${ids[@]}"
+    do 
+       python -u  /users/afengler/git_repos/nn_likelihoods/mcmc_data_handler.py --machine $machine \
+                                                                                --method $method \
+                                                                                --initmode $initmode \
+                                                                                --ndata $n \
+                                                                                --nsubsample $nsubsample \
+                                                                                --nnbatchid $id \
+                                                                                --analytic $analytic \
+                                                                                --modelidentifier $modelidentifier \
+                                                                                --fileprefix $fileprefix \
+                                                                                --sampler $sampler
+    done
+done
 
 
 # CNN
