@@ -71,7 +71,7 @@ class data_generator():
         out = self.simulator(theta  = theta, 
                              model = self.config['method'])
         
-        print(self.config['nbins'])
+        #print(self.config['nbins'])
         if self.config['nbins'] > 0:
             return self._bin_simulator_output(simulations = out)
         else:
@@ -99,7 +99,7 @@ class data_generator():
     def _filter_simulations_fast(self,
                                  simulations = None,
                                  ):
-        print(simulations[2])
+        #print(simulations[2])
 
         max_t = simulations[2]['max_t']
         #tmp_max_rt_ = simulations[0].max().round(2)
@@ -201,8 +201,8 @@ class data_generator():
                                                  high = self.config['param_bounds'][1]))
             
             simulations = self.get_simulations(theta = theta)
-            print(theta)
-            print(simulations)
+            #print(theta)
+            #print(simulations)
             keep, stats = self._filter_simulations_fast(simulations)
 
         data = self._make_kde_data(simulations = simulations,
