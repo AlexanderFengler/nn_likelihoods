@@ -2706,14 +2706,14 @@ if __name__ == "__main__":
             method_comparison_folder = '/Users/afengler/OneDrive/project_nn_likelihoods/data/analytic/' + model + '/method_comparison/' + '/analytic/'
 
         # Get trained networks for model
-        if fileidentifier == 'elife_slice_':
+        if fileidentifier == 'elife_slice_' or fileidentifier == 'elife_diffevo_':
             file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + str(n) + '_init_mle_'
         else:
             file_signature = 'post_samp_data_param_recov_unif_reps_1_n_' + str(n) + '_init_mle_1_'
         
         summary_file = method_comparison_folder +  'summary_' + fileidentifier + file_signature[:-1] + '.pickle'
     elif method == 'cnn':
-        summary_file = '/users/afengler/OneDrive/project_nn_likelihoods/eLIFE_exps/summaries/IS_summary_' + model + '_N_' + str(n) + '.pickle'
+        summary_file = '/users/afengler/OneDrive/project_nn_likelihoods/eLIFE_exps/summaries/IS_summary_' + fileidentifier + model + '_N_' + str(n) + '.pickle'
     elif method == 'sbi':
         if model == 'ddm':
             if n == 1000:

@@ -55,7 +55,7 @@ def kde_vs_mlp_likelihoods(ax_titles = [],
                            sharex = True, 
                            sharey = False)
     
-    fig.suptitle(title + ': ' + model.upper(), fontsize = 40)
+    fig.suptitle(title + ': ' + model.upper().replace('_', '-'), fontsize = 40)
     sns.despine(right = True)
     
     # Data template
@@ -128,7 +128,7 @@ def kde_vs_mlp_likelihoods(ax_titles = [],
                                             boundary_multiplicative = True,
                                             boundary_params = {})
 
-                if model == 'full_ddm':
+                if model == 'full_ddm' or model == 'full_ddm2':
                     out = cds.full_ddm(v = parameter_matrix[i, 0],
                                        a = parameter_matrix[i, 1],
                                        w = parameter_matrix[i, 2],
@@ -351,7 +351,7 @@ def mlp_manifold(params = [],
                     alpha = 1.0, 
                     cmap = cm.coolwarm)
     
-    ax.set_ylabel(vary_name.upper(),  
+    ax.set_ylabel(vary_name.upper().replace('_', '-'),  
                   fontsize = 16,
                   labelpad = 20)
     
@@ -379,7 +379,7 @@ def mlp_manifold(params = [],
                                 1))
     
     ax.tick_params(labelsize = 16)
-    ax.set_title(model.upper() + ' - MLP: Manifold', 
+    ax.set_title(model.upper().replace('_', '-') + ' - MLP: Manifold', 
                  fontsize = 20, 
                  pad = 20)
     ax.w_xaxis.set_pane_color((1.0, 1.0, 1.0, 1.0))
@@ -442,6 +442,9 @@ if __name__ == "__main__":
     CLI.add_argument("--manifoldlayers",
                      type = int,
                      default = 50)
+    CLI.add_argument("--modelidentifier",
+                     type = str,
+                     default = '')
 
     args = CLI.parse_args()
     print(args)
@@ -454,6 +457,11 @@ if __name__ == "__main__":
     traindatanalytic = args.traindatanalytic
     mlekdereps = args.mlekdereps
     manifoldlayers = args.manifoldlayers
+    
+    if args.modelidentifier == 'None':
+        modelidentifier = ''
+    else:
+        modelidentifier = args.modelidentifier
     
     # INSERT HERE
 #     machine = 'home' # put custom if you want to keep your network_path
@@ -485,12 +493,14 @@ if __name__ == "__main__":
         ndt_idx = model_params['param_names'].index('ndt')
         output_folder = model_params['output_folder']
         with open("model_paths_home.yaml") as tmp_file:
+            print('NETWOK ID:', networkidx)
             if networkidx == -1:
-                network_path = yaml.load(tmp_file)[model]
+                network_path = yaml.load(tmp_file)[model + modelidentifier]
                 #network_id = network_path[list(re.finditer('/', network_path))[-2].end():]
             else:
                 network_path = yaml.load(tmp_file)[model + '_batch'][networkidx]
                 #network_id = network_path[list(re.finditer('/', network_path))[-2].end():]
+                print('Why am I passing here ?????')
 
     # Load training data
     if machine == 'home':
@@ -533,7 +543,7 @@ if __name__ == "__main__":
     plt.xlabel('MLP Prediction Error', 
                size = 20)
 
-    plt.title('Prediction Error: ' + model.upper(), 
+    plt.title('Prediction Error: ' + model.upper().replace('_', '-'), 
               size = 24)
     
     if traindatanalytic:
@@ -556,7 +566,7 @@ if __name__ == "__main__":
 
     plt.xlabel('log likelihood', size = 20)
     plt.ylabel('Proportion Error >= ', size = 20)
-    plt.title('Prediction Error / ll: ' + model.upper(), size = 24)
+    plt.title('Prediction Error / ll: ' + model.upper().replace('_', '-'), size = 24)
     plt.ylim((0, 0.05))
     plt.legend(title = 'Error size', title_fontsize = 14, labelspacing = 0.1, fontsize = 10)
     
@@ -584,81 +594,85 @@ if __name__ == "__main__":
         model2 = 'angle'
     if model == 'ddm_analytic':
         model2 = 'ddm'
+    if model == 'weibull_cdf2':
+        model2 = 'weibull_cdf'
+    if model == 'full_ddm2':
+        model2 = 'full_ddm'
     else:
         model2 = model
 
     print('Now Plotting KDE vs. MLP Likelihoods')
-#     kde_vs_mlp_likelihoods(ax_titles = [str(i) for i in range(1, ngraphs + 1, 1)],
-#                            parameter_matrix = parameter_matrix,
-#                            network_dir = network_path,
-#                            cols = 3,
-#                            model = model2,
-#                            n_samples = 20000,
-#                            nreps = mlekdereps,
-#                            save = True,
-#                            show = False,
-#                            machine = 'home',
-#                            method = 'mlp',
-#                            traindatanalytic = traindatanalytic)
+    kde_vs_mlp_likelihoods(ax_titles = [str(i) for i in range(1, ngraphs + 1, 1)],
+                           parameter_matrix = parameter_matrix,
+                           network_dir = network_path,
+                           cols = 3,
+                           model = model2,
+                           n_samples = 20000,
+                           nreps = mlekdereps,
+                           save = True,
+                           show = False,
+                           machine = 'home',
+                           method = 'mlp',
+                           traindatanalytic = traindatanalytic)
     
     
     # MANIFOLD PLOTS
-    if model == 'ddm' or model == 'ddm_analytic':
-        vary_idx_vec = [0, 1, 2, 3]
-        start_params = [0, 1.5, 0.5, 1]
-        vary_range_vec = [[-2, 2], [0.3, 2], [0.2, 0.8], [0, 2]]
-        vary_name_vec = ['v', 'a', 'w', 'ndt']
+#     if model == 'ddm' or model == 'ddm_analytic':
+#         vary_idx_vec = [0, 1, 2, 3]
+#         start_params = [0, 1.5, 0.5, 1]
+#         vary_range_vec = [[-2, 2], [0.3, 2], [0.2, 0.8], [0, 2]]
+#         vary_name_vec = ['v', 'a', 'w', 'ndt']
     
-    if model == 'angle2' or model == 'angle':
-        vary_idx_vec = [0, 1, 2, 3, 4]
-        start_params = [0, 1.5, 0.5, 1, 0.2]
-        vary_range_vec = [[-2, 2], [0.3, 2], [0.2, 0.8], [0, 2], [0, 1]]
-        vary_name_vec = ['v', 'a', 'w', 'ndt', 'angle']
+#     if model == 'angle2' or model == 'angle':
+#         vary_idx_vec = [0, 1, 2, 3, 4]
+#         start_params = [0, 1.5, 0.5, 1, 0.2]
+#         vary_range_vec = [[-2, 2], [0.3, 2], [0.2, 0.8], [0, 2], [0, 1]]
+#         vary_name_vec = ['v', 'a', 'w', 'ndt', 'angle']
 
-    if model == 'ornstein':
-        vary_idx_vec = [0, 1, 2, 3, 4]
-        start_params = [0, 1.5, 0.5, 0.0, 1]
-        vary_range_vec = [[-2, 2], [0.3, 2], [0.2, 0.8], [-1, 1], [0, 2]]
-        vary_name_vec = ['v', 'a', 'w', 'ndt', 'Inhibition']
+#     if model == 'ornstein':
+#         vary_idx_vec = [0, 1, 2, 3, 4]
+#         start_params = [0, 1.5, 0.5, 0.0, 1]
+#         vary_range_vec = [[-2, 2], [0.3, 2], [0.2, 0.8], [-1, 1], [0, 2]]
+#         vary_name_vec = ['v', 'a', 'w', 'ndt', 'Inhibition']
 
-    if model == 'full_ddm':
-        vary_idx_vec = [0, 1, 2, 3, 4, 5, 6]
-        start_params = [0.0, 1.5, 0.5, 1.0, 0.0, 0.0, 0.0]
-        vary_range_vec = [[-2, 2], [0.3, 2], [0.2, 0.8], [0.25, 2], [0.0, 0.2], [0.0, 1.0], [0.0, 0.25]]
-        vary_name_vec = ['v', 'a', 'w', 'ndt', 'w noise', 'v noise', 'ndt noise']
+#     if model == 'full_ddm':
+#         vary_idx_vec = [0, 1, 2, 3, 4, 5, 6]
+#         start_params = [0.0, 1.5, 0.5, 1.0, 0.0, 0.0, 0.0]
+#         vary_range_vec = [[-2, 2], [0.3, 2], [0.2, 0.8], [0.25, 2], [0.0, 0.2], [0.0, 1.0], [0.0, 0.25]]
+#         vary_name_vec = ['v', 'a', 'w', 'ndt', 'w noise', 'v noise', 'ndt noise']
         
-    # add full_ddm2
+#     # add full_ddm2
     
-    if model == 'levy':
-        vary_idx_vec = [0, 1, 2, 3, 4]
-        start_params = [0.0, 1.5, 0.5, 1.5, 1.0]
-        vary_range_vec = [[-2, 2], [0.3, 2], [0.2, 0.8], [1.0 , 2.0], [0.0, 2.0]]
-        vary_name_vec = ['v', 'a', 'w', 'noise alpha', 'ndt']
+#     if model == 'levy':
+#         vary_idx_vec = [0, 1, 2, 3, 4]
+#         start_params = [0.0, 1.5, 0.5, 1.5, 1.0]
+#         vary_range_vec = [[-2, 2], [0.3, 2], [0.2, 0.8], [1.0 , 2.0], [0.0, 2.0]]
+#         vary_name_vec = ['v', 'a', 'w', 'noise alpha', 'ndt']
 
-    if model == 'weibull_cdf':
-        vary_idx_vec = [0, 1, 2, 3, 4, 5]
-        start_params = [0, 1.5, 0.5, 1.0, 2.0, 2.0]
-        vary_range_vec = [[-2, 2], [0.3, 2], [0.2, 0.8], [0.0 , 2.0], [0.3, 5.0], [0.3, 7.0]]
-        vary_name_vec = ['v', 'a', 'w', 'ndt', 'alpha bound', 'beta boundary']
+#     if model == 'weibull_cdf':
+#         vary_idx_vec = [0, 1, 2, 3, 4, 5]
+#         start_params = [0, 1.5, 0.5, 1.0, 2.0, 2.0]
+#         vary_range_vec = [[-2, 2], [0.3, 2], [0.2, 0.8], [0.0 , 2.0], [0.3, 5.0], [0.3, 7.0]]
+#         vary_name_vec = ['v', 'a', 'w', 'ndt', 'alpha bound', 'beta boundary']
         
-    if model == 'ddm_sdv' or model == 'ddm_sdv_analytic':
-        vary_idx_vec = [0, 1, 2, 3, 4]
-        start_params = [0.0, 1.5, 0.5, 1.0, 0.5]
-        vary_range_vec = [[-2, 2], [0.3, 2], [0.2, 0.8], [0.25, 2],  [0.0, 2.0]]
-        vary_name_vec = ['v', 'a', 'w', 'ndt', 'v_noise']
+#     if model == 'ddm_sdv' or model == 'ddm_sdv_analytic':
+#         vary_idx_vec = [0, 1, 2, 3, 4]
+#         start_params = [0.0, 1.5, 0.5, 1.0, 0.5]
+#         vary_range_vec = [[-2, 2], [0.3, 2], [0.2, 0.8], [0.25, 2],  [0.0, 2.0]]
+#         vary_name_vec = ['v', 'a', 'w', 'ndt', 'v_noise']
         
     
-    print('Now plotting MLP Likelihood Manifolds')
-    for i in range(len(start_params)):
-        print(i)
-        mlp_manifold(params = start_params.copy(),
-                     vary_idx = vary_idx_vec[i],
-                     vary_range = vary_range_vec[i],
-                     vary_name = vary_name_vec[i],
-                     n_levels = manifoldlayers,
-                     network_dir = network_path,
-                     save = True,
-                     show = False,
-                     title = 'MLP Manifold',
-                     model = model,
-                     traindatanalytic = traindatanalytic)
+#     print('Now plotting MLP Likelihood Manifolds')
+#     for i in range(len(start_params)):
+#         print(i)
+#         mlp_manifold(params = start_params.copy(),
+#                      vary_idx = vary_idx_vec[i],
+#                      vary_range = vary_range_vec[i],
+#                      vary_name = vary_name_vec[i],
+#                      n_levels = manifoldlayers,
+#                      network_dir = network_path,
+#                      save = True,
+#                      show = False,
+#                      title = 'MLP Manifold',
+#                      model = model,
+#                      traindatanalytic = traindatanalytic)
