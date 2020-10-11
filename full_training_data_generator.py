@@ -20,7 +20,6 @@ import basic_simulator as bs
 import kde_info
 import kde_class
 
-
 #from tqdm as tqdm
 #from cdwiener import batch_fptd
 #import clba
