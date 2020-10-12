@@ -33,14 +33,14 @@ module load cuda/10.0.130
 module load cudnn/7.6 
 
 nfiles=100
-method='full_ddm2'
+method='race_model_3'
 analytic=0
 machine='ccv'
-maxidfiles=300
+maxidfiles=200
 
 
 if [ $analytic -eq 1 ]; then
-    for i in {1..5}
+    for i in {1..2}
     do
        echo "Now starting run: $i"
        python -u /users/afengler/git_repos/nn_likelihoods/keras_fit_model.py --machine $machine \
@@ -52,7 +52,7 @@ if [ $analytic -eq 1 ]; then
                                                                              --analytic $analytic
     done
 else
-    for i in {1..5}
+    for i in {1..2}
     do
        echo "Now starting run: $i"
        python -u /users/afengler/git_repos/nn_likelihoods/keras_fit_model.py --machine $machine \
