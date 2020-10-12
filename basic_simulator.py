@@ -209,6 +209,51 @@ def simulator(theta,
                        n_samples = n_samples,
                        max_t = max_t)
         
+    if model == 'lca_3':
+        x = lca(v = theta[:3],
+                a = theta[4],
+                w = theta[4:7],
+                g = theta[7],
+                b = theta[8],
+                ndt = theta[9],
+                s = 1.0,
+                boundary_fun = bf.constant,
+                boundary_multiplicative = True,
+                boundary_params = {},
+                delta_t = delta_t,
+                n_samples = n_samples,
+                max_t = max_t)
+        
+    if model == 'lca_3':
+        x = lca(v = theta[:3],
+                a = theta[3],
+                w = theta[4:7],
+                g = theta[7],
+                b = theta[8],
+                ndt = theta[9],
+                s = 1.0,
+                boundary_fun = bf.constant,
+                boundary_multiplicative = True,
+                boundary_params = {},
+                delta_t = delta_t,
+                n_samples = n_samples,
+                max_t = max_t)
+        
+    if model == 'lca_4':
+        x = lca(v = theta[:4],
+                a = theta[4],
+                w = theta[5:9],
+                g = theta[9],
+                b = theta[10],
+                ndt = theta[11],
+                s = 1.0,
+                boundary_fun = bf.constant,
+                boundary_multiplicative = True,
+                boundary_params = {},
+                delta_t = delta_t,
+                n_samples = n_samples,
+                max_t = max_t)
+        
 #         race_model(v = np.array([0, 0, 0], dtype = DTYPE), # np.array expected, one column of floats
 #                float a = 1, # initial boundary separation
 #                w = np.array([0, 0, 0], dtype = DTYPE), # np.array expected, one column of floats

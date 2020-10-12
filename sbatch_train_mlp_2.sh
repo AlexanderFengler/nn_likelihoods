@@ -37,6 +37,7 @@ method='race_model_3'
 analytic=0
 machine='ccv'
 maxidfiles=200
+trainn=100000
 
 
 if [ $analytic -eq 1 ]; then
@@ -47,7 +48,7 @@ if [ $analytic -eq 1 ]; then
                                                                              --method $method \
                                                                              --nfiles $nfiles \
                                                                              --maxidfiles $maxidfiles \
-                                                                             --datafolder /users/afengler/data/analytic/${method}/training_data_binned_0_nbins_0_n_20000/ \
+                                                                             --datafolder /users/afengler/data/analytic/${method}/training_data_binned_0_nbins_0_n_${trainn}/ \
                                                                              --warmstart 0 \
                                                                              --analytic $analytic
     done
@@ -59,7 +60,7 @@ else
                                                                              --method $method \
                                                                              --nfiles $nfiles \
                                                                              --maxidfiles $maxidfiles \
-                                                                             --datafolder /users/afengler/data/kde/${method}/training_data_binned_0_nbins_0_n_20000/ \
+                                                                             --datafolder /users/afengler/data/kde/${method}/training_data_binned_0_nbins_0_n_${trainn}/ \
                                                                              --warmstart 0 \
                                                                              --analytic $analytic
     done

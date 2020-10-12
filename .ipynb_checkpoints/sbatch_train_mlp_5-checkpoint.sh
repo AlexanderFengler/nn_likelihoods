@@ -18,7 +18,7 @@
 
 # Request runtime, memory, cores
 #SBATCH --time=18:00:00
-#SBATCH --mem=192G
+#SBATCH --mem=128G
 #SBATCH -c 8
 #SBATCH -N 1
 #SBATCH --constraint='quadrortx'
@@ -32,34 +32,35 @@ conda activate tf-gpu-py37
 module load cuda/10.0.130 
 module load cudnn/7.6 
 
-nfiles=200
-method='angle2'
+nfiles=100
+method='race_model_3'
 analytic=0
 machine='ccv'
 maxidfiles=200
+trainn=100000
 
 
 if [ $analytic -eq 1 ]; then
-    for i in {1..5}
+    for i in {1..2}
     do
        echo "Now starting run: $i"
        python -u /users/afengler/git_repos/nn_likelihoods/keras_fit_model.py --machine $machine \
                                                                              --method $method \
                                                                              --nfiles $nfiles \
                                                                              --maxidfiles $maxidfiles \
-                                                                             --datafolder /users/afengler/data/analytic/${method}/training_data_binned_0_nbins_0_n_100000/ \
+                                                                             --datafolder /users/afengler/data/analytic/${method}/training_data_binned_0_nbins_0_n_${trainn}/ \
                                                                              --warmstart 0 \
                                                                              --analytic $analytic
     done
 else
-    for i in {1..5}
+    for i in {1..2}
     do
        echo "Now starting run: $i"
        python -u /users/afengler/git_repos/nn_likelihoods/keras_fit_model.py --machine $machine \
                                                                              --method $method \
                                                                              --nfiles $nfiles \
                                                                              --maxidfiles $maxidfiles \
-                                                                             --datafolder /users/afengler/data/kde/${method}/training_data_binned_0_nbins_0_n_100000/ \
+                                                                             --datafolder /users/afengler/data/kde/${method}/training_data_binned_0_nbins_0_n_${trainn}/ \
                                                                              --warmstart 0 \
                                                                              --analytic $analytic
     done
