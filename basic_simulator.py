@@ -12,6 +12,7 @@ from cddm_data_simulation import full_ddm
 from cddm_data_simulation import ddm_sdv
 from cddm_data_simulation import ddm_flexbound_pre
 from cddm_data_simulation import race_model
+from cddm_data_simulation import lca
 import cddm_data_simulation as cds
 import boundary_functions as bf
 
