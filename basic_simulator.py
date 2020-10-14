@@ -106,7 +106,7 @@ def simulator(theta,
                           n_samples = n_samples,
                           max_t = max_t)
     
-    if model == 'weibull_cdf' or model == 'weibull_cdf2':
+    if model == 'weibull_cdf' or model == 'weibull_cdf2' or model == 'weibull_cdf_ext' or model == 'weibull_cdf_concave':
         x = ddm_flexbound(v = theta[0], 
                           a = theta[1], 
                           w = theta[2], 
@@ -213,21 +213,6 @@ def simulator(theta,
     if model == 'lca_3':
         x = lca(v = theta[:3],
                 a = theta[4],
-                w = theta[4:7],
-                g = theta[7],
-                b = theta[8],
-                ndt = theta[9],
-                s = 1.0,
-                boundary_fun = bf.constant,
-                boundary_multiplicative = True,
-                boundary_params = {},
-                delta_t = delta_t,
-                n_samples = n_samples,
-                max_t = max_t)
-        
-    if model == 'lca_3':
-        x = lca(v = theta[:3],
-                a = theta[3],
                 w = theta[4:7],
                 g = theta[7],
                 b = theta[8],
