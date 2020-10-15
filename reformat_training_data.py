@@ -16,11 +16,8 @@ if __name__ == "__main__":
     args = CLI.parse_args()
     print(args)
     
-    
-    
-    
     files_ = os.listdir(args.datafolder)
-    files_ = files_[:10]
+    #files_ = files_[:10]
     # preprocess
     tmp = pickle.load(open(args.datafolder + files_[0], 'rb'))
     nchoices = len(np.unique(tmp[:, -2]))
@@ -35,22 +32,10 @@ if __name__ == "__main__":
         print('processing file: ', file_)
         data = pickle.load(open(args.datafolder + file_, 'rb'))
         new_data[:, : -(nchoices + 1)] = data[:, :(-2)]
+        new_data[:, -1] = data[:, -1]
         
         for choice_cnt in range(nchoices):
             new_data[:, - (nchoices + 1 - choice_cnt)] = (data[:, -2] == choices_sorted[choice_cnt]).astype(np.int)
     
-        
         print('writing to new file: ', args.newdatafolder + file_)
-        pickle.dump(new_data, open(args.newdatafolder + file_, 'wb'))
-        
-        
-    
-        
-            
-    
-
-
-                     
-                     
-                     
-                     
+        pickle.dump(new_data, open(args.newdatafolder + file_, 'wb'))             
