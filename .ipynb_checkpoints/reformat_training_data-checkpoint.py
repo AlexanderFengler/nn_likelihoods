@@ -33,7 +33,7 @@ if __name__ == "__main__":
     
     for file_ in files_:
         print('processing file: ', file_)
-        data = pickle.load(open(datafolder + file_, 'rb'))
+        data = pickle.load(open(args.datafolder + file_, 'rb'))
         new_data[:, : -(nchoices + 1)] = data[:, :(-2)]
         
         for choice_cnt in range(nchoices):
