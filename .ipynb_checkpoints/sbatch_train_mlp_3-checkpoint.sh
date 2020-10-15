@@ -32,7 +32,7 @@ conda activate tf-gpu-py37
 module load cuda/10.0.130 
 module load cudnn/7.6 
 
-nfiles=200
+nfiles=175
 method='race_model_4'
 analytic=0
 machine='ccv'
