@@ -13,19 +13,23 @@ if __name__ == "__main__":
     CLI.add_argument("--newdatafolder",
                      type = str,
                      default = 'none')
+    args = CLI.parse_args()
+    print(args)
     
     
-    files_ = os.listdir(datafolder)
+    
+    
+    files_ = os.listdir(args.datafolder)
     files_ = files[:10]
     # preprocess
-    tmp = pickle.load(open(datafolder + file_[0], 'rb'))
+    tmp = pickle.load(open(args.datafolder + file_[0], 'rb'))
     nchoices = len(np.unique(tmp[:, -2]))
     choices_sorted = np.unique(tmp[:, -2])
     choices_sorted.sort()
     new_data = np.zeros((tmp.shape[0], tmp.shape[1] + nchoices - 1))
     
-    if not os.path.exists(newdatafolder):
-        os.makedirs(newdatafolder)
+    if not os.path.exists(args.newdatafolder):
+        os.makedirs(args.newdatafolder)
     
     for file_ in files_:
         print('processing file: ', file_)
@@ -36,8 +40,8 @@ if __name__ == "__main__":
             new_data[:, - (nchoices + 1 - choice_cnt)] = (data[:, -2] == choices_sorted[choice_cnt]).astype(np.int)
     
         
-        print('writing to new file: ', newdatafolder + file_)
-        pickle.dump(new_data, open(newdatafolder + file_, 'wb'))
+        print('writing to new file: ', args.newdatafolder + file_)
+        pickle.dump(new_data, open(args.newdatafolder + file_, 'wb'))
         
         
     
