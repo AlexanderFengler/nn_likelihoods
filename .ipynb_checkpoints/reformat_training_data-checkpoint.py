@@ -22,7 +22,7 @@ if __name__ == "__main__":
     files_ = os.listdir(args.datafolder)
     files_ = files_[:10]
     # preprocess
-    tmp = pickle.load(open(args.datafolder + file_[0], 'rb'))
+    tmp = pickle.load(open(args.datafolder + files_[0], 'rb'))
     nchoices = len(np.unique(tmp[:, -2]))
     choices_sorted = np.unique(tmp[:, -2])
     choices_sorted.sort()
