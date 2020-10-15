@@ -15,7 +15,7 @@ if __name__ == "__main__":
                      default = 'none')
     
     
-    files_ = os.listidir(datafolder)
+    files_ = os.listdir(datafolder)
     files_ = files[:10]
     # preprocess
     tmp = pickle.load(open(datafolder + file_[0], 'rb'))
