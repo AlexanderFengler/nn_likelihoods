@@ -33,7 +33,7 @@ module load cuda/10.0.130
 module load cudnn/7.6 
 
 nfiles=200
-method='weibull_cdf_ext'
+method='weibull_cdf_concave'
 analytic=0
 machine='ccv'
 maxidfiles=200
