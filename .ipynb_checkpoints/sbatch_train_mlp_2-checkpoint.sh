@@ -18,7 +18,7 @@
 
 # Request runtime, memory, cores
 #SBATCH --time=18:00:00
-#SBATCH --mem=192G
+#SBATCH --mem=256G
 #SBATCH -c 8
 #SBATCH -N 1
 ##SBATCH --constraint='quadrortx'
@@ -32,7 +32,7 @@ conda activate tf-gpu-py37
 module load cuda/10.0.130 
 module load cudnn/7.6 
 
-nfiles=175
+nfiles=200
 method='race_model_3'
 analytic=0
 machine='ccv'
