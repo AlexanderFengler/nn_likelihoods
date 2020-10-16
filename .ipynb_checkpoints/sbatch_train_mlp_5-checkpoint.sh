@@ -32,8 +32,8 @@ conda activate tf-gpu-py37
 module load cuda/10.0.130 
 module load cudnn/7.6 
 
-nfiles=100
-method='race_model_3'
+nfiles=150
+method='lca_4'
 analytic=0
 machine='ccv'
 maxidfiles=200
@@ -48,7 +48,7 @@ if [ $analytic -eq 1 ]; then
                                                                              --method $method \
                                                                              --nfiles $nfiles \
                                                                              --maxidfiles $maxidfiles \
-                                                                             --datafolder /users/afengler/data/analytic/${method}/training_data_binned_0_nbins_0_n_${trainn}/ \
+                                                                             --datafolder /users/afengler/data/analytic/${method}/training_data_wide_binned_0_nbins_0_n_${trainn}/ \
                                                                              --warmstart 0 \
                                                                              --analytic $analytic
     done
@@ -60,7 +60,7 @@ else
                                                                              --method $method \
                                                                              --nfiles $nfiles \
                                                                              --maxidfiles $maxidfiles \
-                                                                             --datafolder /users/afengler/data/kde/${method}/training_data_binned_0_nbins_0_n_${trainn}/ \
+                                                                             --datafolder /users/afengler/data/kde/${method}/training_data_wide_binned_0_nbins_0_n_${trainn}/ \
                                                                              --warmstart 0 \
                                                                              --analytic $analytic
     done
