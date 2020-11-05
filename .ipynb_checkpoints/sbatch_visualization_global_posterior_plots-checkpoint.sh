@@ -3,11 +3,11 @@
 
 # plotlist=( "hdi_p" "hdi_coverage" "parameter_recovery_scatter" "model_uncertainty" "posterior_predictive" "posterior_pair") #( "posterior_variance" "hdi_coverage" "hdi_p" "parameter_recovery_scatter" "parameter_recovery_hist" "posterior_pair" "model_uncertainty" "posterior_predictive" )
 #plotlist=( "posterior_pair" "model_uncertainty" )
-plotlist=( "" ) #( "parameter_recovery_scatter" ) #( "model_uncertainty_alt" "a_of_t" "posterior_pair_alt" ) #  "a_of_t" )  #( "posterior_pair_alt" "model_uncertainty_alt" "a_of_t") #  "a_of_t" ) # "posterior_pair_alt" ) # ( "a_of_t" ) #, 'model_uncertainty' )
+plotlist=( "parameter_recovery_scatter" ) #( "parameter_recovery_scatter" ) #( "model_uncertainty_alt" "a_of_t" "posterior_pair_alt" ) #  "a_of_t" )  #( "posterior_pair_alt" "model_uncertainty_alt" "a_of_t") #  "a_of_t" ) # "posterior_pair_alt" ) # ( "a_of_t" ) #, 'model_uncertainty' )
 
-# CNN
+#CNN
 
-# # # DDM -----------------------------------------------
+# # DDM -----------------------------------------------
 # model="ddm"
 # machine="home"
 # method="cnn"
@@ -20,6 +20,7 @@ plotlist=( "" ) #( "parameter_recovery_scatter" ) #( "model_uncertainty_alt" "a_
 # npostpair=9
 # datafilter='choice_p'
 # fileidentifier="elife_"
+# modelidentifier='_100k'
 
 # for n_tmp in "${n[@]}"
 # do
@@ -37,39 +38,40 @@ plotlist=( "" ) #( "parameter_recovery_scatter" ) #( "model_uncertainty_alt" "a_
 #                                                   --fileidentifier $fileidentifier \
 #                                                   --modelidentifier $modelidentifier
 # done
-# # # ---------------------------------------------------
+# # ---------------------------------------------------
 
 # DDM_SDV -------------------------------------------------
 
-# model="ddm_sdv"
-# machine="home"
-# method="cnn"
-# traindattype="binned"
-# networkidx=2
-# n=( 1024 4096 )
-# analytic=0
-# rhatcutoff=1.1
-# npostpred=9
-# npostpair=9
-# datafilter='choice_p'
-# fileidentifier="elife_"
+model="ddm_sdv"
+machine="home"
+method="cnn"
+traindattype="binned"
+networkidx=2
+n=( 1024 4096 )
+analytic=0
+rhatcutoff=1.1
+npostpred=9
+npostpair=9
+datafilter='none'
+fileidentifier="elife_"
+modelidentifier='none'
 
-# for n_tmp in "${n[@]}"
-# do
-#     python -u visualization_global_posterior_plots.py --model $model \
-#                                                   --machine $machine \
-#                                                   --method $method \
-#                                                   --networkidx $networkidx \
-#                                                   --traindattype $traindattype \
-#                                                   --n $n_tmp \
-#                                                   --analytic $analytic \
-#                                                   --rhatcutoff $rhatcutoff \
-#                                                   --npostpred $npostpred \
-#                                                   --npostpair $npostpair \
-#                                                   --plots ${plotlist[@]} \
-#                                                   --fileidentifier $fileidentifier \
-#                                                   --modelidentifier $modelidentifier
-# done
+for n_tmp in "${n[@]}"
+do
+    python -u visualization_global_posterior_plots.py --model $model \
+                                                  --machine $machine \
+                                                  --method $method \
+                                                  --networkidx $networkidx \
+                                                  --traindattype $traindattype \
+                                                  --n $n_tmp \
+                                                  --analytic $analytic \
+                                                  --rhatcutoff $rhatcutoff \
+                                                  --npostpred $npostpred \
+                                                  --npostpair $npostpair \
+                                                  --plots ${plotlist[@]} \
+                                                  --fileidentifier $fileidentifier \
+                                                  --modelidentifier $modelidentifier
+done
 # ---------------------------------------------------
 
 # ANGLE2 ---------------------------------------------------
@@ -591,7 +593,7 @@ plotlist=( "" ) #( "parameter_recovery_scatter" ) #( "model_uncertainty_alt" "a_
 #     python -u visualization_global_posterior_plots.py --model $model --machine $machine --method $method --networkidx $networkidx --traindattype $traindattype --n $n_tmp --analytic $analytic --rhatcutoff $rhatcutoff --npostpred $npostpred --npostpair $npostpair --plots ${plotlist[@]}
 # done
 
-model="weibull_cdf2"
+#model="weibull_cdf2"
 # machine="home"
 # method="mlp"
 # traindattype="kde"

@@ -406,6 +406,10 @@ def parameter_recovery_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
                     ax = ax[row_tmp, col_tmp],
                     scatter_kws = {'s': 120, 'alpha': 0.3, 'color': grayscale_map(normalized_sds[:, i]), 'edgecolor': 'face'})
         unity_coords = np.linspace(*ax[row_tmp, col_tmp].get_xlim())
+        print('xlims: ')
+        print(ax[row_tmp, col_tmp].get_xlim())
+        print('ylims: ')
+        print(ax[row_tmp, col_tmp].get_ylim())
         ax[row_tmp, col_tmp].plot(unity_coords, unity_coords, color = 'red')
         
         ax[row_tmp, col_tmp].text(0.6, 0.1, '$R^2$: ' + r2_vec[i], 
@@ -416,7 +420,7 @@ def parameter_recovery_plot(ax_titles = ['v', 'a', 'w', 'ndt', 'angle'],
         ax[row_tmp, col_tmp].set_ylabel(ax_titles[i] + ' - posterior mean', 
                                         fontsize = 20);
         ax[row_tmp, col_tmp].tick_params(axis = "x", 
-                                         labelsize = 18)
+                                         labelsize = 18);
 
     for i in range(estimates.shape[1], rows * cols, 1):
         row_tmp = int(np.floor(i / cols))
