@@ -212,28 +212,10 @@
 
 # CNN
 
-# machine="x7"
-# ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
-# ndata=( 1024 4096 ) #  4096 )
-# method="ddm_sdv"
-# analytic=0
-
-# for n in "${ndata[@]}"
-# do
-#     for id in "${ids[@]}"
-#     do 
-#        python -u  is_data_handler.py --machine $machine \
-#                                                                               --method $method \
-#                                                                               --ndata $n \
-#                                                                               --nsubsample 20000 \
-#                                                                               --isfolder 'results/time_benchmark_eLIFE_exps_round2'
-#     done
-# done
-
 machine="x7"
 ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
-ndata=( 4096 ) #  4096 )
-method="ddm"
+ndata=( 1024 ) #  4096 )
+method="ddm_sdv"
 analytic=0
 
 for n in "${ndata[@]}"
@@ -247,6 +229,24 @@ do
                                                                               --isfolder 'results/time_benchmark_eLIFE_exps_round2'
     done
 done
+
+# machine="x7"
+# ids=( -1 ) #( 0 1 2 3 4 5 6 7 8 9)
+# ndata=( 4096 ) #  4096 )
+# method="ddm"
+# analytic=0
+
+# for n in "${ndata[@]}"
+# do
+#     for id in "${ids[@]}"
+#     do 
+#        python -u  is_data_handler.py --machine $machine \
+#                                                                               --method $method \
+#                                                                               --ndata $n \
+#                                                                               --nsubsample 20000 \
+#                                                                               --isfolder 'results/time_benchmark_eLIFE_exps_round2'
+#     done
+# done
 
 
 

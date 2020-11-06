@@ -7,47 +7,13 @@ plotlist=( "parameter_recovery_scatter" ) #( "parameter_recovery_scatter" ) #( "
 
 #CNN
 
-# # DDM -----------------------------------------------
-# model="ddm"
-# machine="home"
-# method="cnn"
-# traindattype="binned" # 'kde', 'analytic', 'binned'
-# networkidx=8
-# n=( 1024 4096 )
-# analytic=0
-# rhatcutoff=1.1
-# npostpred=9
-# npostpair=9
-# datafilter='choice_p'
-# fileidentifier="elife_"
-# modelidentifier='_100k'
-
-# for n_tmp in "${n[@]}"
-# do
-#     python -u visualization_global_posterior_plots.py --model $model \
-#                                                   --machine $machine \
-#                                                   --method $method \
-#                                                   --networkidx $networkidx \
-#                                                   --traindattype $traindattype \
-#                                                   --n $n_tmp \
-#                                                   --analytic $analytic \
-#                                                   --rhatcutoff $rhatcutoff \
-#                                                   --npostpred $npostpred \
-#                                                   --npostpair $npostpair \
-#                                                   --plots ${plotlist[@]} \
-#                                                   --fileidentifier $fileidentifier \
-#                                                   --modelidentifier $modelidentifier
-# done
-# # ---------------------------------------------------
-
-# DDM_SDV -------------------------------------------------
-
-model="ddm_sdv"
+# DDM -----------------------------------------------
+model="ddm"
 machine="home"
 method="cnn"
-traindattype="binned"
-networkidx=2
-n=( 1024 4096 )
+traindattype="binned" # 'kde', 'analytic', 'binned'
+networkidx=8
+n=( 4096 )
 analytic=0
 rhatcutoff=1.1
 npostpred=9
@@ -73,6 +39,40 @@ do
                                                   --modelidentifier $modelidentifier
 done
 # ---------------------------------------------------
+
+# # DDM_SDV -------------------------------------------------
+
+# model="ddm_sdv"
+# machine="home"
+# method="cnn"
+# traindattype="binned"
+# networkidx=2
+# n=( 1024 4096 )
+# analytic=0
+# rhatcutoff=1.1
+# npostpred=9
+# npostpair=9
+# datafilter='none'
+# fileidentifier="elife_"
+# modelidentifier='none'
+
+# for n_tmp in "${n[@]}"
+# do
+#     python -u visualization_global_posterior_plots.py --model $model \
+#                                                   --machine $machine \
+#                                                   --method $method \
+#                                                   --networkidx $networkidx \
+#                                                   --traindattype $traindattype \
+#                                                   --n $n_tmp \
+#                                                   --analytic $analytic \
+#                                                   --rhatcutoff $rhatcutoff \
+#                                                   --npostpred $npostpred \
+#                                                   --npostpair $npostpair \
+#                                                   --plots ${plotlist[@]} \
+#                                                   --fileidentifier $fileidentifier \
+#                                                   --modelidentifier $modelidentifier
+# done
+# # ---------------------------------------------------
 
 # ANGLE2 ---------------------------------------------------
 # model="angle"
