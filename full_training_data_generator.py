@@ -18,6 +18,7 @@ import multiprocessing as mp
 import cddm_data_simulation as cd
 import basic_simulator as bs
 import kde_info
+from config import config as cfg
 import kde_class
 
 #from tqdm as tqdm
@@ -593,26 +594,29 @@ if __name__ == "__main__":
     config['meta']['delta_t'] = config['delta_t']
     
     # Add some machine dependent folder structure
-    if args.machine == 'x7':
-        config['method_comparison_folder'] = kde_info.temp[config['method']]['output_folder_x7']
-        config['method_folder'] = kde_info.temp[config['method']]['method_folder_x7']
+    config['method_folder'] = cfg['base_data_folder'][args.machine] + cfg['model_data'][args.method]
+    config['method_comparison_folder'] = cfg['base_data_folder'][args.machine] + cfg['model_data'][args.method] + 'mcmc_out/'
 
-    if args.machine == 'ccv':
-        config['method_comparison_folder'] = kde_info.temp[config['method']]['output_folder']
-        config['method_folder'] = kde_info.temp[config['method']]['method_folder']
+    # if args.machine == 'x7':
+    #     config['method_comparison_folder'] = kde_info.temp[config['method']]['output_folder_x7']
+    #     config['method_folder'] = kde_info.temp[config['method']]['method_folder_x7']
 
-    if args.machine == 'home':
-        config['method_comparison_folder'] = kde_info.temp[config['method']]['output_folder_home']
-        config['method_folder'] = kde_info.temp[config['method']]['method_folder_home']
+    # if args.machine == 'ccv':
+    #     config['method_comparison_folder'] = kde_info.temp[config['method']]['output_folder']
+    #     config['method_folder'] = kde_info.temp[config['method']]['method_folder']
 
-    if args.machine == 'other': # This doesn't use any extra 
-        if not os.path.exists('data_storage'):
-            os.makedirs('data_storage')
+    # if args.machine == 'home':
+    #     config['method_comparison_folder'] = kde_info.temp[config['method']]['output_folder_home']
+    #     config['method_folder'] = kde_info.temp[config['method']]['method_folder_home']
 
-        print('generated new folder: data_storage. Please update git_ignore if this is not supposed to be committed to repo')
+    # if args.machine == 'other': # This doesn't use any extra 
+    #     if not os.path.exists('data_storage'):
+    #         os.makedirs('data_storage')
 
-        config['method_comparison_folder']  = 'data_storage/'
-        config['method_folder'] = 'data_storage/' + config['method'] + '_'
+    #     print('generated new folder: data_storage. Please update git_ignore if this is not supposed to be committed to repo')
+
+    #     config['method_comparison_folder']  = 'data_storage/'
+    #     config['method_folder'] = 'data_storage/' + config['method'] + '_'
     # -------------------------------------------------------------------------------------
     
     # GET DATASETS ------------------------------------------------------------------------

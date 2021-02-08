@@ -100,9 +100,9 @@ if __name__ == "__main__":
     CLI.add_argument('--nfiles',
                      type = int,
                      default = 100)
-    CLI.add_argument('--maxidfiles',
-                     type = int,
-                     default = 100)
+    # CLI.add_argument('--maxidfiles',
+    #                  type = int,
+    #                  default = 100)
     CLI.add_argument('--nbydataset',
                      type = int,
                      default = 10000000)
@@ -130,7 +130,7 @@ if __name__ == "__main__":
     method = args.method
     warm_start = args.warmstart
     n_training_datasets_to_load = args.nfiles
-    maxidfiles = args.maxidfiles
+    # maxidfiles = args.maxidfiles
     machine = args.machine
     #data_folder = args.datafolder
     #model_data_folder = args.modeldatafolder
@@ -248,21 +248,12 @@ if __name__ == "__main__":
         open(model_path + "model_spec.yaml", "w").write(spec)
 
         print('STRUCTURE OF GENERATED MODEL: ....')
-        print(model.summary())
+        print(model.summary()) 
 
-        if machine == 'x7':
-
-            if dnn_params['loss'] == 'huber':
-                model.compile(loss = tf.losses.huber_loss, 
-                              optimizer = "adam", 
-                              metrics = ["mse"])
-        
-        if machine == 'ccv':
-
-            if dnn_params['loss'] == 'huber':
-                model.compile(loss = tf.keras.losses.Huber(),
-                              optimizer = "adam",
-                              metrics = ["mse"])
+        if dnn_params['loss'] == 'huber':
+            model.compile(loss = tf.keras.losses.Huber(),
+                            optimizer = "adam",
+                            metrics = ["mse"])
 
         if dnn_params['loss'] == 'mse':
             model.compile(loss = 'mse', 

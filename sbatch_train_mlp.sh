@@ -6,7 +6,6 @@
 #SBATCH -J mlp_analytic
 
 # priority
-##SBATCH --account=bibs-frankmj-condo
 #SBATCH --account=carney-frankmj-condo
 
 # email error reports
@@ -32,62 +31,21 @@ conda activate tf-gpu-py37
 module load cuda/10.0.130
 module load cudnn/7.6
 
-nfiles=200
-method='weibull_cdf_concave'
-analytic=0 # Training labels from analytic likelihood (1) or from KDE (0) (This is now all in the model_name)
-machine='ccv'
-maxidfiles=200
-trainn=100000
+nfiles=200 # Number of training data files to use for training
+n_networks_to_train=5 # Number of networks to train
+method='weibull_cdf_concave' # choose data generating process (includes analytic label !) 
+#analytic=0 # Training labels from analytic likelihood (1) or from KDE (0) (This is now all in the model_name)
+machine='ccv' # Choose machine
+train_n_sim=100000 # Choose training data --> based on how many simulations ?
+training_data_folder="training_data_binned_0_nbins_0_n_${train_n_sim}/"
 
-#base_folder="users/afengler/data/analytic/" # Base folder where data sits (finally subfolder targeted) CHANGE THIS
-# training_data_folder="$base_folder/${method}/training_data_binned_0_nbins_0_n_${trainn}/" # subfolder with self explanatory title SUBFOLDER STRUCTURE SHOULD BE MAINTAINED
-
-training_data_folder="training_data_binned_0_nbins_0_n_${trainn}/"
-#model_data_folder="$base_folder/${method}/" # MAINTAIN
-
-if [ $analytic -eq 1 ]; then
-    for i in {1..2}
+for ((i = 1; i <= $n_networks_to_train; i++))
     do
-       echo "Now starting run: $i"
-       python -u /users/afengler/git_repos/nn_likelihoods/keras_fit_model.py --machine $machine \
-                                                                             --method $method \
-                                                                             --nfiles $nfiles \
-                                                                             --maxidfiles $maxidfiles \
-                                                                             --traindatafolder $training_data_folder \
-                                                                             --warmstart 0 \
-                                                                             --analytic $analytic
-    done
-else
-    for i in {1..2}
-    do
-       echo "Now starting run: $i"
+       echo "NOW TRAINING NETWORK: $i of $n_networks_to_train"
        python -u /users/afengler/git_repos/nn_likelihoods/keras_fit_model.py --machine $machine \
                                                                              --method $method \
                                                                              --nfiles $nfiles \
                                                                              --traindatafolder $training_data_folder \
-                                                                             --maxidfiles $maxidfiles \
-                                                                             --warmstart 0 \
-                                                                             --analytic $analytic
+                                                                             --warmstart 0 
+                                                                             #--analytic $analytic
     done
-
-fi
-
-# USE THIS DATAFOLDER FOR ANY CASE UP TO DDM ANALYTIC
-# datafolder=/users/afengler/data/kde/${method}/training_data_binned_0_nbins_0_n_20000/
-
-# for i in {1..5}
-# do
-#    echo "Now starting run: $i \n"
-#    python -u /users/afengler/git_repos/nn_likelihoods/keras_fit_model.py --machine $machine --method $method --nfiles $nfiles --maxidfiles $maxidfiles --datafolder /users/afengler/data/${model_type}/${method}/training_data_binned_0_nbins_0_n_20000/ --nbydataset 10000000 --warmstart 0
-# done
-
-# #!/bin/bash
-
-
-# Pick number of files to consider
-# nfiles=100
-# method='levy'
-
-# # Function call
-# python -u keras_fit_model.py --machine x7 --method $method --nfiles $nfiles --datafolder /media/data_cifs/afengler/data/kde/${method}/training_data_binned_0_nbins_0_n_20000/ --nbydataset 10000000 --warmstart 0
-#data_folder='/users/afengler/data/kde/levy/'
