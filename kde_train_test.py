@@ -16,6 +16,8 @@ import argparse
 
 import kde_training_utilities as kde_util
 import kde_class as kde
+import kde_info
+from config import config as cfg
 
 if __name__ == "__main__":
     # Interfact ----
@@ -51,25 +53,29 @@ if __name__ == "__main__":
     CLI.add_argument('--analytic',
                      type = int,
                      default = 0)
+    CLI.add_argument("--data_folder",
+                     type = str,
+                     default = 'datastorage/')
     
     args = CLI.parse_args()
     print(args)
     
-    # Specify base simulation folder ------
-    if args.machine == 'x7':
-        method_params = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle",
-                                         "rb"))[args.method]
-        method_folder = method_params['method_folder_x7']
+    method_params = cfg['model_data'][args.method]
+    method_folder = cfg['base_data_folder'][args.machine] + cfg['model_data'][arg.method]
+    #method_params = kde_info.temp[args.method]
 
-    if args.machine == 'ccv':
-        method_params = pickle.load(open("/users/afengler/git_repos/nn_likelihoods/kde_stats.pickle", 
-                                         "rb"))[args.method]
-        method_folder = method_params['method_folder']
+#     # Specify base simulation folder ------
+#     if args.machine == 'x7':
+#         method_folder = method_params['method_folder_x7']
+
+#     if args.machine == 'ccv':
+#         method_folder = method_params['method_folder']
     
-    if args.machine == 'home':
-        method_parms = pickle.load(open("/Users/afengler/OneDrive/git_repos/nn_likelihoods/kde_stats.pickle",
-                                       "rb"))[args.method]
-        method_folder = method_params['method_folder_home']
+#     if args.machine == 'home':
+#         method_folder = method_params['method_folder_home']
+    
+#     if args.machine == 'other':
+#         method_folder = args.datafolder + args.method + '/'
     
     # Speficy names of process parameters
     process_params = method_params['param_names'] + method_params['boundary_param_names']

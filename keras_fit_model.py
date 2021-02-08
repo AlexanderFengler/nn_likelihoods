@@ -9,11 +9,12 @@ from datetime import datetime
 import pickle
 import yaml
 import keras_to_numpy as ktnp
+import kde_info
+from config import config
 
 #from kde_training_utilities import kde_load_data
 #from kde_training_utilities import kde_load_data_new
 #from kde_training_utilities import kde_make_train_test_split
-
 
 # SUPPORT FUNCTIONS ----------------------------
 def kde_load_data_new(path = '',
@@ -90,6 +91,12 @@ if __name__ == "__main__":
     CLI.add_argument('--datafolder',
                      type = str,
                      default = 'base_simulations')
+    CLI.add_argument('--traindatafolder',
+                     type = str,
+                     default = 'base_simulations')
+    CLI.add_argument('--modeldatafolder',
+                     type = str,
+                     default = 'test')
     CLI.add_argument('--nfiles',
                      type = int,
                      default = 100)
@@ -112,45 +119,66 @@ if __name__ == "__main__":
     # CHOOSE ---------
     
     # If we training data comes from analytic likelihood add analytic tag to model to pick out the correct key in dictionary loaded with kde_stats.pickle
-    if args.analytic:
-        method = args.method + '_analytic'
-    else:
-        method = args.method
     
+#     if args.analytic:
+#         method = args.method + '_analytic'
+#     else:
+#         method = args.method
+    
+
     # method = "weibull_cdf" # ddm, linear_collapse, ornstein, full, lba
+    method = args.method
     warm_start = args.warmstart
     n_training_datasets_to_load = args.nfiles
     maxidfiles = args.maxidfiles
     machine = args.machine
-    data_folder = args.datafolder
+    #data_folder = args.datafolder
+    #model_data_folder = args.modeldatafolder
     # ----------------
 
     # INITIALIZATIONS ----------------------------------------------------------------
-    if machine == 'x7':
-        stats = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))[method]
-        dnn_params = yaml.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/hyperparameters.yaml"))
-    else:
-        stats = pickle.load(open("/users/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))[method]
-        dnn_params = yaml.load(open("/users/afengler/git_repos/nn_likelihoods/hyperparameters.yaml"))
+    stats = config['model_data'][method]
+    dnn_params = config['mlp_hyperparamters']
+    model_path = config['base_data_folder'][machine] + stats['folder_suffix'] + 'keras_models/'
+    train_data_folder = config['base_data_folder'][machine] + stats['folder_suffix'] + args.traindatafolder
+    
+    #stats = kde_info.temp[method]
+    #dnn_params = yaml.load(open("hyperparameters.yaml"))
+    
+#     if machine == 'x7':
+        
+        
+#     if machine == 'ccv':
+        
+#     if machine == ''
+    
+#     if machine == 'x7':
+#         #stats = pickle.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))[method]
+#         dnn_params = yaml.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/hyperparameters.yaml"))
+#     else:
+#         #stats = pickle.load(open("/users/afengler/git_repos/nn_likelihoods/kde_stats.pickle", "rb"))[method]
+#         dnn_params = yaml.load(open("/users/afengler/git_repos/nn_likelihoods/hyperparameters.yaml"))
 
-    if machine == 'x7':
-        model_path = stats["model_folder_x7"]
-    else:
-        model_path = stats["model_folder"]
+#     if machine == 'x7':
+#         model_path = stats["model_folder_x7"]
+#     else:
+#         model_path = stats["model_folder"]
 
     if not warm_start:
         model_path += dnn_params["model_type"] + "_{}_".format(method) + datetime.now().strftime('%m_%d_%y_%H_%M_%S') + "/"
+        pickle.dump(config['mlp_hyperparameters'], model_path + 'hyperparameters.pickle')
+
 
     print('if it does not exist, make model path')
 
     if not os.path.exists(model_path):
         os.makedirs(model_path)
 
-    # Copy hyperparameter setup into model path
-    if machine == 'x7':
-        os.system("cp {} {}".format("/media/data_cifs/afengler/git_repos/nn_likelihoods/hyperparameters.yaml", model_path))
-    else:
-        os.system("cp {} {}".format("/users/afengler/git_repos/nn_likelihoods/hyperparameters.yaml", model_path))
+#     # Copy hyperparameter setup into model path
+#     if machine == 'x7':
+#         os.system("cp {} {}".format("/media/data_cifs/afengler/git_repos/nn_likelihoods/hyperparameters.yaml", model_path))
+#     else:
+#         os.system("cp {} {}".format("/users/afengler/git_repos/nn_likelihoods/hyperparameters.yaml", model_path))
 
     # set up gpu to use
     if machine == 'x7':
@@ -171,7 +199,8 @@ if __name__ == "__main__":
     # Load the training data
     print('loading data.... ')
                                 
-    folder_list = os.listdir(data_folder)
+    #folder_list = os.listdir(data_folder)
+    folder_list = os.listdir(train_data_folder)
     data_file_names = []
     
     for file_ in folder_list:
@@ -182,7 +211,14 @@ if __name__ == "__main__":
                                             replace = False, 
                                             size = n_training_datasets_to_load))
     
-    dataset = kde_load_data_new(path = data_folder,
+#     dataset = kde_load_data_new(path = data_folder,
+#                                 file_id_list = data_file_names,
+#                                 return_log = True,
+#                                 prelog_cutoff_low = 1e-7,
+#                                 prelog_cutoff_high = 100,
+#                                 make_split = True)
+    
+    dataset = kde_load_data_new(path = train_data_folder,
                                 file_id_list = data_file_names,
                                 return_log = True,
                                 prelog_cutoff_low = 1e-7,
@@ -211,7 +247,6 @@ if __name__ == "__main__":
         spec = model.to_yaml()
         open(model_path + "model_spec.yaml", "w").write(spec)
 
-
         print('STRUCTURE OF GENERATED MODEL: ....')
         print(model.summary())
 
@@ -234,13 +269,15 @@ if __name__ == "__main__":
                           optimizer = "adam", 
                           metrics = ["mse"])
     if warm_start:
-        # Returns a compiled model identical to the previous one
-        if machine == 'x7':
-            model_paths = yaml.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/model_paths_x7.yaml"))
-        if machine == 'ccv':
-            model_paths = yaml.load(open("/users/afengler/git_repos/nn_likelihoods/model_paths.yaml"))
-
-        model_path = model_paths[method +  '_' + str(n_training_datasets_to_load)]
+#         # Returns a compiled model identical to the previous one
+#         if machine == 'x7':
+#             model_paths = yaml.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/model_paths_x7.yaml"))
+#         if machine == 'ccv':
+#             model_paths = yaml.load(open("/users/afengler/git_repos/nn_likelihoods/model_paths.yaml"))
+           # model_path = model_paths[method +  '_' + str(n_training_datasets_to_load)]
+    
+        model_path = config['base_data_folder'] + config[method]['folder_suffix'] + 'keras_models/' + config['model_paths'] 
+       
         model = load_model(model_path + 'model_final.h5', custom_objects = {"huber_loss": tf.losses.huber_loss})
 
     # ---------------------------------------------------------------------------
@@ -292,15 +329,25 @@ if __name__ == "__main__":
                                                save = True, 
                                                save_path = model_path)
 
+    # Instead of just updating the model paths, maybe we want something closer to ranking performances here and then check if updating the model paths is necessary (underperforming models should not be promoted to model_paths...)
+    tmp_model_paths = yaml.load(open("model_paths_simple.yaml"))
+    tmp_model_paths[method + '_' + str(n_training_datasets_to_load)] = model_path
+    yaml.dump(model_paths, open("model_paths_simple.yaml", "w"))
+    
     # Update model paths in model_path.yaml
-    if machine == 'x7':
-        if not warm_start:
-            model_paths = yaml.load(open("model_paths_x7.yaml"))
-            model_paths[method + '_' + str(n_training_datasets_to_load)] = model_path
-            yaml.dump(model_paths, open("model_paths_x7.yaml", "w"))
-    if machine == 'ccv':
-        if not warm_start:
-            model_paths = yaml.load(open("model_paths.yaml"))
-            model_paths[method + '_' + str(n_training_datasets_to_load)] = model_path
-            yaml.dump(model_paths, open("model_paths.yaml", "w"))
+#     if machine == 'x7':
+#         if not warm_start:
+#             model_paths = yaml.load(open("model_paths_x7.yaml"))
+#             model_paths[method + '_' + str(n_training_datasets_to_load)] = model_path
+#             yaml.dump(model_paths, open("model_paths_x7.yaml", "w"))
+#     if machine == 'ccv':
+#         if not warm_start:
+#             model_paths = yaml.load(open("model_paths.yaml"))
+#             model_paths[method + '_' + str(n_training_datasets_to_load)] = model_path
+#             yaml.dump(model_paths, open("model_paths.yaml", "w"))
+#     if machine == 'other':
+#         if not warm_start:
+#             model_paths = yaml.load(open("model_paths_custom.yaml"))
+#             model_path[method + '_' + str(n_training_datasets_to_load)] = model_path
+#             yaml.dump(model_paths, open("model_paths_custom.yaml", "w"))
     # ----------------------------------------------------------------------------

@@ -25,6 +25,7 @@ from multiprocessing import Process
 from multiprocessing import Pool
 import psutil
 import argparse
+from config import config
 
 # --------------------------------------------------------------------------------
 
@@ -42,35 +43,41 @@ class data_generator():
         self.config = config
         self.method = self.config['method']
         
-        if self.machine == 'x7':  
-            self.method_params = pickle.load(open("/media/data_cifs/afengler/" + \
-                                                  "git_repos/nn_likelihoods/kde_stats.pickle", "rb"))[self.method]
-            self.method_comparison_folder = self.method_params['output_folder_x7']
-            self.method_folder = self.method_params['method_folder_x7']
-
-        if self.machine == 'ccv':
-            self.method_params = pickle.load(open("/users/afengler/git_repos/" + \
-                                                  "nn_likelihoods/kde_stats.pickle", "rb"))[self.method]
-            self.method_comparison_folder = self.method_params['output_folder']
-            self.method_folder = self.method_params['method_folder']
-
-        if self.machine == 'home':
-            self.method_params = pickle.load(open("/Users/afengler/OneDrive/git_repos/" + \
-                                                  "nn_likelihoods/kde_stats.pickle", "rb"))[self.method]
-            self.method_comparison_folder = self.method_params['output_folder_home']
-            self.method_folder = self.method_params['method_folder_home']
-            
-        if self.machine == 'other': # This doesn't use any extra 
-            self.method_params = pickle.load(open('kde_stats.pickle', 'rb'))[self.method]
-            if not os.path.exists('data_storage'):
-                os.makedirs('data_storage')
-                
-            print('generated new folder: data_storage. Please update git_ignore if this is not supposed to be committed to repo')
-                
-            self.method_comparison_folder = 'data_storage/'
-            self.method_folder = 'data_storage/' + self.method + '_'
         
-        self.dgp_hyperparameters = dict(self.method_params['dgp_hyperparameters'])
+        self.method_params = config['model_data'][self.method]
+        self.method_folder = config['base_data_folder'] + config['model_data'][self.method]['folder_suffix']
+        self.method_comparison_folder = self.method_folder + 'mcmc_out/'
+        
+        
+#         if self.machine == 'x7':  
+#             self.method_params = pickle.load(open("/media/data_cifs/afengler/" + \
+#                                                   "git_repos/nn_likelihoods/kde_stats.pickle", "rb"))[self.method]
+#             self.method_comparison_folder = self.method_params['output_folder_x7']
+#             self.method_folder = self.method_params['method_folder_x7']
+
+#         if self.machine == 'ccv':
+#             self.method_params = pickle.load(open("/users/afengler/git_repos/" + \
+#                                                   "nn_likelihoods/kde_stats.pickle", "rb"))[self.method]
+#             self.method_comparison_folder = self.method_params['output_folder']
+#             self.method_folder = self.method_params['method_folder']
+
+#         if self.machine == 'home':
+#             self.method_params = pickle.load(open("/Users/afengler/OneDrive/git_repos/" + \
+#                                                   "nn_likelihoods/kde_stats.pickle", "rb"))[self.method]
+#             self.method_comparison_folder = self.method_params['output_folder_home']
+#             self.method_folder = self.method_params['method_folder_home']
+            
+#         if self.machine == 'other': # This doesn't use any extra 
+#             self.method_params = pickle.load(open('kde_stats.pickle', 'rb'))[self.method]
+#             if not os.path.exists('data_storage'):
+#                 os.makedirs('data_storage')
+                
+#             print('generated new folder: data_storage. Please update git_ignore if this is not supposed to be committed to repo')
+                
+#             self.method_comparison_folder = 'data_storage/'
+#             self.method_folder = 'data_storage/' + self.method + '_'
+        
+        self.dgp_hyperparameters = self.method_params['dgp_hyperparameters']
         self.dgp_hyperparameters['max_t'] = max_t
         self.dgp_hyperparameters['n_samples'] = self.config['nsamples']
         self.dgp_hyperparameters['delta_t'] = delta_t
@@ -317,7 +324,6 @@ class data_generator():
             data_grid = np.array(pool.starmap(self.data_generator, args_list))
 
         return data_grid   
-  
         
     def make_dataset_perturbation_experiment(self,
                                              save = True):
@@ -824,20 +830,21 @@ if __name__ == "__main__":
     
     
     # YAML DATA basically only use for perturbation experiment data
-    if machine == 'x7':
-        config = yaml.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/config_files/config_data_generator.yaml"),
-                           Loader = yaml.SafeLoader)
+#     if machine == 'x7':
+#         config = yaml.load(open("/media/data_cifs/afengler/git_repos/nn_likelihoods/config_files/config_data_generator.yaml"),
+#                            Loader = yaml.SafeLoader)
         
-    if machine == 'ccv':
-        config = yaml.load(open("/users/afengler/git_repos/nn_likelihoods/config_files/config_data_generator.yaml"),
-                          Loader = yaml.SafeLoader)
+#     if machine == 'ccv':
+#         config = yaml.load(open("/users/afengler/git_repos/nn_likelihoods/config_files/config_data_generator.yaml"),
+#                           Loader = yaml.SafeLoader)
      
-    if machine == 'home':
-        config = yaml.load(open("/Users/afengler/OneDrive/git_repos/nn_likelihoods/config_files/config_data_generator.yaml"))
-    if machine == 'other':
-        config = yaml.load(open("config_files/config_data_generator.yaml"))
+#     if machine == 'home':
+#         config = yaml.load(open("/Users/afengler/OneDrive/git_repos/nn_likelihoods/config_files/config_data_generator.yaml"))
     
-    config = {}
+#     if machine == 'other':
+#         config = yaml.load(open("config_files/config_data_generator.yaml"))
+    
+    #config = {}
     config['n_cpus'] = 'all'
     
     # Update config with specifics of run

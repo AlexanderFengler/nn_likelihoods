@@ -3,8 +3,6 @@ from tensorflow import keras
 import os
 import pandas as pd
 
-
-
 # Function asks for a dictionary as input with the following keys (and associated datatypes)
 # params = {'input_shape': 3,
 #           'output_shape': 1,

@@ -61,13 +61,16 @@ def filter_simulations_fast(base_simulation_folder = '',
     
     # MAX RT BY SIMULATION: TEST SHOULD BE CONSISTENT
     n_simulations = file_[1].shape[1] #['n_samples']
+    
     # TODO: BASE SIMULATIONS FILES NEED TO HOLD THE N-CHOICES PROPERTY DIRECTLY
-    n_choices = 2
+    # TODO RESOLVED
+    n_choices = len(file_[2]['possible_choices'])
     #n_choices = len(np.unique(file_[1][0, :, 1])) # ['n_choices']
     
     # TODO: BASE SIMULATIONS NEED TO HOLD THE UNIQUE CHOICES PROPERTY DIRECTLY
     # RIGHT NOW THIS CODE USES THE DATA ITSELF TO RECOVER THE POSSIBLE CHOICES BUT THIS ALLOWS FOR READING IN N CHOICES < REAL N CHOICES
-    choices = np.unique([-1, 1])
+    # TODO RESOLVED
+    choices = file_[2]['possible_choices']
     #choices = np.unique(file_[1][0, :, 1])
     
     #n_choices = len(file_[0][2]['possible_choices'])
@@ -77,7 +80,6 @@ def filter_simulations_fast(base_simulation_folder = '',
     
     max_t = file_[2]['max_t']
     sim_stat_data['max_t'] = max_t
-    
     
     #max_ts[:] = max_t 
     max_ts = np.zeros((n_datasets, 1))
@@ -337,10 +339,7 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
     stat_ = pickle.load(open( base_simulation_folder + '/simulator_statistics' + '_' + str(file_id) + '.pickle', 'rb' ) )
 
     # Initialize dataframe
-#     my_columns = process_params + ['rt', 'choice', 'log_l']
-#     data = pd.DataFrame(np.zeros((np.sum(stat_['keep_file']) * n_by_param, len(my_columns))),
-#                         columns = my_columns)             
-    
+
     # Initializations
     n_kde = int(n_by_param * mixture_p[0])
     n_unif_down = int(n_by_param * mixture_p[1])
@@ -350,7 +349,7 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
     # Add possible choices to file_[2] which is the meta data for the simulator (expected when loaded the kde class)
     
     # TODO: THIS INFORMATION SHOULD BE INCLUDED AS META-DATA INTO THE BASE SIMULATOIN FILES
-    file_[2]['possible_choices'] = np.unique([-1,1])
+    file_[2]['possible_choices'] = np.unique([-1, 1])
     #file_[2]['possible_choices'] = np.unique(file_[1][0, :, 1])
     file_[2]['possible_choices'].sort()
 
@@ -372,64 +371,29 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
                 tmp_sim_data_ok = 1
                 
             lb = cnt * (n_unif_down + n_unif_up + n_kde)
-            #lb_kde = s_id_kde + (cnt * (n_kde))
-            
-#             # Make empty dataframe of appropriate size
-#             p_cnt = 0
-            
-#             for param in process_params:
-#                 data.iloc[(lb):(lb + n_unif_down + n_unif_up + n_kde), my_columns.index(param)] = file_[0][i, p_cnt]
-#                 p_cnt += 1
             
             # Allocate to starmap tuple for mixture component 3
             if analytic:
                 starmap_iterator += ((file_[1][i, :, :].copy(), file_[0][i, :].copy(), file_[2].copy(), n_kde, n_unif_up, n_unif_down, cnt), )
             else:
                 starmap_iterator += ((file_[1][i, :, :], file_[2], n_kde, n_unif_up, n_unif_down, cnt), ) 
-                #starmap_iterator += ((n_kde, n_unif_up, n_unif_down, cnt), )
-            # alternative
-            # tmp = i
-            # starmap_iterator += ((tmp), )
             
             cnt += 1
             if (cnt % 100 == 0) or (i == file_[1].shape[0] - 1):
                 with Pool(processes = n_cpus, maxtasksperchild = 200) as pool:
-                    results.append(np.array(pool.starmap(make_kde_data, starmap_iterator)).reshape((-1, 3)))   #.reshape((-1, 3))
-                    #result = pool.starmap(make_kde_data, starmap_iterator)
+                    results.append(np.array(pool.starmap(make_kde_data, starmap_iterator)).reshape((-1, 3)))
                 starmap_iterator = ()
                 print(i, 'arguments generated')
         if not stat_['keep_file'][i]:
             if (i == (file_[1].shape[0] - 1)) and len(starmap_iterator) > 0:
                 with Pool(processes = n_cpus, maxtasksperchild = 200) as pool:
-                    results.append(np.array(pool.starmap(make_kde_data, starmap_iterator)).reshape((-1, 3)))   #.reshape((-1, 3))
-                    #result = pool.starmap(make_kde_data, starmap_iterator)
+                    results.append(np.array(pool.starmap(make_kde_data, starmap_iterator)).reshape((-1, 3)))
                 starmap_iterator = ()
                 print(i, 'last dataset was not kept')
-    
-    # Garbage collection before starting pool:
-#     del file_
-#     gc.collect()
-    
-
-#     if analytic:
-#         with Pool(processes = n_cpus, maxtasksperchild = 200) as pool:
-#             #result = np.array(pool.starmap(make_fptd_data, starmap_iterator))   #.reshape((-1, 3))
-#             result = pool.starmap(make_fptd_data, starmap_iterator)
-#     else:
-#         with Pool(processes = n_cpus, maxtasksperchild = 200) as pool:
-#             #result = np.array(pool.starmap(make_kde_data, starmap_iterator))   #.reshape((-1, 3))
-#             result = pool.starmap(make_kde_data, starmap_iterator)
-    
-    # result = np.array(result).reshape((-1, 3))
-    
-    # Make dataframe to save
-    # Initialize dataframe
     
     my_columns = process_params + ['rt', 'choice', 'log_l']
     data = pd.DataFrame(np.zeros((np.sum(stat_['keep_file']) * n_by_param, len(my_columns))),
                         columns = my_columns)    
-    
-    #data.values[: , -3:] = result.reshape((-1, 3))
     
     data.values[:, -3:] = np.concatenate(results)
     
@@ -473,6 +437,27 @@ def kde_from_simulations_fast_parallel(base_simulation_folder = '',
         pickle.dump(tmp_sim_data, open(target_folder + '/meta_data.pickle', 'wb') )
 
     return 0 #data
+
+# UNUSED FROM PREV FUNCTION
+    # Garbage collection before starting pool:
+#     del file_
+#     gc.collect()
+    
+
+#     if analytic:
+#         with Pool(processes = n_cpus, maxtasksperchild = 200) as pool:
+#             #result = np.array(pool.starmap(make_fptd_data, starmap_iterator))   #.reshape((-1, 3))
+#             result = pool.starmap(make_fptd_data, starmap_iterator)
+#     else:
+#         with Pool(processes = n_cpus, maxtasksperchild = 200) as pool:
+#             #result = np.array(pool.starmap(make_kde_data, starmap_iterator))   #.reshape((-1, 3))
+#             result = pool.starmap(make_kde_data, starmap_iterator)
+    
+    # result = np.array(result).reshape((-1, 3))
+    
+    # Make dataframe to save
+    # Initialize dataframe
+    
                                        
                                        
 def kde_from_simulations_fast(base_simulation_folder = '',

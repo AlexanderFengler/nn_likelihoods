@@ -7,7 +7,6 @@ from datetime import datetime
 import argparse
 import gzip
 
-
 def collect_datasets_is(folder = [],
                         model = [],
                         ndata = [],

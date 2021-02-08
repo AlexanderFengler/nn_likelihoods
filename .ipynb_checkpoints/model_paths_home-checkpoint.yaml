@@ -1,15 +1,6 @@
 #ddm: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm/keras_models/dnnregressor_ddm_08_08_19_23_37_48/
 ddm_analytic: /not/a/real/path
 #ddm: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm/keras_models/dnnregressor_ddm_ndt_09_27_19_19_02_40/
-fcn_ddm_1000: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm/keras_models/deep_inference_1000_11_12_19_01_10_54
-fcn_ddm_10000: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm/keras_models/deep_inference_10000_11_12_19_01_18_28
-fcn_ddm_2500: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm/keras_models/deep_inference_2500_11_12_19_01_14_31
-fcn_ddm_5000: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm/keras_models/deep_inference_5000_11_12_19_01_16_31
-fcn_ddm_ndt_100: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm/keras_models/deep_inference_100_10_22_19_18_52_56
-fcn_ddm_ndt_1000: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm/keras_models/deep_inference_1000_10_22_19_18_55_14
-fcn_ddm_ndt_20000: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm/keras_models/deep_inference_20000_10_23_19_13_59_23
-fcn_ddm_ndt_250: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm/keras_models/deep_inference_250_10_22_19_18_54_36
-fcn_ddm_ndt_2500: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/ddm/keras_models/deep_inference_2500_10_23_19_14_00_38
 #full: /users/afengler/OneDrive/project_nn_likelihoods/data/kde/full_ddm/keras_models/dnnregressor_full_08_17_19_16_27_27/
 lba: /media/data_cifs/afengler/data/kde/lba/keras_models/dnnregressor_lba_09_25_19_12_09_58/
 lba_analytic: /media/data_cifs/afengler/data/analytic/lba/keras_models/dnnregressor_lba_analytic_09_23_19_17_53_35/

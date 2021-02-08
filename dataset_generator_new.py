@@ -17,6 +17,7 @@ import multiprocessing as mp
 import cddm_data_simulation as cd
 import basic_simulator as bs
 import kde_info
+from config import config as cfg
 
 #from tqdm as tqdm
 #from cdwiener import batch_fptd
@@ -264,6 +265,9 @@ if __name__ == "__main__":
     CLI.add_argument("--pickleprotocol",
                      type = int,
                      default = 4)
+    CLI.add_argument("--data_folder",
+                     type = str,
+                     default = 'datastorage/')
     
     args = CLI.parse_args()
     print('Arguments passed: ')
@@ -284,6 +288,7 @@ if __name__ == "__main__":
     config['mode'] = args.mode
     config['file_id'] = args.fileid
     config['nsamples'] = args.nsamples
+    
     if args.nbins is not None:
         config['binned'] = 1
     else:
@@ -304,43 +309,48 @@ if __name__ == "__main__":
     config['n_samples'] = args.nsamples
     config['max_t'] = args.maxt
     config['delta_t'] = args.deltat
+    config['custom_data_folder'] = args.data_folder
     
     # Make parameter bounds
     if args.mode == 'train' and config['binned']:
-        bounds_tmp = kde_info.temp[config['method']]['param_bounds_cnn'] + kde_info.temp[config['method']]['boundary_param_bounds_cnn']
+        
+        bounds_tmp = cfg['model_data'][config['method']]['param_bounds_cnn'] + cfg['model_data'][config['method']]['boundary_param_bounds_cnn']
     elif args.mode == 'train' and not config['binned']:
-        bounds_tmp = kde_info.temp[config['method']]['param_bounds_network'] + kde_info.temp[config['method']]['boundary_param_bounds_network']
+        bounds_tmp = cfg['model_data'][config['method']]['param_bounds_network'] + cfg['model_data'][config['method']]['boundary_param_bounds_network']
     elif args.mode == 'test' and config['binned']:
-        bounds_tmp = kde_info.temp[config['method']]['param_bounds_sampler'] + kde_info.temp[config['method']]['boundary_param_bounds_sampler']
+        bounds_tmp = cfg['model_data'][config['method']]['param_bounds_sampler'] + cfg['model_data'][config['method']]['boundary_param_bounds_sampler']
     elif args.mode == 'test' and not config['binned']:
-        bounds_tmp = kde_info.temp[config['method']]['param_bounds_sampler'] + kde_info.temp[config['method']]['boundary_param_bounds_sampler']
+        bounds_tmp = cfg['model_data'][config['method']]['param_bounds_sampler'] + cfg['model_data'][config['method']]['boundary_param_bounds_sampler']
 
     config['param_bounds'] = np.array([[i[0] for i in bounds_tmp], [i[1] for i in bounds_tmp]])
     config['nparams'] = config['param_bounds'][0].shape[0]
     
-    config['meta'] = kde_info.temp[config['method']]['dgp_hyperparameters']
+    config['meta'] = cfg['model_data'][config['method']]['dgp_hyperparameters']
     
     # Add some machine dependent folder structure
-    if args.machine == 'x7':
-        config['method_comparison_folder'] = kde_info.temp[config['method']]['output_folder_x7']
-        config['method_folder'] = kde_info.temp[config['method']]['method_folder_x7']
+    config['method_comparison_folder'] = cfg['base_data_folder'][config['machine']] + cfg['model_data'][config['method']]['folder_suffix'] + 'mcmc_out/'
+    config['method_folder'] = cfg['base_data_folder'][config['machine']] + cfg['model_data'][config['method']]['folder_suffix']
+    
+#     if args.machine == 'x7':
+#         config['method_comparison_folder'] = cfg['model_data'][config['method']]['output_folder_x7']
+#         config['method_folder'] = cfg['model_data'][config['method']]['method_folder_x7']
 
-    if args.machine == 'ccv':
-        config['method_comparison_folder'] = kde_info.temp[config['method']]['output_folder']
-        config['method_folder'] = kde_info.temp[config['method']]['method_folder']
+#     if args.machine == 'ccv':
+#         config['method_comparison_folder'] = cfg['model_data'][config['method']]['output_folder']
+#         config['method_folder'] = cfg['model_data'][config['method']]['method_folder']
 
-    if args.machine == 'home':
-        config['method_comparison_folder'] = kde_info.temp[config['method']]['output_folder_home']
-        config['method_folder'] = kde_info.temp[config['method']]['method_folder_home']
+#     if args.machine == 'home':
+#         config['method_comparison_folder'] = cfg['model_data'][config['method']]['output_folder_home']
+#         config['method_folder'] = cfg['model_data'][config['method']]['method_folder_home']
 
-    if args.machine == 'other': # This doesn't use any extra 
-        if not os.path.exists('data_storage'):
-            os.makedirs('data_storage')
+#     if args.machine == 'other': # This doesn't use any extra 
+#         if not os.path.exists('data_storage'):
+#             os.makedirs('data_storage')
 
-        print('generated new folder: data_storage. Please update git_ignore if this is not supposed to be committed to repo')
+#         print('generated new folder: data_storage. Please update git_ignore if this is not supposed to be committed to repo')
 
-        config['method_comparison_folder']  = 'data_storage/'
-        config['method_folder'] = 'data_storage/' + config['method'] + '_'
+#         config['method_comparison_folder']  = config['custom_data_folder']
+#         config['method_folder'] = config['custom_data_folder'] + config['method'] + '/'
     # -------------------------------------------------------------------------------------
     
     # GET DATASETS ------------------------------------------------------------------------

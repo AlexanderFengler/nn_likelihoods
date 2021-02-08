@@ -29,7 +29,8 @@ n_choices=( 2 ) #( 4 5 6 )
 n_parameter_sets=5000   #20000
 n_bins=( 0 )
 binned=0
-machine="ccv" #"ccv"
+machine="ccv" # "ccv", "home", "x7" , "other" 
+custom_data_folder="data_storage/" # use if machine is set to other 
 datatype="cnn_train" #"cnn_train" # "parameter_recovery"
 mode="mlp"
 analytic=0
@@ -66,13 +67,15 @@ do
                                                       --nparamsets $n_parameter_sets \
                                                       --save 1 \
                                                       --deltat 0.001 \
-                                                      --fileid $SLURM_ARRAY_TASK_ID 
+                                                      --fileid $SLURM_ARRAY_TASK_ID
+                                                      --data_folder $custom_data_folder
                        
                        python -u simulator_get_stats.py --machine $machine \
                                                         --method $dgp \
                                                         --simfolder training_data_binned_${binned}_nbins_${bins}_n_${n} \
                                                         --fileprefix ${dgp}_nchoices_${n_c}_train_data_binned_${binned}_nbins_${bins}_n_${n} \
                                                         --fileid $SLURM_ARRAY_TASK_ID
+                                                        --data_folder $custom_data_folder
                        
                        python -u kde_train_test.py --machine $machine \
                                                    --method $dgp \
@@ -84,6 +87,7 @@ do
                                                    --fileid $SLURM_ARRAY_TASK_ID \
                                                    --nproc $nproc \
                                                    --analytic $analytic
+                                                   --data_folder $custom_data_folder
            
                 done
             else
@@ -103,6 +107,7 @@ do
                                                 --save 1 \
                                                 --deltat 0.001 \
                                                 --fileid $SLURM_ARRAY_TASK_ID
+                                                --data_folder $custom_data_folder
                                                 
                  
                  python -u simulator_get_stats.py --machine $machine \
@@ -110,6 +115,7 @@ do
                                                   --simfolder training_data_binned_${binned}_nbins_${bins}_n_${n} \
                                                   --fileprefix ${dgp}_nchoices_${n_choices[0]}_train_data_binned_${binned}_nbins_${bins}_n_${n} \
                                                   --fileid $SLURM_ARRAY_TASK_ID
+                                                  --data_folder $custom_data_folder
                                                   
                  python -u kde_train_test.py --machine $machine \
                                              --method $dgp \
@@ -121,6 +127,7 @@ do
                                              --fileid $SLURM_ARRAY_TASK_ID \
                                              --nproc $nproc \
                                              --analytic $analytic
+                                             --data_folder $custom_data_folder
             fi
         done
                 # normal call to function
