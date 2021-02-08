@@ -602,7 +602,16 @@ if __name__ == "__main__":
     
     # Add some machine dependent folder structure
     config['method_folder'] = cfg['base_data_folder'][args.machine] + cfg['model_data'][args.method]
+
     config['method_comparison_folder'] = cfg['base_data_folder'][args.machine] + cfg['model_data'][args.method] + 'mcmc_out/'
+
+    # If relevant folders don't exist --> make them
+    # Note: sequence matters because second is subfolder of first
+    if not os.path.exists(config['method_folder']):
+        os.makedirs(config['method_folder'])
+
+    if not os.path.exists(config['method_comparison_folder']):
+        os.makedirs(config['method_comparison_folder'])
 
     # if args.machine == 'x7':
     #     config['method_comparison_folder'] = kde_info.temp[config['method']]['output_folder_x7']
