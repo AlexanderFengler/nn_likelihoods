@@ -559,8 +559,7 @@ if __name__ == "__main__":
         elif tmp_file_id < 1000:
             tmp_file_id = '0' + str(tmp_file_id)     
         elif tmp_file_id > 10000:
-            print('File id provided is too high of a number !')
-            return
+            sys.exit('File id provided is too high of a number !')
 
     config['nsamples'] = args.nsamples
 
