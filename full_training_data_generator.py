@@ -601,9 +601,9 @@ if __name__ == "__main__":
     config['nchoices'] = len(config['meta']['possible_choices'])
     
     # Add some machine dependent folder structure
-    config['method_folder'] = cfg['base_data_folder'][args.machine] + cfg['model_data'][config['method']]
+    config['method_folder'] = cfg['base_data_folder'][args.machine] + cfg['model_data'][config['method']]['folder_suffix']
 
-    config['method_comparison_folder'] = cfg['base_data_folder'][args.machine] + cfg['model_data'][config['method']] + 'mcmc_out/'
+    config['method_comparison_folder'] = cfg['base_data_folder'][args.machine] + cfg['model_data'][config['method']]['folder_suffix'] + 'mcmc_out/'
 
     # If relevant folders don't exist --> make them
     # Note: sequence matters because second is subfolder of first
