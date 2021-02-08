@@ -13,6 +13,10 @@ from cddm_data_simulation import ddm_sdv
 from cddm_data_simulation import ddm_flexbound_pre
 from cddm_data_simulation import race_model
 from cddm_data_simulation import lca
+from cddm_data_simulation import ddm_flexbound_seq2
+from cddm_data_simulation import ddm_flexbound_par2
+from cddm_data_simulation import ddm_flexbound_mic2
+
 import cddm_data_simulation as cds
 import boundary_functions as bf
 
@@ -81,8 +85,20 @@ def simulator(theta,
         pass
     else:
         theta = theta.numpy()
+
+    if model == 'test':
+        x = ddm_flexbound(v = theta[0],
+                          a = theta[1], 
+                          w = theta[2],
+                          ndt = theta[3],
+                          n_samples = n_samples,
+                          delta_t = delta_t,
+                          boundary_params = {},
+                          boundary_fun = bf.constant,
+                          boundary_multiplicative = True,
+                          max_t = max_t)
     
-    if model == 'ddm':
+    if model == 'ddm' or model == 'ddm_elife' or model == 'ddm_analytic':
         x = ddm_flexbound(v = theta[0],
                           a = theta[1], 
                           w = theta[2],
@@ -240,20 +256,54 @@ def simulator(theta,
                 n_samples = n_samples,
                 max_t = max_t)
         
-#         race_model(v = np.array([0, 0, 0], dtype = DTYPE), # np.array expected, one column of floats
-#                float a = 1, # initial boundary separation
-#                w = np.array([0, 0, 0], dtype = DTYPE), # np.array expected, one column of floats
-#                float ndt = 1, # for now we we don't allow ndt by choice
-#                #ndt = np.array([0.0, 0.0, 0.0], dtype = DTYPE),
-#                s = np.array([1, 1, 1], dtype = DTYPE), # np.array expected, one column of floats
-#                float delta_t = 0.001, # time increment step
-#                float max_t = 20, # maximum rt allowed
-#                int n_samples = 2000, 
-#                print_info = True,
-#                boundary_fun = None,
-#                boundary_multiplicative = True,
-#                boundary_params = {})       
-#     if model == 'race_model_4':
+    if model == 'ddm_seq2':
+        x = ddm_flexbound_seq2(v_h = theta[0],
+                               v_l_1 = theta[1],
+                               v_l_2 = theta[2],
+                               a = theta[3],
+                               w_h = theta[4],
+                               w_l_1 = theta[5],
+                               w_l_2 = theta[6],
+                               ndt = theta[7],
+                               s = 1.0,
+                               delta_t = delta_t,
+                               max_t = max_t,
+                               boundary_fun = bf.constant,
+                               boundary_multiplicative = True,
+                               boundary_params = {})
+
+    if model == 'ddm_par2':
+        x = ddm_flexbound_par2(v_h = theta[0],
+                               v_l_1 = theta[1],
+                               v_l_2 = theta[2],
+                               a = theta[3],
+                               w_h = theta[4],
+                               w_l_1 = theta[5],
+                               w_l_2 = theta[6],
+                               ndt = theta[7],
+                               s = 1.0,
+                               delta_t = delta_t,
+                               max_t = max_t,
+                               boundary_fun = bf.constant,
+                               boundary_multiplicative = True,
+                               boundary_params = {})
+
+    if model == 'ddm_mic2':
+        x = ddm_flexbound_par2(v_h = theta[0],
+                               v_l_1 = theta[1],
+                               v_l_2 = theta[2],
+                               a = theta[3],
+                               w_h = theta[4],
+                               w_l_1 = theta[5],
+                               w_l_2 = theta[6],
+                               d = theta[7],
+                               ndt = theta[8],
+                               s = 1.0,
+                               delta_t = delta_t,
+                               max_t = max_t,
+                               boundary_fun = bf.constant,
+                               boundary_multiplicative = True,
+                               boundary_params = {})
     
     if bin_dim == 0:
         return x
