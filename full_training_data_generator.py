@@ -17,7 +17,7 @@ import boundary_functions as bf
 import multiprocessing as mp
 import cddm_data_simulation as cd
 import basic_simulator as bs
-import kde_info
+# import kde_info
 from config import config as cfg
 import kde_class
 
@@ -495,9 +495,9 @@ if __name__ == "__main__":
     CLI.add_argument("--nsamples",
                      type = int,
                      default = 20000)
-    CLI.add_argument("--nchoices",
-                     type = int,
-                     default = 2)
+    # CLI.add_argument("--nchoices",
+    #                  type = int,
+    #                  default = 2)
     CLI.add_argument("--nsimbnds",
                      nargs = '*',
                      type = int,
@@ -558,7 +558,7 @@ if __name__ == "__main__":
         config['binned'] = 0
     
     config['datatype'] = args.datatype
-    config['nchoices'] = args.nchoices
+    # config['nchoices'] = args.nchoices
     config['nparamsets'] = args.nparamsets
     config['nreps'] = args.nreps
     config['pickleprotocol'] = args.pickleprotocol
@@ -579,19 +579,26 @@ if __name__ == "__main__":
                         }
     
     # Make parameter bounds
+    
+    # TODO: ADJUST SO WE CAN IN FACT HAVE MULTIPLE DGPS
+
     if args.datatype == 'training' and config['binned']:
-        bounds_tmp = kde_info.temp[config['method']]['param_bounds_cnn'] + kde_info.temp[config['method']]['boundary_param_bounds_cnn']
+        bounds_tmp = cfg['model_data'][config['method']]['param_bounds_cnn'] + cfg['model_data'][config['method']]['boundary_param_bounds_cnn']
+        # bounds_tmp = kde_info.temp[config['method']]['param_bounds_cnn'] + kde_info.temp[config['method']]['boundary_param_bounds_cnn']
     elif args.datatype == 'training' and not config['binned']:
-        bounds_tmp = kde_info.temp[config['method']]['param_bounds_network'] + kde_info.temp[config['method']]['boundary_param_bounds_network']
+        bounds_tmp = cfg['model_data'][config['method']]['param_bounds_network'] + cfg['model_data'][config['method']]['boundary_param_bounds_network']
+        # bounds_tmp = kde_info.temp[config['method']]['param_bounds_network'] + kde_info.temp[config['method']]['boundary_param_bounds_network']
     else:
-        bounds_tmp = kde_info.temp[config['method']]['param_bounds_sampler'] + kde_info.temp[config['method']]['boundary_param_bounds_sampler']
+        bounds_tmp = cfg['model_data'][config['method']]['param_bounds_sampler'] + cfg['model_data'][config['method']]['boundary_param_bounds_sampler']
+        # bounds_tmp = kde_info.temp[config['method']]['param_bounds_sampler'] + kde_info.temp[config['method']]['boundary_param_bounds_sampler']
 
     config['param_bounds'] = np.array([[i[0] for i in bounds_tmp], [i[1] for i in bounds_tmp]])
     config['nparams'] = config['param_bounds'][0].shape[0]
     
-    config['meta'] = dict(kde_info.temp[config['method']]['dgp_hyperparameters'])
+    config['meta'] = cfg['model_data'][config['method']]['dgp_hyperparameters']
     config['meta']['n_samples'] = config['n_samples']
     config['meta']['delta_t'] = config['delta_t']
+    config['nchoices'] = len(config['meta']['possible_choices'])
     
     # Add some machine dependent folder structure
     config['method_folder'] = cfg['base_data_folder'][args.machine] + cfg['model_data'][args.method]

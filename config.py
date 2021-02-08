@@ -17,7 +17,7 @@ config['model_paths'] = yaml.load(open("model_paths_simple.yaml"))
 
 # Add machine basic folders here
 config['base_data_folder'] = {'af_x7': '/media/data_cifs/projects/...', 
-                              'af_ccv': '/users/afengler/data/',
+                              'af_ccv': '/users/afengler/data/proj_nn_likelihoods/',
                               'af_home': '/Users/afengler/OneDrive/project_nn_likelihoods/data/nn_likelihoods/',
                               'default': ''}
 
