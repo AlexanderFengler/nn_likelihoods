@@ -31,12 +31,12 @@ conda activate tf-gpu-py37
 module load cuda/10.0.130
 module load cudnn/7.6
 
-nfiles=200 # Number of training data files to use for training
+nfiles=10 # Number of training data files to use for training
 n_networks_to_train=5 # Number of networks to train
-method='weibull_cdf_concave' # choose data generating process (includes analytic label !) 
+method='test' # choose data generating process (includes analytic label !) 
 #analytic=0 # Training labels from analytic likelihood (1) or from KDE (0) (This is now all in the model_name)
-machine='ccv' # Choose machine
-train_n_sim=100000 # Choose training data --> based on how many simulations ?
+machine='af_ccv' # Choose machine
+train_n_sim=10000 # Choose training data --> based on how many simulations ?
 training_data_folder="training_data_binned_0_nbins_0_n_${train_n_sim}/"
 
 for ((i = 1; i <= $n_networks_to_train; i++))

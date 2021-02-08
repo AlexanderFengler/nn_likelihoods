@@ -548,6 +548,20 @@ if __name__ == "__main__":
         
     # config['mode'] = args.mode
     config['file_id'] = args.fileid
+    
+    # Make file ids sortable ! (prepend with 0s)
+    if not config['file_id'] == 'TEST':
+        tmp_file_id = int(config['file_id'])
+        if tmp_file_id < 10:
+            tmp_file_id = '000' + str(tmp_file_id)
+        elif tmp_file_id < 100:
+            tmp_file_id = '00' + str(tmp_file_id)
+        elif tmp_file_id < 1000:
+            tmp_file_id = '0' + str(tmp_file_id)     
+        elif tmp_file_id > 10000:
+            print('File id provided is too high of a number !')
+            return
+
     config['nsamples'] = args.nsamples
 
     config['nbins'] = args.nbins
