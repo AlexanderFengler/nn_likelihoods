@@ -17,7 +17,7 @@
 
 # Request runtime, memory, cores
 #SBATCH --time=18:00:00
-#SBATCH --mem=192G
+#SBATCH --mem=32G
 #SBATCH -c 8
 #SBATCH -N 1
 ##SBATCH --constraint='quadrortx'
