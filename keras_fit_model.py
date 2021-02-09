@@ -117,7 +117,7 @@ if __name__ == "__main__":
     print(args)
 
     # CHOOSE ---------
-    
+
     # If we training data comes from analytic likelihood add analytic tag to model to pick out the correct key in dictionary loaded with kde_stats.pickle
     
 #     if args.analytic:
@@ -125,7 +125,6 @@ if __name__ == "__main__":
 #     else:
 #         method = args.method
     
-
     # method = "weibull_cdf" # ddm, linear_collapse, ornstein, full, lba
     method = args.method
     warm_start = args.warmstart
@@ -138,7 +137,7 @@ if __name__ == "__main__":
 
     # INITIALIZATIONS ----------------------------------------------------------------
     stats = config['model_data'][method]
-    dnn_params = config['mlp_hyperparamters']
+    dnn_params = config['mlp_hyperparameters']
     model_path = config['base_data_folder'][machine] + stats['folder_suffix'] + 'keras_models/'
     train_data_folder = config['base_data_folder'][machine] + stats['folder_suffix'] + args.traindatafolder
     
@@ -167,7 +166,6 @@ if __name__ == "__main__":
     if not warm_start:
         model_path += dnn_params["model_type"] + "_{}_".format(method) + datetime.now().strftime('%m_%d_%y_%H_%M_%S') + "/"
         pickle.dump(config['mlp_hyperparameters'], model_path + 'hyperparameters.pickle')
-
 
     print('if it does not exist, make model path')
 
