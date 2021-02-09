@@ -22,8 +22,11 @@
 #SBATCH -N 1
 #SBATCH --array=1-1
 
+conda deactivate
+conda activate tf_cpu_py36
+
 nfiles=10 # Number of training data files to use for training
-n_networks_to_train=5 # Number of networks to train
+n_networks_to_train=2 # Number of networks to train
 method='test' # choose data generating process (includes analytic label !) 
 #analytic=0 # Training labels from analytic likelihood (1) or from KDE (0) (This is now all in the model_name)
 machine='af_ccv' # Choose machine
