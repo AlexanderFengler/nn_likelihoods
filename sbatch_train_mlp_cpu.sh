@@ -25,7 +25,7 @@
 source /users/afengler/.bashrc
 
 conda deactivate
-conda activate tf_cpu_py36
+conda activate tf-gpu-py37
 
 nfiles=10 # Number of training data files to use for training
 n_networks_to_train=2 # Number of networks to train
