@@ -22,6 +22,8 @@
 #SBATCH -N 1
 #SBATCH --array=1-1
 
+source /users/afengler/.bashrc
+
 conda deactivate
 conda activate tf_cpu_py36
 

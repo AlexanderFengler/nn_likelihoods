@@ -165,7 +165,7 @@ if __name__ == "__main__":
 
     if not warm_start:
         model_path += dnn_params["model_type"] + "_{}_".format(method) + datetime.now().strftime('%m_%d_%y_%H_%M_%S') + "/"
-        pickle.dump(config['mlp_hyperparameters'], model_path + 'hyperparameters.pickle')
+        pickle.dump(config['mlp_hyperparameters'], open(model_path + 'hyperparameters.pickle', 'wb'))
 
     print('if it does not exist, make model path')
 
