@@ -28,12 +28,12 @@ conda deactivate
 conda activate tf-gpu-py37
 
 nfiles=10 # Number of training data files to use for training
-n_networks_to_train=2 # Number of networks to train
+n_networks_to_train=5 # Number of networks to train
 method="$@" # supplied as argument # choose data generating process (includes analytic label !) 
 #analytic=0 # Training labels from analytic likelihood (1) or from KDE (0) (This is now all in the model_name)
 machine='af_ccv' # Choose machine
-train_n_sim=10000 # Choose training data --> based on how many simulations ?
-training_data_folder="training_data_binned_0_nbins_0_n_${train_n_sim}/"
+train_n_sim=10000 # Specifies which training data to choose (n is the number of simulations that were run per parameterization)
+training_data_folder="training_data_binned_0_nbins_0_n_${train_n_sim}/" # subfolder that holds the training data
 
 for ((i = 1; i <= $n_networks_to_train; i++))
     do
