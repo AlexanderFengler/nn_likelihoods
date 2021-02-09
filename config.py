@@ -26,7 +26,7 @@ config['mlp_hyperparameters'] = {'hidden_layers': [100, 100, 120, 1],
                                  'hidden_activations': ["tanh", "tanh", "tanh", "linear"],
                                  'filters': [128, 128, 128, 128],
                                  'batch_size': 100000,
-                                 'n_epochs': 50, # CHANGE AGAINs
+                                 'n_epochs': 100, # CHANGE AGAINs
                                  'learning_rate': .002, # I think was originally 0.0002
                                  'momentum': .7,
                                  'model_type': "dnnregressor",
@@ -34,6 +34,13 @@ config['mlp_hyperparameters'] = {'hidden_layers': [100, 100, 120, 1],
                                  'log': True,
                                  'loss': "huber",
                                  'gpu_x7': '2'}
+
+config['mlp_simulation_filters'] =  {'mode': 20, # != (if mode is max_rt)
+                                     'choice_cnt': 10, # > (each choice receive at least 10 samples in simulator)
+                                     'mean_rt': 15, # < (mean_rt is smaller than specified value
+                                     'std': 0, # > (std is positive for each choice)
+                                     'mode_cnt_rel': 0.5  # < (mode does not receive more than a proportion of samples for each choice)
+                                    }
 
 config['model_data'] = {
 "test":{

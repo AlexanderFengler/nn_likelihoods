@@ -29,7 +29,7 @@ conda activate tf-gpu-py37
 
 nfiles=10 # Number of training data files to use for training
 n_networks_to_train=2 # Number of networks to train
-method='test' # choose data generating process (includes analytic label !) 
+method="$@" # supplied as argument # choose data generating process (includes analytic label !) 
 #analytic=0 # Training labels from analytic likelihood (1) or from KDE (0) (This is now all in the model_name)
 machine='af_ccv' # Choose machine
 train_n_sim=10000 # Choose training data --> based on how many simulations ?

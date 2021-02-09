@@ -193,7 +193,7 @@ class data_generator():
         return out.astype(np.float)
     
     def _mlp_get_processed_data_for_theta(self,
-                                      random_seed):
+                                          random_seed):
         np.random.seed(random_seed)
         keep = 0
         while not keep:
@@ -305,14 +305,11 @@ class data_generator():
             full_file_name = training_data_folder + '/' + \
                              'data_' + \
                              self.config['file_id'] + '.pickle'
-
             print('Writing to file: ', full_file_name)
 
             pickle.dump(np.float32(data_grid),
                         open(full_file_name, 'wb'), 
                         protocol = self.config['pickleprotocol'])
-            
-
             return 'Dataset completed'
         
         else:
@@ -327,8 +324,7 @@ class data_generator():
         # Get simulations
         with Pool(processes = self.config['n_cpus']) as pool:
             data_grid = np.array(pool.map(self.get_simulations, theta_list))
-         
-        
+
         # Save to correct destination
         if save:
             
@@ -353,25 +349,6 @@ class data_generator():
                             '_n_' + str(self.config['nsamples']) + \
                             '.pickle'
 
-#             else:
-#                 training_data_folder = self.config['method_folder'] + \
-#                                       'training_data_binned_' + \
-#                                       str(int(self.config['binned'])) + \
-#                                       '_nbins_' + str(self.config['nbins']) + \
-#                                       '_n_' + str(self.config['nsamples'])
-                
-#                 if not os.path.exists(training_data_folder):
-#                     os.makedirs(training_data_folder)
-
-#                 full_file_name = training_data_folder + '/' + \
-#                                 self.config['method'] + \
-#                                 '_nchoices_' + str(self.config['nchoices']) + \
-#                                 '_train_data_binned_' + \
-#                                 str(int(self.config['binned'])) + \
-#                                 '_nbins_' + str(self.config['nbins']) + \
-#                                 '_n_' + str(self.config['nsamples']) + \
-#                                 '_' + self.config['file_id'] + '.pickle'
-            
             print('Writing to file: ', full_file_name)
             
             pickle.dump((np.float32(np.stack(theta_list)), 
@@ -495,9 +472,6 @@ if __name__ == "__main__":
     CLI.add_argument("--nsamples",
                      type = int,
                      default = 20000)
-    # CLI.add_argument("--nchoices",
-    #                  type = int,
-    #                  default = 2)
     CLI.add_argument("--nsimbnds",
                      nargs = '*',
                      type = int,
@@ -586,26 +560,17 @@ if __name__ == "__main__":
     config['n_by_param'] = args.nbyparam
     config['nparamsetsrej'] = args.nparamsetsrej
     config['mixture_probabilities'] = [0.8, 0.1, 0.1]
-    config['filter'] =  {'mode': 20, # != (if mode is max_rt)
-                         'choice_cnt': 10, # > (each choice receive at least 10 samples in simulator)
-                         'mean_rt': 15, # < (mean_rt is smaller than specified value
-                         'std': 0, # > (std is positive for each choice)
-                         'mode_cnt_rel': 0.5  # < (mode does not receive more than a proportion of samples for each choice)
-                        }
-    
+    config['filter'] = cfg['mlp_simulation_filters']
+
     # Make parameter bounds
-    
     # TODO: ADJUST SO WE CAN IN FACT HAVE MULTIPLE DGPS
 
     if args.datatype == 'training' and config['binned']:
         bounds_tmp = cfg['model_data'][config['method']]['param_bounds_cnn'] + cfg['model_data'][config['method']]['boundary_param_bounds_cnn']
-        # bounds_tmp = kde_info.temp[config['method']]['param_bounds_cnn'] + kde_info.temp[config['method']]['boundary_param_bounds_cnn']
     elif args.datatype == 'training' and not config['binned']:
         bounds_tmp = cfg['model_data'][config['method']]['param_bounds_network'] + cfg['model_data'][config['method']]['boundary_param_bounds_network']
-        # bounds_tmp = kde_info.temp[config['method']]['param_bounds_network'] + kde_info.temp[config['method']]['boundary_param_bounds_network']
     else:
         bounds_tmp = cfg['model_data'][config['method']]['param_bounds_sampler'] + cfg['model_data'][config['method']]['boundary_param_bounds_sampler']
-        # bounds_tmp = kde_info.temp[config['method']]['param_bounds_sampler'] + kde_info.temp[config['method']]['boundary_param_bounds_sampler']
 
     config['param_bounds'] = np.array([[i[0] for i in bounds_tmp], [i[1] for i in bounds_tmp]])
     config['nparams'] = config['param_bounds'][0].shape[0]
@@ -627,27 +592,6 @@ if __name__ == "__main__":
 
     if not os.path.exists(config['method_comparison_folder']):
         os.makedirs(config['method_comparison_folder'])
-
-    # if args.machine == 'x7':
-    #     config['method_comparison_folder'] = kde_info.temp[config['method']]['output_folder_x7']
-    #     config['method_folder'] = kde_info.temp[config['method']]['method_folder_x7']
-
-    # if args.machine == 'ccv':
-    #     config['method_comparison_folder'] = kde_info.temp[config['method']]['output_folder']
-    #     config['method_folder'] = kde_info.temp[config['method']]['method_folder']
-
-    # if args.machine == 'home':
-    #     config['method_comparison_folder'] = kde_info.temp[config['method']]['output_folder_home']
-    #     config['method_folder'] = kde_info.temp[config['method']]['method_folder_home']
-
-    # if args.machine == 'other': # This doesn't use any extra 
-    #     if not os.path.exists('data_storage'):
-    #         os.makedirs('data_storage')
-
-    #     print('generated new folder: data_storage. Please update git_ignore if this is not supposed to be committed to repo')
-
-    #     config['method_comparison_folder']  = 'data_storage/'
-    #     config['method_folder'] = 'data_storage/' + config['method'] + '_'
     # -------------------------------------------------------------------------------------
     
     # GET DATASETS ------------------------------------------------------------------------
