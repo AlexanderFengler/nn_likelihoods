@@ -140,6 +140,10 @@ if __name__ == "__main__":
     dnn_params = config['mlp_hyperparameters']
     model_path = config['base_data_folder'][machine] + stats['folder_suffix'] + 'keras_models/'
     train_data_folder = config['base_data_folder'][machine] + stats['folder_suffix'] + args.traindatafolder
+
+    # make necessary folders
+    if not os.path.exists(model_path):
+        os.makedirs(model_path)
     
     #stats = kde_info.temp[method]
     #dnn_params = yaml.load(open("hyperparameters.yaml"))
@@ -165,12 +169,17 @@ if __name__ == "__main__":
 
     if not warm_start:
         model_path += dnn_params["model_type"] + "_{}_".format(method) + datetime.now().strftime('%m_%d_%y_%H_%M_%S') + "/"
+
+        # Make folder corresponding to model path
+        print('if it does not exist, make model path')
+        if not os.path.exists(model_path):
+            os.makedirs(model_path)
+
         pickle.dump(config['mlp_hyperparameters'], open(model_path + 'hyperparameters.pickle', 'wb'))
 
-    print('if it does not exist, make model path')
-
-    if not os.path.exists(model_path):
-        os.makedirs(model_path)
+    # print('if it does not exist, make model path')
+    # if not os.path.exists(model_path):
+    #     os.makedirs(model_path)
 
 #     # Copy hyperparameter setup into model path
 #     if machine == 'x7':
