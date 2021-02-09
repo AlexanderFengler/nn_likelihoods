@@ -17,10 +17,10 @@
 
 # Request runtime, memory, cores
 #SBATCH --time=18:00:00
-#SBATCH --mem=32G
+#SBATCH --mem=16G
 #SBATCH -c 8
 #SBATCH -N 1
-##SBATCH --constraint='quadrortx'
+#SBATCH --constraint='quadrortx'
 ##SBATCH --constraint='cascade'
 #SBATCH -p gpu --gres=gpu:1
 #SBATCH --array=1-1
