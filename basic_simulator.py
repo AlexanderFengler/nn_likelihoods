@@ -23,25 +23,34 @@ import boundary_functions as bf
 
 def bin_simulator_output(out = None,
                          bin_dt = 0.04,
-                         nbins = 0): # ['v', 'a', 'w', 'ndt', 'angle']
+                         nbins = 0,
+                         max_t = -1,
+                         freq_cnt = False): # ['v', 'a', 'w', 'ndt', 'angle']
 
+    if max_t == -1:
+        max_t = out[2]['max_t']
+    
     # Generate bins
     if nbins == 0:
-        nbins = int(out[2]['max_t'] / bin_dt)
+        nbins = int(max_t / bin_dt)
         bins = np.zeros(nbins + 1)
-        bins[:nbins] = np.linspace(0, out[2]['max_t'], nbins)
+        bins[:nbins] = np.linspace(0, max_t, nbins)
         bins[nbins] = np.inf
     else:  
         bins = np.zeros(nbins + 1)
-        bins[:nbins] = np.linspace(0, out[2]['max_t'], nbins)
+        bins[:nbins] = np.linspace(0, max_t, nbins)
         bins[nbins] = np.inf
 
     cnt = 0
     counts = np.zeros( (nbins, len(out[2]['possible_choices']) ) )
 
     for choice in out[2]['possible_choices']:
-        counts[:, cnt] = np.histogram(out[0][out[1] == choice], bins = bins)[0] / out[2]['n_samples']
+        counts[:, cnt] = np.histogram(out[0][out[1] == choice], bins = bins)[0]
         cnt += 1
+
+    if freq_cnt == False:
+        counts = counts / out[2]['n_samples']
+        
     return counts
 
 def bin_arbitrary_fptd(out = None,
@@ -78,7 +87,7 @@ def simulator(theta,
               n_samples = 1000, 
               delta_t = 0.001,
               max_t = 20,
-              bin_dim = None):
+              bin_dim = None): 
     
     # Useful for sbi
     if type(theta) == list or type(theta) == np.ndarray:
@@ -307,6 +316,8 @@ def simulator(theta,
     
     if bin_dim == 0:
         return x
-    else:
+    elif bin_dim > 0:
         return bin_simulator_output(x, nbins = bin_dim)
+    elif bin_dim == -1:
+        return 'invaid bin_dim'
     

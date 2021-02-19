@@ -44,4 +44,5 @@ keras_models/
 experiments/
 batch_scripts/
 figures/
+models/
 cifs*

@@ -45,7 +45,7 @@ class data_generator():
             print()
             return
         else:
-            self.config = config
+            self.config = config 
             self._build_simulator()
             self._get_ncpus()
     
@@ -72,30 +72,44 @@ class data_generator():
                              model = self.config['method'])
         
         #print(self.config['nbins'])
-        if self.config['nbins'] > 0:
-            return self._bin_simulator_output(simulations = out)
-        else:
+        if self.config['nbins'] == 0:
             return out
-    
-    def _get_training_data_theta(self, theta):
-        out = self.get_simulations(theta)
         
-    def _bin_simulator_output(self, 
-                              simulations = None): # ['v', 'a', 'w', 'ndt', 'angle']
-        
-        # Generate bins 
-        bins = np.zeros(self.config['nbins'] + 1)
-        bins[:self.config['nbins']] = np.linspace(0, simulations[2]['max_t'], self.config['nbins'])
-        bins[self.config['nbins']] = np.inf
+        elif self.config['nbins'] > 0:
+            return bs.bin_simulator_output(out = out,
+                                           nbins = self.config['nbins'],
+                                           max_t = self.config['binned_max_t'])
+            # return self._bin_simulator_output(simulations = out)
+        else:
+            return 'number bins not accurately specified --> returning from simulator without output'
 
-        # Make Choice Histogram
-        cnt = 0
-        counts = np.zeros( (self.config['nbins'], len(simulations[2]['possible_choices']) ) )
-        for choice in simulations[2]['possible_choices']:
-            counts[:, cnt] = np.histogram(simulations[0][simulations[1] == choice], bins = bins)[0] / simulations[2]['n_samples']
-            cnt += 1
-        return counts
-    
+    def get_simulations_param_recov(self, 
+                                    theta = None):
+        
+        simulations = self.get_simulations(theta = theta)
+        #print(theta)
+        #print(simulations)
+        #keep, stats = self._filter_simulations_fast(simulations)
+        
+        return np.concatenate([simulations[0], simulations[1]], axis = 1)
+
+    # NOT NEEDED
+    # def _bin_simulator_output(self, 
+    #                           simulations = None): # ['v', 'a', 'w', 'ndt', 'angle']
+        
+    #     # Generate bins 
+    #     bins = np.zeros(self.config['nbins'] + 1)
+    #     bins[:self.config['nbins']] = np.linspace(0, simulations[2]['binned_max_t'], self.config['nbins'])
+    #     bins[self.config['nbins']] = np.inf
+
+    #     # Make Choice Histogram
+    #     cnt = 0
+    #     counts = np.zeros( (self.config['nbins'], len(simulations[2]['possible_choices']) ) )
+    #     for choice in simulations[2]['possible_choices']:
+    #         counts[:, cnt] = np.histogram(simulations[0][simulations[1] == choice], bins = bins)[0] / simulations[2]['n_samples']
+    #         cnt += 1
+    #     return counts
+
     def _filter_simulations_fast(self,
                                  simulations = None,
                                  ):
@@ -129,8 +143,11 @@ class data_generator():
                    (std_ > self.config['filter']['std']) & \
                    (mode_cnt_rel_ < self.config['filter']['mode_cnt_rel']) & \
                    (tmp_n_c > self.config['filter']['choice_cnt'])
-        
-        return keep, np.array([mode_, mean_, std_, mode_cnt_rel_, tmp_n_c])
+                           
+        # print(np.array([mode_, mean_, std_, mode_cnt_rel_, tmp_n_c]))
+        # print(np.array([mode_, mean_, std_, mode_cnt_rel_, tmp_n_c], dtype = np.float32))
+        # print(np.array([mode_, mean_, std_, mode_cnt_rel_, tmp_n_c]) + np.array([mode_, mean_, std_, mode_cnt_rel_, tmp_n_c], dtype = np.float32))
+        return keep, np.array([mode_, mean_, std_, mode_cnt_rel_, tmp_n_c], dtype = np.float32)
              
     def _make_kde_data(self,
                        simulations = None, 
@@ -264,6 +281,58 @@ class data_generator():
                 subject_param_grid[n, i, :] = np.float32(global_means[n] + truncnorm.rvs(a, b, size = global_stds.shape[1]) * global_stds[n])
 
         return subject_param_grid, global_stds, global_means
+
+    # def generate_data_training_uniform_cnn_mlp(self, 
+    #                                            save = False):
+
+    #     seeds = np.random.choice(400000000, size = self.config['nparamsets'])
+        
+    #     # Inits
+    #     subrun_n = self.config['nparamsets'] // self.config['printsplit']
+        
+    #     data_grid = {'mlp': np.zeros((int(self.config['nparamsets'] * 1000), 
+    #                                   len(self.config['param_bounds'][0]) + 3)),
+    #                  'cnn': np.zeros((int(self.config['nparamsets']), 
+    #                                   self.config['nbins'], 
+    #                                   self.config['nchoices']))}
+
+    #     # Get Simulations 
+    #     for i in range(self.config['printsplit']):
+    #         print('simulation round:', i + 1 , ' of', self.config['printsplit'])
+    #         with Pool(processes = self.config['n_cpus']) as pool:
+    #             data_grid[(i * subrun_n * 1000):((i + 1) * subrun_n * 1000), :] = np.concatenate(pool.map(self._mlp_get_processed_data_for_theta, 
+    #                                                                                                     [j for j in seeds[(i * subrun_n):((i + 1) * subrun_n)]]))
+    #     else:
+    #         data_grid = np.zeros((int(self.config['nparamsets'], self.config['nbins'], self.config['nchoices'])))
+            
+    #         for i in range(self.config['printsplit']):
+    #             print('simulation round: ', i + 1, ' of', self.config['printsplit'])
+    #             with Pool(processes = self.config['n_cpus']) as pool:
+    #                 data_grid[(i * subrun_n): ((i + 1) * subrun_n), :, :] = np.concatenate(pool.map(self._cnn_get_processed_data_for_theta,
+    #                                                                                                 [j for j in seeds[(i * subrun_n):((i + 1) * subrun_n)]]))
+        
+    #     if save:
+    #         training_data_folder = self.config['method_folder'] + \
+    #                               'training_data_binned_' + \
+    #                               str(int(self.config['binned'])) + \
+    #                               '_nbins_' + str(self.config['nbins']) + \
+    #                               '_n_' + str(self.config['nsamples'])
+
+    #         if not os.path.exists(training_data_folder):
+    #             os.makedirs(training_data_folder)
+
+    #         full_file_name = training_data_folder + '/' + \
+    #                          'data_' + \
+    #                          self.config['file_id'] + '.pickle'
+    #         print('Writing to file: ', full_file_name)
+
+    #         pickle.dump(np.float32(data_grid),
+    #                     open(full_file_name, 'wb'), 
+    #                     protocol = self.config['pickleprotocol'])
+    #         return 'Dataset completed'
+        
+    #     else:
+    #         return data_grid
                  
     def generate_data_training_uniform(self, 
                                        save = False):
@@ -318,51 +387,86 @@ class data_generator():
     def generate_data_parameter_recovery(self, save = False):
         
         # Make parameters
-        theta_list = [np.float32((np.random.uniform(low = self.config['param_bounds'][0], 
-                                                    high = self.config['param_bounds'][1])) for i in range(self.config['nparamsets']))]
+        theta_list = [np.float32(np.random.uniform(low = self.config['param_bounds'][0], 
+                                                    high = self.config['param_bounds'][1])) for i in range(self.config['nparamsets'])]
         
         # Get simulations
         with Pool(processes = self.config['n_cpus']) as pool:
-            data_grid = np.array(pool.map(self.get_simulations, theta_list))
+            data_grid = np.array(pool.map(self.get_simulations_param_recov, theta_list))
+
+        print('data_grid shape: ', data_grid.shape)
+        data_grid = np.expand_dims(data_grid, axis = 0)
+        
+        # Add the binned versions
+        binned_tmp_256 = np.zeros((1, self.config['nparamsets'], 256, 2))
+        binned_tmp_512 = np.zeros((1, self.config['nparamsets'], 512, 2))
+
+        for i in range(self.config['nparamsets']):
+            print('subset shape: ', data_grid[0, i, :, 0].shape)
+            data_tmp = (np.expand_dims(data_grid[0, i, :, 0], axis = 1), 
+                        np.expand_dims(data_grid[0, i, :, 1], axis = 1),
+                        config['meta'])
+            
+            binned_tmp_256[0, i, :, :] = bs.bin_simulator_output(out = data_tmp,
+                                                                 nbins = 256,
+                                                                 max_t = self.config['binned_max_t'])
+            
+            binned_tmp_512[0, i, :, :] = bs.bin_simulator_output(out = data_tmp,
+                                                                 nbins = 512,
+                                                                 max_t = self.config['binned_max_t'])
 
         # Save to correct destination
         if save:
+            binned_tmp = ['0', '1', '1']
+            bins_tmp = ['0', '256', '512']
+            data_arrays = [data_grid, binned_tmp_256, binned_tmp_512]
             
-            # -----
-            #if self.config['mode'] == 'test':
-            training_data_folder = self.config['method_folder'] + \
-                                   'parameter_recovery_data_binned_' + \
-                                   str(int(self.config['binned'])) + \
-                                   '_nbins_' + str(self.config['nbins']) + \
-                                   '_n_' + str(self.config['nsamples'])
+            for k in range(len(binned_tmp)):
+                # Make folder unbinnend
+                training_data_folder = self.config['method_folder'] + \
+                                      'parameter_recovery_data_binned_' + \
+                                      binned_tmp[k] + \
+                                      '_nbins_' + bins_tmp[k] + \
+                                      '_n_' + str(self.config['nsamples'])
 
-            if not os.path.exists(training_data_folder):
-                os.makedirs(training_data_folder)
+                if not os.path.exists(training_data_folder):
+                    os.makedirs(training_data_folder)
 
-            full_file_name = training_data_folder + '/' + \
-                            self.config['method'] + \
-                            '_nchoices_' + str(self.config['nchoices']) + \
-                            '_parameter_recovery_binned_' + \
-                            str(int(self.config['binned'])) + \
-                            '_nbins_' + str(self.config['nbins']) + \
-                            '_nreps_' + str(self.config['nreps']) + \
-                            '_n_' + str(self.config['nsamples']) + \
-                            '.pickle'
+                # full_file_name = training_data_folder + '/' + \
+                #                 self.config['method'] + \
+                #                 '_nchoices_' + str(self.config['nchoices']) + \
+                #                 '_parameter_recovery_binned_' + \
+                #                 str(int(self.config['binned'])) + \
+                #                 '_nbins_' + str(self.config['nbins']) + \
+                #                 '_nreps_' + str(self.config['nreps']) + \
+                #                 '_n_' + str(self.config['nsamples']) + \
+                #                 '.pickle'
 
-            print('Writing to file: ', full_file_name)
+
+                full_file_name = training_data_folder + '/' + \
+                                 self.config['method'] + \
+                                 '_nchoices_' + str(self.config['nchoices']) + \
+                                 '_parameter_recovery_binned_' + \
+                                 binned_tmp[k] + \
+                                 '_nbins_' + bins_tmp[k] + \
+                                 '_nreps_' + str(self.config['nreps']) + \
+                                 '_n_' + str(self.config['nsamples']) + \
+                                 '.pickle'
+
+                print('Writing to file: ', full_file_name)
+                
+                pickle.dump((np.float32(np.stack(theta_list)), 
+                            np.float32(data_arrays[k]),
+                            self.config['meta']), 
+                            open(full_file_name, 'wb'), 
+                            protocol = self.config['pickleprotocol'])
             
-            pickle.dump((np.float32(np.stack(theta_list)), 
-                         np.float32(np.expand_dims(data_grid, axis = 0)), 
-                         self.config['meta']), 
-                        open(full_file_name, 'wb'), 
-                        protocol = self.config['pickleprotocol'])
-            
-            return 'Dataset completed'
+            return 'Dataset completed and stored'
         
         # Or else return the data
         else:
             return np.float32(np.stack(theta_list)), np.float32(np.expand_dims(data_grid, axis = 0)) 
-            
+   
     def generate_data_hierarchical(self, save = False):
         
         subject_param_grid, global_stds, global_means = self._make_param_grid_hierarchical()
@@ -488,6 +592,9 @@ if __name__ == "__main__":
     CLI.add_argument("--maxt",
                      type = float,
                      default = 10.0)
+    CLI.add_argument("--binned_maxt",
+                     type = float,
+                     default = 10.0)
     CLI.add_argument("--deltat",
                      type = float,
                      default = 0.001)
@@ -555,6 +662,7 @@ if __name__ == "__main__":
     config['nsubjects'] = args.nsubjects
     config['n_samples'] = args.nsamples
     config['max_t'] = args.maxt
+    config['binned_max_t'] = args.binned_maxt
     config['delta_t'] = args.deltat
     config['printsplit'] = args.printsplit
     config['n_by_param'] = args.nbyparam
@@ -578,6 +686,7 @@ if __name__ == "__main__":
     config['meta'] = cfg['model_data'][config['method']]['dgp_hyperparameters']
     config['meta']['n_samples'] = config['n_samples']
     config['meta']['delta_t'] = config['delta_t']
+    config['meta']['binned_max_t'] = config['binned_max_t']
     config['nchoices'] = len(config['meta']['possible_choices'])
     
     # Add some machine dependent folder structure

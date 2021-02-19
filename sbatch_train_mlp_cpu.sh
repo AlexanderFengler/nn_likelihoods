@@ -38,10 +38,13 @@ training_data_folder="training_data_binned_0_nbins_0_n_${train_n_sim}/" # subfol
 for ((i = 1; i <= $n_networks_to_train; i++))
     do
        echo "NOW TRAINING NETWORK: $i of $n_networks_to_train"
-       python -u /users/afengler/git_repos/nn_likelihoods/keras_fit_model.py --machine $machine \
-                                                                             --method $method \
-                                                                             --nfiles $nfiles \
-                                                                             --traindatafolder $training_data_folder \
-                                                                             --warmstart 0 
-                                                                             #--analytic $analytic
+       python -u keras_fit_model.py --machine $machine \
+                                    --method $method \
+                                    --nfiles $nfiles \
+                                    --traindatafolder $training_data_folder \
+                                    --warmstart 0 
+                                    #--analytic $analytic
     done
+
+
+# /users/afengler/git_repos/nn_likelihoods/
