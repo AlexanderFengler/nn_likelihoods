@@ -38,6 +38,8 @@ Thumbs.db
 
 # My additions
 __pycache__/
+.vscode/
+build/
 data_storage/
 tensorflow_models/
 keras_models/
