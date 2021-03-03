@@ -37,6 +37,8 @@ ehthumbs.db
 Thumbs.db
 
 # My additions
+.ipynb_checkpoints/
+.vscode/
 __pycache__/
 data_storage/
 tensorflow_models/
