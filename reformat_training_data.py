@@ -38,4 +38,4 @@ if __name__ == "__main__":
             new_data[:, - (nchoices + 1 - choice_cnt)] = (data[:, -2] == choices_sorted[choice_cnt]).astype(np.int)
     
         print('writing to new file: ', args.newdatafolder + file_)
-        pickle.dump(new_data, open(args.newdatafolder + file_, 'wb'))             
+        pickle.dump(new_data, open(args.newdatafolder + file_, 'wb'))
