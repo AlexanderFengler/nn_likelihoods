@@ -246,8 +246,12 @@ def ddm_flexbound(float v = 0,
                   print_info = True,
                   boundary_fun = None, # function of t (and potentially other parameters) that takes in (t, *args)
                   boundary_multiplicative = True,
-                  boundary_params = {}
+                  boundary_params = {},
+                  trajectory = 0,
                   ):
+
+    traj = np.zeros((int(max_t / delta_t) + 1, 1), dtype = DTYPE)
+    cdef float[:,:] traj_view = traj
 
     rts = np.zeros((n_samples, 1), dtype = DTYPE)
     choices = np.zeros((n_samples, 1), dtype = np.intc)
@@ -287,6 +291,7 @@ def ddm_flexbound(float v = 0,
         y = (-1) * boundary_view[0] + (w * 2 * (boundary_view[0]))  # reset starting position 
         t = 0 # reset time
         ix = 0 # reset boundary index
+        traj_view[0, 0] = y
 
         # Random walker
         while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
@@ -294,13 +299,14 @@ def ddm_flexbound(float v = 0,
             t += delta_t
             ix += 1
             m += 1
+            traj_view[ix, 0] = y
             if m == num_draws:
                 gaussian_values = draw_gaussian(num_draws)
                 m = 0
 
         rts_view[n, 0] = t + ndt # Store rt
         choices_view[n, 0] = sign(y) # Store choice
-
+    
     return (rts, choices,  {'v': v,
                             'a': a,
                             'w': w,
@@ -312,7 +318,10 @@ def ddm_flexbound(float v = 0,
                             'n_samples': n_samples,
                             'simulator': 'ddm_flexbound',
                             'boundary_fun_type': boundary_fun.__name__,
-                            'possible_choices': [-1, 1]})
+                            'possible_choices': [-1, 1],
+                            'trajectory': traj})
+# ----------------------------------------------------------------------------------------------------
+
 # ----------------------------------------------------------------------------------------------------
 
 # Simulate (rt, choice) tuples from: Levy Flight with Flex Bound -------------------------------------
