@@ -117,12 +117,14 @@ class data_generator():
 
         max_t = simulations[2]['max_t']
         #tmp_max_rt_ = simulations[0].max().round(2)
-
+        #debug_tmp_n_c_tot = 0
+        debug_tmp_n_c_min = 1000000
         keep = 1
         for choice_tmp in simulations[2]['possible_choices']:
             tmp_rts = simulations[0][simulations[1] == choice_tmp]
             tmp_n_c = len(tmp_rts)
-
+            #debug_tmp_n_c_tot += tmp_n_c
+            debug_tmp_n_c_min = np.minimum(debug_tmp_n_c_min, tmp_n_c)
             if tmp_n_c > 0:
                 mode_, mode_cnt_ = mode(tmp_rts)
                 std_ = np.std(tmp_rts)
@@ -136,15 +138,22 @@ class data_generator():
                 std_ = -1
                 mode_cnt_rel_ = 1
                 choice_prop_  = 0
-
+            #print('choice_tmp, std')
+            #print(choice_tmp)
+            #print(std_)
             keep = keep & \
                    (mode_ != self.config['filter']['mode']) & \
                    (mean_ < self.config['filter']['mean_rt']) & \
                    (std_ > self.config['filter']['std']) & \
                    (mode_cnt_rel_ < self.config['filter']['mode_cnt_rel']) & \
                    (tmp_n_c > self.config['filter']['choice_cnt'])
-                           
-        # print(np.array([mode_, mean_, std_, mode_cnt_rel_, tmp_n_c]))
+        
+        #print('keep')
+        #print(keep)
+        #print(debug_tmp_n_c_min)
+        #print(debug_tmp_n_c_tot)
+        #print(np.array([mode_, mean_, std_, mode_cnt_rel_, tmp_n_c]))
+        #print(simulations[2])
         # print(np.array([mode_, mean_, std_, mode_cnt_rel_, tmp_n_c], dtype = np.float32))
         # print(np.array([mode_, mean_, std_, mode_cnt_rel_, tmp_n_c]) + np.array([mode_, mean_, std_, mode_cnt_rel_, tmp_n_c], dtype = np.float32))
         return keep, np.array([mode_, mean_, std_, mode_cnt_rel_, tmp_n_c], dtype = np.float32)
