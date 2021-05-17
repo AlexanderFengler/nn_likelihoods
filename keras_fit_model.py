@@ -262,6 +262,6 @@ if __name__ == "__main__":
                                                save_path = model_path)
 
     # TODO: Instead of just updating the model paths, maybe we want something closer to ranking performances here and then check if updating the model paths is necessary (underperforming models should not be promoted to model_paths...)
-    tmp_model_paths = yaml.load(open("model_paths_simple.yaml"))
-    tmp_model_paths[method + '_' + str(n_training_datasets_to_load)] = model_path # CHECK IF THIS IS FULL PATH --> SHOULD NOT BE FULL PATH
-    yaml.dump(tmp_model_paths, open("model_paths_simple.yaml", "wb"))
+    # tmp_model_paths = yaml.load(open("model_paths_simple.yaml"))
+    # tmp_model_paths[method + '_' + str(n_training_datasets_to_load)] = model_path # CHECK IF THIS IS FULL PATH --> SHOULD NOT BE FULL PATH
+    # yaml.dump(tmp_model_paths, open("model_paths_simple.yaml", "wb"))
